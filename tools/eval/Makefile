@@ -12,7 +12,7 @@ CORE := fmt.c ast.c units.c parser.c numeric.c deriv.c solve.c integrate.c stat.
 
 # Device build. Requires the Ndless SDK on PATH; see docs/PHASE0.md M1 and H8.
 
-all: evalcli test_eval
+all: evalcli test_eval fuzz
 
 evalcli: $(CORE) main.c eval.h
 	$(CC) $(CFLAGS) -o $@ $(CORE) main.c $(LDLIBS)
@@ -20,8 +20,12 @@ evalcli: $(CORE) main.c eval.h
 test_eval: $(CORE) test_eval.c eval.h
 	$(CC) $(CFLAGS) -o $@ $(CORE) test_eval.c $(LDLIBS)
 
-check: test_eval
+fuzz: $(CORE) fuzz.c eval.h
+	$(CC) $(CFLAGS) -o $@ $(CORE) fuzz.c $(LDLIBS)
+
+check: test_eval fuzz
 	./test_eval
+	./fuzz 200000
 
 clean:
 	rm -f evalcli test_eval fuzz eval_device.elf eval_device.tns eval_device.zehn golden.txt
