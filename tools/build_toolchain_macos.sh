@@ -30,6 +30,21 @@ export LDFLAGS="-L${BREW}/lib -L${BREW}/opt/zlib/lib"
 export LIBFARM_NOTE="headers are copied, not linked -- see above"
 export PARALLEL="${PARALLEL:--j10}"
 
+# Upstream passes --disable-nls to binutils and newlib but NOT to GCC. On a machine with Homebrew's
+# gettext installed, GCC's configure reports "whether to use NLS... yes", so libcpp/system.h takes
+# its `#include <libintl.h>` branch. libcpp's own configure meanwhile leaves HAVE_SETLOCALE
+# undefined, so system.h:275 has already defined `setlocale` as a function-like macro -- which then
+# mangles libintl.h's own setlocale declaration and every libcpp translation unit dies with
+# "expected unqualified-id".
+#
+# This is a property of the host having gettext installed, not of the target, so disabling NLS is
+# the correct fix rather than a workaround. Patch is idempotent.
+TC_SCRIPT="$(dirname "$0")/../vendor/Ndless/ndless-sdk/toolchain/build_toolchain.sh"
+if ! grep -q 'OPTIONS_GCC=.*--disable-nls' "${TC_SCRIPT}"; then
+    sed -i.orig 's|^OPTIONS_GCC="|OPTIONS_GCC="--disable-nls |' "${TC_SCRIPT}"
+    echo "patched OPTIONS_GCC with --disable-nls"
+fi
+
 cd "$(dirname "$0")/../vendor/Ndless/ndless-sdk/toolchain"
 echo "=== toolchain build start: $(date) ==="
 echo "PARALLEL=${PARALLEL}  LIBRARY_PATH=${LIBRARY_PATH}"
