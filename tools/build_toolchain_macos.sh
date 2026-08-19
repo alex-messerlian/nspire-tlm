@@ -30,6 +30,13 @@ export LDFLAGS="-L${BREW}/lib -L${BREW}/opt/zlib/lib"
 export LIBFARM_NOTE="headers are copied, not linked -- see above"
 export PARALLEL="${PARALLEL:--j10}"
 
+# newlib's libgloss builds documentation, which needs makeinfo. Missing makeinfo fails the whole
+# libgloss target with Error 127 -- a doc-only failure that kills a library build. Homebrew's
+# texinfo is keg-only so it is not on PATH by default; put it there, and set MAKEINFO=true as a
+# fallback so a doc target can never again block the toolchain.
+[ -d "${BREW}/opt/texinfo/bin" ] && export PATH="${BREW}/opt/texinfo/bin:${PATH}"
+export MAKEINFO="${MAKEINFO:-true}"
+
 # Upstream passes --disable-nls to binutils and newlib but NOT to GCC. On a machine with Homebrew's
 # gettext installed, GCC's configure reports "whether to use NLS... yes", so libcpp/system.h takes
 # its `#include <libintl.h>` branch. libcpp's own configure meanwhile leaves HAVE_SETLOCALE

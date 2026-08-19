@@ -1,5 +1,8 @@
 /* nspire.c -- implementation of the porting seam. See nspire.h for why each piece exists. */
 #include "nspire.h"
+#undef mmap
+#undef munmap
+#undef clock_gettime
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -10,7 +13,7 @@
 static void  *g_map_ptr  = NULL;
 static size_t g_map_len  = 0;
 
-void *mmap(void *addr, size_t len, int prot, int flags, int fildes, long off) {
+void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long off) {
     (void)addr; (void)prot; (void)flags;
     void *p = malloc(len);
     if (!p) {
@@ -37,7 +40,7 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fildes, long off) {
     return p;
 }
 
-int munmap(void *addr, size_t len) {
+int nspire_munmap(void *addr, size_t len) {
     (void)len;
     if (addr && addr != MAP_FAILED) free(addr);
     if (addr == g_map_ptr) { g_map_ptr = NULL; g_map_len = 0; }
@@ -59,6 +62,20 @@ int munmap(void *addr, size_t len) {
  * assumption is visible in the log rather than silently scaling every tok/s number. */
 #define ASSUMED_TIMER_HZ 99000000u
 
+#ifdef NSPIRE_HOST_TEST
+/* Host build of the SAME port, so the malloc+read replacement for mmap can be validated against the
+ * golden output before the device is involved. Only the MMIO-backed pieces are swapped -- the file
+ * loading path under test is byte-identical to what the device runs. */
+#include <sys/time.h>
+int nspire_clock_gettime(int clk_id, struct timespec *tp) {
+    (void)clk_id;
+    struct timeval tv; gettimeofday(&tv, NULL);
+    tp->tv_sec = tv.tv_sec; tp->tv_nsec = tv.tv_usec * 1000L;
+    return 0;
+}
+unsigned nspire_timer_hz(void) { return 1000000u; }
+unsigned nspire_cpu_hz(void)   { return 0u; }
+#else
 static int      g_timer_ready = 0;
 static uint32_t g_last_raw    = 0;
 static uint64_t g_ticks       = 0;
@@ -76,7 +93,7 @@ static void timer_init(void) {
     g_timer_ready = 1;
 }
 
-int clock_gettime(int clk_id, struct timespec *tp) {
+int nspire_clock_gettime(int clk_id, struct timespec *tp) {
     (void)clk_id;
     if (!g_timer_ready) timer_init();
     uint32_t raw = MMIO32(TIMER_FAST_BASE + SP804_VALUE);
@@ -100,3 +117,4 @@ unsigned nspire_cpu_hz(void) {
         hz /= (((MMIO32(PMU_CLK_DIV2) >> 20) & 0xFu) + 1u);
     return hz;
 }
+#endif /* NSPIRE_HOST_TEST */

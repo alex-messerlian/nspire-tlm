@@ -19,6 +19,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <time.h>
+#include <unistd.h>   /* runq.c calls open/read/close/lseek directly */
+#include <fcntl.h>
 
 #define PROT_NONE    0
 #define PROT_READ    1
@@ -33,9 +35,17 @@
 #define CLOCK_REALTIME 0
 #endif
 
-void *mmap(void *addr, size_t len, int prot, int flags, int fildes, long off);
-int   munmap(void *addr, size_t len);
-int   clock_gettime(int clk_id, struct timespec *tp);
+/* Macro-renamed rather than declared under the real names. newlib may already declare
+ * clock_gettime with a clockid_t first parameter, and redeclaring it is a hard error; renaming
+ * sidesteps whatever the target libc happens to provide and guarantees OUR implementation is the
+ * one runq.c binds to. runq.c calls these by name, so the macros catch its call sites. */
+void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long off);
+int   nspire_munmap(void *addr, size_t len);
+int   nspire_clock_gettime(int clk_id, struct timespec *tp);
+
+#define mmap(a,l,p,f,fd,o)  nspire_mmap((a),(l),(p),(f),(fd),(o))
+#define munmap(a,l)         nspire_munmap((a),(l))
+#define clock_gettime(c,t)  nspire_clock_gettime((c),(t))
 
 /* Reported by our main() so a run's numbers can be audited after the fact. */
 unsigned nspire_cpu_hz(void);
