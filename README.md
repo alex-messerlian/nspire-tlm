@@ -2,16 +2,53 @@
 
 Mission, phases, and rules of engagement live in the project log.
 
+## Architecture
+
+**Tool-augmented, not knowledge-augmented.** The model never computes. It emits a structured call,
+the runtime executes it, the result is injected, and the model composes prose around it. The model
+learns *format*, which is reachable at 45M parameters; it does not learn calculus, which is not.
+
+One base model (language + math register + call format), then continued training per domain —
+algebra, calculus, physics, statistics. N finetuned packs ship to flash, one loads into RAM at a
+time. Training N models from scratch would pay the English tax N times, and at 45M most of the
+capacity is language.
+
 | Doc | What it is |
 |---|---|
+| [`docs/TOOL_SPEC.md`](docs/TOOL_SPEC.md) | **FROZEN v1.0.0.** The call format. Everything downstream depends on it. |
+| [`tools/eval/`](tools/eval/) | Backend 1: our own C evaluator. Built, tested, 86/86 passing. |
+| [`docs/BACKEND2_TI_MATH.md`](docs/BACKEND2_TI_MATH.md) | Backend 2 research: TI's math server. Reachable in principle, not in practice. |
 | [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md) | What already exists. Read this before anything else. |
 | [`docs/HARDWARE.md`](docs/HARDWARE.md) | Measured device properties. Currently all `UNMEASURED`. |
 | [`docs/PHASE0.md`](docs/PHASE0.md) | Phase 0 checklist, split into device-required and host-only. |
 | [`bench/`](bench/) | The four micro-benchmarks that fill in HARDWARE.md. |
 
-**Current state: Phase 0, gate not met.** No toolchain built, no device access, zero measurements.
-Every number anywhere in this repo is either sourced from someone else's published work and tagged
-`[SOURCED]`, or derived with the arithmetic shown and tagged `[ESTIMATE]`.
+## Sequencing
+
+1. ~~Tool interface spec + host evaluator~~ — **done**, no hardware needed.
+2. Data generation, **algebra only**.
+3. Train **one** model. Prove the full loop on host.
+4. Port to device.
+5. Only then add domains 2–4.
+
+Do not train four models before one runs on the calculator.
+
+**Current state: step 1 complete. Phase 0 hardware gate still not met** — no toolchain built, no
+device access, zero measurements. Every hardware number in this repo is either sourced from someone
+else's published work and tagged `[SOURCED]`, or derived with the arithmetic shown and tagged
+`[ESTIMATE]`.
+
+## Metrics
+
+Alongside tok/s and perplexity:
+
+- **Tool call validity rate** — emitted calls that parse and execute, split by first attempt vs.
+  retry so recovery is visible separately from first-shot accuracy.
+- **Answer correctness with tools vs. without** — same checkpoint, same questions, tool layer on and
+  off. This difference is the architecture's entire justification, so it is the headline number.
+- **Result-span leak rate** — how often the model tries to emit a `<res>` token. Should be ~0. A
+  nonzero value means the training loss mask is broken, which is the most dangerous possible bug in
+  the pipeline.
 
 ---
 
@@ -56,6 +93,10 @@ the most interesting scientific question in the project — considerably more in
 beat 30M parameters."
 
 ### 2. The headline result is already gone; the frontier is the real contribution
+
+*(Partly superseded by the tool-augmented architecture: the claim is no longer "largest model" alone
+but "largest model that answers correctly," which is a better and less crowded claim. The frontier
+argument below still holds.)*
 
 Published **2026-08-03**: a 28.9M-parameter model on an **ESP32-S3** — 240 MHz, 8 MB of slow PSRAM —
 at a measured **9.88 tok/s**. See [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md) §2.
