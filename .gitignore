@@ -8,3 +8,4 @@ models/*.bin
 models/*.gguf
 models/*.pt
 .DS_Store
+vendor/libnspire/
