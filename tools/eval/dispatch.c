@@ -120,7 +120,13 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
     if (!strcmp(name, "solve")) {
         if (!valid_ident(args[1])) return fail(E_EXPR, out, out_sz);
         if ((e = parse_expr(&g_arena, args[0], 1, &n))) return fail(e, out, out_sz);
-        if ((e = solve_eq(&g_arena, n, args[1], out, out_sz))) return fail(e, out, out_sz);
+        e = solve_eq(&g_arena, n, args[1], out, out_sz);
+        if (e == E_NOSOL) {
+            /* Numeric extraction failed. Try symbolic-coefficient isolation before giving up --
+             * this is the whole formula-rearrangement class (F=ma for a, v=d/t for t). */
+            e = literal_solve(&g_arena, n, args[1], out, out_sz);
+        }
+        if (e) return fail(e, out, out_sz);
         return TB_OK;
     }
 

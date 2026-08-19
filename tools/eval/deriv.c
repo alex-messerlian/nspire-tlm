@@ -192,6 +192,13 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
         if (node_eq(l, r) && !is_num(l, 0)) { *changed = 1; return ar_num(a, 1); }
         if (l && l->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l->kid[0], r)); }
         if (r && r->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l, r->kid[0])); }
+        /* A negative numeric denominator moves its sign up, so -(P-2*w)/-2 can fold to (P-2*w)/2.
+         * Without this, literal isolation emits a double negative on every equation whose target
+         * carries a negative coefficient -- which is most of them after moving terms across. */
+        if (is_anynum(r) && r->num < 0) {
+            *changed = 1;
+            return neg_of(a, ar_bin(a, N_DIV, l, ar_num(a, -r->num)));
+        }
         break;
     case N_POW:
         if (is_num(r, 1)) { *changed = 1; return l; }

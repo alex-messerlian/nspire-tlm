@@ -112,6 +112,10 @@ err_t render(const node_t *n, const char *var, char *out, size_t sz);   /* canon
 /* ---- Solve ---------------------------------------------------------------------------------- */
 err_t solve_eq(arena_t *a, const node_t *eq, const char *var, char *out, size_t sz);
 
+/* E1/E2/E3r: symbolic-coefficient solving, tried only after solve_eq returns E_NOSOL. See
+ * literal.c and docs/P1_PROBE_PRELIM.md. */
+err_t literal_solve(arena_t *a, const node_t *eq, const char *var, char *out, size_t sz);
+
 /* ---- Numeric integration -------------------------------------------------------------------- */
 err_t integrate(const node_t *f, const char *var, double lo, double hi, double *out);
 

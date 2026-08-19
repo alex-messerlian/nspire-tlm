@@ -85,7 +85,29 @@ static void run_tests(void) {
     T("<tool>solve<arg>x/x=1<arg>x</tool>",            "!nosol");      /* var in a denominator */
     T("<tool>solve<arg>x-pi=0<arg>x</tool>",           "x=3.141592654");
     T("<tool>solve<arg>2x-6<arg>x</tool>",             "x=3");         /* bare expr, implicit =0 */
-    T("<tool>solve<arg>x+y=0<arg>x</tool>",            "!nosol");      /* second free symbol */
+
+    /* ---- E1: linear literal isolation ---- */
+    T("<tool>solve<arg>x+y=0<arg>x</tool>",            "x=-y");
+    T("<tool>solve<arg>F=m*a<arg>a</tool>",            "a=F/m");
+    T("<tool>solve<arg>F=m*a<arg>m</tool>",            "m=F/a");
+    T("<tool>solve<arg>V=I*R<arg>R</tool>",            "R=V/I");
+    T("<tool>solve<arg>P=2*l+2*w<arg>l</tool>",        "l=(P-2*w)/2");
+    T("<tool>solve<arg>v=v0+a*t<arg>t</tool>",         "t=(v-v0)/a");
+    T("<tool>solve<arg>PE=m*g*h<arg>h</tool>",         "h=PE/(m*g)");
+
+    /* ---- E2: denominator clearing ---- */
+    T("<tool>solve<arg>v=d/t<arg>t</tool>",            "t=d/v");
+    T("<tool>solve<arg>P=W/t<arg>t</tool>",            "t=W/P");
+    T("<tool>solve<arg>rho=m/V<arg>V</tool>",          "V=m/rho");
+    T("<tool>solve<arg>P=F/A<arg>A</tool>",            "A=F/P");
+
+    /* ---- E3r: root extraction ---- */
+    T("<tool>solve<arg>A=pi*r^2<arg>r</tool>",         "r=+-sqrt(A/pi)");
+
+    /* ---- still refused, by decision ---- */
+    T("<tool>solve<arg>d=v0*t+0.5*a*t^2<arg>t</tool>", "!nosol");   /* full quadratic literal = E3 */
+    T("<tool>solve<arg>sin(x)=y<arg>x</tool>",         "!nosol");   /* not polynomial in x */
+    T("<tool>solve<arg>x^3=y<arg>x</tool>",            "!nosol");   /* degree 3 */
     T("<tool>solve<arg>sqrt(4)*x-8=0<arg>x</tool>",    "x=4");         /* fn of a constant */
 
     /* ---- diff ---- */

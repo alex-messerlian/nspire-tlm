@@ -8,7 +8,7 @@ CC      ?= cc
 CFLAGS  ?= -O2 -std=c99 -Wall -Wextra -Wno-unused-parameter -ffp-contract=off
 LDLIBS  := -lm
 
-CORE := fmt.c ast.c units.c parser.c numeric.c deriv.c solve.c integrate.c stat.c dispatch.c
+CORE := fmt.c ast.c units.c parser.c numeric.c deriv.c solve.c literal.c integrate.c stat.c dispatch.c
 
 # Device build. Requires the Ndless SDK on PATH; see docs/PHASE0.md M1 and H8.
 
@@ -17,7 +17,7 @@ all: evalcli test_eval fuzz
 evalcli: $(CORE) main.c eval.h
 	$(CC) $(CFLAGS) -o $@ $(CORE) main.c $(LDLIBS)
 
-test_eval: $(CORE) test_eval.c eval.h
+test_eval: $(CORE) test_eval.c tests.inc eval.h
 	$(CC) $(CFLAGS) -o $@ $(CORE) test_eval.c $(LDLIBS)
 
 fuzz: $(CORE) fuzz.c eval.h
