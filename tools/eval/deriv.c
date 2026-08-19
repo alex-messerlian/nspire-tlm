@@ -161,6 +161,7 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
         if (r && r->t == N_NEG) { *changed = 1; return ar_bin(a, N_SUB, l, r->kid[0]); }
         break;
     case N_SUB:
+        if (r && r->t == N_NEG) { *changed = 1; return ar_bin(a, N_ADD, l, r->kid[0]); }
         if (is_num(r, 0)) { *changed = 1; return l; }
         if (is_num(l, 0)) { *changed = 1; return neg_of(a, r); }
         if (is_anynum(l) && is_anynum(r)) { *changed = 1; return ar_num(a, l->num - r->num); }
@@ -179,12 +180,18 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
             *changed = 1;
             return ar_bin(a, N_MUL, ar_num(a, l->num * r->kid[0]->num), r->kid[1]);
         }
+        /* Hoist negation out of a product: 2*(-x) -> -(2*x). Keeps MUL free of NEG children, which
+         * is what lets the renderer drop parens around a leading unary minus safely. */
+        if (l && l->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_MUL, l->kid[0], r)); }
+        if (r && r->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_MUL, l, r->kid[0])); }
         break;
     case N_DIV:
         if (is_num(r, 1)) { *changed = 1; return l; }
         if (is_num(l, 0)) { *changed = 1; return ar_num(a, 0); }
         if (is_anynum(l) && is_anynum(r) && r->num != 0) { *changed = 1; return ar_num(a, l->num / r->num); }
         if (node_eq(l, r) && !is_num(l, 0)) { *changed = 1; return ar_num(a, 1); }
+        if (l && l->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l->kid[0], r)); }
+        if (r && r->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l, r->kid[0])); }
         break;
     case N_POW:
         if (is_num(r, 1)) { *changed = 1; return l; }
@@ -257,8 +264,11 @@ static err_t emit(const node_t *n, char *out, size_t sz, size_t *k, int need, in
     case N_SYM:
         return put(out, sz, k, n->name);
     case N_NEG:
+        /* need=2, not 3: "-2*x" and "-1/sqrt(x)" are unambiguous and are what a textbook writes.
+         * Safe because the simplifier hoists NEG out of MUL and DIV, so a NEG child never appears
+         * in a position where dropping parens would change the parse. Sums still get them: -(a+b). */
         if ((e = put(out, sz, k, "-"))) return e;
-        return emit_kid(n->kid[0], out, sz, k, 3, depth);
+        return emit_kid(n->kid[0], out, sz, k, 2, depth);
     case N_ADD: case N_SUB:
         if ((e = emit_kid(n->kid[0], out, sz, k, 1, depth))) return e;
         if ((e = put(out, sz, k, n->t == N_ADD ? "+" : "-"))) return e;
@@ -285,6 +295,81 @@ static err_t emit(const node_t *n, char *out, size_t sz, size_t *k, int need, in
         return emit(n->kid[1], out, sz, k, 0, depth + 1);
     }
     return E_EXPR;
+}
+
+/* ---- canonical sum ordering (TOOL_SPEC.md section 5.3) -------------------------------------- */
+/* The simplifier is deterministic, so output was already stable without this -- but "2+6*x" is not
+ * what a textbook writes, and the corpus is generated from these strings. Sort top-level sum terms
+ * by descending degree in the differentiation variable, ties broken by rendered text so the order is
+ * total and reproducible. */
+
+static int degree_in(const node_t *n, const char *var, int depth) {
+    if (!n || depth > MAX_DEPTH) return 0;
+    switch (n->t) {
+    case N_NUM: return 0;
+    case N_SYM: return strcmp(n->name, var) == 0 ? 1 : 0;
+    case N_NEG: return degree_in(n->kid[0], var, depth + 1);
+    case N_ADD: case N_SUB: {
+        int a = degree_in(n->kid[0], var, depth + 1), b = degree_in(n->kid[1], var, depth + 1);
+        return a > b ? a : b;
+    }
+    case N_MUL: return degree_in(n->kid[0], var, depth+1) + degree_in(n->kid[1], var, depth+1);
+    case N_DIV: return degree_in(n->kid[0], var, depth+1) - degree_in(n->kid[1], var, depth+1);
+    case N_POW:
+        if (n->kid[1] && n->kid[1]->t == N_NUM && n->kid[1]->num == (double)(int)n->kid[1]->num)
+            return degree_in(n->kid[0], var, depth + 1) * (int)n->kid[1]->num;
+        return 0;
+    /* A function of the variable has no polynomial degree. Treated as 0 and ordered by text, which
+     * is a documented limitation rather than a claim about calculus. */
+    default: return 0;
+    }
+}
+
+#define MAX_TERMS 32
+typedef struct { node_t *n; int sign; int deg; char txt[96]; } term_t;
+
+static int flatten(node_t *n, int sign, term_t *t, int *nt, int depth) {
+    if (!n || depth > MAX_DEPTH) return 0;
+    if (n->t == N_ADD || n->t == N_SUB) {
+        if (!flatten(n->kid[0], sign, t, nt, depth + 1)) return 0;
+        return flatten(n->kid[1], n->t == N_ADD ? sign : -sign, t, nt, depth + 1);
+    }
+    if (n->t == N_NEG) return flatten(n->kid[0], -sign, t, nt, depth + 1);
+    if (*nt >= MAX_TERMS) return 0;
+    t[*nt].n = n; t[*nt].sign = sign;
+    (*nt)++;
+    return 1;
+}
+
+err_t canon(arena_t *a, node_t *n, const char *var, node_t **out) {
+    term_t t[MAX_TERMS];
+    int nt = 0;
+    *out = n;
+    if (!flatten(n, 1, t, &nt, 0)) return E_NONE;    /* too complex to order: leave as-is */
+    if (nt < 2) return E_NONE;
+
+    for (int i = 0; i < nt; i++) {
+        t[i].deg = degree_in(t[i].n, var, 0);
+        if (render(t[i].n, var, t[i].txt, sizeof t[i].txt) != E_NONE) return E_NONE;
+    }
+    /* Insertion sort: stable, and nt is tiny. */
+    for (int i = 1; i < nt; i++) {
+        term_t k = t[i];
+        int j = i - 1;
+        while (j >= 0 && (t[j].deg < k.deg || (t[j].deg == k.deg && strcmp(t[j].txt, k.txt) > 0))) {
+            t[j + 1] = t[j]; j--;
+        }
+        t[j + 1] = k;
+    }
+
+    node_t *acc = t[0].sign < 0 ? neg_of(a, t[0].n) : t[0].n;
+    if (!acc) return E_RANGE;
+    for (int i = 1; i < nt; i++) {
+        acc = ar_bin(a, t[i].sign < 0 ? N_SUB : N_ADD, acc, t[i].n);
+        if (!acc) return E_RANGE;
+    }
+    *out = acc;
+    return E_NONE;
 }
 
 err_t render(const node_t *n, const char *var, char *out, size_t sz) {

@@ -125,11 +125,23 @@ static void emit_dim(char *p, size_t *k, size_t sz, const char *sym, int exp) {
  * as "16000 J" rather than "16000 m^2*kg/s^2" matters: the physics corpus is generated from these
  * strings, and the base-unit form is not what a textbook answer looks like.
  *
- * Fixed table, fixed order, so this stays deterministic. Known ambiguity: torque (N*m) has the same
- * dimension as energy and will render as J. Accepted -- energy is far more common in the corpus. */
+ * Fixed table, fixed order, so this stays deterministic.
+ *
+ * BLOCKLIST (TOOL_SPEC.md section 5.4, v1.1). Two dimension vectors are genuinely ambiguous and are
+ * deliberately ABSENT from this table, so they fall through to base units:
+ *
+ *   m^2*kg/s^2  energy (J) vs torque (N*m)
+ *   1/s         frequency (Hz) vs angular velocity (rad/s) vs decay constant
+ *
+ * A dimension vector cannot distinguish these, and guessing compiles a physics error straight into
+ * the weights -- "torque is measured in joules" is the first thing a physics judge catches. The data
+ * generator must name the target unit explicitly with conv (TOOL_SPEC.md section 8.5).
+ *
+ * Deliberately NOT blocked: Pa is shared by pressure, stress and Young's modulus, but all three are
+ * correctly written Pa, so the collapse is right in every case. */
 static const struct { dim_t d; const char *sym; } DERIVED[] = {
-    {D_N,"N"},{D_J,"J"},{D_W,"W"},{D_PA,"Pa"},{D_V,"V"},{D_OHM,"ohm"},
-    {D_F,"F"},{D_T,"T"},{D_C,"C"},{D_HZ,"Hz"},
+    {D_N,"N"},{D_W,"W"},{D_PA,"Pa"},{D_V,"V"},{D_OHM,"ohm"},
+    {D_F,"F"},{D_T,"T"},{D_C,"C"},
 };
 #define NDERIVED ((int)(sizeof DERIVED / sizeof DERIVED[0]))
 

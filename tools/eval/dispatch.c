@@ -130,6 +130,7 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
         node_t *dn;
         if ((e = deriv(&g_arena, n, args[1], &dn))) return fail(e, out, out_sz);
         if ((e = simplify(&g_arena, dn, &dn)))      return fail(e, out, out_sz);
+        if ((e = canon(&g_arena, dn, args[1], &dn))) return fail(e, out, out_sz);
         if ((e = render(dn, args[1], out, out_sz))) return fail(e, out, out_sz);
         return TB_OK;
     }

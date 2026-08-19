@@ -10,6 +10,8 @@ LDLIBS  := -lm
 
 CORE := fmt.c ast.c units.c parser.c numeric.c deriv.c solve.c integrate.c stat.c dispatch.c
 
+# Device build. Requires the Ndless SDK on PATH; see docs/PHASE0.md M1 and H8.
+
 all: evalcli test_eval
 
 evalcli: $(CORE) main.c eval.h
@@ -22,6 +24,22 @@ check: test_eval
 	./test_eval
 
 clean:
-	rm -f evalcli test_eval
+	rm -f evalcli test_eval fuzz eval_device.elf eval_device.tns eval_device.zehn golden.txt
 
 .PHONY: all check clean
+
+# Cross-compile the acceptance suite for the calculator. PASS CRITERION: byte-identical to host.
+NSPIRE_CFLAGS := -O2 -std=c99 -Wall -Wextra -Wno-unused-parameter -marm -mcpu=arm926ej-s
+
+eval_device.tns: $(CORE) device_main.c tests.inc eval.h
+	nspire-gcc $(NSPIRE_CFLAGS) -o eval_device.elf $(CORE) device_main.c -lm
+	genzehn --input eval_device.elf --output eval_device.zehn --name eval_device
+	make-prg eval_device.zehn $@
+	rm -f eval_device.zehn
+
+device: eval_device.tns
+
+# Golden host output, for byte-comparison against the device log.
+golden.txt: test_eval
+	./test_eval > $@ 2>&1 || true
+	@echo "compare the device's eval_device.txt.tns against this"

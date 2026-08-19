@@ -1,11 +1,22 @@
 # Tool call format specification
 
-**Status: FROZEN v1.0.0.** Data generation, the evaluator, the training pipeline, and the device
+**Status: FROZEN v1.1.0.** Data generation, the evaluator, the training pipeline, and the device
 runtime all depend on this document. Changing it invalidates every generated corpus and every trained
 checkpoint.
 
 Change procedure: bump the version, write a migration note, regenerate all data, retrain. There is no
 cheap edit. That is deliberate.
+
+### Changelog
+
+**v1.1.0** — amended before any data generation, so no migration was required.
+- **§5.4 added: ambiguous dimension vectors are never collapsed to a derived unit name.** v1.0.0
+  rendered every coherent SI dimension as its derived symbol, which made torque print as joules.
+  A dimension vector cannot distinguish energy from torque, and emitting a guess would compile
+  "torque is measured in joules" into the weights — the first error a physics judge catches.
+- **§5.3 sum-term ordering is now implemented**, not just specified. v1.0.0 described
+  descending-degree ordering that the evaluator did not perform. Spec and code now agree.
+- §8.5 added: the data generator must name target units explicitly via `conv` for blocked dimensions.
 
 ---
 
@@ -194,7 +205,8 @@ Root ordering is specified because unordered output is nondeterministic output.
 
 ### 5.3 Canonical expression form
 
-`diff` output must be canonicalised or the same derivative prints differently run to run:
+`diff` output must be canonicalised or the same derivative prints differently run to run.
+**Implemented in `deriv.c:canon()`; verified by test.** Spec and code agree — do not let them drift.
 
 - Explicit `*` between all factors. No implicit multiplication on output.
 - No spaces.
@@ -202,7 +214,34 @@ Root ordering is specified because unordered output is nondeterministic output.
   rendered term.
 - Constant folding applied. Identities `x*1→x`, `x+0→x`, `x^1→x`, `x^0→1`, `0*x→0` applied to fixpoint,
   capped at 32 passes.
-- Parentheses only where precedence requires them.
+- Parentheses only where precedence requires them. A leading unary minus does not parenthesise a
+  product or quotient: `-2*x`, not `-(2*x)`. This is safe because the simplifier hoists negation out
+  of `*` and `/`, so a `NEG` node never sits where dropping parens would change the parse.
+- Ordering caveat: a function of the variable has no polynomial degree and is treated as degree 0,
+  ordered against other degree-0 terms by rendered text. Deterministic, but it is not a claim about
+  calculus.
+
+### 5.4 Ambiguous dimensions are never named
+
+Values carry SI dimension vectors, and output collapses a coherent dimension to its derived symbol —
+`6 N`, `24 W`, `50 Pa`. **Two dimension vectors are excluded from that collapse and always render in
+base units:**
+
+| Dimension | Collides | Renders as |
+|---|---|---|
+| `m^2*kg/s^2` | energy (J) **vs** torque (N*m) | `m^2*kg/s^2` |
+| `1/s` | frequency (Hz) **vs** angular velocity (rad/s) **vs** decay constant | `1/s` |
+
+A dimension vector carries no information that separates these. Guessing writes a physics error
+directly into the corpus, and therefore into the weights. Base units are always *correct*, merely
+verbose — and §8.5 makes the verbosity the generator's problem, not the model's.
+
+Deliberately **not** blocked: `Pa` is shared by pressure, stress and Young's modulus, but all three
+are correctly written `Pa`, so the collapse is right in every case.
+
+To extend the blocklist, remove the entry from `DERIVED[]` in `tools/eval/units.c` and add a row
+above. The cost of blocking a vector unnecessarily is verbose output; the cost of failing to block an
+ambiguous one is a wrong physics fact in the training data. Bias toward blocking.
 
 ## 6. Errors
 
@@ -282,6 +321,20 @@ Enforced by the generator, not hoped for:
 4. **Error-recovery samples are included on purpose**, at a target rate of roughly 5% of tool-using
    documents: a malformed call, a `!code`, a corrected call, a correct answer. The model cannot
    learn §6.2 recovery from data where every call succeeds.
+5. **Any physics quantity whose dimension is on the §5.4 blocklist must be produced with `conv` and
+   an explicit target unit**, never with bare `eval`. The generator knows from the problem context
+   whether it is computing energy or torque; the evaluator does not and must not guess.
+
+   ```
+   wrong:  <tool>eval<arg>0.5*80 kg*(20 m/s)^2</tool>      -> 16000 m^2*kg/s^2
+   right:  <tool>conv<arg>0.5*80 kg*(20 m/s)^2<arg>J</tool> -> 16000 J
+   right:  <tool>conv<arg>50 N*m<arg>N*m</tool>             -> 50 N*m
+   right:  <tool>conv<arg>1/(0.5 s)<arg>Hz</tool>           -> 2 Hz
+   right:  <tool>conv<arg>2*pi*3/(1 s)<arg>rad/s</tool>     -> 18.84955592 rad/s
+   ```
+
+   This is a lint the generator can enforce mechanically: if an `eval` result ends in
+   `m^2*kg/s^2` or `1/s`, the sample is rejected and regenerated as a `conv`.
 
 ## 9. Metrics this spec makes measurable
 
