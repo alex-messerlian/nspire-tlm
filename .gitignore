@@ -1,0 +1,10 @@
+*.elf
+*.tns
+*.zehn
+*.dis
+vendor/Ndless/
+vendor/llama2.c/
+models/*.bin
+models/*.gguf
+models/*.pt
+.DS_Store
