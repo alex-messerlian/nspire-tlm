@@ -1,6 +1,6 @@
 # Tool call format specification
 
-**Status: FROZEN v1.1.0.** Data generation, the evaluator, the training pipeline, and the device
+**Status: FROZEN v1.1.1.** Data generation, the evaluator, the training pipeline, and the device
 runtime all depend on this document. Changing it invalidates every generated corpus and every trained
 checkpoint.
 
@@ -8,6 +8,9 @@ Change procedure: bump the version, write a migration note, regenerate all data,
 cheap edit. That is deliberate.
 
 ### Changelog
+
+**v1.1.1** — metrics only, no format change.
+- §9: added false-positive tool call rate on conceptual questions.
 
 **v1.1.0** — amended before any data generation, so no migration was required.
 - **§5.4 added: ambiguous dimension vectors are never collapsed to a derived unit name.** v1.0.0
@@ -346,3 +349,8 @@ Enforced by the generator, not hoped for:
 - **Result-span leak rate** — how often the model tries to emit a `<res>` token. Should be ~0 given
   §1's loss mask. **A nonzero value means the mask is broken**, and it is a cheap continuous check on
   the most dangerous possible bug in the pipeline.
+- **False-positive tool call rate** — share of *conceptual* eval questions ("what is a polynomial?",
+  "why does a quadratic have at most two real roots?") on which the model emits a call at all. Should
+  be near zero. Validity rate alone cannot see this failure: a model that answers every conceptual
+  question with a syntactically perfect, semantically pointless `solve` call scores 100% valid and is
+  visibly broken in front of a judge. Held-out conceptual set, reported every eval.
