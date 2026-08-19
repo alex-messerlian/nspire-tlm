@@ -909,6 +909,13 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     if (pos > 1) {
         long end = time_in_ms();
         fprintf(stderr, "achieved tok/s: %f\n", (pos-1) / (double)(end-start)*1000);
+#ifdef _TINSPIRE
+        if (g_nspire_log) {
+            fprintf(g_nspire_log, "tokens=%d\nelapsed_ms=%ld\ntok_per_s=%f\n",
+                    pos-1, (long)(end-start), (pos-1) / (double)(end-start)*1000);
+            fflush(g_nspire_log);
+        }
+#endif
     }
 
     free(prompt_tokens);

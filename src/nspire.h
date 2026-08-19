@@ -49,6 +49,10 @@ int   nspire_clock_gettime(int clk_id, struct timespec *tp);
 
 /* Reported by our main() so a run's numbers can be audited after the fact. */
 unsigned nspire_cpu_hz(void);
+
+/* Set by nspire_main before the run so the ported runq.c can tee its tok/s line into the log. */
+#include <stdio.h>
+extern FILE *g_nspire_log;
 unsigned nspire_timer_hz(void);
 
 #endif

@@ -158,7 +158,11 @@ static inline void bench_result(const char *key, const char *fmt, ...) {
     vsnprintf(buf, sizeof buf, fmt, ap);
     va_end(ap);
     printf("%s = %s\n", key, buf);
-    if (g_log) fprintf(g_log, "%s=%s\n", key, buf);
+    if (g_log) {
+        fprintf(g_log, "%s=%s\n", key, buf);
+        fflush(g_log);   /* crash-safe: probe_sram() may reset the device, and an unflushed
+                          * result is a measurement that never happened */
+    }
 }
 
 static inline void bench_close(void) {
