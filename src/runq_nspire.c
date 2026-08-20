@@ -255,6 +255,9 @@ void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weigh
     *file_size = ftell(file); // get the file size, in bytes
     fclose(file);
     // memory map the Transformer weights into the data pointer
+#ifdef _TINSPIRE
+    nspire_set_checkpoint_path(checkpoint);
+#endif
     *fd = open(checkpoint, O_RDONLY); // open in read only mode
     if (*fd == -1) { fprintf(stderr, "open failed!\n"); exit(EXIT_FAILURE); }
     *data = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, *fd, 0);

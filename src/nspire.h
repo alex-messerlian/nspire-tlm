@@ -53,6 +53,10 @@ unsigned nspire_cpu_hz(void);
 /* Set by nspire_main before the run so the ported runq.c can tee its tok/s line into the log. */
 #include <stdio.h>
 extern FILE *g_nspire_log;
+
+/* Set by the ported read_checkpoint before mmap, so the shim can fopen() the path rather than
+ * fdopen() a descriptor -- see nspire.c. */
+void nspire_set_checkpoint_path(const char *p);
 unsigned nspire_timer_hz(void);
 
 #endif

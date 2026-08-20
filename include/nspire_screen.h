@@ -12,9 +12,17 @@
 #ifndef NSPIRE_SCREEN_H
 #define NSPIRE_SCREEN_H
 
-#include <nspireio/nspireio.h>
 #include <stdarg.h>
 #include <stdio.h>
+
+/* Host builds (NSPIRE_HOST_TEST) have no nspireio and no framebuffer -- keep plain printf so the
+ * same sources can be validated against the golden output on the host. */
+#ifdef NSPIRE_HOST_TEST
+static inline void screen_init(void)  {}
+static inline void screen_free(void)  {}
+static inline void screen_flush(void) { fflush(stdout); }
+#else
+#include <nspireio/nspireio.h>
 
 static nio_console g_csl;
 static int g_screen_ready = 0;
@@ -52,5 +60,6 @@ static inline void screen_flush(void) {
 }
 
 #define printf screen_printf
+#endif /* NSPIRE_HOST_TEST */
 
 #endif

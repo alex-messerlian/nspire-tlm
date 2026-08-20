@@ -1,5 +1,6 @@
 /* nspire.c -- implementation of the porting seam. See nspire.h for why each piece exists. */
 #include "nspire.h"
+#include <string.h>
 #undef mmap
 #undef munmap
 #undef clock_gettime
@@ -16,16 +17,26 @@ extern FILE *g_nspire_log;   /* progress goes to the log too, so a reset still l
 static void  *g_map_ptr  = NULL;
 static size_t g_map_len  = 0;
 
+/* The checkpoint path, stashed by the ported read_checkpoint. */
+static char g_ckpt_path[256];
+void nspire_set_checkpoint_path(const char *p) {
+    if (!p) { g_ckpt_path[0] = 0; return; }
+    strncpy(g_ckpt_path, p, sizeof g_ckpt_path - 1);
+    g_ckpt_path[sizeof g_ckpt_path - 1] = 0;
+}
+
 void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long off) {
     (void)addr; (void)prot; (void)flags;
     void *p = malloc(len);
     if (!p) {
-        /* This is the failure we most expect on a 64 MB device, so say so plainly rather than
-         * returning MAP_FAILED and letting runq.c print "mmap failed". */
-        fprintf(stderr, "out of memory: needed %lu bytes for the checkpoint\n", (unsigned long)len);
+        /* Print via printf, NOT stderr: stderr is not routed to the nspireio console, so an
+         * out-of-memory message on stderr is invisible and looks identical to a hang. */
+        printf("OUT OF MEMORY: needed %lu bytes\n", (unsigned long)len);
+        if (g_nspire_log) { fprintf(g_nspire_log, "error=oom bytes=%lu\n", (unsigned long)len); fflush(g_nspire_log); }
+        screen_flush();
         return MAP_FAILED;
     }
-    if (lseek(fildes, off, SEEK_SET) < 0) { free(p); return MAP_FAILED; }
+    (void)fildes;   /* deliberately unused -- see below */
 
     /* MEASURED 2026-08-19: random 4 KB flash access on this device is 58 ms, and sequential is only
      * 2 MB/s. The first device run of this program showed a blank screen for 17 minutes before a
@@ -35,29 +46,39 @@ void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long 
      *
      * So: go through a FILE* with a large explicit buffer, which coalesces into big sequential
      * reads, and report progress so a slow load can never again be mistaken for a hang. */
-    static unsigned char iobuf[256 * 1024];
-    /* fdopen without dup(): Ndless's newlib has no dup(). We therefore do NOT fclose this stream --
-     * runq.c owns the fd and closes it itself, and closing here would double-close. The buffer is
-     * static, so nothing leaks. */
-    FILE *fp = fdopen(fildes, "rb");
-    if (!fp) { free(p); return MAP_FAILED; }
-    setvbuf(fp, (char *)iobuf, _IOFBF, sizeof iobuf);
+    /* 64 KB, matching bench_flash, which is the only read path proven to work on this device. */
+    #define CHUNK (64u * 1024u)
+    /* MEASURED: fdopen() on the descriptor HANGS on this device -- the first read never returned
+     * after 30 minutes, and no progress line was ever printed. bench_flash reads an 8 MB file
+     * happily using plain fopen() with 64 KB chunks, so use exactly that proven route. The fd
+     * runq.c opened is left alone; runq.c closes it itself. */
+    if (!g_ckpt_path[0]) { free(p); return MAP_FAILED; }
+    FILE *fp = fopen(g_ckpt_path, "rb");
+    if (!fp) {
+        printf("cannot open %s\n", g_ckpt_path);
+        screen_flush();
+        free(p);
+        return MAP_FAILED;
+    }
+    if (off) fseek(fp, off, SEEK_SET);
 
     unsigned char *q = (unsigned char *)p;
     size_t remaining = len, done = 0;
     unsigned last_pct = 999;
     while (remaining) {
-        size_t want = remaining > (1u << 20) ? (1u << 20) : remaining;
+        size_t want = remaining > CHUNK ? CHUNK : remaining;
         size_t got = fread(q, 1, want, fp);
         if (got == 0) { free(p); return MAP_FAILED; }
         q += got; remaining -= got; done += got;
         unsigned pct = (unsigned)((done * 100) / len);
-        if (pct / 10 != last_pct / 10) {          /* every 10%, so progress is visible */
+        if (pct / 5 != last_pct / 5) {            /* every 5%, so a stall is localised quickly */
             last_pct = pct;
             printf("loading %u%%\n", pct);
+            screen_flush();
             if (g_nspire_log) { fprintf(g_nspire_log, "load_pct=%u\n", pct); fflush(g_nspire_log); }
         }
     }
+    fclose(fp);
     g_map_ptr = p;
     g_map_len = len;
     return p;
@@ -138,6 +159,6 @@ unsigned nspire_cpu_hz(void) {
     uint32_t hz = (uint32_t)(((uint64_t)12000000u * mult) / div1);
     if (((MMIO32(PMU_CLK_GATE) >> 4) & 1u) && !((main >> 4) & 1u))
         hz /= (((MMIO32(PMU_CLK_DIV2) >> 20) & 0xFu) + 1u);
-    return hz;
+    return hz * 2u;   /* the PMU formula yields AHB; CPU = 2 x AHB. The screen said 198, not 396. */
 }
 #endif /* NSPIRE_HOST_TEST */
