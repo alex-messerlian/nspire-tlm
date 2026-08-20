@@ -18,20 +18,35 @@ def conv(e):
         # Presentation MathML writes B*l*v_d as three adjacent <mi> with NO operator between them.
         # Concatenating them produced the identifier "Blv_d" -- a single symbol where three
         # variables were meant. Insert the implicit multiply that the markup omits.
-        parts, prev_atom = [], False
+        # Function names arrive as <mtext>tan</mtext> or <mi>sin</mi> followed by their argument
+        # with no application syntax. Left alone they concatenate into identifiers -- "tantheta",
+        # "gsintheta" -- which parse, gate clean, and are wrong. Found by hand-reading 30 documents.
+        FN = ("sin","cos","tan","asin","acos","atan","sinh","cosh","tanh","ln","log","exp","sqrt")
+        pieces = []
         for c in k:
             ct = c.tag.replace(M, "")
-            atom = ct in ("mi","mn","msub","msup","mfrac","msqrt","mfenced","mrow")
+            if ct == "mspace": continue
             piece = conv(c)
-            if not piece: continue
+            if piece: pieces.append((ct, piece))
+        parts, prev_atom, i = [], False, 0
+        while i < len(pieces):
+            ct, piece = pieces[i]
+            if piece in FN and i + 1 < len(pieces):          # apply to the next atom
+                arg = pieces[i+1][1]
+                if not (arg.startswith("(") and arg.endswith(")")): arg = "(" + arg + ")"
+                if prev_atom: parts.append("*")
+                parts.append(piece + arg); prev_atom = True; i += 2; continue
+            atom = ct in ("mi","mn","mtext","msub","msup","mfrac","msqrt","mfenced","mrow")
             if prev_atom and atom and piece[0] not in "+-*/^=)":
                 parts.append("*")
             parts.append(piece)
             prev_atom = atom and piece[-1] not in "+-*/^=("
+            i += 1
         return "".join(parts)
     if t in ("mi","mn","mtext"):
         s = (e.text or "").strip()
         return GREEK.get(s, s)
+    if t == "mspace": return ""
     if t == "mo":
         s = (e.text or "").strip()
         return {"−":"-","×":"*","·":"*","⋅":"*","∕":"/","=":"=","+":"+","(":"(",")":")"}.get(s, s)

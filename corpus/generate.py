@@ -6,6 +6,22 @@ and the token count looks identical to a genuinely varied corpus. Everything her
 alongside three diversity measures, never alone."""
 import json, re, random, subprocess, collections, math, sys, time, pathlib
 
+# Universal constants are NOT free variables. The hand-read of 30 found 8 documents assigning
+# random values to h, c, k_e, a_0, epsilon_0 and mu_0 -- teaching that Planck's constant is 36.
+# They are supplied by the record (PROMPT_FORMAT section 2) and never sampled.
+CONST = {
+ "h":6.626e-34, "hbar":1.055e-34, "c":2.998e8, "G":6.674e-11, "k_e":8.988e9, "k":8.988e9,
+ "epsilon_0":8.854e-12, "mu_0":1.257e-6, "a_0":5.292e-11, "N_A":6.022e23, "R":8.314,
+ "sigma":5.670e-8, "g":9.81, "e":1.602e-19, "m_e":9.109e-31, "m_p":1.673e-27,
+}
+_EMP = json.load(open("corpus/empirical_values.json"))
+_POOL = sorted(v for vs in _EMP.values() for v in vs)
+
+def sample_value(rng):
+    """Draw from the empirical OpenStax distribution: median ~5, 60-90% round numbers.
+    uniform(1.5, 95) produced m = 92.6 kg and r = 70.25 m, which no textbook contains."""
+    return rng.choice(_POOL)
+
 VAR = re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
 RES = {"pi","e","sin","cos","tan","ln","log","sqrt","exp","d","f","x","t"}
 
@@ -51,9 +67,11 @@ def gen(n, seed=0):
         r = rng.choice(recs)
         lhs, rhs = r["f"].split("=", 1)
         vs = sorted({v for v in VAR.findall(rhs)} - {"pi", "e"})
-        vals = {v: round(rng.uniform(1.5, 95), rng.choice([0, 1, 2])) or 2.0 for v in vs}
+        vals = {v: (CONST[v] if v in CONST else sample_value(rng)) for v in vs}
         expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
-        g = ", ".join(f"{v} = {vals[v]}" for v in vs)
+        free = [v for v in vs if v not in CONST]
+        if not free: continue                          # nothing left to ask about
+        g = ", ".join(f"{v} = {vals[v]:g}" for v in free)
         stem = rng.choice(GIVE).format(g=g)
         ask  = rng.choice(ASK).format(q=r["name"].lower())
         q = stem + (ask if stem.endswith(", ") and False else
@@ -68,6 +86,8 @@ def gen(n, seed=0):
     built, dropped = [], 0
     for d, c, res in zip(docs, calls, out):
         if res.startswith("!"): dropped += 1; continue        # TOOL_SPEC 8.1: drop, never guess
+        try:   res = f"{float(res):.4g}"            # signed off: 4 significant figures
+        except ValueError: pass
         ans = d["close"].format(v=d["lhs"], a=res, q=d["name"].lower(), why=d["why"])
         built.append({"head": d["head"],
                       "text": f"<q>{d['q']}</q><r>{d['rec']}{c}<res>{res}</res><a>{ans}<end>",

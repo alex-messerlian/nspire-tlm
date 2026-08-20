@@ -1,4601 +1,1510 @@
 [
  {
   "name": "Solution for simple harmonic motion",
-  "f": "x(t)=c_1cos(omega*t)+c_2sin(omega*t)",
-  "solvable": [
-   "omega",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "x(t)=c_1*cos(omega*t)+c_2*sin(omega*t)"
  },
  {
   "name": "Charge in a RLC series circuit",
-  "f": "L*(((d)^(2)*q)/(d*(t)^(2)))+R*((d*q)/(d*t))+((1)/(C))*q=E(t)",
-  "solvable": [
-   "L",
-   "R",
-   "q"
-  ],
-  "numeric_only": [
-   "C",
-   "d",
-   "t"
-  ],
-  "roots": "positive"
+  "f": "L*(((d)^(2)*q)/(d*(t)^(2)))+R*((d*q)/(d*t))+((1)/(C))*q=E(t)"
  },
  {
   "name": "Generalized sine function",
-  "f": "f*(x)=Asin(B*(x-alpha))+C",
-  "solvable": [
-   "B",
-   "C",
-   "alpha",
-   "f",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f*(x)=A*sin(B*(x-alpha))+C"
  },
  {
   "name": "Point-slope equation of a line",
-  "f": "y-y_1=m*(x-x_1)",
-  "solvable": [
-   "m",
-   "x",
-   "x_1",
-   "y",
-   "y_1"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y-y_1=m*(x-x_1)"
  },
  {
   "name": "Slope-intercept form of a line",
-  "f": "y=m*x+b",
-  "solvable": [
-   "b",
-   "m",
-   "x",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y=m*x+b"
  },
  {
   "name": "Standard form of a line",
-  "f": "a*x+b*y=c",
-  "solvable": [
-   "a",
-   "b",
-   "c",
-   "x",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a*x+b*y=c"
  },
  {
   "name": "Slope of a Secant Line",
-  "f": "m_sec=((f*(x)-f*(a))/(x-a))",
-  "solvable": [
-   "a",
-   "f",
-   "m_sec",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "m_sec=((f*(x)-f*(a))/(x-a))"
  },
  {
   "name": "Average Velocity over Interval [a,t]",
-  "f": "v_ave=((s*(t)-s*(a))/(t-a))",
-  "solvable": [
-   "a",
-   "s",
-   "t",
-   "v_ave"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_ave=((s*(t)-s*(a))/(t-a))"
  },
  {
   "name": "Binormal vector",
-  "f": "B(t)=T(t)*N(t)",
-  "solvable": [],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "B(t)=T(t)*N(t)"
  },
  {
   "name": "Solution to the logistic differential equation/initial-value problem",
-  "f": "P*(t)=((P_0*K*(e)^(r*t))/((K-P_0)+P_0*(e)^(r*t)))",
-  "solvable": [
-   "K",
-   "P",
-   "P_0"
-  ],
-  "numeric_only": [
-   "r",
-   "t"
-  ],
-  "roots": "positive"
+  "f": "P*(t)=((P_0*K*(e)^(r*t))/((K-P_0)+P_0*(e)^(r*t)))"
  },
  {
   "name": "Difference quotient",
-  "f": "Q=((f*(x)-f(a))/(x-a))",
-  "solvable": [
-   "Q",
-   "a",
-   "f",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=((f*(x)-f(a))/(x-a))"
  },
  {
   "name": "Average velocity",
-  "f": "v_ave=((s*(t)-s(a))/(t-a))",
-  "solvable": [
-   "a",
-   "s",
-   "t",
-   "v_ave"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_ave=((s*(t)-s(a))/(t-a))"
  },
  {
   "name": "Distance between two points in space:",
-  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)+((z_2-z_1))^(2))",
-  "solvable": [
-   "d"
-  ],
-  "numeric_only": [
-   "x_1",
-   "x_2",
-   "y_1",
-   "y_2",
-   "z_1",
-   "z_2"
-  ],
-  "roots": "positive"
+  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)+((z_2-z_1))^(2))"
  },
  {
   "name": "General solution to a nonhomogeneous linear differential equation",
-  "f": "y(x)=c_1*y_1(x)+c_2*y_2(x)+y_p(x)",
-  "solvable": [
-   "c_1",
-   "c_2",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y(x)=c_1*y_1(x)+c_2*y_2(x)+y_p(x)"
  },
  {
   "name": "Vector Equation of a Line",
-  "f": "r=r_0+tv",
-  "solvable": [
-   "r",
-   "r_0",
-   "tv"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "r=r_0+tv"
  },
  {
   "name": "Scalar Equation of a Plane",
-  "f": "a*(x-x_0)+b*(y-y_0)+c*(z-z_0)=0",
-  "solvable": [
-   "a",
-   "b",
-   "c",
-   "x",
-   "x_0",
-   "y",
-   "y_0",
-   "z",
-   "z_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a*(x-x_0)+b*(y-y_0)+c*(z-z_0)=0"
  },
  {
   "name": "The cross product of two vectors in terms of the unit vectors",
-  "f": "u*v=(u_2*v_3-u_3*v_2)i-(u_1*v_3-u_3*v_1)j+(u_1*v_2-u_2*v_1)k",
-  "solvable": [
-   "i",
-   "j",
-   "k",
-   "u",
-   "u_1",
-   "u_2",
-   "u_3",
-   "v",
-   "v_1",
-   "v_2",
-   "v_3"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "u*v=(u_2*v_3-u_3*v_2)i-(u_1*v_3-u_3*v_1)j+(u_1*v_2-u_2*v_1)k"
  },
  {
   "name": "Velocity of center of mass of rolling object",
-  "f": "v_CM=R*omega",
-  "solvable": [
-   "R",
-   "omega",
-   "v_CM"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_CM=R*omega"
  },
  {
   "name": "Acceleration of center of mass of rolling object",
-  "f": "a_CM=R*alpha",
-  "solvable": [
-   "R",
-   "a_CM",
-   "alpha"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a_CM=R*alpha"
  },
  {
   "name": "Displacement of center of mass of rolling object",
-  "f": "d_CM=R*theta",
-  "solvable": [
-   "R",
-   "d_CM",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "d_CM=R*theta"
  },
  {
   "name": "Acceleration of an object rolling without slipping",
-  "f": "a_CM=((m*gsintheta)/(m+(I_CM/(r)^(2))))",
-  "solvable": [
-   "I_CM",
-   "a_CM",
-   "gsintheta",
-   "m"
-  ],
-  "numeric_only": [
-   "r"
-  ],
-  "roots": "positive"
+  "f": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))"
  },
  {
   "name": "Angular momentum of a rotating rigid body",
-  "f": "L=I*omega",
-  "solvable": [
-   "I",
-   "L",
-   "omega"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "L=I*omega"
  },
  {
   "name": "Precessional angular velocity",
-  "f": "omega_P=((r*M*g)/(I*omega))",
-  "solvable": [
-   "I",
-   "M",
-   "g",
-   "omega",
-   "omega_P",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "omega_P=((r*M*g)/(I*omega))"
  },
  {
   "name": "Focal length for a spherical mirror",
-  "f": "f=((R)/(2))",
-  "solvable": [
-   "R",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f=((R)/(2))"
  },
  {
   "name": "Apparent depth equation",
-  "f": "h_i=(((n_2)/(n_1)))*h_o",
-  "solvable": [
-   "h_i",
-   "h_o",
-   "n_2"
-  ],
-  "numeric_only": [
-   "n_1"
-  ],
-  "roots": "positive"
+  "f": "h_i=(((n_2)/(n_1)))*h_o"
  },
  {
   "name": "Optical power",
-  "f": "P=((1)/(f))",
-  "solvable": [
-   "P",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P=((1)/(f))"
  },
  {
   "name": "Angular magnification M of a simple magnifier",
-  "f": "M=((theta_image)/(theta_object))",
-  "solvable": [
-   "M",
-   "theta_image",
-   "theta_object"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "M=((theta_image)/(theta_object))"
  },
  {
   "name": "Newton\u2019s second law, scalar form",
-  "f": "F_net=m*a",
-  "solvable": [
-   "F_net",
-   "a",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F_net=m*a"
  },
  {
   "name": "Definition of weight, scalar form",
-  "f": "w=m*g",
-  "solvable": [
-   "g",
-   "m",
-   "w"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "w=m*g"
  },
  {
   "name": "Normal force on an object resting on ahorizontal surface, scalar form",
-  "f": "N=m*g",
-  "solvable": [
-   "N",
-   "g",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "N=m*g"
  },
  {
   "name": "Normal force on an object resting on aninclined plane, scalar form",
-  "f": "N=m*gcostheta",
-  "solvable": [
-   "N",
-   "gcostheta",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "N=m*g*cos(theta)"
  },
  {
   "name": "Magnitude of kinetic friction",
-  "f": "f_k=mu_k*N",
-  "solvable": [
-   "N",
-   "f_k",
-   "mu_k"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "Ideal angle of a banked curve",
-  "f": "tantheta=(((v)^(2))/(r*g))",
-  "solvable": [
-   "g",
-   "r",
-   "tantheta",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "f_k=mu_k*N"
  },
  {
   "name": "Drag force",
-  "f": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
-  "solvable": [
-   "A",
-   "C",
-   "F_D",
-   "rho",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "F_D=((1)/(2))*C*rho*A*(v)^(2)"
  },
  {
   "name": "Acceleration due to gravityat the surface of Earth",
-  "f": "g=G*((M_E)/(r2))",
-  "solvable": [
-   "G",
-   "M_E",
-   "g"
-  ],
-  "numeric_only": [
-   "r2"
-  ],
-  "roots": "positive"
+  "f": "g=G*((M_E)/(r2))"
  },
  {
   "name": "Gravitational potential energy beyond Earth",
-  "f": "U=-((G*M_E*m)/(r))",
-  "solvable": [
-   "G",
-   "M_E",
-   "U",
-   "m",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "U=-((G*M_E*m)/(r))"
  },
  {
   "name": "Escape velocity",
-  "f": "v_esc=sqrt(((2*G*M)/(R)))",
-  "solvable": [
-   "v_esc"
-  ],
-  "numeric_only": [
-   "G",
-   "M",
-   "R"
-  ],
-  "roots": "positive"
+  "f": "v_esc=sqrt(((2*G*M)/(R)))"
  },
  {
   "name": "Orbital speed",
-  "f": "v_orbit=sqrt(((GM_E)/(r)))",
-  "solvable": [
-   "v_orbit"
-  ],
-  "numeric_only": [
-   "GM_E",
-   "r"
-  ],
-  "roots": "positive"
+  "f": "v_orbit=sqrt(((GM_E)/(r)))"
  },
  {
   "name": "Schwarzschild radius",
-  "f": "R_S=((2*G*M)/((c)^(2)))",
-  "solvable": [
-   "G",
-   "M",
-   "R_S",
-   "c"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "R_S=((2*G*M)/((c)^(2)))"
  },
  {
   "name": "Displacement current",
-  "f": "I_d=epsilon_0*((d*Phi_E)/(d*t))",
-  "solvable": [
-   "I_d",
-   "Phi_E",
-   "epsilon_0"
-  ],
-  "numeric_only": [
-   "d",
-   "t"
-  ],
-  "roots": "positive"
+  "f": "I_d=epsilon_0*((d*Phi_E)/(d*t))"
  },
  {
   "name": "Speed of EM waves",
-  "f": "c=((1)/(sqrt(epsilon_0*mu_0)))",
-  "solvable": [
-   "c"
-  ],
-  "numeric_only": [
-   "epsilon_0",
-   "mu_0"
-  ],
-  "roots": "positive"
+  "f": "c=((1)/(sqrt(epsilon_0*mu_0)))"
  },
  {
   "name": "Ratio of E field to B field in electromagnetic wave",
-  "f": "c=((E)/(B))",
-  "solvable": [
-   "B",
-   "E",
-   "c"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "c=((E)/(B))"
  },
  {
   "name": "Faraday\u2019s law",
-  "f": "epsilon=-N*((d*Phi_m)/(d*t))",
-  "solvable": [
-   "N",
-   "Phi_m",
-   "epsilon"
-  ],
-  "numeric_only": [
-   "d",
-   "t"
-  ],
-  "roots": "positive"
+  "f": "epsilon=-N*((d*Phi_m)/(d*t))"
  },
  {
   "name": "Motionally induced emf",
-  "f": "epsilon=B*l*v",
-  "solvable": [
-   "B",
-   "epsilon",
-   "l",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "Emf produced by an electric generator",
-  "f": "epsilon=N*B*A*omegasin(omega*t)",
-  "solvable": [
-   "A",
-   "B",
-   "N",
-   "epsilon",
-   "omega",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "epsilon=B*l*v"
  },
  {
   "name": "Multiplication by a scalar (scalar equation for magnitudes)",
-  "f": "B=|alpha|A",
-  "solvable": [
-   "A",
-   "B"
-  ],
-  "numeric_only": [
-   "alpha"
-  ],
-  "roots": "positive"
+  "f": "B=|alpha|A"
  },
  {
   "name": "Magnitude of a vector in a plane",
-  "f": "A=sqrt(Ax2+Ay2)",
-  "solvable": [
-   "A"
-  ],
-  "numeric_only": [
-   "Ax2",
-   "Ay2"
-  ],
-  "roots": "positive"
+  "f": "A=sqrt(Ax2+Ay2)"
  },
  {
   "name": "The scalar z-component of a vector in three dimensions",
-  "f": "A_z=z_e-z_b",
-  "solvable": [
-   "A_z",
-   "z_b",
-   "z_e"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "A_z=z_e-z_b"
  },
  {
   "name": "Magnitude of a vector in three dimensions",
-  "f": "A=sqrt(Ax2+Ay2+Az2)",
-  "solvable": [
-   "A"
-  ],
-  "numeric_only": [
-   "Ax2",
-   "Ay2",
-   "Az2"
-  ],
-  "roots": "positive"
+  "f": "A=sqrt(Ax2+Ay2+Az2)"
  },
  {
   "name": "Displacement",
-  "f": "Deltax=x_f-x_i",
-  "solvable": [
-   "Deltax",
-   "x_f",
-   "x_i"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*x=x_f-x_i"
  },
  {
   "name": "Instantaneous velocity",
-  "f": "v(t)=((d*x(t))/(d*t))",
-  "solvable": [
-   "d"
-  ],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "v(t)=((d*x(t))/(d*t))"
  },
  {
   "name": "Instantaneous speed",
-  "f": "Instantaneousspeed=|v(t)|",
-  "solvable": [
-   "Instantaneousspeed"
-  ],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "Instantaneousspeed=|v(t)|"
  },
  {
   "name": "Instantaneous acceleration",
-  "f": "a(t)=((d*v(t))/(d*t))",
-  "solvable": [
-   "d"
-  ],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "a(t)=((d*v(t))/(d*t))"
  },
  {
   "name": "Velocity from acceleration",
-  "f": "v=v_0+a*t(constanta)",
-  "solvable": [
-   "a",
-   "constanta",
-   "v",
-   "v_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=v_0+a*t(constant*a)"
  },
  {
   "name": "Position from velocity and acceleration",
-  "f": "x=x_0+v_0*t+((1)/(2))*a*(t)^(2)*(constanta)",
-  "solvable": [
-   "a",
-   "constanta",
-   "v_0",
-   "x",
-   "x_0"
-  ],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "x=x_0+v_0*t+((1)/(2))*a*(t)^(2)*(constant*a)"
  },
  {
   "name": "Velocity of free fall",
-  "f": "v=v_0-g*t(positiveupward)",
-  "solvable": [
-   "g",
-   "positiveupward",
-   "v",
-   "v_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=v_0-g*t*(positiveupward)"
  },
  {
   "name": "Height of free fall",
-  "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
-  "solvable": [
-   "g",
-   "v_0",
-   "y",
-   "y_0"
-  ],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)"
  },
  {
   "name": "Electrostatic energy for equilibrium separation distance between atoms",
-  "f": "U_coul=-((k*(e)^(2))/(r_0))",
-  "solvable": [
-   "U_coul",
-   "k",
-   "r_0"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "U_coul=-((k*(e)^(2))/(r_0))"
  },
  {
   "name": "Energy change associated with ionic bonding",
-  "f": "U_form=E_transfer+U_coul+U_ex",
-  "solvable": [
-   "E_transfer",
-   "U_coul",
-   "U_ex",
-   "U_form"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "U_form=E_transfer+U_coul+U_ex"
  },
  {
   "name": "Potential energy associated with the exclusion principle",
-  "f": "U_ex=((A)/((r)^(n)))",
-  "solvable": [
-   "A",
-   "U_ex"
-  ],
-  "numeric_only": [
-   "n",
-   "r"
-  ],
-  "roots": "positive"
+  "f": "U_ex=((A)/((r)^(n)))"
  },
  {
   "name": "Dissociation energy of a solid",
-  "f": "U_diss=alpha*((k*(e)^(2))/(r_0))*(1-((1)/(n)))",
-  "solvable": [
-   "U_diss",
-   "alpha",
-   "k"
-  ],
-  "numeric_only": [
-   "n",
-   "r_0"
-  ],
-  "roots": "positive"
+  "f": "U_diss=alpha*((k*(e)^(2))/(r_0))*(1-((1)/(n)))"
  },
  {
   "name": "Moment of inertia of a diatomic molecule with reduced mass \u03bc",
-  "f": "I=mur02",
-  "solvable": [
-   "I",
-   "mur02"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I=mur02"
  },
  {
   "name": "Electron density of states of a metal",
-  "f": "g*(E)=((pi*V)/(2))*((((8*m_e)/((h)^(2)))))^(3/2)*(E)^(1/2)",
-  "solvable": [
-   "V",
-   "g"
-  ],
-  "numeric_only": [
-   "E",
-   "h",
-   "m_e"
-  ],
-  "roots": "positive"
+  "f": "g*(E)=((pi*V)/(2))*((((8*m_e)/((h)^(2)))))^(3/2)*(E)^(1/2)"
  },
  {
   "name": "Fermi energy",
-  "f": "E_F=(((h)^(2))/(8*m_e))*((((3*N)/(pi*V))))^(2/3)",
-  "solvable": [
-   "E_F",
-   "h"
-  ],
-  "numeric_only": [
-   "N",
-   "V",
-   "m_e"
-  ],
-  "roots": "positive"
+  "f": "E_F=(((h)^(2))/(8*m_e))*((((3*N)/(pi*V))))^(2/3)"
  },
  {
   "name": "Fermi temperature",
-  "f": "T_F=((E_F)/(k_B))",
-  "solvable": [
-   "E_F",
-   "T_F",
-   "k_B"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_F=((E_F)/(k_B))"
  },
  {
   "name": "Hall effect",
-  "f": "V_H=u*B*w",
-  "solvable": [
-   "B",
-   "V_H",
-   "u",
-   "w"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V_H=u*B*w"
  },
  {
   "name": "Current versus bias voltage across p-n junction",
-  "f": "I_net=I_0*((e)^(e*V_b/k_B*T)-1)",
-  "solvable": [
-   "I_0",
-   "I_net"
-  ],
-  "numeric_only": [
-   "T",
-   "V_b",
-   "k_B"
-  ],
-  "roots": "positive"
+  "f": "I_net=I_0*((e)^(e*V_b/k_B*T)-1)"
  },
  {
   "name": "Current gain",
-  "f": "I_c=beta*I_B",
-  "solvable": [
-   "I_B",
-   "I_c",
-   "beta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I_c=beta*I_B"
  },
  {
   "name": "Result of energy conservation",
-  "f": "W=Q_h-Q_c",
-  "solvable": [
-   "Q_c",
-   "Q_h",
-   "W"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W=Q_h-Q_c"
  },
  {
   "name": "Resulting efficiency of a Carnot cycle",
-  "f": "e=1-((T_c)/(T_h))",
-  "solvable": [
-   "T_c",
-   "T_h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "e=1-((T_c)/(T_h))"
  },
  {
   "name": "Performance coefficient of a reversible refrigerator",
-  "f": "K_R=((T_c)/(T_h-T_c))",
-  "solvable": [
-   "K_R",
-   "T_c",
-   "T_h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "K_R=((T_c)/(T_h-T_c))"
  },
  {
   "name": "Performance coefficient of a reversible heat pump",
-  "f": "K_P=((T_h)/(T_h-T_c))",
-  "solvable": [
-   "K_P",
-   "T_c",
-   "T_h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "K_P=((T_h)/(T_h-T_c))"
  },
  {
   "name": "Entropy of a system undergoing a reversible process at a constant temperature",
-  "f": "DeltaS=((Q)/(T))",
-  "solvable": [
-   "DeltaS",
-   "Q",
-   "T"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*S=((Q)/(T))"
  },
  {
   "name": "First law of thermodynamics",
-  "f": "DeltaE_int=Q-W",
-  "solvable": [
-   "DeltaE_int",
-   "Q",
-   "W"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*E_int=Q-W"
  },
  {
   "name": "Molar heat capacity at constant pressure",
-  "f": "C_p=C_V+R",
-  "solvable": [
-   "C_V",
-   "C_p",
-   "R"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "C_p=C_V+R"
  },
  {
   "name": "Ratio of molar heat capacities",
-  "f": "gamma=C_p/C_V",
-  "solvable": [
-   "C_V",
-   "C_p",
-   "gamma"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "gamma=C_p/C_V"
  },
  {
   "name": "Condition for an ideal gas in a quasi-static adiabatic process",
-  "f": "p*(V)^(gamma)=constant",
-  "solvable": [
-   "constant",
-   "p"
-  ],
-  "numeric_only": [
-   "V",
-   "gamma"
-  ],
-  "roots": "positive"
+  "f": "p*(V)^(gamma)=constant"
  },
  {
   "name": "Capacitance",
-  "f": "C=((Q)/(V))",
-  "solvable": [
-   "C",
-   "Q",
-   "V"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "C=((Q)/(V))"
  },
  {
   "name": "Capacitance of a parallel-plate capacitor",
-  "f": "C=epsilon_0*((A)/(d))",
-  "solvable": [
-   "A",
-   "C",
-   "epsilon_0"
-  ],
-  "numeric_only": [
-   "d"
-  ],
-  "roots": "positive"
+  "f": "C=epsilon_0*((A)/(d))"
  },
  {
   "name": "Capacitance of a vacuum spherical capacitor",
-  "f": "C=4*pi*epsilon_0*((R_1*R_2)/(R_2-R_1))",
-  "solvable": [
-   "C",
-   "epsilon_0"
-  ],
-  "numeric_only": [
-   "R_1",
-   "R_2"
-  ],
-  "roots": "positive"
- },
- {
-  "name": "Capacitance of a vacuum cylindrical capacitor",
-  "f": "C=((2*pi*epsilon_0*l)/(ln(R_2/R_1)))",
-  "solvable": [
-   "C",
-   "epsilon_0",
-   "l"
-  ],
-  "numeric_only": [
-   "R_1",
-   "R_2"
-  ],
-  "roots": "positive"
+  "f": "C=4*pi*epsilon_0*((R_1*R_2)/(R_2-R_1))"
  },
  {
   "name": "Energy density",
-  "f": "u_E=((1)/(2))*epsilon_0*(E)^(2)",
-  "solvable": [
-   "E",
-   "epsilon_0",
-   "u_E"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "u_E=((1)/(2))*epsilon_0*(E)^(2)"
  },
  {
   "name": "Time of flight",
-  "f": "T_tof=((2(v_0sintheta_0))/(g))",
-  "solvable": [
-   "T_tof",
-   "g",
-   "v_0sintheta_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_tof=((2(v_0*sin(theta_0)))/(g))"
  },
  {
   "name": "Range",
-  "f": "R=((v02sin2*theta_0)/(g))",
-  "solvable": [
-   "R",
-   "g",
-   "theta_0",
-   "v02sin2"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "R=((v02sin(2)*theta_0)/(g))"
  },
  {
   "name": "Centripetal acceleration",
-  "f": "a_C=(((v)^(2))/(r))",
-  "solvable": [
-   "a_C",
-   "r",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "a_C=(((v)^(2))/(r))"
  },
  {
   "name": "Maximum number of electrons in a subshell ofa hydrogen atom",
-  "f": "N=4*l+2",
-  "solvable": [
-   "N",
-   "l"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "N=4*l+2"
  },
  {
   "name": "Conservative force is the negative derivative of potential energy",
-  "f": "F_l=-((d*U)/(d*l))",
-  "solvable": [
-   "F_l",
-   "U",
-   "d",
-   "l"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F_l=-((d*U)/(d*l))"
  },
  {
   "name": "Momentum of a charged particle in a cyclotron",
-  "f": "p=0.3*B*r",
-  "solvable": [
-   "B",
-   "p",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p=0.3*B*r"
  },
  {
   "name": "Approximate time for exchange of a virtual particle between two other particles",
-  "f": "Deltat=((h)/(E))",
-  "solvable": [
-   "Deltat",
-   "E",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*t=((h)/(E))"
  },
  {
   "name": "Hubble\u2019s law",
-  "f": "v=H_0*d",
-  "solvable": [
-   "H_0",
-   "d",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=H_0*d"
  },
  {
   "name": "Cosmological space-time metric",
-  "f": "d*(s)^(2)=(c)^(2)*d*(t)^(2)-a*((t))^(2)*d*(Sigma)^(2)",
-  "solvable": [
-   "Sigma",
-   "a",
-   "c",
-   "d",
-   "s",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "d*(s)^(2)=(c)^(2)*d*(t)^(2)-a*((t))^(2)*d*(Sigma)^(2)"
  },
  {
   "name": "Rocket equation",
-  "f": "Delta*v=uln(((m_i)/(m)))",
-  "solvable": [
-   "Delta",
-   "m_i",
-   "v"
-  ],
-  "numeric_only": [
-   "m"
-  ],
-  "roots": "positive"
+  "f": "Delta*v=u*ln(((m_i)/(m)))"
  },
  {
   "name": "Lorentz factor",
-  "f": "gamma=((1)/(sqrt(1-(((v)^(2))/((c)^(2))))))",
-  "solvable": [
-   "gamma"
-  ],
-  "numeric_only": [
-   "c",
-   "v"
-  ],
-  "roots": "positive"
+  "f": "gamma=((1)/(sqrt(1-(((v)^(2))/((c)^(2))))))"
  },
  {
   "name": "Relativistic Doppler effect for wavelength",
-  "f": "lambda_obs=lambda_s*sqrt(((1+((v)/(c)))/(1-((v)/(c)))))",
-  "solvable": [
-   "lambda_obs",
-   "lambda_s"
-  ],
-  "numeric_only": [
-   "c",
-   "v"
-  ],
-  "roots": "positive"
+  "f": "lambda_obs=lambda_s*sqrt(((1+((v)/(c)))/(1-((v)/(c)))))"
  },
  {
   "name": "Relativistic Doppler effect for frequency",
-  "f": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))",
-  "solvable": [
-   "f_obs",
-   "f_s"
-  ],
-  "numeric_only": [
-   "c",
-   "v"
-  ],
-  "roots": "positive"
+  "f": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))"
  },
  {
   "name": "Potential energy of a two-charge system",
-  "f": "U(r)=k_e*((q*Q)/(r))",
-  "solvable": [
-   "Q",
-   "k_e",
-   "q"
-  ],
-  "numeric_only": [
-   "r"
-  ],
-  "roots": "positive"
+  "f": "U(r)=k_e*((q*Q)/(r))"
  },
  {
   "name": "Electric potential of a point charge",
-  "f": "V=((k_e*q)/(r))",
-  "solvable": [
-   "V",
-   "k_e",
-   "q",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V=((k_e*q)/(r))"
  },
  {
   "name": "Velocity of a wave",
-  "f": "v=f*lambda",
-  "solvable": [
-   "f",
-   "lambda",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=f*lambda"
  },
  {
   "name": "Speed of sound in a fluid",
-  "f": "v=sqrt(((B)/(rho)))",
-  "solvable": [
-   "v"
-  ],
-  "numeric_only": [
-   "B",
-   "rho"
-  ],
-  "roots": "positive"
+  "f": "v=sqrt(((B)/(rho)))"
  },
  {
   "name": "Speed of sound in a solid",
-  "f": "v=sqrt(((Y)/(rho)))",
-  "solvable": [
-   "v"
-  ],
-  "numeric_only": [
-   "Y",
-   "rho"
-  ],
-  "roots": "positive"
+  "f": "v=sqrt(((Y)/(rho)))"
  },
  {
   "name": "Speed of sound in an ideal gas",
-  "f": "v=sqrt(((gamma*R*T)/(M)))",
-  "solvable": [
-   "v"
-  ],
-  "numeric_only": [
-   "M",
-   "R",
-   "T",
-   "gamma"
-  ],
-  "roots": "positive"
+  "f": "v=sqrt(((gamma*R*T)/(M)))"
  },
  {
   "name": "Decrease in intensity as a spherical wave expands",
-  "f": "I_2=I_1*((((r_1)/(r_2))))^(2)",
-  "solvable": [
-   "I_1",
-   "I_2",
-   "r_1"
-  ],
-  "numeric_only": [
-   "r_2"
-  ],
-  "roots": "positive"
+  "f": "I_2=I_1*((((r_1)/(r_2))))^(2)"
  },
  {
   "name": "Intensity of sound",
-  "f": "I=((((Deltap_max))^(2))/(2*rho*v))",
-  "solvable": [
-   "Deltap_max",
-   "I",
-   "rho",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "I=((((Delta*p_max))^(2))/(2*rho*v))"
  },
  {
   "name": "Sound intensity level",
-  "f": "beta*(d*B)=10*log_10*(((I)/(I_0)))",
-  "solvable": [
-   "B",
-   "I",
-   "beta",
-   "d",
-   "log_10"
-  ],
-  "numeric_only": [
-   "I_0"
-  ],
-  "roots": "positive"
+  "f": "beta*(d*B)=10*log_10*(((I)/(I_0)))"
  },
  {
   "name": "Beat frequency produced by two waves thatdiffer in frequency",
-  "f": "f_beat=|f_2-f_1|",
-  "solvable": [
-   "f_beat"
-  ],
-  "numeric_only": [
-   "f_1",
-   "f_2"
-  ],
-  "roots": "positive"
+  "f": "f_beat=|f_2-f_1|"
  },
  {
   "name": "Mach number",
-  "f": "M=((v_s)/(v))",
-  "solvable": [
-   "M",
-   "v",
-   "v_s"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "M=((v_s)/(v))"
  },
  {
   "name": "Density of a sample at constant density",
-  "f": "rho=((m)/(V))",
-  "solvable": [
-   "V",
-   "m",
-   "rho"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "rho=((m)/(V))"
  },
  {
   "name": "Pressure",
-  "f": "p=((F)/(A))",
-  "solvable": [
-   "A",
-   "F",
-   "p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p=((F)/(A))"
  },
  {
   "name": "Pressure at a depth h in a fluid of constant density",
-  "f": "p=p_0+rho*g*h",
-  "solvable": [
-   "g",
-   "h",
-   "p",
-   "p_0",
-   "rho"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p=p_0+rho*g*h"
  },
  {
   "name": "Absolute pressure",
-  "f": "p_abs=p_g+p_atm",
-  "solvable": [
-   "p_abs",
-   "p_atm",
-   "p_g"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p_abs=p_g+p_atm"
  },
  {
   "name": "Volume flow rate",
-  "f": "Q=((d*V)/(d*t))",
-  "solvable": [
-   "Q",
-   "V",
-   "d",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=((d*V)/(d*t))"
  },
  {
   "name": "Continuity equation (constant density)",
-  "f": "A_1*v_1=A_2*v_2",
-  "solvable": [
-   "A_1",
-   "A_2",
-   "v_1",
-   "v_2"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "A_1*v_1=A_2*v_2"
  },
  {
   "name": "Continuity equation (general form)",
-  "f": "rho_1*A_1*v_1=rho_2*A_2*v_2",
-  "solvable": [
-   "A_1",
-   "A_2",
-   "rho_1",
-   "rho_2",
-   "v_1",
-   "v_2"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "rho_1*A_1*v_1=rho_2*A_2*v_2"
  },
  {
   "name": "Bernoulli\u2019s equation",
-  "f": "p+((1)/(2))*rho*(v)^(2)+rho*g*y=constant",
-  "solvable": [
-   "constant",
-   "g",
-   "p",
-   "rho",
-   "v",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "p+((1)/(2))*rho*(v)^(2)+rho*g*y=constant"
  },
  {
   "name": "Relationship between frequency and period",
-  "f": "f=((1)/(T))",
-  "solvable": [
-   "T",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f=((1)/(T))"
  },
  {
   "name": "Position in SHM with\u03d5=0.00",
-  "f": "x*(t)=Acos(omega*t)",
-  "solvable": [
-   "omega",
-   "t",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "x*(t)=A*cos(omega*t)"
  },
  {
   "name": "Maximum displacement (amplitude) of SHM",
-  "f": "x_max=A",
-  "solvable": [
-   "A",
-   "x_max"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "x_max=A"
  },
  {
   "name": "Angular frequency of a mass-spring system in SHM",
-  "f": "omega=sqrt(((k)/(m)))",
-  "solvable": [
-   "omega"
-  ],
-  "numeric_only": [
-   "k",
-   "m"
-  ],
-  "roots": "positive"
+  "f": "omega=sqrt(((k)/(m)))"
  },
  {
   "name": "Period of a mass-spring system in SHM",
-  "f": "T=2*pi*sqrt(((m)/(k)))",
-  "solvable": [
-   "T"
-  ],
-  "numeric_only": [
-   "k",
-   "m"
-  ],
-  "roots": "positive"
+  "f": "T=2*pi*sqrt(((m)/(k)))"
  },
  {
   "name": "Frequency of a mass-spring system in SHM",
-  "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
-  "solvable": [
-   "f"
-  ],
-  "numeric_only": [
-   "k",
-   "m"
-  ],
-  "roots": "positive"
+  "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))"
  },
  {
   "name": "Angular frequency for a simple pendulum",
-  "f": "omega=sqrt(((g)/(L)))",
-  "solvable": [
-   "omega"
-  ],
-  "numeric_only": [
-   "L",
-   "g"
-  ],
-  "roots": "positive"
+  "f": "omega=sqrt(((g)/(L)))"
  },
  {
   "name": "Period of a simple pendulum",
-  "f": "T=2*pi*sqrt(((L)/(g)))",
-  "solvable": [
-   "T"
-  ],
-  "numeric_only": [
-   "L",
-   "g"
-  ],
-  "roots": "positive"
+  "f": "T=2*pi*sqrt(((L)/(g)))"
  },
  {
   "name": "Angular frequency of a physical pendulum",
-  "f": "omega=sqrt(((m*g*L)/(I)))",
-  "solvable": [
-   "omega"
-  ],
-  "numeric_only": [
-   "I",
-   "L",
-   "g",
-   "m"
-  ],
-  "roots": "positive"
+  "f": "omega=sqrt(((m*g*L)/(I)))"
  },
  {
   "name": "Period of a physical pendulum",
-  "f": "T=2*pi*sqrt(((I)/(m*g*L)))",
-  "solvable": [
-   "T"
-  ],
-  "numeric_only": [
-   "I",
-   "L",
-   "g",
-   "m"
-  ],
-  "roots": "positive"
+  "f": "T=2*pi*sqrt(((I)/(m*g*L)))"
  },
  {
   "name": "Newton\u2019s second law for harmonic motion",
-  "f": "m*(((d)^(2)*x)/(d*(t)^(2)))+b*((d*x)/(d*t))+k*x=0",
-  "solvable": [
-   "b",
-   "k",
-   "m",
-   "x"
-  ],
-  "numeric_only": [
-   "d",
-   "t"
-  ],
-  "roots": "positive"
+  "f": "m*(((d)^(2)*x)/(d*(t)^(2)))+b*((d*x)/(d*t))+k*x=0"
  },
  {
   "name": "Natural angular frequency of amass-spring system",
-  "f": "omega_0=sqrt(((k)/(m)))",
-  "solvable": [
-   "omega_0"
-  ],
-  "numeric_only": [
-   "k",
-   "m"
-  ],
-  "roots": "positive"
+  "f": "omega_0=sqrt(((k)/(m)))"
  },
  {
   "name": "Angular frequency of underdampedharmonic motion",
-  "f": "omega=sqrt(omega02-((((b)/(2*m))))^(2))",
-  "solvable": [
-   "omega"
-  ],
-  "numeric_only": [
-   "b",
-   "m",
-   "omega02"
-  ],
-  "roots": "positive"
+  "f": "omega=sqrt(omega02-((((b)/(2*m))))^(2))"
  },
  {
   "name": "Amplitude of system undergoing forced,damped oscillations",
-  "f": "A=((F_o)/(sqrt((m)^(2)*(((omega)^(2)-omegao2))^(2)+(b)^(2)*(omega)^(2))))",
-  "solvable": [
-   "A",
-   "F_o"
-  ],
-  "numeric_only": [
-   "b",
-   "m",
-   "omega",
-   "omegao2"
-  ],
-  "roots": "positive"
+  "f": "A=((F_o)/(sqrt((m)^(2)*(((omega)^(2)-omegao2))^(2)+(b)^(2)*(omega)^(2))))"
  },
  {
   "name": "Self-inductance in terms of magnetic flux",
-  "f": "N*Phi_m=L*I",
-  "solvable": [
-   "I",
-   "L",
-   "N",
-   "Phi_m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "N*Phi_m=L*I"
  },
  {
   "name": "Self-inductance of a solenoid",
-  "f": "L_solenoid=((mu_0*(N)^(2)*A)/(l))",
-  "solvable": [
-   "A",
-   "L_solenoid",
-   "N",
-   "l",
-   "mu_0"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "L_solenoid=((mu_0*(N)^(2)*A)/(l))"
  },
  {
   "name": "Energy stored in an inductor",
-  "f": "U=((1)/(2))*L*(I)^(2)",
-  "solvable": [
-   "I",
-   "L",
-   "U"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "U=((1)/(2))*L*(I)^(2)"
  },
  {
   "name": "Time constant for a RL circuit",
-  "f": "tau_L=L/R",
-  "solvable": [
-   "L",
-   "R",
-   "tau_L"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "tau_L=L/R"
  },
  {
   "name": "Angular frequency in LC circuits",
-  "f": "omega=sqrt(((1)/(L*C)))",
-  "solvable": [
-   "omega"
-  ],
-  "numeric_only": [
-   "C",
-   "L"
-  ],
-  "roots": "positive"
+  "f": "omega=sqrt(((1)/(L*C)))"
  },
  {
   "name": "Field amplitude in the diffraction pattern",
-  "f": "E=NDeltaE_0*((sinbeta)/(beta))",
-  "solvable": [
-   "E",
-   "NDeltaE_0",
-   "sinbeta"
-  ],
-  "numeric_only": [
-   "beta"
-  ],
-  "roots": "positive"
+  "f": "E=N*Delta*E_0*((sin(beta))/(beta))"
  },
  {
   "name": "Intensity in the diffraction pattern",
-  "f": "I=I_0*((((sinbeta)/(beta))))^(2)",
-  "solvable": [
-   "I",
-   "I_0",
-   "sinbeta"
-  ],
-  "numeric_only": [
-   "beta"
-  ],
-  "roots": "positive"
+  "f": "I=I_0*((((sin(beta))/(beta))))^(2)"
  },
  {
   "name": "Rayleigh criterion for circular apertures",
-  "f": "theta=1.22*((lambda)/(D))",
-  "solvable": [
-   "lambda",
-   "theta"
-  ],
-  "numeric_only": [
-   "D"
-  ],
-  "roots": "positive"
+  "f": "theta=1.22*((lambda)/(D))"
  },
  {
   "name": "Ideal gas law in terms of molecules",
-  "f": "p*V=N*k_B*T",
-  "solvable": [
-   "N",
-   "T",
-   "V",
-   "k_B",
-   "p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p*V=N*k_B*T"
  },
  {
   "name": "Ideal gas law in terms of moles",
-  "f": "p*V=n*R*T",
-  "solvable": [
-   "R",
-   "T",
-   "V",
-   "n",
-   "p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p*V=n*R*T"
  },
  {
   "name": "Mean free time",
-  "f": "tau=((k_B*T)/(4*sqrt(2)*pi*(r)^(2)*p*v_rms))",
-  "solvable": [
-   "T",
-   "k_B",
-   "p",
-   "r",
-   "tau",
-   "v_rms"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "tau=((k_B*T)/(4*sqrt(2)*pi*(r)^(2)*p*v_rms))"
  },
  {
   "name": "Heat in terms of molar heat capacity at constant volume",
-  "f": "Q=n*C_VDeltaT",
-  "solvable": [
-   "C_VDeltaT",
-   "Q",
-   "n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=n*C_V*Delta*T"
  },
  {
   "name": "Molar heat capacity at constant volume for an ideal gas with d degrees of freedom",
-  "f": "C_V=((d)/(2))*R",
-  "solvable": [
-   "C_V",
-   "R",
-   "d"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "C_V=((d)/(2))*R"
  },
  {
   "name": "Average electrical current",
-  "f": "I_ave=((DeltaQ)/(Deltat))",
-  "solvable": [
-   "DeltaQ",
-   "Deltat",
-   "I_ave"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I_ave=((Delta*Q)/(Delta*t))"
  },
  {
   "name": "Electrical current",
-  "f": "I=((d*Q)/(d*t))",
-  "solvable": [
-   "I",
-   "Q",
-   "d",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I=((d*Q)/(d*t))"
  },
  {
   "name": "Drift velocity",
-  "f": "v_d=((I)/(n*q*A))",
-  "solvable": [
-   "A",
-   "I",
-   "n",
-   "q",
-   "v_d"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_d=((I)/(n*q*A))"
  },
  {
   "name": "Resistivity",
-  "f": "rho=((E)/(J))",
-  "solvable": [
-   "E",
-   "J",
-   "rho"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "rho=((E)/(J))"
  },
  {
   "name": "Common expression of Ohm\u2019s law",
-  "f": "V=I*R",
-  "solvable": [
-   "I",
-   "R",
-   "V"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V=I*R"
  },
  {
   "name": "Resistance of a cylinder of material",
-  "f": "R=rho*((L)/(A))",
-  "solvable": [
-   "L",
-   "R",
-   "rho"
-  ],
-  "numeric_only": [
-   "A"
-  ],
-  "roots": "positive"
+  "f": "R=rho*((L)/(A))"
  },
  {
   "name": "Temperature dependence of resistance",
-  "f": "R=R_0*(1+alphaDeltaT)",
-  "solvable": [
-   "R",
-   "R_0",
-   "alphaDeltaT"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "R=R_0*(1+alpha*Delta*T)"
  },
  {
   "name": "Electric power",
-  "f": "P=I*V",
-  "solvable": [
-   "I",
-   "P",
-   "V"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P=I*V"
  },
  {
   "name": "Wien\u2019s displacement law",
-  "f": "lambda_max*T=2.898*(10)^(-3)m*K",
-  "solvable": [
-   "K",
-   "T",
-   "lambda_max",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "lambda_max*T=2.898*(10)^(-3)*m*K"
  },
  {
   "name": "Stefan\u2019s law",
-  "f": "P(T)=sigma*A*(T)^(4)",
-  "solvable": [
-   "A",
-   "sigma"
-  ],
-  "numeric_only": [
-   "T"
-  ],
-  "roots": "positive"
+  "f": "P(T)=sigma*A*(T)^(4)"
  },
  {
   "name": "Energy quantum of radiation",
-  "f": "Delta*E=h*f",
-  "solvable": [
-   "Delta",
-   "E",
-   "f",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*E=h*f"
  },
  {
   "name": "Maximum kinetic energyof a photoelectron",
-  "f": "K_max=e*Delta*V_s",
-  "solvable": [
-   "Delta",
-   "K_max",
-   "V_s"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "K_max=e*Delta*V_s"
  },
  {
   "name": "Energy of a photon",
-  "f": "E_f=h*f",
-  "solvable": [
-   "E_f",
-   "f",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "E_f=h*f"
  },
  {
   "name": "Energy-momentum relationfor photon",
-  "f": "p_f=((E_f)/(c))",
-  "solvable": [
-   "E_f",
-   "c",
-   "p_f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p_f=((E_f)/(c))"
  },
  {
   "name": "Magnitude of photon\u2019s momentum",
-  "f": "p_f=((h)/(lambda))",
-  "solvable": [
-   "h",
-   "lambda",
-   "p_f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p_f=((h)/(lambda))"
  },
  {
   "name": "The Compton shift",
-  "f": "Delta*lambda=lambda_c(1-cos*theta)",
-  "solvable": [
-   "Delta",
-   "lambda",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*lambda=lambda_c(1-cos(theta))"
  },
  {
   "name": "Bohr\u2019s second quantization condition",
-  "f": "h*f=|E_n-E_m|",
-  "solvable": [
-   "f",
-   "h"
-  ],
-  "numeric_only": [
-   "E_m",
-   "E_n"
-  ],
-  "roots": "positive"
+  "f": "h*f=|E_n-E_m|"
  },
  {
   "name": "Bohr\u2019s radius of the nth orbit",
-  "f": "r_n=a_0*(n)^(2)",
-  "solvable": [
-   "a_0",
-   "n",
-   "r_n"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "r_n=a_0*(n)^(2)"
  },
  {
   "name": "Electron\u2019s energy inthe nth orbit",
-  "f": "E_n=-E_0*((1)/((n)^(2)))",
-  "solvable": [
-   "E_0",
-   "E_n"
-  ],
-  "numeric_only": [
-   "n"
-  ],
-  "roots": "positive"
+  "f": "E_n=-E_0*((1)/((n)^(2)))"
  },
  {
   "name": "The nth orbit ofhydrogen-like ion",
-  "f": "r_n=((a_0)/(Z))*(n)^(2)",
-  "solvable": [
-   "a_0",
-   "n",
-   "r_n"
-  ],
-  "numeric_only": [
-   "Z"
-  ],
-  "roots": "positive"
+  "f": "r_n=((a_0)/(Z))*(n)^(2)"
  },
  {
   "name": "The nth energyof hydrogen-like ion",
-  "f": "E_n=-(Z)^(2)*E_0*((1)/((n)^(2)))",
-  "solvable": [
-   "E_0",
-   "E_n",
-   "Z"
-  ],
-  "numeric_only": [
-   "n"
-  ],
-  "roots": "positive"
+  "f": "E_n=-(Z)^(2)*E_0*((1)/((n)^(2)))"
  },
  {
   "name": "Energy of a matter wave",
-  "f": "E=h*f",
-  "solvable": [
-   "E",
-   "f",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "E=h*f"
  },
  {
   "name": "The de Broglie wavelength",
-  "f": "lambda=((h)/(p))",
-  "solvable": [
-   "h",
-   "lambda",
-   "p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "lambda=((h)/(p))"
  },
  {
   "name": "The frequency-wavelength relationfor matter waves",
-  "f": "lambda*f=((c)/(beta))",
-  "solvable": [
-   "beta",
-   "c",
-   "f",
-   "lambda"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "lambda*f=((c)/(beta))"
  },
  {
   "name": "Angular position",
-  "f": "theta=((s)/(r))",
-  "solvable": [
-   "r",
-   "s",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "theta=((s)/(r))"
  },
  {
   "name": "Tangential speed",
-  "f": "v_t=r*omega",
-  "solvable": [
-   "omega",
-   "r",
-   "v_t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_t=r*omega"
  },
  {
   "name": "Tangential acceleration",
-  "f": "a_t=r*alpha",
-  "solvable": [
-   "a_t",
-   "alpha",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a_t=r*alpha"
  },
  {
   "name": "Angular velocity from constant angular acceleration",
-  "f": "omega_f=omega_0+alpha*t",
-  "solvable": [
-   "alpha",
-   "omega_0",
-   "omega_f",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "omega_f=omega_0+alpha*t"
  },
  {
   "name": "Angular velocity from displacement andconstant angular acceleration",
-  "f": "theta_f=theta_0+omega_0*t+((1)/(2))*alpha*(t)^(2)",
-  "solvable": [
-   "alpha",
-   "omega_0",
-   "theta_0",
-   "theta_f"
-  ],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "theta_f=theta_0+omega_0*t+((1)/(2))*alpha*(t)^(2)"
  },
  {
   "name": "Change in angular velocity",
-  "f": "omegaf2=omega02+2*alpha(Deltatheta)",
-  "solvable": [
-   "Deltatheta",
-   "omega02",
-   "omegaf2"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "omegaf2=omega02+2*alpha(Delta*theta)"
  },
  {
   "name": "Rotational kinetic energy in terms of themoment of inertia of a rigid body",
-  "f": "K=((1)/(2))*I*(omega)^(2)",
-  "solvable": [
-   "I",
-   "K",
-   "omega"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "K=((1)/(2))*I*(omega)^(2)"
  },
  {
   "name": "Parallel-axis theorem",
-  "f": "I_parallelaxis=I_centerofmass+m*(d)^(2)",
-  "solvable": [
-   "I_centerofmass",
-   "I_parallelaxis",
-   "d",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "I_parallelaxis=I_centerofmass+m*(d)^(2)"
  },
  {
   "name": "Work-energy theorem",
-  "f": "W_AB=K_B-K_A",
-  "solvable": [
-   "K_A",
-   "K_B",
-   "W_AB"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W_AB=K_B-K_A"
  },
  {
   "name": "Rotational power",
-  "f": "P=tau*omega",
-  "solvable": [
-   "P",
-   "omega",
-   "tau"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P=tau*omega"
  },
  {
   "name": "Atomic mass number",
-  "f": "A=Z+N",
-  "solvable": [
-   "A",
-   "N",
-   "Z"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "A=Z+N"
  },
  {
   "name": "Nuclear radius, where r0 is the radius of a single proton",
-  "f": "r=r_0*(A)^(1/3)",
-  "solvable": [
-   "r",
-   "r_0"
-  ],
-  "numeric_only": [
-   "A"
-  ],
-  "roots": "positive"
+  "f": "r=r_0*(A)^(1/3)"
  },
  {
   "name": "Mass defect",
-  "f": "Deltam=Z*m_p+(A-Z)m_n-m_nuc",
-  "solvable": [
-   "A",
-   "Deltam",
-   "Z",
-   "m_n",
-   "m_nuc",
-   "m_p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*m=Z*m_p+(A-Z)m_n-m_nuc"
  },
  {
   "name": "Binding energy",
-  "f": "E=(Deltam)(c)^(2)",
-  "solvable": [
-   "Deltam",
-   "E",
-   "c"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "E=(Delta*m)(c)^(2)"
  },
  {
   "name": "Binding energy per nucleon",
-  "f": "B*E*N=((E_b)/(A))",
-  "solvable": [
-   "A",
-   "B",
-   "E",
-   "E_b",
-   "N"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "B*E*N=((E_b)/(A))"
  },
  {
   "name": "Decay constant",
-  "f": "lambda=((0.693)/(T_12))",
-  "solvable": [
-   "T_12",
-   "lambda"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "lambda=((0.693)/(T_12))"
  },
  {
   "name": "The magnitude of the electric field just outside the surface of a conductor",
-  "f": "E=((sigma)/(epsilon_0))",
-  "solvable": [
-   "E",
-   "epsilon_0",
-   "sigma"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "E=((sigma)/(epsilon_0))"
  },
  {
   "name": "Terminal voltage of a single voltage source",
-  "f": "V_terminal=epsilon-I*r_eq",
-  "solvable": [
-   "I",
-   "V_terminal",
-   "epsilon",
-   "r_eq"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V_terminal=epsilon-I*r_eq"
  },
  {
   "name": "Time constant",
-  "f": "tau=R*C",
-  "solvable": [
-   "C",
-   "R",
-   "tau"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "tau=R*C"
  },
  {
   "name": "Charge on a discharging capacitor",
-  "f": "q*(t)=Q*(e)^(-((t)/(tau)))",
-  "solvable": [
-   "Q",
-   "q"
-  ],
-  "numeric_only": [
-   "t",
-   "tau"
-  ],
-  "roots": "positive"
+  "f": "q*(t)=Q*(e)^(-((t)/(tau)))"
  },
  {
   "name": "Current during discharging of a capacitor",
-  "f": "I*(t)=-((Q)/(R*C))*(e)^(-((t)/(tau)))",
-  "solvable": [
-   "I",
-   "Q"
-  ],
-  "numeric_only": [
-   "C",
-   "R",
-   "t",
-   "tau"
-  ],
-  "roots": "positive"
+  "f": "I*(t)=-((Q)/(R*C))*(e)^(-((t)/(tau)))"
  },
  {
   "name": "Contribution to magnetic fieldfrom a current element",
-  "f": "d*B=((mu_0)/(4*pi))*((I*d*lsintheta)/((r)^(2)))",
-  "solvable": [
-   "B",
-   "I",
-   "d",
-   "lsintheta",
-   "mu_0"
-  ],
-  "numeric_only": [
-   "r"
-  ],
-  "roots": "positive"
+  "f": "d*B=((mu_0)/(4*pi))*((I*d*l*sin(theta))/((r)^(2)))"
  },
  {
   "name": "Magnetic field due to along straight wire",
-  "f": "B=((mu_0*I)/(2*pi*R))",
-  "solvable": [
-   "B",
-   "I",
-   "R",
-   "mu_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "B=((mu_0*I)/(2*pi*R))"
  },
  {
   "name": "Magnetic field of a current loop",
-  "f": "B=((mu_0*I)/(2*R))(atcenterofloop)",
-  "solvable": [
-   "B",
-   "I",
-   "atcenterofloop",
-   "mu_0"
-  ],
-  "numeric_only": [
-   "R"
-  ],
-  "roots": "positive"
+  "f": "B=((mu_0*I)/(2*R))*(atcenterofloop)"
  },
  {
   "name": "Magnetic field strengthinside a solenoid",
-  "f": "B=mu_0*n*I",
-  "solvable": [
-   "B",
-   "I",
-   "mu_0",
-   "n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "B=mu_0*n*I"
  },
  {
   "name": "Magnetic field strength inside a toroid",
-  "f": "B=((mu_o*N*I)/(2*pi*r))",
-  "solvable": [
-   "B",
-   "I",
-   "N",
-   "mu_o",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "B=((mu_o*N*I)/(2*pi*r))"
  },
  {
   "name": "Magnetic field of a solenoidfilled with paramagnetic material",
-  "f": "B=mu*n*I",
-  "solvable": [
-   "B",
-   "I",
-   "mu",
-   "n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "B=mu*n*I"
  },
  {
   "name": "AC voltage",
-  "f": "v=V_0sinomega*t",
-  "solvable": [
-   "V_0sinomega",
-   "t",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=V_0*sin(omega)*t"
  },
  {
   "name": "AC current",
-  "f": "i=I_0sinomega*t",
-  "solvable": [
-   "I_0sinomega",
-   "i",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "i=I_0*sin(omega)*t"
  },
  {
   "name": "rms voltage",
-  "f": "V_rms=((V_0)/(sqrt(2)))",
-  "solvable": [
-   "V_0",
-   "V_rms"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V_rms=((V_0)/(sqrt(2)))"
  },
  {
   "name": "rms current",
-  "f": "I_rms=((I_0)/(sqrt(2)))",
-  "solvable": [
-   "I_0",
-   "I_rms"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I_rms=((I_0)/(sqrt(2)))"
  },
  {
   "name": "AC version of Ohm\u2019s law",
-  "f": "I_0=((V_0)/(Z))",
-  "solvable": [
-   "I_0",
-   "V_0",
-   "Z"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I_0=((V_0)/(Z))"
  },
  {
   "name": "Impedance of an RLC series circuit",
-  "f": "Z=sqrt((R)^(2)+((X_L-X_C))^(2))",
-  "solvable": [
-   "Z"
-  ],
-  "numeric_only": [
-   "R",
-   "X_C",
-   "X_L"
-  ],
-  "roots": "positive"
+  "f": "Z=sqrt((R)^(2)+((X_L-X_C))^(2))"
  },
  {
   "name": "Resonant angular frequency of a circuit",
-  "f": "omega_0=sqrt(((1)/(L*C)))",
-  "solvable": [
-   "omega_0"
-  ],
-  "numeric_only": [
-   "C",
-   "L"
-  ],
-  "roots": "positive"
+  "f": "omega_0=sqrt(((1)/(L*C)))"
  },
  {
   "name": "Quality factor of a circuit",
-  "f": "Q=((omega_0)/(Deltaomega))",
-  "solvable": [
-   "Deltaomega",
-   "Q",
-   "omega_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=((omega_0)/(Delta*omega))"
  },
  {
   "name": "Quality factor of a circuit in terms of the circuit parameters",
-  "f": "Q=((omega_0*L)/(R))",
-  "solvable": [
-   "L",
-   "Q",
-   "R",
-   "omega_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=((omega_0*L)/(R))"
  },
  {
   "name": "Transformer equation with current",
-  "f": "I_S=((N_P)/(N_S))*I_P",
-  "solvable": [
-   "I_P",
-   "I_S",
-   "N_P"
-  ],
-  "numeric_only": [
-   "N_S"
-  ],
-  "roots": "positive"
+  "f": "I_S=((N_P)/(N_S))*I_P"
  },
  {
   "name": "Potential-energy function of a harmonic oscillator",
-  "f": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
-  "solvable": [
-   "m",
-   "omega"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)"
  },
  {
   "name": "Linear mass density",
-  "f": "mu=((massofthestring)/(lengthofthestring))",
-  "solvable": [
-   "lengthofthestring",
-   "massofthestring",
-   "mu"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "mu=((massofthestring)/(lengthofthestring))"
  },
  {
   "name": "Wave speed",
-  "f": "v=((omega)/(k))",
-  "solvable": [
-   "k",
-   "omega",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=((omega)/(k))"
  },
  {
   "name": "Intensity",
-  "f": "I=((P)/(A))",
-  "solvable": [
-   "A",
-   "I",
-   "P"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I=((P)/(A))"
  },
  {
   "name": "Intensity for a spherical wave",
-  "f": "I=((P)/(4*pi*(r)^(2)))",
-  "solvable": [
-   "I",
-   "P",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "I=((P)/(4*pi*(r)^(2)))"
  },
  {
   "name": "Index of refraction",
-  "f": "n=((c)/(v))",
-  "solvable": [
-   "c",
-   "n",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "n=((c)/(v))"
  },
  {
   "name": "Law of reflection",
-  "f": "theta_r=theta_i",
-  "solvable": [
-   "theta_i",
-   "theta_r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "theta_r=theta_i"
  },
  {
   "name": "Law of refraction (Snell\u2019s law)",
-  "f": "n_1sintheta_1=n_2sintheta_2",
-  "solvable": [
-   "n_1sintheta_1",
-   "n_2sintheta_2"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "n_1*sin(theta_1)=n_2*sin(theta_2)"
  },
  {
   "name": "Malus\u2019s law",
-  "f": "I=I_0*(cos)^(2)*theta",
-  "solvable": [
-   "I",
-   "I_0",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
- },
- {
-  "name": "Brewster\u2019s law",
-  "f": "tantheta_b=((n_2)/(n_1))",
-  "solvable": [
-   "n_1",
-   "n_2",
-   "tantheta_b"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I=I_0*(cos)^(2)*theta"
  },
  {
   "name": "Linear thermal expansion",
-  "f": "DeltaL=alpha*LDeltaT",
-  "solvable": [
-   "DeltaL",
-   "LDeltaT",
-   "alpha"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*L=alpha*L*Delta*T"
  },
  {
   "name": "Thermal expansion in two dimensions",
-  "f": "DeltaA=2*alpha*ADeltaT",
-  "solvable": [
-   "ADeltaT",
-   "DeltaA",
-   "alpha"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*A=2*alpha*A*Delta*T"
  },
  {
   "name": "Thermal expansion in three dimensions",
-  "f": "DeltaV=beta*VDeltaT",
-  "solvable": [
-   "DeltaV",
-   "VDeltaT",
-   "beta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*V=beta*V*Delta*T"
  },
  {
   "name": "Heat transfer",
-  "f": "Q=m*cDeltaT",
-  "solvable": [
-   "Q",
-   "cDeltaT",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=m*c*Delta*T"
  },
  {
   "name": "Transfer of heat in a calorimeter",
-  "f": "Q_cold+Q_hot=0",
-  "solvable": [
-   "Q_cold",
-   "Q_hot"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q_cold+Q_hot=0"
  },
  {
   "name": "Heat due to phase change (melting and freezing)",
-  "f": "Q=m*L_f",
-  "solvable": [
-   "L_f",
-   "Q",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=m*L_f"
  },
  {
   "name": "Heat due to phase change (evaporation and condensation)",
-  "f": "Q=m*L_v",
-  "solvable": [
-   "L_v",
-   "Q",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Q=m*L_v"
  },
  {
   "name": "Rate of conductive heat transfer",
-  "f": "P=((k*A*(T_h-T_c))/(d))",
-  "solvable": [
-   "A",
-   "P",
-   "T_c",
-   "T_h",
-   "d",
-   "k"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P=((k*A*(T_h-T_c))/(d))"
  },
  {
   "name": "Magnitude of magnetic force",
-  "f": "F=q*v*Bsintheta",
-  "solvable": [
-   "Bsintheta",
-   "F",
-   "q",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F=q*v*B*sin(theta)"
  },
  {
   "name": "Radius of a particle\u2019s path in a magnetic field",
-  "f": "r=((m*v)/(q*B))",
-  "solvable": [
-   "B",
-   "m",
-   "q",
-   "r",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "r=((m*v)/(q*B))"
  },
  {
   "name": "Period of a particle\u2019s motion in a magnetic field",
-  "f": "T=((2*pi*m)/(q*B))",
-  "solvable": [
-   "B",
-   "T",
-   "m",
-   "q"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T=((2*pi*m)/(q*B))"
  },
  {
   "name": "Drift velocity in crossed electric and magnetic fields",
-  "f": "v_d=((E)/(B))",
-  "solvable": [
-   "B",
-   "E",
-   "v_d"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_d=((E)/(B))"
  },
  {
   "name": "Hall potential",
-  "f": "V=((I*B*l)/(n*e*A))",
-  "solvable": [
-   "A",
-   "B",
-   "I",
-   "V",
-   "l",
-   "n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V=((I*B*l)/(n*e*A))"
  },
  {
   "name": "Hall potential in terms of drift velocity",
-  "f": "V=B*l*v_d",
-  "solvable": [
-   "B",
-   "V",
-   "l",
-   "v_d"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V=B*l*v_d"
  },
  {
   "name": "Maximum speed of a particle in a cyclotron",
-  "f": "v_max=((q*B*R)/(m))",
-  "solvable": [
-   "B",
-   "R",
-   "m",
-   "q",
-   "v_max"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_max=((q*B*R)/(m))"
  },
  {
   "name": "Path length difference for waves from two slits to a common point on a screen",
-  "f": "Deltal=dsintheta",
-  "solvable": [
-   "Deltal",
-   "dsintheta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*l=d*sin(theta)"
  },
  {
   "name": "Distance from central maximum to the mth bright fringe",
-  "f": "y_m=((m*lambda*D)/(d))",
-  "solvable": [
-   "D",
-   "d",
-   "lambda",
-   "m",
-   "y_m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y_m=((m*lambda*D)/(d))"
  },
  {
   "name": "Displacement measured by a Michelson interferometer",
-  "f": "Deltad=m*((lambda_0)/(2))",
-  "solvable": [
-   "Deltad",
-   "lambda_0",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*d=m*((lambda_0)/(2))"
  },
  {
   "name": "Work-energy theorem",
-  "f": "W_net=K_B-K_A",
-  "solvable": [
-   "K_A",
-   "K_B",
-   "W_net"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W_net=K_B-K_A"
  },
  {
   "name": "Power as rate of doing work",
-  "f": "P=((d*W)/(d*t))",
-  "solvable": [
-   "P",
-   "W",
-   "d",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P=((d*W)/(d*t))"
  },
  {
   "name": "Linear relation betweenstress and strain",
-  "f": "stress=(elasticmodulus)*strain",
-  "solvable": [
-   "elasticmodulus",
-   "strain",
-   "stress"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "stress=(elasticmodulus)*strain"
  },
  {
   "name": "Hooke\u2019s law",
-  "f": "F=-k*x",
-  "solvable": [
-   "F",
-   "k",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F=-k*x"
  },
  {
   "name": "rearranged mirror/lens equation",
-  "f": "d_i=((f*d_o)/(d_o-f))",
-  "solvable": [
-   "d_i",
-   "d_o",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "d_i=((f*d_o)/(d_o-f))"
  },
  {
   "name": "lens/mirror equation (solved version)",
-  "f": "f=((d_i*d_o)/(d_o+d_i))",
-  "solvable": [
-   "d_i",
-   "d_o",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f=((d_i*d_o)/(d_o+d_i))"
  },
  {
   "name": "angle of displacement",
-  "f": "theta=(tan)^(-1)(y/x)",
-  "solvable": [
-   "theta",
-   "y"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "theta=(tan)^(-1)(y/x)"
  },
  {
   "name": "velocity",
-  "f": "v=sqrt(vx2+vy2)",
-  "solvable": [
-   "v"
-  ],
-  "numeric_only": [
-   "vx2",
-   "vy2"
-  ],
-  "roots": "positive"
+  "f": "v=sqrt(vx2+vy2)"
  },
  {
   "name": "angle of velocity",
-  "f": "theta_v=(tan)^(-1)(v_y/v_x)",
-  "solvable": [
-   "theta_v",
-   "v_y"
-  ],
-  "numeric_only": [
-   "v_x"
-  ],
-  "roots": "positive"
+  "f": "theta_v=(tan)^(-1)(v_y/v_x)"
  },
  {
   "name": "maximum height",
-  "f": "h=((v0*y2)/(2g))",
-  "solvable": [
-   "h",
-   "v0",
-   "y2"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "range",
-  "f": "R=((v02sin*2*theta_0)/(g))",
-  "solvable": [
-   "R",
-   "g",
-   "theta_0",
-   "v02sin"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "h=((v0*y2)/(2g))"
  },
  {
   "name": "momentum of a photon (deBroglie relation)",
-  "f": "p=((h)/(lambda))",
-  "solvable": [
-   "h",
-   "lambda",
-   "p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p=((h)/(lambda))"
  },
  {
   "name": "quadratic formula",
-  "f": "y=a*(x)^(2)+b*x+c",
-  "solvable": [
-   "a",
-   "b",
-   "c",
-   "y"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "y=a*(x)^(2)+b*x+c"
  },
  {
   "name": "positive exponential formula",
-  "f": "y=(a)^(x)",
-  "solvable": [
-   "y"
-  ],
-  "numeric_only": [
-   "a",
-   "x"
-  ],
-  "roots": "positive"
+  "f": "y=(a)^(x)"
  },
  {
   "name": "negative exponential formula",
-  "f": "y=(a)^(-x)",
-  "solvable": [
-   "y"
-  ],
-  "numeric_only": [
-   "a",
-   "x"
-  ],
-  "roots": "positive"
+  "f": "y=(a)^(-x)"
  },
  {
   "name": "normal force for a nonaccelerating horizontal surface",
-  "f": "N=mg",
-  "solvable": [
-   "N",
-   "mg"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "N=mg"
  },
  {
   "name": "tension for an object at rest",
-  "f": "T=mg",
-  "solvable": [
-   "T",
-   "mg"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T=mg"
  },
  {
   "name": "beat frequency",
-  "f": "f_B=|f_1-f_2|",
-  "solvable": [
-   "f_B"
-  ],
-  "numeric_only": [
-   "f_1",
-   "f_2"
-  ],
-  "roots": "positive"
+  "f": "f_B=|f_1-f_2|"
  },
  {
   "name": "Newton's first law of motion",
-  "f": "F_net=0",
-  "solvable": [
-   "F_net"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F_net=0"
  },
  {
   "name": "speed of light, frequency, and wavelength",
-  "f": "c=f*lambda",
-  "solvable": [
-   "c",
-   "f",
-   "lambda"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "c=f*lambda"
  },
  {
   "name": "change of wavelength with index of refraction",
-  "f": "lambda_n=((lambda)/(n))",
-  "solvable": [
-   "lambda",
-   "lambda_n",
-   "n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "lambda_n=((lambda)/(n))"
  },
  {
   "name": "two-slit constructive interference",
-  "f": "d*sin*theta=m*lambda",
-  "solvable": [
-   "d",
-   "lambda",
-   "m",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "d*sin(theta)=m*lambda"
  },
  {
   "name": "one-slit destructive interference",
-  "f": "D*sin*theta=m*lambda",
-  "solvable": [
-   "D",
-   "lambda",
-   "m",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "D*sin(theta)=m*lambda"
  },
  {
   "name": "sound intensity",
-  "f": "I=((((Delta*p))^(2))/(2*rho*v_w))",
-  "solvable": [
-   "Delta",
-   "I",
-   "p",
-   "rho",
-   "v_w"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "I=((((Delta*p))^(2))/(2*rho*v_w))"
  },
  {
   "name": "sound intensity level",
-  "f": "beta(dB)=10*log_10*(((I)/(I_0)))",
-  "solvable": [
-   "I",
-   "dB",
-   "log_10"
-  ],
-  "numeric_only": [
-   "I_0"
-  ],
-  "roots": "positive"
+  "f": "beta*(dB)=10*log_10*(((I)/(I_0)))"
  },
  {
   "name": "ideal gas law",
-  "f": "P*V=N*k*T",
-  "solvable": [
-   "N",
-   "P",
-   "T",
-   "V",
-   "k"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P*V=N*k*T"
  },
  {
   "name": "first law of thermodynamics",
-  "f": "Delta*U=Q-W",
-  "solvable": [
-   "Delta",
-   "Q",
-   "U",
-   "W"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*U=Q-W"
  },
  {
   "name": "pressure",
-  "f": "P=((F)/(A))",
-  "solvable": [
-   "A",
-   "F",
-   "P"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P=((F)/(A))"
  },
  {
   "name": "pressure\u2013volume work",
-  "f": "W=P*Delta*V",
-  "solvable": [
-   "Delta",
-   "P",
-   "V",
-   "W"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W=P*Delta*V"
  },
  {
   "name": "Displacement",
-  "f": "Deltad=d_f-d_0",
-  "solvable": [
-   "Deltad",
-   "d_0",
-   "d_f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Deltad=d_f-d_0"
  },
  {
   "name": "change in electric potential energy for a charge that moves in a constant electric field",
-  "f": "Delta*U_E=-q*E*(x_f-x_i)",
-  "solvable": [
-   "Delta",
-   "E",
-   "U_E",
-   "q",
-   "x_f",
-   "x_i"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*U_E=-q*E*(x_f-x_i)"
  },
  {
   "name": "electric potential energy of a charge a distance r from a point charge or sphere of uniform charge",
-  "f": "U_E=((k*Q*q)/(r))",
-  "solvable": [
-   "Q",
-   "U_E",
-   "k",
-   "q",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "U_E=((k*Q*q)/(r))"
  },
  {
   "name": "definition of electric potential",
-  "f": "V=((U_E)/(q))",
-  "solvable": [
-   "U_E",
-   "V",
-   "q"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V=((U_E)/(q))"
  },
  {
   "name": "change in electric potential for a charge that moves in a constant electric field",
-  "f": "Delta*V=-E*(x_f-x_i)",
-  "solvable": [
-   "Delta",
-   "E",
-   "V",
-   "x_f",
-   "x_i"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*V=-E*(x_f-x_i)"
  },
  {
   "name": "electric potential of a charge a distance r from a point charge or sphere of uniform charge",
-  "f": "V=((k*Q)/(r))",
-  "solvable": [
-   "Q",
-   "V",
-   "k",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "V=((k*Q)/(r))"
  },
  {
   "name": "magnitude of electric field of point charge",
-  "f": "E=((k*|Q|)/((r)^(2)))",
-  "solvable": [
-   "E",
-   "k",
-   "r"
-  ],
-  "numeric_only": [
-   "Q"
-  ],
-  "roots": "positive"
+  "f": "E=((k*|Q|)/((r)^(2)))"
  },
  {
   "name": "impulse\u2013momentum theorem",
-  "f": "Deltap=F_netDeltat",
-  "solvable": [
-   "Deltap",
-   "F_netDeltat"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Deltap=F_net*Delta*t"
  },
  {
   "name": "linear momentum",
-  "f": "p=mv",
-  "solvable": [
-   "mv",
-   "p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p=mv"
  },
  {
   "name": "Newton\u2019s second law in terms of momentum",
-  "f": "F_net=((Deltap)/(Deltat))",
-  "solvable": [
-   "Deltap",
-   "Deltat",
-   "F_net"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F_net=((Deltap)/(Delta*t))"
  },
  {
   "name": "equation for work",
-  "f": "W=fd",
-  "solvable": [
-   "W",
-   "fd"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W=fd"
  },
  {
   "name": "kinetic energy",
-  "f": "K*E=((1)/(2))*m*(v)^(2)",
-  "solvable": [
-   "E",
-   "K",
-   "m",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "K*E=((1)/(2))*m*(v)^(2)"
  },
  {
   "name": "power",
-  "f": "P=((W)/(t))",
-  "solvable": [
-   "P",
-   "W",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P=((W)/(t))"
  },
  {
   "name": "elapsed time",
-  "f": "Delta*t=gamma*Delta*t_0",
-  "solvable": [
-   "Delta",
-   "gamma",
-   "t",
-   "t_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*t=gamma*Delta*t_0"
  },
  {
   "name": "relativistic factor",
-  "f": "gamma=((1)/(sqrt(1-(((u)^(2))/((c)^(2))))))",
-  "solvable": [
-   "gamma"
-  ],
-  "numeric_only": [
-   "c",
-   "u"
-  ],
-  "roots": "positive"
+  "f": "gamma=((1)/(sqrt(1-(((u)^(2))/((c)^(2))))))"
  },
  {
   "name": "length contraction",
-  "f": "L=((L_0)/(gamma))",
-  "solvable": [
-   "L",
-   "L_0",
-   "gamma"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "L=((L_0)/(gamma))"
  },
  {
   "name": "relativistic momentum",
-  "f": "p=gamma*mu",
-  "solvable": [
-   "gamma",
-   "mu",
-   "p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "p=gamma*mu"
  },
  {
   "name": "relativistic energy",
-  "f": "E=gamma*m*(c)^(2)",
-  "solvable": [
-   "E",
-   "c",
-   "gamma",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "E=gamma*m*(c)^(2)"
  },
  {
   "name": "rest energy",
-  "f": "E_0=m*(c)^(2)",
-  "solvable": [
-   "E_0",
-   "c",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "E_0=m*(c)^(2)"
  },
  {
   "name": "magnetic flux",
-  "f": "Phi=B*A*cos*theta",
-  "solvable": [
-   "A",
-   "B",
-   "Phi",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Phi=B*A*cos(theta)"
  },
  {
   "name": "emf",
-  "f": "epsilon=-N*((DeltaPhi)/(Deltat))",
-  "solvable": [
-   "DeltaPhi",
-   "N",
-   "epsilon"
-  ],
-  "numeric_only": [
-   "Deltat"
-  ],
-  "roots": "positive"
- },
- {
-  "name": "heat transfer",
-  "f": "Q=m*c*Delta*T",
-  "solvable": [
-   "Delta",
-   "Q",
-   "T",
-   "c",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "epsilon=-N*((Delta*Phi)/(Delta*t))"
  },
  {
   "name": "Velocity",
-  "f": "v=v_0+a*t",
-  "solvable": [
-   "a",
-   "t",
-   "v",
-   "v_0"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=v_0+a*t"
  },
  {
   "name": "Acceleration",
-  "f": "a=((Deltav)/(Delta*t))",
-  "solvable": [
-   "Delta",
-   "Deltav",
-   "a",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a=((Deltav)/(Delta*t))"
  },
  {
   "name": "roentgen equivalent man",
-  "f": "rem=rad*RBE",
-  "solvable": [
-   "RBE",
-   "rad",
-   "rem"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "rem=rad*RBE"
  },
  {
   "name": "wave velocity",
-  "f": "v_w=((lambda)/(T))",
-  "solvable": [
-   "T",
-   "lambda",
-   "v_w"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_w=((lambda)/(T))"
  },
  {
   "name": "period",
-  "f": "T=((1)/(f))",
-  "solvable": [
-   "T",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T=((1)/(f))"
  },
  {
   "name": "resultant magnitude",
-  "f": "R=sqrt(Rx2+Ry2)",
-  "solvable": [
-   "R"
-  ],
-  "numeric_only": [
-   "Rx2",
-   "Ry2"
-  ],
-  "roots": "positive"
+  "f": "R=sqrt(Rx2+Ry2)"
  },
  {
   "name": "resultant direction",
-  "f": "theta=(tan)^(-1)(R_y/R_x)",
-  "solvable": [
-   "R_y",
-   "theta"
-  ],
-  "numeric_only": [
-   "R_x"
-  ],
-  "roots": "positive"
+  "f": "theta=(tan)^(-1)(R_y/R_x)"
  },
  {
   "name": "x-component of a vector A (when an angle is given relative to the horizontal)",
-  "f": "A_x=Acostheta",
-  "solvable": [
-   "A_x",
-   "Acostheta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "A_x=A*cos(theta)"
  },
  {
   "name": "y-component of a vector A (when an angle is given relative to the horizontal)",
-  "f": "A_y=Asintheta",
-  "solvable": [
-   "A_y",
-   "Asintheta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "A_y=A*sin(theta)"
  },
  {
   "name": "addition of vectors",
-  "f": "A_x+A_y=A",
-  "solvable": [
-   "A",
-   "A_x",
-   "A_y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "A_x+A_y=A"
  },
  {
   "name": "Angle of rotation",
-  "f": "Deltatheta=((Deltas)/(r))",
-  "solvable": [
-   "Deltas",
-   "Deltatheta",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "Delta*theta=((Delta*s)/(r))"
  },
  {
   "name": "Angular speed:",
-  "f": "omega=((Deltatheta)/(Deltat))",
-  "solvable": [
-   "Deltat",
-   "Deltatheta",
-   "omega"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "omega=((Delta*theta)/(Delta*t))"
  },
  {
   "name": "Tangential speed:",
-  "f": "v=r*omega",
-  "solvable": [
-   "omega",
-   "r",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=r*omega"
  },
  {
   "name": "thermal efficiency of a heat engine",
-  "f": "E*f*f=((W)/(Q_h))",
-  "solvable": [
-   "E",
-   "Q_h",
-   "W",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "E*f*f=((W)/(Q_h))"
  },
  {
   "name": "Average speed",
-  "f": "v_avg=((distance)/(time))",
-  "solvable": [
-   "distance",
-   "time",
-   "v_avg"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v_avg=((distance)/(time))"
  },
  {
   "name": "radioactive half-life",
-  "f": "N=N_O*(e)^(-lambda*t)",
-  "solvable": [
-   "N",
-   "N_O"
-  ],
-  "numeric_only": [
-   "lambda",
-   "t"
-  ],
-  "roots": "positive"
+  "f": "N=N_O*(e)^(-lambda*t)"
  },
  {
   "name": "force of kinetic friction",
-  "f": "f_k=mu_kN",
-  "solvable": [
-   "f_k",
-   "mu_kN"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f_k=mu_kN"
  },
  {
   "name": "energy stored in a capacitor",
-  "f": "U_E=((1)/(2))*C*(V)^(2)",
-  "solvable": [
-   "C",
-   "U_E",
-   "V"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "U_E=((1)/(2))*C*(V)^(2)"
  },
  {
   "name": "eccentricity",
-  "f": "e=((f)/(a))",
-  "solvable": [
-   "a",
-   "f"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "e=((f)/(a))"
  },
  {
   "name": "area of an ellipse",
-  "f": "A=pi*a*b",
-  "solvable": [
-   "A",
-   "a",
-   "b"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "A=pi*a*b"
  },
  {
   "name": "semi-major axis of an ellipse",
-  "f": "a=(r_a+r_p)/2",
-  "solvable": [
-   "a",
-   "r_a",
-   "r_p"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a=(r_a+r_p)/2"
  },
  {
   "name": "semi-minor axis of an ellipse",
-  "f": "b=sqrt(r_a*r_p)",
-  "solvable": [
-   "b"
-  ],
-  "numeric_only": [
-   "r_a",
-   "r_p"
-  ],
-  "roots": "positive"
+  "f": "b=sqrt(r_a*r_p)"
  },
  {
   "name": "quantum energy",
-  "f": "E=n*h*f",
-  "solvable": [
-   "E",
-   "f",
-   "h",
-   "n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "E=n*h*f"
  },
  {
   "name": "maximum kinetic energy of a photoelectron",
-  "f": "K*E_e=h*f-B*E",
-  "solvable": [
-   "B",
-   "E",
-   "E_e",
-   "K",
-   "f",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "K*E_e=h*f-B*E"
  },
  {
   "name": "binding energy of an electron",
-  "f": "B*E=h*f_O",
-  "solvable": [
-   "B",
-   "E",
-   "f_O",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "change in entropy",
-  "f": "Delta*S=((Q)/(T))",
-  "solvable": [
-   "Delta",
-   "Q",
-   "S",
-   "T"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "B*E=h*f_O"
  },
  {
   "name": "conservation of energy",
-  "f": "K*E_1+P*E_1=K*E_2+P*E_2",
-  "solvable": [
-   "E_1",
-   "E_2",
-   "K",
-   "P"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "K*E_1+P*E_1=K*E_2+P*E_2"
  },
  {
   "name": "Celsius to Fahrenheit conversion",
-  "f": "T_F=((9)/(5))*T_C+32",
-  "solvable": [
-   "T_C",
-   "T_F"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_F=((9)/(5))*T_C+32"
  },
  {
   "name": "Fahrenheit to Celsius conversion",
-  "f": "T_C=((5)/(9))*(T_F-32)",
-  "solvable": [
-   "T_C",
-   "T_F"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_C=((5)/(9))*(T_F-32)"
  },
  {
   "name": "Celsius to Kelvin conversion",
-  "f": "T_K=T_C+273.15",
-  "solvable": [
-   "T_C",
-   "T_K"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_K=T_C+273.15"
  },
  {
   "name": "Kelvin to Celsius conversion",
-  "f": "T_C=T_K-273.15",
-  "solvable": [
-   "T_C",
-   "T_K"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_C=T_K-273.15"
  },
  {
   "name": "Fahrenheit to Kelvin conversion",
-  "f": "T_K=((5)/(9))*(T_F-32)+273.15",
-  "solvable": [
-   "T_F",
-   "T_K"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_K=((5)/(9))*(T_F-32)+273.15"
  },
  {
   "name": "Kelvin to Fahrenheit conversion",
-  "f": "T_F=((9)/(5))*(T_K-273.15)+32",
-  "solvable": [
-   "T_F",
-   "T_K"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "T_F=((9)/(5))*(T_K-273.15)+32"
  },
  {
   "name": "speed of light",
-  "f": "v=lambda*f",
-  "solvable": [
-   "f",
-   "lambda",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=lambda*f"
  },
  {
   "name": "constant value for the speed of light",
-  "f": "c=3.00*(10)^(8)m/s",
-  "solvable": [
-   "c",
-   "m",
-   "s"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "c=3.00*(10)^(8)*m/s"
  },
  {
   "name": "ideal mechanical advantage (lever)",
-  "f": "I*M*A=((L_e)/(L_r))",
-  "solvable": [
-   "A",
-   "I",
-   "L_e",
-   "L_r",
-   "M"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I*M*A=((L_e)/(L_r))"
  },
  {
   "name": "ideal mechanical advantage (wheel and axle)",
-  "f": "I*M*A=((R)/(r))",
-  "solvable": [
-   "A",
-   "I",
-   "M",
-   "R",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I*M*A=((R)/(r))"
  },
  {
   "name": "ideal mechanical advantage (inclined plane)",
-  "f": "I*M*A=((L)/(h))",
-  "solvable": [
-   "A",
-   "I",
-   "L",
-   "M",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I*M*A=((L)/(h))"
  },
  {
   "name": "ideal mechanical advantage (wedge)",
-  "f": "I*M*A=((L)/(t))",
-  "solvable": [
-   "A",
-   "I",
-   "L",
-   "M",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I*M*A=((L)/(t))"
  },
  {
   "name": "ideal mechanical advantage (pulley)",
-  "f": "I*M*A=N",
-  "solvable": [
-   "A",
-   "I",
-   "M",
-   "N"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I*M*A=N"
  },
  {
   "name": "ideal mechanical advantage (screw)",
-  "f": "I*M*A=((2*pi*L)/(P))",
-  "solvable": [
-   "A",
-   "I",
-   "L",
-   "M",
-   "P"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I*M*A=((2*pi*L)/(P))"
  },
  {
   "name": "input work",
-  "f": "W_i=F_i*d_i",
-  "solvable": [
-   "F_i",
-   "W_i",
-   "d_i"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W_i=F_i*d_i"
  },
  {
   "name": "output work",
-  "f": "W_o=F_o*d_o",
-  "solvable": [
-   "F_o",
-   "W_o",
-   "d_o"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W_o=F_o*d_o"
  },
  {
   "name": "Coulomb\u2019s law",
-  "f": "F=((k*q_1*q_2)/((r)^(2)))",
-  "solvable": [
-   "F",
-   "k",
-   "q_1",
-   "q_2",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "F=((k*q_1*q_2)/((r)^(2)))"
  },
  {
   "name": "for a given current I flowing through a resistance R, the electric power dissipated",
-  "f": "P=(I)^(2)*R",
-  "solvable": [
-   "I",
-   "P",
-   "R"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "P=(I)^(2)*R"
  },
  {
   "name": "for a given voltage difference V across a resistor R, the electric power dissipated",
-  "f": "P=(((V)^(2))/(R))",
-  "solvable": [
-   "P",
-   "R",
-   "V"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "P=(((V)^(2))/(R))"
  },
  {
   "name": "electric current I is the charge \u0394Q that passes a plane per unit time \u0394t",
-  "f": "I=((Delta*Q)/(Delta*t))",
-  "solvable": [
-   "Delta",
-   "I",
-   "Q",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "the magnitude of the force on an electric charge",
-  "f": "F=q*v*B*sin*theta",
-  "solvable": [
-   "B",
-   "F",
-   "q",
-   "theta",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "I=((Delta*Q)/(Delta*t))"
  },
  {
   "name": "the magnitude of the magnetic field created by a long, straight current-carrying wire",
-  "f": "B_straightwire=((mu_0*I)/(2*pi*r))",
-  "solvable": [
-   "B_straightwire",
-   "I",
-   "mu_0",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "B_straightwire=((mu_0*I)/(2*pi*r))"
  },
  {
   "name": "illuminance",
-  "f": "illuminance=((P)/(4*pi*(r)^(2)))",
-  "solvable": [
-   "P",
-   "illuminance",
-   "r"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "illuminance=((P)/(4*pi*(r)^(2)))"
  },
  {
   "name": "Angular acceleration",
-  "f": "alpha=((Deltaomega)/(Deltat))",
-  "solvable": [
-   "Deltaomega",
-   "Deltat",
-   "alpha"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "alpha=((Deltaomega)/(Delta*t))"
  },
  {
   "name": "Rotational kinematic equations",
-  "f": "theta=omegat",
-  "solvable": [
-   "omegat",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "theta=omegat"
  },
  {
   "name": "Tangential (linear) acceleration",
-  "f": "a=ralpha",
-  "solvable": [
-   "a",
-   "ralpha"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a=ralpha"
  },
  {
   "name": "Torque",
-  "f": "tau=rFsin*theta",
-  "solvable": [
-   "rFsin",
-   "tau",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "tau=rFsin(theta)"
  },
  {
   "name": "Newton\u2019s second law of motion",
-  "f": "F_net=ma",
-  "solvable": [
-   "F_net",
-   "ma"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F_net=ma"
  },
  {
   "name": "Newton\u2019s second law of motion to solve weight",
-  "f": "W=mg",
-  "solvable": [
-   "W",
-   "mg"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "W=mg"
  },
  {
   "name": "Newton\u2019s universal law of gravitation",
-  "f": "F=G*((m*M)/((r)^(2)))",
-  "solvable": [
-   "F",
-   "G",
-   "M",
-   "m"
-  ],
-  "numeric_only": [
-   "r"
-  ],
-  "roots": "positive"
+  "f": "F=G*((m*M)/((r)^(2)))"
  },
  {
   "name": "acceleration due to gravity",
-  "f": "g=G*((M)/((r)^(2)))",
-  "solvable": [
-   "G",
-   "M",
-   "g"
-  ],
-  "numeric_only": [
-   "r"
-  ],
-  "roots": "positive"
+  "f": "g=G*((M)/((r)^(2)))"
  },
  {
   "name": "Displacement with constant acceleration",
-  "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)",
-  "solvable": [
-   "a",
-   "d",
-   "d_0",
-   "v_0"
-  ],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)"
  },
  {
   "name": "Centripetal acceleration",
-  "f": "a_c=(((v)^(2))/(r))",
-  "solvable": [
-   "a_c",
-   "r",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "a_c=(((v)^(2))/(r))"
  },
  {
   "name": "Centripetal force",
-  "f": "F_c=m*a_c",
-  "solvable": [
-   "F_c",
-   "a_c",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "F_c=m*a_c"
  },
  {
   "name": "energy\u2013mass conversion",
-  "f": "E=m*(c)^(2)",
-  "solvable": [
-   "E",
-   "c",
-   "m"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "E=m*(c)^(2)"
  },
  {
   "name": "Displacement",
-  "f": "d=d_0+vt",
-  "solvable": [
-   "d",
-   "d_0",
-   "vt"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "d=d_0+vt"
  },
  {
   "name": "arc length",
-  "f": "s=r*theta",
-  "solvable": [
-   "r",
-   "s",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "s=r*theta"
  },
  {
   "name": "area of a sector",
-  "f": "A=((1)/(2))*theta*(r)^(2)",
-  "solvable": [
-   "A",
-   "r",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "positive"
+  "f": "A=((1)/(2))*theta*(r)^(2)"
  },
  {
   "name": "angular speed",
-  "f": "omega=((theta)/(t))",
-  "solvable": [
-   "omega",
-   "t",
-   "theta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "omega=((theta)/(t))"
  },
  {
   "name": "linear speed",
-  "f": "v=((s)/(t))",
-  "solvable": [
-   "s",
-   "t",
-   "v"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "v=((s)/(t))"
  },
  {
   "name": "General Form equation of a conic section",
-  "f": "A*(x)^(2)+B*x*y+C*(y)^(2)+D*x+E*y+F=0",
-  "solvable": [
-   "A",
-   "B",
-   "C",
-   "D",
-   "E",
-   "F"
-  ],
-  "numeric_only": [
-   "x",
-   "y"
-  ],
-  "roots": "positive"
+  "f": "A*(x)^(2)+B*x*y+C*(y)^(2)+D*x+E*y+F=0"
  },
  {
   "name": "explicit formula for nth term of a geometric sequence",
-  "f": "a_n=a_1*(r)^(n-1)",
-  "solvable": [
-   "a_1",
-   "a_n"
-  ],
-  "numeric_only": [
-   "n",
-   "r"
-  ],
-  "roots": "positive"
- },
- {
-  "name": "Cosine",
-  "f": "cos*t=x",
-  "solvable": [
-   "t",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "Sine",
-  "f": "sin*t=y",
-  "solvable": [
-   "t",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "a_n=a_1*(r)^(n-1)"
  },
  {
   "name": "sum of the first n terms of an arithmetic series",
-  "f": "S_n=((n(a_1+a_n))/(2))",
-  "solvable": [
-   "S_n",
-   "a_1",
-   "a_n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "S_n=((n(a_1+a_n))/(2))"
  },
  {
   "name": "General Form for the Translation of the Parent Logarithmic Function f(x)= log b ( x )",
-  "f": "f(x)=a*log_b*(x+c)+d",
-  "solvable": [
-   "a",
-   "c",
-   "d",
-   "log_b",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f(x)=a*log_b*(x+c)+d"
  },
  {
   "name": "general form of a quadratic function",
-  "f": "f(x)=a*(x)^(2)+b*x+c",
-  "solvable": [
-   "a",
-   "b",
-   "c"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f(x)=a*(x)^(2)+b*x+c"
  },
  {
   "name": "standard form of a quadratic function",
-  "f": "f(x)=a*((x-h))^(2)+k",
-  "solvable": [
-   "a",
-   "k"
-  ],
-  "numeric_only": [
-   "h",
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f(x)=a*((x-h))^(2)+k"
  },
  {
   "name": "Identity function",
-  "f": "f*(x)=x",
-  "solvable": [
-   "f",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f*(x)=x"
  },
  {
   "name": "Absolute value function",
-  "f": "f*(x)=|x|",
-  "solvable": [
-   "f"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f*(x)=|x|"
  },
  {
   "name": "Quadratic function",
-  "f": "f*(x)=(x)^(2)",
-  "solvable": [
-   "f"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f*(x)=(x)^(2)"
  },
  {
   "name": "Cubic function",
-  "f": "f*(x)=(x)^(3)",
-  "solvable": [
-   "f"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f*(x)=(x)^(3)"
  },
  {
   "name": "Reciprocal function",
-  "f": "f*(x)=((1)/(x))",
-  "solvable": [
-   "f",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f*(x)=((1)/(x))"
  },
  {
   "name": "Reciprocal squared function",
-  "f": "f*(x)=((1)/((x)^(2)))",
-  "solvable": [
-   "f"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f*(x)=((1)/((x)^(2)))"
  },
  {
   "name": "Square root function",
-  "f": "f*(x)=sqrt(x)",
-  "solvable": [
-   "f"
-  ],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f*(x)=sqrt(x)"
  },
  {
   "name": "Cube root function",
-  "f": "f*(x)=x3",
-  "solvable": [
-   "f",
-   "x",
-   "x3"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f*(x)=x3"
  },
  {
   "name": "General Form for the Translation of the Parent Function f(x)= b x",
-  "f": "f(x)=a*(b)^(x+c)+d",
-  "solvable": [
-   "a",
-   "d"
-  ],
-  "numeric_only": [
-   "b",
-   "c",
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f(x)=a*(b)^(x+c)+d"
  },
  {
   "name": "The Product Rule for Logarithms",
-  "f": "log_b(M*N)=log_b*(M)+log_b*(N)",
-  "solvable": [
-   "M",
-   "N",
-   "log_b"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "log_b(M*N)=log_b*(M)+log_b*(N)"
  },
  {
   "name": "The Quotient Rule for Logarithms",
-  "f": "log_b*(((M)/(N)))=log_b*M-log_b*N",
-  "solvable": [
-   "M",
-   "log_b"
-  ],
-  "numeric_only": [
-   "N"
-  ],
-  "roots": "positive"
+  "f": "log_b*(((M)/(N)))=log_b*M-log_b*N"
  },
  {
   "name": "The Power Rule for Logarithms",
-  "f": "log_b*((M)^(n))=n*log_b*M",
-  "solvable": [
-   "log_b"
-  ],
-  "numeric_only": [
-   "M",
-   "n"
-  ],
-  "roots": "positive"
+  "f": "log_b*((M)^(n))=n*log_b*M"
  },
  {
   "name": "slope-intercept form of a line",
-  "f": "f(x)=m*x+b",
-  "solvable": [
-   "b",
-   "m",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "f(x)=m*x+b"
  },
  {
   "name": "Vertical shift",
-  "f": "g(x)=f(x)+k",
-  "solvable": [
-   "k",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "g(x)=f(x)+k"
  },
  {
   "name": "Horizontal shift",
-  "f": "g(x)=f(x-h)",
-  "solvable": [
-   "h",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "g(x)=f(x-h)"
  },
  {
   "name": "Vertical reflection",
-  "f": "g(x)=-f(x)",
-  "solvable": [
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "g(x)=-f(x)"
  },
  {
   "name": "Horizontal reflection",
-  "f": "g(x)=f(-x)",
-  "solvable": [
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "g(x)=f(-x)"
  },
  {
   "name": "Vertical stretch",
-  "f": "g(x)=a*f(x)",
-  "solvable": [
-   "a",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "g(x)=a*f(x)"
  },
  {
   "name": "Horizontal stretch",
-  "f": "g(x)=f(b*x)",
-  "solvable": [
-   "b",
-   "x"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "g(x)=f(b*x)"
  },
  {
   "name": "Division Algorithm",
-  "f": "f(x)=d(x)q(x)+r(x)",
-  "solvable": [],
-  "numeric_only": [
-   "x"
-  ],
-  "roots": "positive"
+  "f": "f(x)=d(x)q(x)+r(x)"
  },
  {
   "name": "average rate of change",
-  "f": "AROC=((f*(a+h)-f*(a))/(h))",
-  "solvable": [
-   "AROC",
-   "a",
-   "f",
-   "h"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "AROC=((f*(a+h)-f*(a))/(h))"
  },
  {
   "name": "explicit formula for nth term of an arithmetic sequence",
-  "f": "a_n=a_1+d(n-1)",
-  "solvable": [
-   "a_1",
-   "a_n",
-   "n"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "Sum Formula for Sine",
-  "f": "sin*(alpha+beta)=sin*alpha*cos*beta+cos*alpha*sin*beta",
-  "solvable": [
-   "alpha",
-   "beta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "Difference Formula for Sine",
-  "f": "sin*(alpha-beta)=sin*alpha*cos*beta-cos*alpha*sin*beta",
-  "solvable": [
-   "alpha",
-   "beta"
-  ],
-  "numeric_only": [],
-  "roots": "single"
- },
- {
-  "name": "Tangent function",
-  "f": "tan*t=((sin*t)/(cos*t))",
-  "solvable": [],
-  "numeric_only": [
-   "t"
-  ],
-  "roots": "positive"
+  "f": "a_n=a_1+d(n-1)"
  },
  {
   "name": "Secant function",
-  "f": "sec*t=((1)/(cos*t))",
-  "solvable": [
-   "sec",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "sec*t=((1)/(cos(t)))"
  },
  {
   "name": "Cosecant function",
-  "f": "csc*t=((1)/(sin*t))",
-  "solvable": [
-   "csc",
-   "t"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "csc*t=((1)/(sin(t)))"
  },
  {
   "name": "Shifted, compressed, and/or stretched tangent function",
-  "f": "y=A*tan*(B*x-C)+D",
-  "solvable": [
-   "A",
-   "B",
-   "C",
-   "D",
-   "x",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y=A*tan(B*x-C)+D"
  },
  {
   "name": "Shifted, compressed, and/or stretched secant function",
-  "f": "y=A*sec*(B*x-C)+D",
-  "solvable": [
-   "A",
-   "B",
-   "C",
-   "D",
-   "sec",
-   "x",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y=A*sec*(B*x-C)+D"
  },
  {
   "name": "Shifted, compressed, and/or stretched cosecant function",
-  "f": "y=A*csc*(B*x-C)+D",
-  "solvable": [
-   "A",
-   "B",
-   "C",
-   "D",
-   "csc",
-   "x",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y=A*csc*(B*x-C)+D"
  },
  {
   "name": "Shifted, compressed, and/or stretched cotangent function",
-  "f": "y=A*cot*(B*x-C)+D",
-  "solvable": [
-   "A",
-   "B",
-   "C",
-   "D",
-   "cot",
-   "x",
-   "y"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "y=A*cot*(B*x-C)+D"
  },
  {
   "name": "probability of an event with equally likely outcomes",
-  "f": "P(E)=((n(E))/(n(S)))",
-  "solvable": [
-   "E",
-   "S"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "P(E)=((n(E))/(n(S)))"
  },
  {
   "name": "Distance",
-  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
-  "solvable": [
-   "d"
-  ],
-  "numeric_only": [
-   "x_1",
-   "x_2",
-   "y_1",
-   "y_2"
-  ],
-  "roots": "positive"
+  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))"
  },
  {
   "name": "Slope of a line",
-  "f": "m=((y_2-y_1)/(x_2-x_1))",
-  "solvable": [
-   "m",
-   "x_1",
-   "x_2",
-   "y_1",
-   "y_2"
-  ],
-  "numeric_only": [],
-  "roots": "single"
+  "f": "m=((y_2-y_1)/(x_2-x_1))"
  }
 ]
