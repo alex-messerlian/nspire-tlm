@@ -77,6 +77,12 @@ for mod in pathlib.Path("corpus/raw").rglob("index.cnxml"):
             try: expr = conv(ET.fromstring(xml))
             except Exception: continue
             expr = re.sub(r"\s+", "", expr)
+            # Delta is a PREFIX on the next symbol, never a multiplicand: Delta*T is "change in T",
+            # one quantity carrying T's unit. Verified across all 37 affected records -- 33 have
+            # every Delta followed by a symbol and the remaining 4 are malformed anyway. Folding it
+            # here is one rewrite instead of 37 annotation decisions, and it removes the artifact
+            # from the corpus at the same time.
+            expr = re.sub(r"\bDelta\*([A-Za-z][A-Za-z0-9_]*)", r"Delta_\1", expr)
             if expr.count("=") != 1: continue
             if not expr or expr in seen: continue
             seen.add(expr); rows.append({"name": name, "f": expr,

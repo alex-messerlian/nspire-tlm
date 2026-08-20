@@ -266,11 +266,6 @@
   "f": "v_CM=R*omega",
   "scope": "m58338",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "R": "m",
-   "omega": "1/s",
-   "v_CM": "m/s"
-  },
   "units_draft": {
    "v_CM": "m/s",
    "R": "m",
@@ -283,11 +278,6 @@
   "f": "a_CM=R*alpha",
   "scope": "m58338",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "R": "m",
-   "alpha": "1/s^2",
-   "a_CM": "m/s^2"
-  },
   "units_draft": {
    "a_CM": "m/s^2",
    "R": "m",
@@ -327,11 +317,6 @@
   "f": "L=I*omega",
   "scope": "m58338",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "I": "kg*m^2",
-   "L": "kg*m^2/s",
-   "omega": "1/s"
-  },
   "units_draft": {
    "L": "kg*m^2/s",
    "I": "kg*m^2",
@@ -360,10 +345,6 @@
   "f": "f=((R)/(2))",
   "scope": "m58534",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "R": "m",
-   "f": "m"
-  },
   "units_draft": {
    "f": "m",
    "R": "m"
@@ -388,10 +369,6 @@
   "f": "P=((1)/(f))",
   "scope": "m58534",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "f": "m",
-   "P": "1/m"
-  },
   "units_draft": {
    "P": "1/m",
    "f": "m"
@@ -428,11 +405,6 @@
   "f": "w=m*g",
   "scope": "m58301",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "w": "N",
-   "m": "kg",
-   "g": "m/s^2"
-  },
   "units_draft": {
    "w": "N",
    "g": "m/s^2",
@@ -683,18 +655,15 @@
  },
  {
   "name": "Displacement",
-  "f": "Delta*x=x_f-x_i",
+  "f": "Delta_x=x_f-x_i",
   "scope": "m58287",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta*x": "m",
-   "x": "m",
+   "Delta_x": "m",
    "x_f": "m",
    "x_i": "m"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Instantaneous velocity",
@@ -891,7 +860,7 @@
   "units_draft": {
    "T_F": "K",
    "E_F": "J",
-   "k_B": "N/m"
+   "k_B": "J/K"
   },
   "units_unknown": []
  },
@@ -941,11 +910,6 @@
   "f": "W=Q_h-Q_c",
   "scope": "m58408",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "Q_h": "J",
-   "W": "J",
-   "Q_c": "J"
-  },
   "units_draft": {
    "W": "J",
    "Q_c": "J",
@@ -960,8 +924,8 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "e": "1",
-   "T_c": "s",
-   "T_h": "s"
+   "T_c": "K",
+   "T_h": "K"
   },
   "units_unknown": []
  },
@@ -991,32 +955,27 @@
  },
  {
   "name": "Entropy of a system undergoing a reversible process at a constant temperature",
-  "f": "Delta*S=((Q)/(T))",
+  "f": "Delta_S=((Q)/(T))",
   "scope": "m58408",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta*S": "K",
+   "Delta_S": "K",
    "Q": "J",
    "T": "K"
   },
-  "units_unknown": [
-   "Delta",
-   "S"
-  ]
+  "units_unknown": []
  },
  {
   "name": "First law of thermodynamics",
-  "f": "Delta*E_int=Q-W",
+  "f": "Delta_E_int=Q-W",
   "scope": "m58401",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "E_int": "J",
    "Q": "J",
    "W": "J"
   },
   "units_unknown": [
-   "Delta*E_int",
-   "Delta"
+   "Delta_E_int"
   ]
  },
  {
@@ -1026,8 +985,8 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "C_p": "J",
-   "C_V": "F",
-   "R": "ohm"
+   "C_V": "J/(mol*K)",
+   "R": "J/(mol*K)"
   },
   "units_unknown": []
  },
@@ -1038,8 +997,8 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "gamma": "J",
-   "C_V": "F",
-   "C_p": "F"
+   "C_V": "J/(mol*K)",
+   "C_p": "J/(mol*K)"
   },
   "units_unknown": []
  },
@@ -1188,18 +1147,15 @@
  },
  {
   "name": "Approximate time for exchange of a virtual particle between two other particles",
-  "f": "Delta*t=((h)/(E))",
+  "f": "Delta_t=((h)/(E))",
   "scope": "m58776",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta*t": "s",
+   "Delta_t": "s",
    "E": "J",
-   "h": "J*s",
-   "t": "s"
+   "h": "J*s"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Hubble\u2019s law",
@@ -1233,17 +1189,15 @@
  },
  {
   "name": "Rocket equation",
-  "f": "Delta*v=u*ln(((m_i)/(m)))",
+  "f": "Delta_v=u*ln(((m_i)/(m)))",
   "scope": "m58324",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "m": "kg",
-   "m_i": "kg",
-   "v": "m/s"
+   "m_i": "kg"
   },
   "units_unknown": [
-   "Delta*v",
-   "Delta",
+   "Delta_v",
    "u"
   ]
  },
@@ -1305,12 +1259,6 @@
   "f": "V=((k_e*q)/(r))",
   "scope": "m58778",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "k_e": "V*m/C",
-   "r": "m",
-   "V": "V",
-   "q": "C"
-  },
   "units_draft": {
    "V": "C",
    "k_e": "N/m",
@@ -1324,11 +1272,6 @@
   "f": "v=f*lambda",
   "scope": "m58382",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "v": "m/s",
-   "f": "Hz",
-   "lambda": "m"
-  },
   "units_draft": {
    "v": "m/s",
    "f": "Hz",
@@ -1368,7 +1311,7 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "v": "m/s",
-   "R": "ohm",
+   "R": "J/(mol*K)",
    "T": "K"
   },
   "units_unknown": [
@@ -1392,17 +1335,16 @@
  },
  {
   "name": "Intensity of sound",
-  "f": "I=((((Delta*p_max))^(2))/(2*rho*v))",
+  "f": "I=((((Delta_p_max))^(2))/(2*rho*v))",
   "scope": "m58382",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "p_max": "kg*m/s",
+   "Delta_p_max": "kg*m/s",
    "rho": "kg/m^3",
    "v": "m/s"
   },
   "units_unknown": [
-   "I",
-   "Delta"
+   "I"
   ]
  },
  {
@@ -1452,11 +1394,6 @@
   "f": "rho=((m)/(V))",
   "scope": "m58359",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "rho": "kg/m^3",
-   "V": "m^3",
-   "m": "kg"
-  },
   "units_draft": {
    "rho": "kg/m^3",
    "V": "m^3",
@@ -1481,13 +1418,6 @@
   "f": "p=p_0+rho*g*h",
   "scope": "m58359",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "p_0": "Pa",
-   "g": "m/s^2",
-   "p": "Pa",
-   "rho": "kg/m^3",
-   "h": "m"
-  },
   "units_draft": {
    "p": "m",
    "g": "m/s^2",
@@ -1822,16 +1752,15 @@
  },
  {
   "name": "Field amplitude in the diffraction pattern",
-  "f": "E=N*Delta*E_0*((sin(beta))/(beta))",
+  "f": "E=N*Delta_E_0*((sin(beta))/(beta))",
   "scope": "m58552",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "E_0": "J",
+   "Delta_E_0": "J",
    "N": "1"
   },
   "units_unknown": [
    "E",
-   "Delta",
    "beta"
   ]
  },
@@ -1870,7 +1799,7 @@
    "N": "1",
    "T": "K",
    "V": "m^3",
-   "k_B": "N/m",
+   "k_B": "J/K",
    "p": "Pa"
   },
   "units_unknown": [
@@ -1883,10 +1812,10 @@
   "scope": "m58394",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "R": "ohm",
+   "R": "J/(mol*K)",
    "T": "K",
    "V": "m^3",
-   "n": "1",
+   "n": "mol",
    "p": "Pa"
   },
   "units_unknown": [
@@ -1910,18 +1839,16 @@
  },
  {
   "name": "Heat in terms of molar heat capacity at constant volume",
-  "f": "Q=n*C_V*Delta*T",
+  "f": "Q=n*C_V*Delta_T",
   "scope": "m58394",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "Q": "J",
-   "C_V": "F",
-   "T": "s",
-   "n": "1"
+   "C_V": "J/(mol*K)",
+   "Delta_T": "K",
+   "n": "mol"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Molar heat capacity at constant volume for an ideal gas with d degrees of freedom",
@@ -1930,24 +1857,22 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "C_V": "J",
-   "R": "ohm",
+   "R": "J/(mol*K)",
    "d": "m"
   },
   "units_unknown": []
  },
  {
   "name": "Average electrical current",
-  "f": "I_ave=((Delta*Q)/(Delta*t))",
+  "f": "I_ave=((Delta_Q)/(Delta_t))",
   "scope": "m58735",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "I_ave": "A",
-   "Q": "J",
-   "t": "s"
+   "Delta_Q": "J",
+   "Delta_t": "s"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Electrical current",
@@ -1994,11 +1919,6 @@
   "f": "V=I*R",
   "scope": "m58735",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "R": "ohm",
-   "I": "A",
-   "V": "V"
-  },
   "units_draft": {
    "V": "V",
    "I": "A",
@@ -2021,18 +1941,16 @@
  },
  {
   "name": "Temperature dependence of resistance",
-  "f": "R=R_0*(1+alpha*Delta*T)",
+  "f": "R=R_0*(1+alpha*Delta_T)",
   "scope": "m58735",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "R": "ohm",
+   "Delta_T": "s",
    "R_0": "ohm",
-   "T": "s",
    "alpha": "1/s^2"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Electric power",
@@ -2076,31 +1994,26 @@
  },
  {
   "name": "Energy quantum of radiation",
-  "f": "Delta*E=h*f",
+  "f": "Delta_E=h*f",
   "scope": "m58766",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta*E": "J",
-   "E": "J",
+   "Delta_E": "J",
    "f": "Hz",
    "h": "J*s"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Maximum kinetic energyof a photoelectron",
-  "f": "K_max=e*Delta*V_s",
+  "f": "K_max=e*Delta_V_s",
   "scope": "m58766",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "K_max": "J",
-   "V_s": "m^3"
+   "Delta_V_s": "m^3"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Energy of a photon",
@@ -2140,16 +2053,14 @@
  },
  {
   "name": "The Compton shift",
-  "f": "Delta*lambda=lambda_c(1-cos(theta))",
+  "f": "Delta_lambda=lambda_c(1-cos(theta))",
   "scope": "m58766",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "lambda": "m",
    "theta": "1"
   },
   "units_unknown": [
-   "Delta*lambda",
-   "Delta"
+   "Delta_lambda"
   ]
  },
  {
@@ -2224,11 +2135,6 @@
   "f": "E=h*f",
   "scope": "m58766",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "f": "Hz",
-   "h": "J*s",
-   "E": "J"
-  },
   "units_draft": {
    "E": "J",
    "f": "Hz",
@@ -2329,15 +2235,14 @@
  },
  {
   "name": "Change in angular velocity",
-  "f": "omegaf2=omega02+2*alpha(Delta*theta)",
+  "f": "omegaf2=omega02+2*alpha(Delta_theta)",
   "scope": "m58333",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "omegaf2": "1/s",
-   "theta": "1"
+   "Delta_theta": "1"
   },
   "units_unknown": [
-   "Delta",
    "omega02"
   ]
  },
@@ -2384,11 +2289,6 @@
   "f": "P=tau*omega",
   "scope": "m58333",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "tau": "N*m",
-   "omega": "1/s",
-   "P": "W"
-  },
   "units_draft": {
    "P": "W",
    "omega": "1/s",
@@ -2423,35 +2323,31 @@
  },
  {
   "name": "Mass defect",
-  "f": "Delta*m=Z*m_p+(A-Z)m_n-m_nuc",
+  "f": "Delta_m=Z*m_p+(A-Z)m_n-m_nuc",
   "scope": "m58614",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta*m": "kg",
+   "Delta_m": "kg",
    "A": "m^2",
-   "m": "kg",
    "m_n": "kg",
    "m_nuc": "kg",
    "m_p": "kg"
   },
   "units_unknown": [
-   "Delta",
    "Z"
   ]
  },
  {
   "name": "Binding energy",
-  "f": "E=(Delta*m)(c)^(2)",
+  "f": "E=(Delta_m)(c)^(2)",
   "scope": "m58614",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "E": "J",
-   "c": "m/s",
-   "m": "kg"
+   "Delta_m": "kg",
+   "c": "m/s"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Binding energy per nucleon",
@@ -2485,11 +2381,6 @@
   "f": "E=((sigma)/(epsilon_0))",
   "scope": "m58426",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "epsilon_0": "C^2/(N*m^2)",
-   "E": "V/m",
-   "sigma": "C/m^2"
-  },
   "units_draft": {
    "E": "V/m",
    "sigma": "C/m^2"
@@ -2731,16 +2622,15 @@
  },
  {
   "name": "Quality factor of a circuit",
-  "f": "Q=((omega_0)/(Delta*omega))",
+  "f": "Q=((omega_0)/(Delta_omega))",
   "scope": "m58494",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "omega": "1/s",
+   "Delta_omega": "1/s",
    "omega_0": "1/s"
   },
   "units_unknown": [
-   "Q",
-   "Delta"
+   "Q"
   ]
  },
  {
@@ -2762,12 +2652,6 @@
   "f": "I_S=((N_P)/(N_S))*I_P",
   "scope": "m58494",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "N_P": "1",
-   "N_S": "1",
-   "I_P": "A",
-   "I_S": "A"
-  },
   "units_draft": {
    "I_S": "A",
    "I_P": "A",
@@ -2893,63 +2777,58 @@
  },
  {
   "name": "Linear thermal expansion",
-  "f": "Delta*L=alpha*L*Delta*T",
+  "f": "Delta_L=alpha*L*Delta_T",
   "scope": "m58389",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
+   "Delta_T": "K",
    "L": "m",
-   "T": "K",
    "alpha": "1/s^2"
   },
   "units_unknown": [
-   "Delta*L",
-   "Delta"
+   "Delta_L"
   ]
  },
  {
   "name": "Thermal expansion in two dimensions",
-  "f": "Delta*A=2*alpha*A*Delta*T",
+  "f": "Delta_A=2*alpha*A*Delta_T",
   "scope": "m58389",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "A": "m^2",
-   "T": "K",
+   "Delta_T": "K",
    "alpha": "1/s^2"
   },
   "units_unknown": [
-   "Delta*A",
-   "Delta"
+   "Delta_A"
   ]
  },
  {
   "name": "Thermal expansion in three dimensions",
-  "f": "Delta*V=beta*V*Delta*T",
+  "f": "Delta_V=beta*V*Delta_T",
   "scope": "m58389",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "T": "K",
+   "Delta_T": "K",
    "V": "m^3"
   },
   "units_unknown": [
-   "Delta*V",
-   "Delta",
+   "Delta_V",
    "beta"
   ]
  },
  {
   "name": "Heat transfer",
-  "f": "Q=m*c*Delta*T",
+  "f": "Q=m*c*Delta_T",
   "scope": "m58389",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "Q": "J",
-   "T": "K",
+   "Delta_T": "K",
    "c": "m/s",
    "m": "kg"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Transfer of heat in a calorimeter",
@@ -3048,11 +2927,6 @@
   "f": "v_d=((E)/(B))",
   "scope": "m58745",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "v_d": "m/s",
-   "B": "T",
-   "E": "V/m"
-  },
   "units_draft": {
    "v_d": "m/s",
    "B": "T",
@@ -3081,12 +2955,6 @@
   "f": "V=B*l*v_d",
   "scope": "m58745",
   "title": "osbooks-university-physics-bundle",
-  "units": {
-   "v_d": "m/s",
-   "l": "m",
-   "B": "T",
-   "V": "V"
-  },
   "units_draft": {
    "V": "m/s",
    "B": "T",
@@ -3111,18 +2979,15 @@
  },
  {
   "name": "Path length difference for waves from two slits to a common point on a screen",
-  "f": "Delta*l=d*sin(theta)",
+  "f": "Delta_l=d*sin(theta)",
   "scope": "m58541",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta*l": "m",
+   "Delta_l": "m",
    "d": "m",
-   "l": "m",
    "theta": "1"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Distance from central maximum to the mth bright fringe",
@@ -3141,18 +3006,15 @@
  },
  {
   "name": "Displacement measured by a Michelson interferometer",
-  "f": "Delta*d=m*((lambda_0)/(2))",
+  "f": "Delta_d=m*((lambda_0)/(2))",
   "scope": "m58541",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta*d": "m",
-   "d": "m",
+   "Delta_d": "m",
    "lambda_0": "m",
    "m": "kg"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Work-energy theorem",
@@ -3283,11 +3145,6 @@
   "f": "p=((h)/(lambda))",
   "scope": "m54552",
   "title": "osbooks-physics",
-  "units": {
-   "h": "J*s",
-   "p": "kg*m/s",
-   "lambda": "m"
-  },
   "units_draft": {
    "p": "kg*m/s",
    "h": "J*s",
@@ -3438,17 +3295,16 @@
  },
  {
   "name": "sound intensity",
-  "f": "I=((((Delta*p))^(2))/(2*rho*v_w))",
+  "f": "I=((((Delta_p))^(2))/(2*rho*v_w))",
   "scope": "m54333",
   "title": "osbooks-physics",
   "units_draft": {
-   "p": "kg*m/s",
+   "Delta_p": "kg*m/s",
    "rho": "kg/m^3",
    "v_w": "m/s"
   },
   "units_unknown": [
-   "I",
-   "Delta"
+   "I"
   ]
  },
  {
@@ -3485,17 +3341,15 @@
  },
  {
   "name": "first law of thermodynamics",
-  "f": "Delta*U=Q-W",
+  "f": "Delta_U=Q-W",
   "scope": "m54305",
   "title": "osbooks-physics",
   "units_draft": {
    "Q": "J",
-   "U": "J",
    "W": "J"
   },
   "units_unknown": [
-   "Delta*U",
-   "Delta"
+   "Delta_U"
   ]
  },
  {
@@ -3503,11 +3357,6 @@
   "f": "P=((F)/(A))",
   "scope": "m54305",
   "title": "osbooks-physics",
-  "units": {
-   "A": "m^2",
-   "F": "N",
-   "P": "Pa"
-  },
   "units_draft": {
    "P": "Pa",
    "A": "m^2",
@@ -3517,17 +3366,15 @@
  },
  {
   "name": "pressure\u2013volume work",
-  "f": "W=P*Delta*V",
+  "f": "W=P*Delta_V",
   "scope": "m54305",
   "title": "osbooks-physics",
   "units_draft": {
    "W": "J",
-   "P": "W",
-   "V": "m^3"
+   "Delta_V": "m^3",
+   "P": "W"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Displacement",
@@ -3543,20 +3390,17 @@
  },
  {
   "name": "change in electric potential energy for a charge that moves in a constant electric field",
-  "f": "Delta*U_E=-q*E*(x_f-x_i)",
+  "f": "Delta_U_E=-q*E*(x_f-x_i)",
   "scope": "m54426",
   "title": "osbooks-physics",
   "units_draft": {
-   "Delta*U_E": "J",
+   "Delta_U_E": "J",
    "E": "J",
-   "U_E": "J",
    "q": "C",
    "x_f": "m",
    "x_i": "m"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "electric potential energy of a charge a distance r from a point charge or sphere of uniform charge",
@@ -3586,19 +3430,16 @@
  },
  {
   "name": "change in electric potential for a charge that moves in a constant electric field",
-  "f": "Delta*V=-E*(x_f-x_i)",
+  "f": "Delta_V=-E*(x_f-x_i)",
   "scope": "m54426",
   "title": "osbooks-physics",
   "units_draft": {
-   "Delta*V": "C",
+   "Delta_V": "C",
    "E": "J",
-   "V": "m^3",
    "x_f": "m",
    "x_i": "m"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "electric potential of a charge a distance r from a point charge or sphere of uniform charge",
@@ -3628,17 +3469,15 @@
  },
  {
   "name": "impulse\u2013momentum theorem",
-  "f": "Deltap=F_net*Delta*t",
+  "f": "Deltap=F_net*Delta_t",
   "scope": "m54215",
   "title": "osbooks-physics",
   "units_draft": {
    "Deltap": "kg*m/s",
-   "F_net": "N",
-   "t": "s"
+   "Delta_t": "s",
+   "F_net": "N"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "linear momentum",
@@ -3654,15 +3493,14 @@
  },
  {
   "name": "Newton\u2019s second law in terms of momentum",
-  "f": "F_net=((Deltap)/(Delta*t))",
+  "f": "F_net=((Deltap)/(Delta_t))",
   "scope": "m54215",
   "title": "osbooks-physics",
   "units_draft": {
    "F_net": "kg*m/s",
-   "t": "s"
+   "Delta_t": "s"
   },
   "units_unknown": [
-   "Delta",
    "Deltap"
   ]
  },
@@ -3697,11 +3535,6 @@
   "f": "P=((W)/(t))",
   "scope": "m54271",
   "title": "osbooks-physics",
-  "units": {
-   "t": "s",
-   "W": "J",
-   "P": "W"
-  },
   "units_draft": {
    "P": "W",
    "W": "J",
@@ -3711,16 +3544,14 @@
  },
  {
   "name": "elapsed time",
-  "f": "Delta*t=gamma*Delta*t_0",
+  "f": "Delta_t=gamma*Delta_t_0",
   "scope": "m54282",
   "title": "osbooks-physics",
   "units_draft": {
-   "Delta*t": "s",
-   "t": "s",
-   "t_0": "s"
+   "Delta_t": "s",
+   "Delta_t_0": "s"
   },
   "units_unknown": [
-   "Delta",
    "gamma"
   ]
  },
@@ -3805,17 +3636,16 @@
  },
  {
   "name": "emf",
-  "f": "epsilon=-N*((Delta*Phi)/(Delta*t))",
+  "f": "epsilon=-N*((Delta_Phi)/(Delta_t))",
   "scope": "m54456",
   "title": "osbooks-physics",
   "units_draft": {
    "epsilon": "V",
-   "N": "1",
-   "t": "s"
+   "Delta_t": "s",
+   "N": "1"
   },
   "units_unknown": [
-   "Delta",
-   "Phi"
+   "Delta_Phi"
   ]
  },
  {
@@ -3833,15 +3663,14 @@
  },
  {
   "name": "Acceleration",
-  "f": "a=((Deltav)/(Delta*t))",
+  "f": "a=((Deltav)/(Delta_t))",
   "scope": "m54094",
   "title": "osbooks-physics",
   "units_draft": {
    "a": "m/s^2",
-   "t": "s"
+   "Delta_t": "s"
   },
   "units_unknown": [
-   "Delta",
    "Deltav"
   ]
  },
@@ -3945,32 +3774,27 @@
  },
  {
   "name": "Angle of rotation",
-  "f": "Delta*theta=((Delta*s)/(r))",
+  "f": "Delta_theta=((Delta_s)/(r))",
   "scope": "m54176",
   "title": "osbooks-physics",
   "units_draft": {
-   "Delta*theta": "1",
-   "r": "m",
-   "s": "m",
-   "theta": "1"
+   "Delta_theta": "1",
+   "Delta_s": "m",
+   "r": "m"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Angular speed:",
-  "f": "omega=((Delta*theta)/(Delta*t))",
+  "f": "omega=((Delta_theta)/(Delta_t))",
   "scope": "m54176",
   "title": "osbooks-physics",
   "units_draft": {
    "omega": "1/s",
-   "t": "s",
-   "theta": "1"
+   "Delta_t": "s",
+   "Delta_theta": "1"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Tangential speed:",
@@ -4066,11 +3890,6 @@
   "f": "A=pi*a*b",
   "scope": "m54192",
   "title": "osbooks-physics",
-  "units": {
-   "b": "m",
-   "A": "m^2",
-   "a": "m"
-  },
   "units_draft": {
    "A": "m^2",
    "a": "m/s^2"
@@ -4418,17 +4237,15 @@
  },
  {
   "name": "electric current I is the charge \u0394Q that passes a plane per unit time \u0394t",
-  "f": "I=((Delta*Q)/(Delta*t))",
+  "f": "I=((Delta_Q)/(Delta_t))",
   "scope": "m54437",
   "title": "osbooks-physics",
   "units_draft": {
    "I": "s",
-   "Q": "J",
-   "t": "s"
+   "Delta_Q": "J",
+   "Delta_t": "s"
   },
-  "units_unknown": [
-   "Delta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "the magnitude of the magnetic field created by a long, straight current-carrying wire",
@@ -4459,15 +4276,14 @@
  },
  {
   "name": "Angular acceleration",
-  "f": "alpha=((Deltaomega)/(Delta*t))",
+  "f": "alpha=((Deltaomega)/(Delta_t))",
   "scope": "m54180",
   "title": "osbooks-physics",
   "units_draft": {
    "alpha": "1/s^2",
-   "t": "s"
+   "Delta_t": "s"
   },
   "units_unknown": [
-   "Delta",
    "Deltaomega"
   ]
  },
@@ -4588,11 +4404,6 @@
   "f": "F_c=m*a_c",
   "scope": "m54181",
   "title": "osbooks-physics",
-  "units": {
-   "F_c": "N",
-   "m": "kg",
-   "a_c": "m/s^2"
-  },
   "units_draft": {
    "F_c": "N",
    "a_c": "m/s^2",
@@ -4630,11 +4441,6 @@
   "f": "s=r*theta",
   "scope": "m51283",
   "title": "osbooks-college-algebra-bundle",
-  "units": {
-   "theta": "1",
-   "r": "m",
-   "s": "m"
-  },
   "units_draft": {
    "s": "m",
    "r": "m",
@@ -4659,11 +4465,6 @@
   "f": "omega=((theta)/(t))",
   "scope": "m51283",
   "title": "osbooks-college-algebra-bundle",
-  "units": {
-   "omega": "1/s",
-   "theta": "1",
-   "t": "s"
-  },
   "units_draft": {
    "omega": "1/s",
    "t": "s",

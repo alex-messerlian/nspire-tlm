@@ -47,7 +47,35 @@ def usable(r):
     if re.search(r"\b(Delta|d|partial|Sigma|nabla)\s*\*", f): return False
     return 2 <= len(vs) <= 4 and len(rhs) <= 40
 
-recs = [r for r in json.load(open("corpus/records_raw.json")) if usable(r)]
+# Only ANNOTATED, dimensionally-gated records enter the corpus. The prompt format signed off in
+# PROMPT_FORMAT section 2 is FORMULA | VAR:UNIT ... | CONDITION, and the previous generator emitted
+# FORMULA | VAR VAR -- no units, no condition. That made every eval prompt out-of-distribution and
+# meant the applicability condition, which licenses every D-category refusal, never appeared in
+# training at all.
+_ann = {r["f"]: r for r in json.load(open("corpus/units_batch1.json"))}
+recs = [r for r in json.load(open("corpus/records_raw.json")) if usable(r) and r["f"] in _ann]
+for r in recs: r["units"] = _ann[r["f"]]["units"]
+
+# Applicability conditions, drafted per subject. THIN by design and flagged as such: these are the
+# weakest annotation in the pipeline and the one the refusal metrics lean on hardest.
+COND = [
+ (r"roll|rotat|angular|torque|moment of inertia", "rigid body, fixed axis"),
+ (r"mirror|lens|optic|focal|magnif|refract",      "thin lens or spherical mirror, paraxial rays"),
+ (r"drag|fluid|buoyan|viscos|flow",               "steady flow, constant density"),
+ (r"circuit|capacit|induct|resist|current|ohm",   "steady state, ohmic components"),
+ (r"photon|quantum|debroglie|planck|bohr",        "non-relativistic, single particle"),
+ (r"therm|heat|entrop|gas|carnot|molar",          "quasi-static, no phase change"),
+ (r"spring|hooke|oscillat|harmonic",              "within the elastic limit, no damping"),
+ (r"magnetic|solenoid|hall|lorentz|flux",         "uniform field, steady current"),
+ (r"free fall|projectile|kinemat|velocity|accel", "constant acceleration, no air resistance"),
+ (r"relativ|doppler|lorentz factor",              "inertial frames, constant relative velocity"),
+]
+def condition(name):
+    n = name.lower()
+    for pat, c in COND:
+        if re.search(pat, n): return c
+    return "standard conditions"
+for r in recs: r["cond"] = condition(r["name"])
 print(f"records usable as physics relations: {len(recs)} of 379 gated  "
       f"(vs 27 heads in the eval set = {len(recs)/27:.1f}x)")
 
@@ -76,7 +104,8 @@ def gen(n, seed=0):
         ask  = rng.choice(ASK).format(q=r["name"].lower())
         q = stem + (ask if stem.endswith(", ") and False else
                     (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask))
-        docs.append({"q": q, "rec": f"{r['f']} | {' '.join(vs)}", "lhs": lhs,
+        umap = " ".join(f"{v}:{r['units'][v]}" for v in vs if v in r["units"])
+        docs.append({"q": q, "rec": f"{r['f']} | {umap} | {r['cond']}", "lhs": lhs,
                      "name": r["name"], "head": r["f"],
                      "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
