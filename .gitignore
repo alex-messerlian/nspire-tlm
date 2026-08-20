@@ -9,3 +9,5 @@ models/*.gguf
 models/*.pt
 .DS_Store
 vendor/libnspire/
+corpus/raw/
+.venv-tok/
