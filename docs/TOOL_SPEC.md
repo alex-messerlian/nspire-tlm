@@ -377,6 +377,27 @@ Enforced by the generator, not hoped for:
    This is a lint the generator can enforce mechanically: if an `eval` result ends in
    `m^2*kg/s^2` or `1/s`, the sample is rejected and regenerated as a `conv`.
 
+6. **No angle constant inside a rate.** `deg`, `rad` and `rev` are dimensionless constants (§5.4
+   exemption), so they survive into a quotient as a bare numeric factor and the dimension check
+   cannot see them:
+
+   ```
+   wrong:  <tool>conv<arg>(5 rev)/(2 s)<arg>Hz</tool>   -> 15.70796327 Hz   (2*pi too large)
+   right:  <tool>conv<arg>5/(2 s)<arg>Hz</tool>         -> 2.5 Hz
+   right:  <tool>conv<arg>2*pi*5/(2 s)<arg>rad/s</tool> -> 15.70796327 rad/s
+   ```
+
+   **Invariant 5 does not catch this** — the wrong form is already a `conv` with an explicit target,
+   so the §5.4 lint passes while the value is off by 2π. The rule is separate: reject any `conv`
+   whose source expression contains `deg`/`rad`/`rev` **and** whose target is a frequency or angular
+   rate. Angle constants belong in trigonometric arguments (`sin(30 deg)`), never in a rate — write
+   the `2*pi` explicitly, as the invariant-5 examples above already do.
+
+   Found by writing the eval set: six A3 items shipped a 2π error past a lint that was designed for
+   exactly this class of mistake. This is the third appearance of the same underlying hazard —
+   *dimensionless but numerically significant* — after the `sin(30 deg)` catch and the unit-name
+   collision. Any new dimensionless constant must be checked against this pattern before it lands.
+
 ## 9. Metrics this spec makes measurable
 
 - **Tool call validity rate** — emitted calls that parse and execute, over all emitted calls. Split
