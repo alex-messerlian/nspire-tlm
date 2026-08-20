@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tokenize the real 85/15 mix into a flat uint16 stream for training."""
 import json, re, pathlib, random, numpy as np, sys
-from tokenizers import Tokenizer, models, trainers, pre_tokenizers
+from tokenizers import Tokenizer, models, trainers, pre_tokenizers, decoders
 V = int(sys.argv[1]) if len(sys.argv) > 1 else 4096
 SPECIAL = ["<q>","</q>","<r>","<a>","<tool>","<arg>","</tool>","<res>","</res>","<end>"]
 TAG,WS,MATH = re.compile(r"<[^>]+>"),re.compile(r"\s+"),re.compile(r"<m:math.*?</m:math>",re.S)
@@ -15,6 +15,10 @@ print(f"synthetic {len(syn):,} docs   OER {len(oer):,} modules")
 
 tk = Tokenizer(models.BPE(unk_token="<unk>"))
 tk.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=True)
+# Without a matching decoder, decode() returns ByteLevel artifacts ("Ġ v = r * omega") rather than
+# text. Training is unaffected -- ids are ids -- but every downstream inspection is garbled, and the
+# device port needs this to print anything a human can read.
+tk.decoder = decoders.ByteLevel()
 tk.train_from_iterator(syn + oer, trainers.BpeTrainer(
     vocab_size=V, special_tokens=["<unk>"]+SPECIAL, show_progress=False))
 tk.save(f"train/tok{V}.json")
