@@ -1,6 +1,11 @@
 # HARDWARE.md — measured properties of the target device
 
-**Status: MEASURED 2026-08-19 on the physical device, on battery, USB disconnected.**
+**Status: MEASURED 2026-08-19. Tethered session + BATTERY CONFIRMATION PASS. Both in
+`results/20260819-204006/results.txt` (the log appends).**
+
+**Battery pass result: CPU 396 MHz confirmed (AHB 198, timer 98.98 vs 99.00 expected). Tick counts
+match the tethered runs to ≤0.53%, and ≤0.21% at every size ≥2 KB. Derived rates agree to ≤3.6%.
+Clock invariance is measured, not inferred. All device numbers below are on solid ground.**
 **Raw logs: `results/20260819-202630/`. Four bench_platform runs, one each of mac/flash/mem.**
 
 > ### ⚠ TWO CORRECTIONS THAT AFFECT EVERY NUMBER BELOW

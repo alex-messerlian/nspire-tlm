@@ -1,0 +1,207 @@
+
+=== bench_platform ===
+cpu_hz=198000000 power=OTHER
+A1_model_id_900A0000=0x00000202 (expect 0x202 for CX II)
+hwtype=1
+is_cx2=1
+A3_cpu_clock_hz=198000000
+power_state=OTHER
+pmu_raw_0x30=0x21020303
+pmu_raw_0x20=0x10000000
+pmu_raw_0x810=0x00000111
+cp15_main_id=0x41069265
+cp15_cache_type=0x1D112152
+cp15_control=0x0005107F
+caches_separate=yes (Harvard)
+A11_dcache=8192 bytes, 32-byte line, 4-way (raw size_f=4 assoc_f=2 M=0 len_f=2)
+A10_icache=16384 bytes, 32-byte line, 4-way (raw size_f=5 assoc_f=2 M=0 len_f=2)
+C1_fast_timer_measured_hz=98978553 (wiki claims 99000000)
+C5_resolution_ns=10.10
+C6_wrap_period_s=43 -- runs longer than this MUST handle wrap
+C7_timer_owned_by_os=fast=no (we configured it) slow=no (we configured it)
+A12_chase=1 KB: 14.99 ns/access (ticks=296886)
+A12_chase=2 KB: 15.15 ns/access (ticks=300031)
+A12_chase=4 KB: 15.11 ns/access (ticks=299288)
+A12_chase=8 KB: 15.15 ns/access (ticks=299955)
+A12_chase=16 KB: 211.48 ns/access (ticks=4186430)
+A12_chase=32 KB: 262.78 ns/access (ticks=5201970)
+A12_chase=64 KB: 262.77 ns/access (ticks=5201801)
+A12_chase=128 KB: 262.77 ns/access (ticks=5201772)
+A12_chase=256 KB: 262.77 ns/access (ticks=5201737)
+A12_note=cache size = largest KB before the latency step; line size needs a separate stride sweep
+
+=== bench_platform ===
+cpu_hz=144000000 power=OTHER
+A1_model_id_900A0000=0x00000202 (expect 0x202 for CX II)
+hwtype=1
+is_cx2=1
+A3_cpu_clock_hz=144000000
+power_state=OTHER
+pmu_raw_0x30=0x18020303
+pmu_raw_0x20=0x10000000
+pmu_raw_0x810=0x00000111
+cp15_main_id=0x41069265
+cp15_cache_type=0x1D112152
+cp15_control=0x0005107F
+caches_separate=yes (Harvard)
+A11_dcache=8192 bytes, 32-byte line, 4-way (raw size_f=4 assoc_f=2 M=0 len_f=2)
+A10_icache=16384 bytes, 32-byte line, 4-way (raw size_f=5 assoc_f=2 M=0 len_f=2)
+C1_fast_timer_measured_hz=71997603 (wiki claims 99000000)
+C5_resolution_ns=13.88
+C6_wrap_period_s=59 -- runs longer than this MUST handle wrap
+C7_timer_owned_by_os=fast=no (we configured it) slow=no (we configured it)
+A12_chase=1 KB: 20.61 ns/access (ticks=296886)
+A12_chase=2 KB: 20.83 ns/access (ticks=300031)
+A12_chase=4 KB: 20.78 ns/access (ticks=299230)
+A12_chase=8 KB: 20.84 ns/access (ticks=300168)
+A12_chase=16 KB: 291.41 ns/access (ticks=4196284)
+A12_chase=32 KB: 361.72 ns/access (ticks=5208648)
+A12_chase=64 KB: 361.70 ns/access (ticks=5208414)
+A12_chase=128 KB: 361.72 ns/access (ticks=5208689)
+A12_chase=256 KB: 361.72 ns/access (ticks=5208670)
+A12_note=cache size = largest KB before the latency step; line size needs a separate stride sweep
+
+=== bench_platform ===
+cpu_hz=144000000 power=OTHER
+A1_model_id_900A0000=0x00000202 (expect 0x202 for CX II)
+hwtype=1
+is_cx2=1
+A3_cpu_clock_hz=144000000
+power_state=OTHER
+pmu_raw_0x30=0x18020303
+pmu_raw_0x20=0x10000000
+pmu_raw_0x810=0x00000111
+cp15_main_id=0x41069265
+cp15_cache_type=0x1D112152
+cp15_control=0x0005107F
+caches_separate=yes (Harvard)
+A11_dcache=8192 bytes, 32-byte line, 4-way (raw size_f=4 assoc_f=2 M=0 len_f=2)
+A10_icache=16384 bytes, 32-byte line, 4-way (raw size_f=5 assoc_f=2 M=0 len_f=2)
+C1_fast_timer_measured_hz=71978548 (wiki claims 99000000)
+C5_resolution_ns=13.89
+C6_wrap_period_s=59 -- runs longer than this MUST handle wrap
+C7_timer_owned_by_os=fast=no (we configured it) slow=no (we configured it)
+A12_chase=1 KB: 20.62 ns/access (ticks=296896)
+A12_chase=2 KB: 20.84 ns/access (ticks=300058)
+A12_chase=4 KB: 20.84 ns/access (ticks=300038)
+A12_chase=8 KB: 20.86 ns/access (ticks=300344)
+A12_chase=16 KB: 291.30 ns/access (ticks=4193536)
+A12_chase=32 KB: 361.90 ns/access (ticks=5209874)
+A12_chase=64 KB: 361.90 ns/access (ticks=5209917)
+A12_chase=128 KB: 361.87 ns/access (ticks=5209514)
+A12_chase=256 KB: 361.88 ns/access (ticks=5209604)
+A12_note=cache size = largest KB before the latency step; line size needs a separate stride sweep
+
+=== bench_platform ===
+cpu_hz=144000000 power=OTHER
+A1_model_id_900A0000=0x00000202 (expect 0x202 for CX II)
+hwtype=1
+is_cx2=1
+A3_cpu_clock_hz=144000000
+power_state=OTHER
+pmu_raw_0x30=0x18020303
+pmu_raw_0x20=0x10000000
+pmu_raw_0x810=0x00000111
+cp15_main_id=0x41069265
+cp15_cache_type=0x1D112152
+cp15_control=0x0005107F
+caches_separate=yes (Harvard)
+A11_dcache=8192 bytes, 32-byte line, 4-way (raw size_f=4 assoc_f=2 M=0 len_f=2)
+A10_icache=16384 bytes, 32-byte line, 4-way (raw size_f=5 assoc_f=2 M=0 len_f=2)
+C1_fast_timer_measured_hz=0 (wiki claims 99000000)
+C7_timer_owned_by_os=fast=no (we configured it) slow=no (we configured it)
+
+=== bench_mac ===
+cpu_hz=144000000 power=OTHER
+timer_hz_assumed=99000000 -- REPLACE with measured C1
+cpu_hz=144000000 (OTHER)
+B10_int8_naive_MMAC_s=48
+B10_cycles_per_MAC=2.97
+B11_int16_smla_MMAC_s=28
+B11_cycles_per_MAC=5.03 (architectural floor is 1.00)
+B12_softfloat_MMAC_s=3
+B12_softfloat_slowdown_vs_B11=9x
+D4_crossover_note=compare B11 against B4 from bench_mem: int4 is compute-bound iff B11 < 2*B4/bytes_per_mac
+
+=== bench_flash ===
+cpu_hz=144000000 power=OTHER
+timer_hz_assumed=99000000 -- REPLACE with measured C1
+B8_flash_seq_MB_s=2 (8388608 bytes, 64 KB chunks, first read after write -- may be OS-cached)
+B9_flash_rand4k_us=42448.5 per 4096-byte read (256 reads)
+B9_ple_verdict=PLE viable iff this x rows_per_token stays well under the per-token budget; at 2 tok/s that budget is 500 ms
+
+=== bench_mem ===
+cpu_hz=144000000 power=OTHER
+timer_hz_assumed=99000000 -- REPLACE with bench_platform's C1 before trusting any MB/s below
+B1_largest_malloc_bytes=22937600 (21 MB)
+B2_total_heap_bytes=26214400 in 25 x 1048576-byte chunks
+B2_total_heap_bytes=28442624 in 434 x 65536-byte chunks
+B4_dram_read_MB_s=97 (buf=4096 KB, reps=4, ticks=17039528)
+B5_memcpy_MB_s=70 (counting bytes copied, not touched)
+B7_sram_read_probe=0xE59FF018 0xE203000F 0x8F88CDAE 0x00000000 (offsets 0, 64K, 128K, 192K)
+B6_sram_read_MB_s=395 (32 KB window x 256 -- likely cache-resident, see note)
+B6_note=if B6 ~= B4 the window fit in D-cache and this measured cache, not SRAM; enlarge the window past A11 and rerun
+B7_sram_writable=NOT TESTED -- writing here may crash the OS; decide by hand from the read probe
+
+=== bench_platform ===
+cpu_hz=198000000 power=OTHER
+A1_model_id_900A0000=0x00000202 (expect 0x202 for CX II)
+hwtype=1
+is_cx2=1
+A3_cpu_clock_hz=198000000
+power_state=OTHER
+pmu_raw_0x30=0x21020303
+pmu_raw_0x20=0x10000000
+pmu_raw_0x810=0x00000111
+cp15_main_id=0x41069265
+cp15_cache_type=0x1D112152
+cp15_control=0x0005107F
+caches_separate=yes (Harvard)
+A11_dcache=8192 bytes, 32-byte line, 4-way (raw size_f=4 assoc_f=2 M=0 len_f=2)
+A10_icache=16384 bytes, 32-byte line, 4-way (raw size_f=5 assoc_f=2 M=0 len_f=2)
+C1_fast_timer_measured_hz=98984254 (wiki claims 99000000)
+C5_resolution_ns=10.10
+C6_wrap_period_s=43 -- runs longer than this MUST handle wrap
+C7_timer_owned_by_os=fast=no (we configured it) slow=no (we configured it)
+A12_chase=1 KB: 15.15 ns/access (ticks=300033)
+A12_chase=2 KB: 15.15 ns/access (ticks=300031)
+A12_chase=4 KB: 15.11 ns/access (ticks=299230)
+A12_chase=8 KB: 15.16 ns/access (ticks=300254)
+A12_chase=16 KB: 211.44 ns/access (ticks=4185866)
+A12_chase=32 KB: 262.80 ns/access (ticks=5202641)
+A12_chase=64 KB: 262.79 ns/access (ticks=5202498)
+A12_chase=128 KB: 262.78 ns/access (ticks=5202226)
+A12_chase=256 KB: 262.78 ns/access (ticks=5202332)
+A12_note=cache size = largest KB before the latency step; line size needs a separate stride sweep
+
+=== bench_mac ===
+cpu_hz=198000000 power=OTHER
+timer_hz_assumed=99000000 -- REPLACE with measured C1
+cpu_hz=198000000 (OTHER)
+B10_int8_naive_MMAC_s=48
+B10_cycles_per_MAC=4.10
+B11_int16_smla_MMAC_s=29
+B11_cycles_per_MAC=6.72 (architectural floor is 1.00)
+B12_softfloat_MMAC_s=3
+B12_softfloat_slowdown_vs_B11=9x
+D4_crossover_note=compare B11 against B4 from bench_mem: int4 is compute-bound iff B11 < 2*B4/bytes_per_mac
+
+=== bench_flash ===
+cpu_hz=198000000 power=OTHER
+timer_hz_assumed=99000000 -- REPLACE with measured C1
+B8_flash_seq_MB_s=2 (8388608 bytes, 64 KB chunks, first read after write -- may be OS-cached)
+B9_flash_rand4k_us=48833.9 per 4096-byte read (256 reads)
+B9_ple_verdict=PLE viable iff this x rows_per_token stays well under the per-token budget; at 2 tok/s that budget is 500 ms
+
+=== bench_mem ===
+cpu_hz=198000000 power=OTHER
+timer_hz_assumed=99000000 -- REPLACE with bench_platform's C1 before trusting any MB/s below
+B1_largest_malloc_bytes=22937600 (21 MB)
+B2_total_heap_bytes=26214400 in 25 x 1048576-byte chunks
+B2_total_heap_bytes=28442624 in 434 x 65536-byte chunks
+B4_dram_read_MB_s=97 (buf=4096 KB, reps=4, ticks=17039519)
+B5_memcpy_MB_s=71 (counting bytes copied, not touched)
+B7_sram_read_probe=0xE59FF018 0xE203000F 0x8F88CDAE 0x00000000 (offsets 0, 64K, 128K, 192K)
+B6_sram_read_MB_s=395 (32 KB window x 256 -- likely cache-resident, see note)
+B6_note=if B6 ~= B4 the window fit in D-cache and this measured cache, not SRAM; enlarge the window past A11 and rerun
+B7_sram_writable=NOT TESTED -- writing here may crash the OS; decide by hand from the read probe
