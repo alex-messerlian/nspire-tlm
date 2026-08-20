@@ -23,7 +23,10 @@ P = [
  ("C1 angle","<tool>eval<arg>1+30 deg</tool>","1.523598776","LEGAL: angles are dimensionless, series expansions need this"),
  ("C1 angle","<tool>conv<arg>asin(0.5)<arg>deg</arg></tool>","!units","malformed target text"),
  ("C1 angle","<tool>conv<arg>asin(0.5)<arg>deg</tool>","30 deg","inverse trig returns rad; naming it deg"),
- ("C1 angle","<tool>eval<arg>cos(0.25 rev)</tool>","6.123233996e-17","FLAGGED: fp noise, a section 5.1 formatting question -- not a units bug"),
+ ("C1 angle","<tool>eval<arg>cos(0.25 rev)</tool>","0","F4 FIXED: near-zero trig snaps"),
+ ("C1 angle","<tool>eval<arg>sin(180 deg)</tool>","0","F4: half turn"),
+ ("C1 angle","<tool>eval<arg>sin(1e-9)</tool>","1e-09","F4 SCOPE GUARD: a genuinely small angle keeps a genuinely small sine"),
+ ("C4 ratio","<tool>eval<arg>6.674e-11*1000*1000/5^2</tool>","2.6696e-06","F4 SCOPE GUARD: legitimately tiny non-trig result survives"),
  ("C1 angle","<tool>eval<arg>tan(45 deg)</tool>","1","canonical"),
  # --- C2 affine units: offset means arithmetic does not distribute -------------
  ("C2 affine","<tool>conv<arg>2*(10 degC)<arg>degC</tool>","!units","doubling an absolute temperature is meaningless"),
