@@ -10,7 +10,7 @@ V2 layout:     256-byte header, fp32 norms, then per-tensor int8 values followed
 """
 import struct, sys, array, pathlib
 
-GROUP = 64
+GROUP = 96
 
 def read_f32(f, n):
     a = array.array('f')

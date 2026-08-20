@@ -30,7 +30,14 @@
 #endif
 // ----------------------------------------------------------------------------
 // Globals
+#ifdef _TINSPIRE
+#ifndef FIXED_GS
+#define FIXED_GS 96
+#endif
+#define GS FIXED_GS   /* compile-time: removes two __divsi3 per group */
+#else
 int GS = 0; // group size global for quantization of the weights
+#endif
 
 // ----------------------------------------------------------------------------
 // Transformer model
@@ -255,7 +262,15 @@ void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weigh
     if (fread(&shared_classifier, sizeof(uint8_t), 1, file) != 1) { exit(EXIT_FAILURE); }
     int group_size; // the group size used in quantization
     if (fread(&group_size, sizeof(int), 1, file) != 1) { exit(EXIT_FAILURE); }
+#ifdef _TINSPIRE
+    if (group_size != FIXED_GS) {
+        printf("FATAL: checkpoint GS=%d but binary compiled for GS=%d\n",
+               group_size, FIXED_GS);
+        exit(EXIT_FAILURE);
+    }
+#else
     GS = group_size; // set as global, as it will be used in many places
+#endif
     // figure out the file size
     fseek(file, 0, SEEK_END); // move file pointer to end of file
     *file_size = ftell(file); // get the file size, in bytes
@@ -939,7 +954,11 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         // print the token as string, decode it with the Tokenizer object
         char* piece = decode(tokenizer, token, next);
         safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
+#ifdef _TINSPIRE
+        screen_flush();   /* paint each token as it is produced */
+#else
         fflush(stdout);
+#endif
         token = next;
 
         // init the timer here because the first iteration can be slower
