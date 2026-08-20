@@ -32,6 +32,19 @@ def as_num(s):
     m = NUM_RE.search(s or "")
     return float(m.group()) if m else None
 
+def _nums(s):
+    """Yield (value, significant_figures_written) for each numeric literal."""
+    for m in NUM_RE.finditer(s):
+        t = m.group(); d, seen = 0, False
+        for ch in t.split("e")[0].split("E")[0]:
+            if ch.isdigit() and (ch != "0" or seen): d += 1; seen = True
+        yield float(t), max(1, d)
+
+def _sig_eq(a, b, sig):
+    if a is None or b is None or b == 0: return a == b
+    m = 10.0 ** (sig - 1 - math.floor(math.log10(abs(b))))
+    return math.floor(abs(b) * m + 0.5) / m * (1 if b > 0 else -1) == a
+
 def close(a, b, rel=1e-6):
     if a is None or b is None: return False
     if math.isnan(a) or math.isnan(b): return False
@@ -63,7 +76,12 @@ def score(item, output):
     """item: dict from the eval set. output: the model transcript for that item."""
     cat = item["id"].split("-")[0].rstrip("0123456789")
     calls = CALL_RE.findall(output)
-    prose = CALL_RE.sub(" ", RES_RE.sub(" ", output))
+    # The answer span is what the model authored, and it is the ONLY thing to grade. Taking
+    # "everything outside <tool>/<res>" also swallows the question and the record, so a reference
+    # number appearing in the QUESTION satisfied answer_stated even when the answer was wrong --
+    # a false PASS. <a> exists to bound this; score.py predated it.
+    seg = output.split("<a>", 1)[1] if "<a>" in output else output
+    prose = CALL_RE.sub(" ", RES_RE.sub(" ", seg)).replace("<end>", " ")
     r = {"id": item["id"], "cat": cat, "n_calls": len(calls)}
 
     # Universal: the loss mask must never let the model AUTHOR a result span.
@@ -104,8 +122,10 @@ def score(item, output):
     # A: numeric. Compare the executed result AND the number the model wrote in prose.
     ref = as_num(run_calls([item["call"]])[0])
     r["call_result_correct"] = close(as_num(results[-1]) if results else None, ref)
-    r["answer_stated"]       = any(close(v, ref, rel=1e-3)
-                                   for v in map(float, NUM_RE.findall(prose)))
+    # "About 13 m/s" is a legitimate rendering of 12.5. Compare at the ANSWER's own written
+    # precision, as provenance.c does -- a fixed rel=1e-3 rejects every rounded answer. That
+    # tolerance was never exercised before: the question-leak bug above was passing these.
+    r["answer_stated"] = any(_sig_eq(v, ref, t) for v, t in _nums(prose))
     r["refused"] = bool(REFUSAL_RE.search(prose))
     r["pass"] = r["call_result_correct"] and r["answer_stated"] and not r["refused"]
     return r
