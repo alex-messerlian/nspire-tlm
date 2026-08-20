@@ -224,6 +224,62 @@ for e in ["100 m/10 s", "12 V/0.25 A", "1/2 2 3", "20 N/4 kg", "500 J/25 s"]:
     g = call(f"<tool>eval<arg>{e}</tool>")
     check(f"ambiguous '{e}' refused", g, g == "!expr", "!expr")
 
+print("=== INTERACTION: one call's output feeding another (the least-covered form) ===")
+# This is how the model actually works -- solve then evaluate, conv then stat, diff then evalat.
+# A result that is correct in isolation can still be unusable as the next call's argument.
+
+# solve -> substitute numbers -> eval.  The rearranged formula must be a legal eval argument.
+for eq, var, subs, expect in [
+    ("F=m*a","a",{"F":"20","m":"4"},5.0),
+    ("V=I*R","R",{"V":"12","I":"0.25"},48.0),
+    ("P=2*l+2*w","l",{"P":"40","w":"6"},14.0),
+    ("v=d/t","t",{"d":"100","v":"10"},10.0),
+    ("PE=m*g*h","h",{"PE":"98","m":"5","g":"9.8"},2.0),
+    ("v^2=v0^2+2*a*d","a",{"v":"10","v0":"0","d":"25"},2.0),
+]:
+    sol = call(f"<tool>solve<arg>{eq}<arg>{var}</tool>")
+    rhs = sol.split("=",1)[1] if "=" in sol else ""
+    e = rhs
+    for k,v in subs.items(): e = re.sub(rf'\b{k}\b', f"({v})", e)
+    got = num(call(f"<tool>eval<arg>{e}</arg></tool>".replace("</arg>","")))
+    ok = got is not None and abs(got-expect) < 1e-6
+    check(f"solve({eq},{var}) -> eval chain", f"{sol} => {e} => {got}", ok, expect)
+
+# diff -> evalat.  The derivative string must be a legal evalat argument.
+for expr, x0 in [("x^3-4x^2+7",2.0), ("sin(x)*x",1.1), ("1/x",3.0), ("sqrt(x)",4.0), ("exp(x^2)",0.7)]:
+    d = call(f"<tool>diff<arg>{expr}<arg>x</tool>")
+    v = call(f"<tool>evalat<arg>{d}<arg>x<arg>{x0}</tool>")
+    ok = not v.startswith("!") and num(v) is not None
+    check(f"diff({expr}) output is a legal evalat argument", f"{d} -> {v}", ok, "a number")
+
+# conv -> stat.  Converted values must be parseable back into a stat list.
+vals = []
+for q in ("1 km","2 km","3 km"):
+    vals.append(num(call(f"<tool>conv<arg>{q}<arg>m</tool>")))
+lst = ",".join(str(int(v)) for v in vals if v is not None)
+g = num(call(f"<tool>stat<arg>mean<arg>{lst}</tool>"))
+check("conv outputs feed stat", f"{lst} -> {g}", g is not None and abs(g-2000)<1e-6, 2000)
+
+# integ -> eval.  A definite integral's output must be usable as a number.
+iv = call("<tool>integ<arg>x^2<arg>x<arg>0<arg>3</tool>")
+g  = num(call(f"<tool>eval<arg>{iv}*2</tool>"))
+check("integ output feeds eval", f"{iv} -> {g}", g is not None and abs(g-18)<1e-6, 18)
+
+# solve -> the root fed back through evalat, for the quadratic branch specifically.
+sol = call("<tool>solve<arg>2x^2+3x-5=0<arg>x</tool>")
+roots = [float(m) for m in re.findall(r'x=(-?[\d.]+)', sol)]
+ok = len(roots) == 2
+for r in roots:
+    resid = num(call(f"<tool>evalat<arg>2x^2+3x-5<arg>x<arg>{r}</tool>"))
+    if resid is None or abs(resid) > 1e-6: ok = False
+check("quadratic roots feed back through evalat", f"{sol} -> {roots}", ok, "residual 0")
+
+# A conv result string must be re-parseable by conv (round trip through the FORMATTED string).
+c1 = call("<tool>conv<arg>100 km/h<arg>m/s</tool>")
+c2 = call(f"<tool>conv<arg>{c1}<arg>km/h</tool>")
+ok = num(c2) is not None and abs(num(c2)-100) < 1e-6
+check("conv output string is re-parseable by conv", f"{c1} -> {c2}", ok, "100 km/h")
+
 print()
 if fails:
     print(f"*** {len(fails)} SEMANTIC FAILURES of {total} ***\n")
