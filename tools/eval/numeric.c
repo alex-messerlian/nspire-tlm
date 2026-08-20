@@ -91,6 +91,16 @@ static err_t call_fn(const char *name, quant_t *a, int n, quant_t *out) {
 
     if (isnan(r)) return E_DOMAIN;
     if (isinf(r)) return E_RANGE;
+
+    /* Snap near-zero TRIG results only. cos(0.25 rev) is 6.123233996e-17 because pi/2 is not
+     * representable, and that string would teach the corpus that the cosine of a quarter turn is a
+     * tiny number in scientific notation. Scoped deliberately to sin/cos/tan: their range is
+     * [-1,1], so an absolute threshold is meaningful, and no textbook angle yields a true value
+     * between 1e-12 and 0. A general near-zero snap would corrupt legitimately tiny results -- the
+     * 2.6696e-06 gravitational force in A6-002 is real. */
+    if ((strcmp(name, "sin") == 0 || strcmp(name, "cos") == 0 || strcmp(name, "tan") == 0)
+        && r != 0.0 && (r < 1e-12 && r > -1e-12)) r = 0.0;
+
     out->v = r; out->d = DIM_NONE;
     /* sin/cos/tan CONSUME an angle -- sin(30 deg) is a pure ratio, and (5 rev)/(2 s) is not.
      * asin/acos/atan PRODUCE one, so naming their result in deg stays legal. */
