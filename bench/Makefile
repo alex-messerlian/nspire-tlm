@@ -13,7 +13,7 @@ LDFLAGS  :=
 all: $(addsuffix .tns,$(BENCHES))
 
 %.elf: %.c common.h
-	nspire-gcc $(CFLAGS) $< -o $@ $(LDFLAGS) -lnspireio
+	nspire-gcc $(CFLAGS) $< ../include/nspire_screen.c -o $@ $(LDFLAGS) -lnspireio
 
 %.tns: %.elf
 	genzehn --input $< --output $@.zehn --name $*

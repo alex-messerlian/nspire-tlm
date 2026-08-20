@@ -24,22 +24,18 @@ static inline void screen_flush(void) { fflush(stdout); }
 #else
 #include <nspireio/nspireio.h>
 
-static nio_console g_csl;
-static int g_screen_ready = 0;
+/* EXTERN, not static.
+ *
+ * These were `static` in this header, which gives every translation unit its OWN copy. screen_init()
+ * runs in nspire_main.c and set THAT TU's flag; runq_nspire.c and nspire.c each had a separate copy
+ * still at zero, so their screen_printf calls returned early and printed nothing. Every trace and
+ * every generated token from the engine was silently discarded, which looked exactly like a freeze.
+ * One definition, in nspire_screen.c. */
+extern nio_console g_csl;
+extern int g_screen_ready;
 
-static inline void screen_init(void) {
-    if (g_screen_ready) return;
-    /* Full-width, full-height console: 53x30 on the Nspire. White on black. */
-    if (nio_init(&g_csl, NIO_MAX_COLS, NIO_MAX_ROWS, 0, 0,
-                 NIO_COLOR_BLACK, NIO_COLOR_WHITE, true)) {
-        nio_set_default(&g_csl);
-        g_screen_ready = 1;
-    }
-}
-
-static inline void screen_free(void) {
-    if (g_screen_ready) { nio_free(&g_csl); g_screen_ready = 0; }
-}
+void screen_init(void);
+void screen_free(void);
 
 /* Route printf to the console, but GUARDED. If nio_init failed we must not call into nspireio with
  * no default console -- a crash is strictly worse than the black screen we are trying to fix. A
