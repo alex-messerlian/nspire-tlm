@@ -54,14 +54,14 @@ static void run_tests(void) {
     T("<tool>eval<arg>20 N/4 kg</tool>",               "!expr");
     T("<tool>eval<arg>1/2 2 3</tool>",                 "!expr");
     /* parenthesised forms are unambiguous and must work */
-    T("<tool>eval<arg>100 m/(10 s)</tool>",            "10 m/s");
-    T("<tool>eval<arg>12 V/(0.25 A)</tool>",           "48 ohm");
-    T("<tool>eval<arg>20 N/(4 kg)</tool>",             "5 m/s^2");
+    T("<tool>conv<arg>100 m/(10 s)<arg>m/s</tool>",    "10 m/s");
+    T("<tool>conv<arg>12 V/(0.25 A)<arg>ohm</tool>",   "48 ohm");
+    T("<tool>conv<arg>20 N/(4 kg)<arg>m/s^2</tool>",   "5 m/s^2");
     T("<tool>conv<arg>500 J/(25 s)<arg>W</tool>",      "20 W");
-    T("<tool>eval<arg>60 km/(2 h)</tool>",             "8.333333333 m/s");
+    T("<tool>conv<arg>60 km/(2 h)<arg>m/s</tool>",     "8.333333333 m/s");
     /* single-factor denominators stay unambiguous */
-    T("<tool>eval<arg>9.8 m/s^2 * 3 s</tool>",         "29.4 m/s");
-    T("<tool>eval<arg>100 km/h</tool>",                "27.77777778 m/s");
+    T("<tool>conv<arg>9.8 m/s^2 * 3 s<arg>m/s</tool>", "29.4 m/s");
+    T("<tool>conv<arg>100 km/h<arg>m/s</tool>",        "27.77777778 m/s");
     /* canonical form: numeric factors pulled left regardless of nesting */
     T("<tool>diff<arg>m*x^2<arg>x</tool>",             "2*m*x");
     T("<tool>diff<arg>a*b*x^2<arg>x</tool>",           "2*a*b*x");
@@ -70,29 +70,53 @@ static void run_tests(void) {
     T("<tool>eval<arg>100/10/2</tool>",                "5");
     T("<tool>eval<arg>2*3 x</tool>",                   "!expr");   /* x unbound, but parses */
 
-    /* ---- units ---- */
-    T("<tool>eval<arg>9.8 m/s^2 * 3 s</tool>",         "29.4 m/s");
-    T("<tool>eval<arg>2 kg * 3 m/s^2</tool>",          "6 N");     /* coherent derived unit */
-    T("<tool>eval<arg>12 V*2 A</tool>",                "24 W");
+    /* ---- v1.2.0: units resolve ONLY in conv. Every identifier is a symbol elsewhere. ----
+     * Pins the entire colliding set. Before this, evalat(m*g*h, m, 2) silently returned 7.2 kg*s
+     * with g as GRAMS and h as HOURS -- a confident, well-formatted, physically meaningless number.
+     * These are the symbols in nearly every intro-mechanics formula. */
+    T("<tool>evalat<arg>m*g*h<arg>m<arg>2</tool>",     "!expr");
+    T("<tool>evalat<arg>0.5*m*v^2<arg>v<arg>20</tool>","!expr");
+    T("<tool>evalat<arg>v*t<arg>v<arg>10</tool>",      "!expr");
+    T("<tool>eval<arg>9.8 m/s^2</tool>",               "!expr");
+    T("<tool>eval<arg>g</tool>",                       "!expr");
+    T("<tool>eval<arg>h</tool>",                       "!expr");
+    T("<tool>eval<arg>t</tool>",                       "!expr");
+    T("<tool>eval<arg>s</tool>",                       "!expr");
+    T("<tool>eval<arg>T</tool>",                       "!expr");
+    T("<tool>eval<arg>A</tool>",                       "!expr");
+    T("<tool>eval<arg>V</tool>",                       "!expr");
+    T("<tool>eval<arg>C</tool>",                       "!expr");
+    T("<tool>eval<arg>F</tool>",                       "!expr");
+    T("<tool>eval<arg>N</tool>",                       "!expr");
+    T("<tool>eval<arg>K</tool>",                       "!expr");
+    T("<tool>eval<arg>m</tool>",                       "!expr");
+    /* constants are NOT units and must still resolve */
+    T("<tool>eval<arg>pi</tool>",                      "3.141592654");
+    T("<tool>evalat<arg>0.5*80*v^2<arg>v<arg>20</tool>","16000");
+
+    /* ---- units (conv only) ---- */
+    T("<tool>conv<arg>9.8 m/s^2 * 3 s<arg>m/s</tool>", "29.4 m/s");
+    T("<tool>conv<arg>2 kg*(3 m/s^2)<arg>N</tool>",    "6 N");     /* coherent derived unit */
+    T("<tool>conv<arg>12 V*(2 A)<arg>W</tool>",        "24 W");
 
     /* ---- v1.1: ambiguous dimension vectors are NOT collapsed (TOOL_SPEC 5.4) ---- */
     /* energy vs torque -- both m^2*kg/s^2, so neither name may be guessed */
-    T("<tool>eval<arg>0.5*80 kg*(20 m/s)^2</tool>",    "16000 m^2*kg/s^2");
+    T("<tool>conv<arg>0.5*80 kg*(20 m/s)^2<arg>J</tool>", "16000 J");
     T("<tool>conv<arg>0.5*80 kg*(20 m/s)^2<arg>J</tool>", "16000 J");
     T("<tool>conv<arg>50 N*m<arg>N*m</tool>",          "50 N*m");
     /* frequency vs angular velocity -- both 1/s */
-    T("<tool>eval<arg>1/(0.5 s)</tool>",               "2 1/s");
+    T("<tool>conv<arg>1/(0.5 s)<arg>Hz</tool>",        "2 Hz");
     T("<tool>conv<arg>1/(0.5 s)<arg>Hz</tool>",        "2 Hz");
     T("<tool>conv<arg>2*pi*3/(1 s)<arg>rad/s</tool>",  "18.84955592 rad/s");
     /* Pa is deliberately NOT blocked: pressure, stress and modulus are all correctly written Pa */
-    T("<tool>eval<arg>100 N/(2 m^2)</tool>",           "50 Pa");
-    T("<tool>eval<arg>3 kg*m/s</tool>",                "3 m*kg/s"); /* no derived name -> base */
+    T("<tool>conv<arg>100 N/(2 m^2)<arg>Pa</tool>",    "50 Pa");
+    T("<tool>conv<arg>3 kg*m/s<arg>kg*m/s</tool>",     "3 kg*m/s"); /* no derived name -> base */
     T("<tool>conv<arg>25 degC<arg>K</tool>",           "298.15 K"); /* affine, conv only */
     T("<tool>conv<arg>98.6 degF<arg>degC</tool>",      "37 degC");
     T("<tool>conv<arg>273.15 K<arg>degC</tool>",       "0 degC");
-    T("<tool>eval<arg>25 degC + 1</tool>",             "!units");   /* affine in a compound expr */
-    T("<tool>eval<arg>5 km + 300 m</tool>",            "5300 m");
-    T("<tool>eval<arg>1 m + 1 s</tool>",               "!units");
+    T("<tool>conv<arg>25 degC + 1<arg>K</tool>",       "!units");   /* affine in a compound expr */
+    T("<tool>conv<arg>5 km + 300 m<arg>m</tool>",      "5300 m");
+    T("<tool>conv<arg>1 m + 1 s<arg>m</tool>",         "!units");
     T("<tool>conv<arg>1 h<arg>min</tool>",             "60 min");
     T("<tool>conv<arg>100 km/h<arg>m/s</tool>",        "27.77777778 m/s");
     T("<tool>conv<arg>1 kg<arg>V</tool>",              "!units");

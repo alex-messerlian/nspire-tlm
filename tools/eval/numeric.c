@@ -108,6 +108,14 @@ err_t num_eval(const node_t *n, const binds_t *b, int use_units, quant_t *out) {
         if (bound(b, n->name, &v) == E_NONE) { out->v = v; out->d = DIM_NONE; return E_NONE; }
         if (strcmp(n->name, "pi") == 0) { out->v = 3.14159265358979323846; out->d = DIM_NONE; return E_NONE; }
         if (strcmp(n->name, "e")  == 0) { out->v = 2.71828182845904523536; out->d = DIM_NONE; return E_NONE; }
+        /* Angle names are dimensionless CONSTANTS, not units, so they resolve everywhere -- see
+         * TOOL_SPEC v1.2.0 §3.2. Units were confined to conv because single-letter unit names
+         * (m g h t s T A V C F N K) collide with the variables of every mechanics formula. No
+         * physics variable is called deg, rad or rev, so there is nothing to collide with, and
+         * exempting them keeps sin(30 deg) working -- degrees are pervasive in physics. */
+        if (strcmp(n->name, "deg") == 0) { out->v = 0.017453292519943295; out->d = DIM_NONE; return E_NONE; }
+        if (strcmp(n->name, "rad") == 0) { out->v = 1.0;                  out->d = DIM_NONE; return E_NONE; }
+        if (strcmp(n->name, "rev") == 0) { out->v = 6.283185307179586;    out->d = DIM_NONE; return E_NONE; }
         if (use_units) {
             quant_t q; double off;
             if (units_lookup(n->name, &q, &off)) {

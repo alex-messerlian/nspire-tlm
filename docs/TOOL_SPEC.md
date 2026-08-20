@@ -1,6 +1,6 @@
 # Tool call format specification
 
-**Status: FROZEN v1.1.1.** Data generation, the evaluator, the training pipeline, and the device
+**Status: FROZEN v1.2.0.** Data generation, the evaluator, the training pipeline, and the device
 runtime all depend on this document. Changing it invalidates every generated corpus and every trained
 checkpoint.
 
@@ -8,6 +8,42 @@ Change procedure: bump the version, write a migration note, regenerate all data,
 cheap edit. That is deliberate.
 
 ### Changelog
+
+**v1.2.0** — **breaking for expression syntax, not for the wire format.** Amended before any data
+generation, so no migration was required.
+
+- **§3.2 replaced: units resolve ONLY in `conv`. Everywhere else every identifier is a symbol.**
+  Previously units resolved in `eval`, `evalat` and `conv`. That made the single-letter unit names
+  collide with the variables of nearly every mechanics formula, silently:
+
+  | call | returned | why |
+  |---|---|---|
+  | `evalat(m*g*h, m, 2)` | `7.2 kg*s` | `g`→grams, `h`→hours |
+  | `evalat(0.5*m*v^2, v, 20)` | `200 m` | `m`→metres |
+  | `evalat(v*t, v, 10)` | `10000 kg` | `t`→tonnes |
+
+  Colliding: `m g h t s T A V C F N K J W L`. Confident, well-formatted, physically meaningless —
+  the exact failure this architecture exists to prevent, in the component it depends on.
+
+  A generator lint was rejected: it constrains one producer, and there are several (the generator,
+  retrieval records, hand-written tests, a student at the keypad). The interface constrains all of
+  them. It is also a rule a 10M model can actually learn — *"units live in `conv`"* — rather than a
+  12-symbol collision list. And it makes the interface **more** uniform, not less: `solve`, `diff`
+  and `integ` already treated identifiers as symbols, so `conv` becomes the single place units exist.
+
+  **Consequence, and it replaces a lint with a type rule:** §8.5's blocklist check is now enforced by
+  the interface. A unit-bearing computation *cannot* be written as a bare `eval`, so it cannot
+  silently emit `m^2*kg/s^2` where `J` was meant.
+
+- **Angle names are exempt.** `deg`, `rad`, `rev` are dimensionless *constants*, not units, and
+  resolve everywhere alongside `pi` and `e`. No physics variable is named `deg`/`rad`/`rev`, so
+  there is nothing to collide with, and `sin(30 deg)` keeps working.
+
+- **§4 amended: ambiguous division is refused.** A `/` followed by an implicit-multiplication group
+  of two or more factors returns `!expr`. `100 m/10 s` means `(100 m)/(10 s)` while `1/2 m v^2`
+  means `(1/2)·m·v²` — opposite precedences, and either choice silently corrupts the other. Same
+  principle as `solve` returning `!nosol` rather than an unreliable root. Single-factor denominators
+  (`m/s`, `km/h`, `9.8 m/s^2`) are unambiguous and unaffected.
 
 **v1.1.1** — metrics only, no format change.
 - §9: added false-positive tool call rate on conceptual questions.
@@ -136,15 +172,17 @@ common silent wrongness in a stats tool.
 
 The one genuine ambiguity in the grammar. Is `m` a variable or metres?
 
-**Rule: units are recognised only in `eval`, `evalat`, and `conv`. In `solve`, `diff`, and `integ`,
-every bare identifier is a symbol.**
+**Rule (v1.2.0): units are recognised ONLY in `conv`. In `eval`, `evalat`, `solve`, `diff` and
+`integ`, every bare identifier is a symbol.**
 
-So `eval(9.8 m/s^2 * 3 s)` gives `29.4 m/s`, while `solve(m*x+b=0, x)` treats `m` and `b` as symbols.
-Per-function, no context sensitivity, predictable from the function name alone — which means the
-model can learn it.
+So `conv(9.8 m/s^2 * 3 s, m/s)` gives `29.4 m/s`, while `evalat(0.5*m*v^2, v, 20)` returns `!expr`
+because `m` is an unbound symbol — not `200 m` with `m` silently read as metres.
 
-Known limitation, accepted: you cannot do unit-carrying symbolic calculus. Attach units to `integ`
-results by hand in the prose.
+Exempt: `pi`, `e`, and the dimensionless angle constants `deg`, `rad`, `rev`, which resolve
+everywhere. `sin(30 deg)` works.
+
+One rule, one place, learnable at 10M parameters. Known limitation, accepted: you cannot do
+unit-carrying symbolic calculus; attach units to `integ` results in the prose.
 
 ## 4. Expression grammar
 

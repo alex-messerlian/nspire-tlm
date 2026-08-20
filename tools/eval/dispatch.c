@@ -98,7 +98,8 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
         if ((e = parse_expr(&g_arena, args[0], 0, &n))) return fail(e, out, out_sz);
         quant_t q;
         binds_t nb = {{0},{0},0};
-        if ((e = num_eval(n, &nb, 1, &q))) return fail(e, out, out_sz);
+        /* use_units = 0: TOOL_SPEC v1.2.0 §3.2 -- units resolve ONLY in conv. */
+        if ((e = num_eval(n, &nb, 0, &q))) return fail(e, out, out_sz);
         if ((e = fmt_quant(q, out, out_sz))) return fail(e, out, out_sz);
         return TB_OK;
     }
@@ -112,7 +113,8 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
         binds_t b = {{0},{0},0};
         b.name[0] = args[1]; b.val[0] = at; b.n = 1;
         quant_t q;
-        if ((e = num_eval(n, &b, 1, &q))) return fail(e, out, out_sz);
+        /* use_units = 0: see above. m, g, h, t, s are physics variables here, not units. */
+        if ((e = num_eval(n, &b, 0, &q))) return fail(e, out, out_sz);
         if ((e = fmt_quant(q, out, out_sz))) return fail(e, out, out_sz);
         return TB_OK;
     }

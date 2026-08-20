@@ -51,20 +51,44 @@ def RAW(label, callstr, want):
     g = call(callstr)
     check(label, g, g == want, want)
 
+def CONVDIM(label, expr, target, u=None):
+    g = call(f"<tool>conv<arg>{expr}<arg>{target}</tool>")
+    check(label, g, unit(g) == (u or target), f"unit {u or target}")
+
+def CONVVAL(label, expr, target, expect, tol=1e-6):
+    g = call(f"<tool>conv<arg>{expr}<arg>{target}</tool>")
+    v = num(g)
+    ok = v is not None and abs(v-expect) <= tol*max(1.0,abs(expect))
+    check(label, g, ok, f"{expect:g} {target}")
+
+print("=== v1.2.0: units live ONLY in conv; identifiers are symbols everywhere else ===")
+# Every symbol in intro mechanics collides with a unit name. Pin the whole set.
+for sym in ["m","g","h","t","s","T","A","V","C","F","N","K","J","W","L"]:
+    g = call(f"<tool>eval<arg>{sym}</tool>")
+    check(f"bare '{sym}' is a symbol, not a unit", g, g == "!expr", "!expr")
+for expr, var, val in [("m*g*h","m",2), ("0.5*m*v^2","v",20), ("v*t","v",10), ("F/A","F",100)]:
+    g = call(f"<tool>evalat<arg>{expr}<arg>{var}<arg>{val}</tool>")
+    check(f"evalat({expr}) does not silently unit-ify", g, g == "!expr", "!expr")
+# Constants must survive the change.
+VALUE("pi still resolves", "pi", math.pi, tol=1e-9)
+VALUE("e still resolves",  "e",  math.e,  tol=1e-9)
+
 print("=== eval: physics quantities as a physicist writes them ===")
 # Ohm's law, Newton, kinematics, energy, power -- dimensions must come out right.
-DIM("V/(I) -> ohm",            "12 V/(0.25 A)", "ohm")
-DIM("m*a -> N",                "2 kg*3 m/s^2", "N")
-DIM("d/(t) -> m/s",            "100 m/(10 s)", "m/s")
-DIM("F/(A) -> Pa",             "100 N/(2 m^2)", "Pa")
-DIM("V^2/(R) -> W",            "(12 V)^2/(6 ohm)", "W")
-DIM("power of a quantity",     "(20 m/s)^2", "m^2/s^2")
-DIM("sqrt of a squared unit",  "sqrt(16 m^2)", "m")
-DIM("prefixed units",          "5 kN/(2 m^2)", "Pa")
-DIM("q*V -> J",                "2 C*3 V", "m^2*kg/s^2")   # blocklisted, stays base units
+CONVVAL("Ohm's law V/I",       "12 V/(0.25 A)", "ohm", 48.0)
+CONVVAL("Newton m*a",          "2 kg*(3 m/s^2)", "N", 6.0)
+CONVVAL("speed d/t",           "100 m/(10 s)", "m/s", 10.0)
+CONVVAL("pressure F/A",        "100 N/(2 m^2)", "Pa", 50.0)
+CONVVAL("power V^2/R",         "(12 V)^2/(6 ohm)", "W", 24.0)
+CONVVAL("kinetic energy",      "0.5*80 kg*(20 m/s)^2", "J", 16000.0)
+CONVVAL("prefixed units",      "5 kN/(2 m^2)", "Pa", 2500.0)
+CONVVAL("power of a quantity", "(20 m/s)^2", "m^2/s^2", 400.0)
+CONVVAL("sqrt of squared unit","sqrt(16 m^2)", "m", 4.0)
+CONVVAL("frequency 1/t",       "1/(0.5 s)", "Hz", 2.0)
+CONVVAL("momentum",            "2 kg*(3 m/s)", "kg*m/s", 6.0)
 
 VALUE("g from GM/r^2", "6.674e-11*5.972e24/((6.371e6)^2)", 9.8195, tol=1e-3)
-VALUE("KE = 0.5 m v^2", "0.5*80*(20)^2", 16000.0)
+VALUE("KE numeric (no units)", "0.5*80*(20)^2", 16000.0)
 VALUE("scientific notation", "6.022e23/1e23", 6.022, tol=1e-9)
 VALUE("sin of degrees", "sin(30 deg)", 0.5, tol=1e-6)
 VALUE("cos of degrees", "cos(60 deg)", 0.5, tol=1e-6)
@@ -141,6 +165,59 @@ check("stat sd is SAMPLE (n-1), not population", g, g is not None and abs(g-math
       f"{math.sqrt(svar):.9g} (population would be {math.sqrt(pvar):.9g})")
 VALUEmean = num(call(f"<tool>stat<arg>mean<arg>{ds}</tool>"))
 check("stat mean", VALUEmean, VALUEmean is not None and abs(VALUEmean-mean)<1e-9, mean)
+
+print("=== diff: every chain rule, verified numerically ===")
+for expr, x0 in [("tan(x)",0.4), ("log(x)",5.0), ("tanh(x)",0.6), ("atan(x)",0.9),
+                 ("asin(x)",0.4), ("acos(x)",0.4), ("sinh(x)",0.5), ("cosh(x)",0.5),
+                 ("2^x",1.5), ("x^4",1.7), ("exp(x^2)",0.8), ("sin(x)/x",1.2)]:
+    d = call(f"<tool>diff<arg>{expr}<arg>x</tool>")
+    if d.startswith("!"):
+        check(f"diff({expr})", d, False, "an expression"); continue
+    sym = num(call(f"<tool>evalat<arg>{d}<arg>x<arg>{x0}</tool>"))
+    h = 1e-5
+    f1 = num(call(f"<tool>evalat<arg>{expr}<arg>x<arg>{x0+h}</tool>"))
+    f2 = num(call(f"<tool>evalat<arg>{expr}<arg>x<arg>{x0-h}</tool>"))
+    ok = None not in (sym,f1,f2) and abs(sym-(f1-f2)/(2*h)) < 1e-3*max(1,abs(sym))
+    check(f"diff({expr}) at {x0}", f"{d} -> {sym}", ok, (f1-f2)/(2*h) if None not in (f1,f2) else "?")
+
+print("=== stat: every op against an independent computation ===")
+import statistics as st
+data=[3,1,4,1,5,9,2,6]; ds=",".join(map(str,data))
+for op, ref in [("mean",st.mean(data)), ("median",st.median(data)), ("sd",st.stdev(data)),
+                ("var",st.variance(data)), ("sum",sum(data)), ("min",min(data)),
+                ("max",max(data)), ("n",len(data))]:
+    v = num(call(f"<tool>stat<arg>{op}<arg>{ds}</tool>"))
+    ok = v is not None and abs(v-ref) < 1e-6*max(1,abs(ref))
+    check(f"stat {op}", v, ok, ref)
+
+print("=== conv: every unit family round-trips ===")
+for q,a,b in [("1","N","kg*m/s^2"),("1","J","N*m"),("1","W","J/s"),("1","Pa","N/m^2"),
+              ("1","V","W/A"),("1","C","A*s"),("1","T","kg/(A*s^2)"),("1","L","m^3"),
+              ("1","eV","J"),("1","kWh","J"),("1","bar","Pa"),("1","ft","m"),("1","lb","kg")]:
+    fwd = num(call(f"<tool>conv<arg>{q} {a}<arg>{b}</tool>"))
+    back = num(call(f"<tool>conv<arg>{fwd} {b}<arg>{a}</tool>")) if fwd is not None else None
+    ok = back is not None and abs(back-float(q)) < 1e-6
+    check(f"conv round trip {a} <-> {b}", f"{fwd} -> {back}", ok, q)
+
+print("=== solve: degenerate and complex cases ===")
+RAW("no solution",      "<tool>solve<arg>x+1=x<arg>x</tool>", "none")
+RAW("all solutions",    "<tool>solve<arg>x=x<arg>x</tool>", "all")
+RAW("double root",      "<tool>solve<arg>x^2-2x+1=0<arg>x</tool>", "x=1")
+RAW("complex pair",     "<tool>solve<arg>x^2+1=0<arg>x</tool>", "x=0+1i, x=0-1i")
+RAW("degree 3 refused", "<tool>solve<arg>x^3-1=0<arg>x</tool>", "!nosol")
+RAW("non-polynomial",   "<tool>solve<arg>sin(x)=0<arg>x</tool>", "!nosol")
+
+print("=== every error code in TOOL_SPEC 6.1 is reachable ===")
+for callstr, code in [("<tool>eval<arg>1/0</tool>","!domain"),
+                      ("<tool>eval<arg>ln(0)</tool>","!domain"),
+                      ("<tool>eval<arg>2+</tool>","!parse"),
+                      ("<tool>nope<arg>1</tool>","!name"),
+                      ("<tool>eval<arg>1<arg>2</tool>","!arity"),
+                      ("<tool>eval<arg>zzz</tool>","!expr"),
+                      ("<tool>conv<arg>1 kg<arg>V</tool>","!units"),
+                      ("<tool>solve<arg>x^3=1<arg>x</tool>","!nosol"),
+                      ("<tool>eval<arg>1e300*1e300</tool>","!range")]:
+    g = call(callstr); check(f"{code} reachable", g, g==code, code)
 
 print("=== ambiguity must be refused, never guessed ===")
 for e in ["100 m/10 s", "12 V/0.25 A", "1/2 2 3", "20 N/4 kg", "500 J/25 s"]:
