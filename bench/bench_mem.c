@@ -144,9 +144,8 @@ int main(void) {
 
     bench_timer_t t;
     timer_acquire(&t, TIMER_FAST_BASE);
-    uint32_t timer_hz = 99000000u;   /* TODO: read the value bench_platform measured, do not assume */
-    bench_result("timer_hz_assumed", "%lu -- REPLACE with bench_platform's C1 before trusting any MB/s below",
-                 (unsigned long)timer_hz);
+    uint32_t timer_hz = apb_clock_hz();   /* derived from the PMU, not assumed */
+    bench_result("timer_hz_derived", "%lu (APB = CPU/4, from the PMU)", (unsigned long)timer_hz);
 
     uint32_t largest = probe_largest_malloc();
     bench_result("B1_largest_malloc_bytes", "%lu (%lu MB)",

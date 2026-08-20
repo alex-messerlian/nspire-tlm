@@ -105,10 +105,17 @@ static inline uint32_t timer_delta(uint32_t start_raw, uint32_t end_raw) {
 }
 
 /* ---- CPU clock, read live from the PMU ----------------------------------------------------- */
-/* Zephray: clock = (12 MHz * mult / div1) / (1 + div2), where div2 applies only when
- * bit4 of PMU_CLK_GATE is set AND bit4 of PMU_CLK_MAIN is clear.
- * Returns 0 if the registers read back implausibly (e.g. div1 == 0) rather than lying. */
-static inline uint32_t cpu_clock_hz(void) {
+/* Zephray: (12 MHz * mult / div1) / (1 + div2), div2 applying only when bit4 of PMU_CLK_GATE is set
+ * AND bit4 of PMU_CLK_MAIN is clear.
+ *
+ * CORRECTED 2026-08-19: this formula yields the **AHB** clock, not the CPU clock. The documented
+ * tree is CPU 396 / AHB 198 / APB 99 -- AHB = CPU/2, APB = CPU/4. Confirmed on hardware to 0.02%:
+ * PMU-derived 198 with the crystal-gated timer reading 98.98 MHz, and PMU-derived 144 with the timer
+ * reading 72.00 MHz.
+ *
+ * Calling the raw value "cpu_hz" made a perfectly normal 396/288 device look like it was throttling
+ * to 198/144, and produced a session's worth of wrong conclusions. Hence three explicit accessors. */
+static inline uint32_t ahb_clock_hz(void) {
     uint32_t main = MMIO32(PMU_CLK_MAIN);
     uint32_t mult = (main >> 24) & 0xFFu;
     uint32_t div1 = (main >> 16) & 0x3Fu;
@@ -125,11 +132,18 @@ static inline uint32_t cpu_clock_hz(void) {
 }
 
 /* Heuristic only — the log records the raw Hz too, so this never hides anything. */
+/* The number that matters for compute. */
+static inline uint32_t cpu_clock_hz(void) { return ahb_clock_hz() * 2u; }
+
+/* What the SP804 timers actually count at. DERIVE it -- do not assume 99 MHz. Assuming it is why
+ * every rate in the first device session needed a 1.375x correction. */
+static inline uint32_t apb_clock_hz(void) { return ahb_clock_hz() / 2u; }
+
 static inline const char *power_state_guess(uint32_t hz) {
     if (hz == 0)                       return "UNKNOWN";
-    if (hz > 380000000u)               return "BATTERY(396-class)";
-    if (hz > 270000000u && hz < 310000000u) return "USB(288-class) -- RESULT INVALID";
-    return "OTHER";
+    if (hz > 380000000u && hz < 410000000u) return "BATTERY(396) -- valid";
+    if (hz > 270000000u && hz < 310000000u) return "TETHERED(288) -- USB or CHARGER, timings suspect";
+    return "UNEXPECTED -- investigate before trusting any timing";
 }
 
 /* ---- Result logging ------------------------------------------------------------------------ */
@@ -146,7 +160,10 @@ static inline void bench_open(const char *bench_name) {
     printf("cpu %lu Hz (%s)\n", (unsigned long)hz, power_state_guess(hz));
     if (g_log) {
         fprintf(g_log, "\n=== %s ===\n", bench_name);
-        fprintf(g_log, "cpu_hz=%lu power=%s\n", (unsigned long)hz, power_state_guess(hz));
+        fprintf(g_log, "cpu_hz=%lu ahb_hz=%lu apb_hz=%lu power=%s\n",
+                (unsigned long)hz, (unsigned long)ahb_clock_hz(),
+                (unsigned long)apb_clock_hz(), power_state_guess(hz));
+        fflush(g_log);
     }
 }
 

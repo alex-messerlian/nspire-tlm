@@ -43,8 +43,8 @@ int main(void) {
 
     bench_timer_t t;
     timer_acquire(&t, TIMER_FAST_BASE);
-    uint32_t timer_hz = 99000000u;   /* TODO: use bench_platform's measured C1 */
-    bench_result("timer_hz_assumed", "%lu -- REPLACE with measured C1", (unsigned long)timer_hz);
+    uint32_t timer_hz = apb_clock_hz();   /* derived from the PMU, not assumed */
+    bench_result("timer_hz_derived", "%lu (APB = CPU/4, from the PMU)", (unsigned long)timer_hz);
 
     if (!make_blob()) { bench_result("B8_flash_seq_MB_s", "BLOB CREATION FAILED"); bench_close(); return 1; }
 

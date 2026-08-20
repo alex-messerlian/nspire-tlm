@@ -52,6 +52,63 @@ static int32_t dot_int16_smla(const int16_t *w, const int16_t *x, uint32_t n) {
     return acc;
 }
 
+/* ---- B11b: variants, to find the real compute lever ------------------------------------------
+ *
+ * The first device run showed the hand-written SMLA version LOSING to naive C, 28 vs 48 MMAC/s.
+ * Disassembly explains it: GCC already emits `smlabb` for the naive loop by itself, and the
+ * hand-written 4x-unrolled asm added nothing but register pressure -- 4 stack spills.
+ *
+ * So "use the DSP MAC" was never the lever; the compiler was already using it. The naive inner loop
+ * is 5 instructions per MAC (2 byte loads, compare, mac, branch) and measured ~8 cycles/MAC, so it
+ * is stalling on load-use, not on the multiply.
+ *
+ * The real lever is therefore LOADS PER MAC. A word load brings 4 int8 values, so one LDR can feed
+ * four MACs instead of one LDRSB feeding one. These variants test that directly. */
+
+/* Word-loaded int8: one LDR per 4 values, sign-extended pairwise, 4 MACs per load pair. */
+static int32_t dot_int8_word(const int8_t *w, const int8_t *x, uint32_t n) {
+    int32_t acc = 0;
+    const uint32_t *w32 = (const uint32_t *)w, *x32 = (const uint32_t *)x;
+    uint32_t words = n / 4u, i = 0;
+    for (; i < words; i++) {
+        uint32_t a = w32[i], b = x32[i];
+        acc += (int32_t)(int8_t)(a       ) * (int32_t)(int8_t)(b       );
+        acc += (int32_t)(int8_t)(a >>  8u) * (int32_t)(int8_t)(b >>  8u);
+        acc += (int32_t)(int8_t)(a >> 16u) * (int32_t)(int8_t)(b >> 16u);
+        acc += (int32_t)(int8_t)(a >> 24u) * (int32_t)(int8_t)(b >> 24u);
+    }
+    for (uint32_t j = i * 4u; j < n; j++) acc += (int32_t)w[j] * (int32_t)x[j];
+    return acc;
+}
+
+/* Same idea, but 2 words per iteration so the loads are further from their uses. ARM926 has no
+ * out-of-order recovery, so distance between a load and its consumer is the whole game. */
+static int32_t dot_int8_word2(const int8_t *w, const int8_t *x, uint32_t n) {
+    int32_t acc = 0;
+    const uint32_t *w32 = (const uint32_t *)w, *x32 = (const uint32_t *)x;
+    uint32_t words = n / 4u, i = 0;
+    for (; i + 2 <= words; i += 2) {
+        uint32_t a0 = w32[i], b0 = x32[i], a1 = w32[i+1], b1 = x32[i+1];
+        acc += (int32_t)(int8_t)(a0      ) * (int32_t)(int8_t)(b0      );
+        acc += (int32_t)(int8_t)(a0 >>  8) * (int32_t)(int8_t)(b0 >>  8);
+        acc += (int32_t)(int8_t)(a0 >> 16) * (int32_t)(int8_t)(b0 >> 16);
+        acc += (int32_t)(int8_t)(a0 >> 24) * (int32_t)(int8_t)(b0 >> 24);
+        acc += (int32_t)(int8_t)(a1      ) * (int32_t)(int8_t)(b1      );
+        acc += (int32_t)(int8_t)(a1 >>  8) * (int32_t)(int8_t)(b1 >>  8);
+        acc += (int32_t)(int8_t)(a1 >> 16) * (int32_t)(int8_t)(b1 >> 16);
+        acc += (int32_t)(int8_t)(a1 >> 24) * (int32_t)(int8_t)(b1 >> 24);
+    }
+    for (uint32_t j = i * 4u; j < n; j++) acc += (int32_t)w[j] * (int32_t)x[j];
+    return acc;
+}
+
+/* Plain int16 C, no asm -- checks whether the compiler beats the hand-written asm here too. */
+static int32_t dot_int16_c(const int16_t *w, const int16_t *x, uint32_t n) {
+    int32_t acc = 0;
+    for (uint32_t i = 0; i < n; i++) acc += (int32_t)w[i] * (int32_t)x[i];
+    return acc;
+}
+
 /* ---- B12: the soft-float penalty ------------------------------------------------------------ */
 /* There is no FPU. Every float op is a libgcc call. This measures exactly what a stray float in the
  * hot loop costs, so "no soft-float in the hot loop" becomes a measured rule rather than folklore. */
@@ -71,9 +128,9 @@ int main(void) {
 
     bench_timer_t t;
     timer_acquire(&t, TIMER_FAST_BASE);
-    uint32_t timer_hz = 99000000u;   /* TODO: use bench_platform's measured C1 */
+    uint32_t timer_hz = apb_clock_hz();   /* derived from the PMU, not assumed */
     uint32_t cpu_hz   = cpu_clock_hz();
-    bench_result("timer_hz_assumed", "%lu -- REPLACE with measured C1", (unsigned long)timer_hz);
+    bench_result("timer_hz_derived", "%lu (APB = CPU/4, from the PMU)", (unsigned long)timer_hz);
     bench_result("cpu_hz", "%lu (%s)", (unsigned long)cpu_hz, power_state_guess(cpu_hz));
 
     int8_t  *w8  = (int8_t  *)malloc(VEC_N);
@@ -114,6 +171,25 @@ int main(void) {
         bench_result("B11_cycles_per_MAC", "%lu.%02lu (architectural floor is 1.00)",
                      (unsigned long)(((uint64_t)ticks16 * cpu_hz) / ((uint64_t)timer_hz * macs)),
                      (unsigned long)((((uint64_t)ticks16 * cpu_hz * 100) / ((uint64_t)timer_hz * macs)) % 100));
+
+    /* B11b: the variants. Same macs, same buffers, so the numbers are directly comparable. */
+    t0 = timer_raw(t.base);
+    for (uint32_t r = 0; r < ROWS; r++) sink32 += dot_int16_c(w16, x16, VEC_N);
+    t1 = timer_raw(t.base);
+    bench_result("B11b_int16_plain_C_MMAC_s", "%lu",
+                 (unsigned long)mmac_per_s(timer_delta(t0, t1), timer_hz, macs));
+
+    t0 = timer_raw(t.base);
+    for (uint32_t r = 0; r < ROWS; r++) sink32 += dot_int8_word(w8, x8, VEC_N);
+    t1 = timer_raw(t.base);
+    bench_result("B11c_int8_word_MMAC_s", "%lu (1 LDR per 4 MACs)",
+                 (unsigned long)mmac_per_s(timer_delta(t0, t1), timer_hz, macs));
+
+    t0 = timer_raw(t.base);
+    for (uint32_t r = 0; r < ROWS; r++) sink32 += dot_int8_word2(w8, x8, VEC_N);
+    t1 = timer_raw(t.base);
+    bench_result("B11d_int8_word2_MMAC_s", "%lu (2 words/iter, loads further from use)",
+                 (unsigned long)mmac_per_s(timer_delta(t0, t1), timer_hz, macs));
 
     /* Float run is 64x shorter -- soft-float is slow enough that a full-length run would wrap the timer. */
     t0 = timer_raw(t.base);

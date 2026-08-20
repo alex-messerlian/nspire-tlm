@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+extern FILE *g_nspire_log;   /* progress goes to the log too, so a reset still leaves evidence */
+
 /* ---- mmap: malloc + read ------------------------------------------------------------------- */
 /* runq.c mmaps the checkpoint once and munmaps it once, so a single-slot record is enough. Keeping
  * the pointer lets munmap() free the right thing without the caller changing. */
@@ -24,16 +26,36 @@ void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long 
     }
     if (lseek(fildes, off, SEEK_SET) < 0) { free(p); return MAP_FAILED; }
 
-    /* Read in chunks: a single 17 MB read through newlib is a good way to find out the hard way
-     * that some layer uses a 16-bit count somewhere. */
+    /* MEASURED 2026-08-19: random 4 KB flash access on this device is 58 ms, and sequential is only
+     * 2 MB/s. The first device run of this program showed a blank screen for 17 minutes before a
+     * hard reset. 17.1 MB in 4 KB requests is ~4 min; in 512 B requests it is ~32 min. The observed
+     * 17 min sits between them, so the leading hypothesis is that raw read() was issuing small
+     * requests, not that anything hung.
+     *
+     * So: go through a FILE* with a large explicit buffer, which coalesces into big sequential
+     * reads, and report progress so a slow load can never again be mistaken for a hang. */
+    static unsigned char iobuf[256 * 1024];
+    /* fdopen without dup(): Ndless's newlib has no dup(). We therefore do NOT fclose this stream --
+     * runq.c owns the fd and closes it itself, and closing here would double-close. The buffer is
+     * static, so nothing leaks. */
+    FILE *fp = fdopen(fildes, "rb");
+    if (!fp) { free(p); return MAP_FAILED; }
+    setvbuf(fp, (char *)iobuf, _IOFBF, sizeof iobuf);
+
     unsigned char *q = (unsigned char *)p;
-    size_t remaining = len;
+    size_t remaining = len, done = 0;
+    unsigned last_pct = 999;
     while (remaining) {
         size_t want = remaining > (1u << 20) ? (1u << 20) : remaining;
-        long got = read(fildes, q, want);
-        if (got <= 0) { free(p); return MAP_FAILED; }
-        q += got;
-        remaining -= (size_t)got;
+        size_t got = fread(q, 1, want, fp);
+        if (got == 0) { free(p); return MAP_FAILED; }
+        q += got; remaining -= got; done += got;
+        unsigned pct = (unsigned)((done * 100) / len);
+        if (pct / 10 != last_pct / 10) {          /* every 10%, so progress is visible */
+            last_pct = pct;
+            printf("loading %u%%\n", pct);
+            if (g_nspire_log) { fprintf(g_nspire_log, "load_pct=%u\n", pct); fflush(g_nspire_log); }
+        }
     }
     g_map_ptr = p;
     g_map_len = len;
