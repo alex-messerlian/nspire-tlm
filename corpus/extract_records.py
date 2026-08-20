@@ -79,7 +79,8 @@ for mod in pathlib.Path("corpus/raw").rglob("index.cnxml"):
             expr = re.sub(r"\s+", "", expr)
             if expr.count("=") != 1: continue
             if not expr or expr in seen: continue
-            seen.add(expr); rows.append({"name": name, "f": expr})
+            seen.add(expr); rows.append({"name": name, "f": expr,
+                "scope": mod.parent.name, "title": mod.parts[2]})
 
 print(f"extracted {len(rows)} unique (name, equation) pairs from Key Equations tables")
 # GATE A: parses and is solvable for its own LHS variable

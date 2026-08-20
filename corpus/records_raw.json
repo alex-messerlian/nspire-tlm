@@ -1,1510 +1,2392 @@
 [
  {
   "name": "Solution for simple harmonic motion",
-  "f": "x(t)=c_1*cos(omega*t)+c_2*sin(omega*t)"
+  "f": "x(t)=c_1*cos(omega*t)+c_2*sin(omega*t)",
+  "scope": "m54044",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Charge in a RLC series circuit",
-  "f": "L*(((d)^(2)*q)/(d*(t)^(2)))+R*((d*q)/(d*t))+((1)/(C))*q=E(t)"
+  "f": "L*(((d)^(2)*q)/(d*(t)^(2)))+R*((d*q)/(d*t))+((1)/(C))*q=E(t)",
+  "scope": "m54044",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Generalized sine function",
-  "f": "f*(x)=A*sin(B*(x-alpha))+C"
+  "f": "f*(x)=A*sin(B*(x-alpha))+C",
+  "scope": "m53479",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Point-slope equation of a line",
-  "f": "y-y_1=m*(x-x_1)"
+  "f": "y-y_1=m*(x-x_1)",
+  "scope": "m53478",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Slope-intercept form of a line",
-  "f": "y=m*x+b"
+  "f": "y=m*x+b",
+  "scope": "m53478",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Standard form of a line",
-  "f": "a*x+b*y=c"
+  "f": "a*x+b*y=c",
+  "scope": "m53478",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Slope of a Secant Line",
-  "f": "m_sec=((f*(x)-f*(a))/(x-a))"
+  "f": "m_sec=((f*(x)-f*(a))/(x-a))",
+  "scope": "m53485",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Average Velocity over Interval [a,t]",
-  "f": "v_ave=((s*(t)-s*(a))/(t-a))"
+  "f": "v_ave=((s*(t)-s*(a))/(t-a))",
+  "scope": "m53485",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Binormal vector",
-  "f": "B(t)=T(t)*N(t)"
+  "f": "B(t)=T(t)*N(t)",
+  "scope": "m53919",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Solution to the logistic differential equation/initial-value problem",
-  "f": "P*(t)=((P_0*K*(e)^(r*t))/((K-P_0)+P_0*(e)^(r*t)))"
+  "f": "P*(t)=((P_0*K*(e)^(r*t))/((K-P_0)+P_0*(e)^(r*t)))",
+  "scope": "m53710",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Difference quotient",
-  "f": "Q=((f*(x)-f(a))/(x-a))"
+  "f": "Q=((f*(x)-f(a))/(x-a))",
+  "scope": "m53495",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Average velocity",
-  "f": "v_ave=((s*(t)-s(a))/(t-a))"
+  "f": "v_ave=((s*(t)-s(a))/(t-a))",
+  "scope": "m53495",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Distance between two points in space:",
-  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)+((z_2-z_1))^(2))"
+  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)+((z_2-z_1))^(2))",
+  "scope": "m53897",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "General solution to a nonhomogeneous linear differential equation",
-  "f": "y(x)=c_1*y_1(x)+c_2*y_2(x)+y_p(x)"
+  "f": "y(x)=c_1*y_1(x)+c_2*y_2(x)+y_p(x)",
+  "scope": "m54047",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Vector Equation of a Line",
-  "f": "r=r_0+tv"
+  "f": "r=r_0+tv",
+  "scope": "m53870",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Scalar Equation of a Plane",
-  "f": "a*(x-x_0)+b*(y-y_0)+c*(z-z_0)=0"
+  "f": "a*(x-x_0)+b*(y-y_0)+c*(z-z_0)=0",
+  "scope": "m53870",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "The cross product of two vectors in terms of the unit vectors",
-  "f": "u*v=(u_2*v_3-u_3*v_2)i-(u_1*v_3-u_3*v_1)j+(u_1*v_2-u_2*v_1)k"
+  "f": "u*v=(u_2*v_3-u_3*v_2)i-(u_1*v_3-u_3*v_1)j+(u_1*v_2-u_2*v_1)k",
+  "scope": "m53903",
+  "title": "osbooks-calculus-bundle"
  },
  {
   "name": "Velocity of center of mass of rolling object",
-  "f": "v_CM=R*omega"
+  "f": "v_CM=R*omega",
+  "scope": "m58338",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "R": "m",
+   "omega": "1/s",
+   "v_CM": "m/s"
+  }
  },
  {
   "name": "Acceleration of center of mass of rolling object",
-  "f": "a_CM=R*alpha"
+  "f": "a_CM=R*alpha",
+  "scope": "m58338",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "R": "m",
+   "alpha": "1/s^2",
+   "a_CM": "m/s^2"
+  }
  },
  {
   "name": "Displacement of center of mass of rolling object",
-  "f": "d_CM=R*theta"
+  "f": "d_CM=R*theta",
+  "scope": "m58338",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Acceleration of an object rolling without slipping",
-  "f": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))"
+  "f": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))",
+  "scope": "m58338",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular momentum of a rotating rigid body",
-  "f": "L=I*omega"
+  "f": "L=I*omega",
+  "scope": "m58338",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "I": "kg*m^2",
+   "L": "kg*m^2/s",
+   "omega": "1/s"
+  }
  },
  {
   "name": "Precessional angular velocity",
-  "f": "omega_P=((r*M*g)/(I*omega))"
+  "f": "omega_P=((r*M*g)/(I*omega))",
+  "scope": "m58338",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Focal length for a spherical mirror",
-  "f": "f=((R)/(2))"
+  "f": "f=((R)/(2))",
+  "scope": "m58534",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "R": "m",
+   "f": "m"
+  }
  },
  {
   "name": "Apparent depth equation",
-  "f": "h_i=(((n_2)/(n_1)))*h_o"
+  "f": "h_i=(((n_2)/(n_1)))*h_o",
+  "scope": "m58534",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Optical power",
-  "f": "P=((1)/(f))"
+  "f": "P=((1)/(f))",
+  "scope": "m58534",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "f": "m",
+   "P": "1/m"
+  }
  },
  {
   "name": "Angular magnification M of a simple magnifier",
-  "f": "M=((theta_image)/(theta_object))"
+  "f": "M=((theta_image)/(theta_object))",
+  "scope": "m58534",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Newton\u2019s second law, scalar form",
-  "f": "F_net=m*a"
+  "f": "F_net=m*a",
+  "scope": "m58301",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Definition of weight, scalar form",
-  "f": "w=m*g"
+  "f": "w=m*g",
+  "scope": "m58301",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "w": "N",
+   "m": "kg",
+   "g": "m/s^2"
+  }
  },
  {
   "name": "Normal force on an object resting on ahorizontal surface, scalar form",
-  "f": "N=m*g"
+  "f": "N=m*g",
+  "scope": "m58301",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Normal force on an object resting on aninclined plane, scalar form",
-  "f": "N=m*g*cos(theta)"
+  "f": "N=m*g*cos(theta)",
+  "scope": "m58301",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnitude of kinetic friction",
-  "f": "f_k=mu_k*N"
+  "f": "f_k=mu_k*N",
+  "scope": "m58306",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Drag force",
-  "f": "F_D=((1)/(2))*C*rho*A*(v)^(2)"
+  "f": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+  "scope": "m58306",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Acceleration due to gravityat the surface of Earth",
-  "f": "g=G*((M_E)/(r2))"
+  "f": "g=G*((M_E)/(r2))",
+  "scope": "m58352",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Gravitational potential energy beyond Earth",
-  "f": "U=-((G*M_E*m)/(r))"
+  "f": "U=-((G*M_E*m)/(r))",
+  "scope": "m58352",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Escape velocity",
-  "f": "v_esc=sqrt(((2*G*M)/(R)))"
+  "f": "v_esc=sqrt(((2*G*M)/(R)))",
+  "scope": "m58352",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Orbital speed",
-  "f": "v_orbit=sqrt(((GM_E)/(r)))"
+  "f": "v_orbit=sqrt(((GM_E)/(r)))",
+  "scope": "m58352",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Schwarzschild radius",
-  "f": "R_S=((2*G*M)/((c)^(2)))"
+  "f": "R_S=((2*G*M)/((c)^(2)))",
+  "scope": "m58352",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Displacement current",
-  "f": "I_d=epsilon_0*((d*Phi_E)/(d*t))"
+  "f": "I_d=epsilon_0*((d*Phi_E)/(d*t))",
+  "scope": "m58503",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Speed of EM waves",
-  "f": "c=((1)/(sqrt(epsilon_0*mu_0)))"
+  "f": "c=((1)/(sqrt(epsilon_0*mu_0)))",
+  "scope": "m58503",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Ratio of E field to B field in electromagnetic wave",
-  "f": "c=((E)/(B))"
+  "f": "c=((E)/(B))",
+  "scope": "m58503",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Faraday\u2019s law",
-  "f": "epsilon=-N*((d*Phi_m)/(d*t))"
+  "f": "epsilon=-N*((d*Phi_m)/(d*t))",
+  "scope": "m58482",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Motionally induced emf",
-  "f": "epsilon=B*l*v"
+  "f": "epsilon=B*l*v",
+  "scope": "m58482",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Multiplication by a scalar (scalar equation for magnitudes)",
-  "f": "B=|alpha|A"
+  "f": "B=|alpha|A",
+  "scope": "m58280",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnitude of a vector in a plane",
-  "f": "A=sqrt(Ax2+Ay2)"
+  "f": "A=sqrt(Ax2+Ay2)",
+  "scope": "m58280",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "The scalar z-component of a vector in three dimensions",
-  "f": "A_z=z_e-z_b"
+  "f": "A_z=z_e-z_b",
+  "scope": "m58280",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnitude of a vector in three dimensions",
-  "f": "A=sqrt(Ax2+Ay2+Az2)"
+  "f": "A=sqrt(Ax2+Ay2+Az2)",
+  "scope": "m58280",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Displacement",
-  "f": "Delta*x=x_f-x_i"
+  "f": "Delta*x=x_f-x_i",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Instantaneous velocity",
-  "f": "v(t)=((d*x(t))/(d*t))"
+  "f": "v(t)=((d*x(t))/(d*t))",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Instantaneous speed",
-  "f": "Instantaneousspeed=|v(t)|"
+  "f": "Instantaneousspeed=|v(t)|",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Instantaneous acceleration",
-  "f": "a(t)=((d*v(t))/(d*t))"
+  "f": "a(t)=((d*v(t))/(d*t))",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Velocity from acceleration",
-  "f": "v=v_0+a*t(constant*a)"
+  "f": "v=v_0+a*t(constant*a)",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Position from velocity and acceleration",
-  "f": "x=x_0+v_0*t+((1)/(2))*a*(t)^(2)*(constant*a)"
+  "f": "x=x_0+v_0*t+((1)/(2))*a*(t)^(2)*(constant*a)",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Velocity of free fall",
-  "f": "v=v_0-g*t*(positiveupward)"
+  "f": "v=v_0-g*t*(positiveupward)",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Height of free fall",
-  "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)"
+  "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
+  "scope": "m58287",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Electrostatic energy for equilibrium separation distance between atoms",
-  "f": "U_coul=-((k*(e)^(2))/(r_0))"
+  "f": "U_coul=-((k*(e)^(2))/(r_0))",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Energy change associated with ionic bonding",
-  "f": "U_form=E_transfer+U_coul+U_ex"
+  "f": "U_form=E_transfer+U_coul+U_ex",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Potential energy associated with the exclusion principle",
-  "f": "U_ex=((A)/((r)^(n)))"
+  "f": "U_ex=((A)/((r)^(n)))",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Dissociation energy of a solid",
-  "f": "U_diss=alpha*((k*(e)^(2))/(r_0))*(1-((1)/(n)))"
+  "f": "U_diss=alpha*((k*(e)^(2))/(r_0))*(1-((1)/(n)))",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Moment of inertia of a diatomic molecule with reduced mass \u03bc",
-  "f": "I=mur02"
+  "f": "I=mur02",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Electron density of states of a metal",
-  "f": "g*(E)=((pi*V)/(2))*((((8*m_e)/((h)^(2)))))^(3/2)*(E)^(1/2)"
+  "f": "g*(E)=((pi*V)/(2))*((((8*m_e)/((h)^(2)))))^(3/2)*(E)^(1/2)",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Fermi energy",
-  "f": "E_F=(((h)^(2))/(8*m_e))*((((3*N)/(pi*V))))^(2/3)"
+  "f": "E_F=(((h)^(2))/(8*m_e))*((((3*N)/(pi*V))))^(2/3)",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Fermi temperature",
-  "f": "T_F=((E_F)/(k_B))"
+  "f": "T_F=((E_F)/(k_B))",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Hall effect",
-  "f": "V_H=u*B*w"
+  "f": "V_H=u*B*w",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Current versus bias voltage across p-n junction",
-  "f": "I_net=I_0*((e)^(e*V_b/k_B*T)-1)"
+  "f": "I_net=I_0*((e)^(e*V_b/k_B*T)-1)",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Current gain",
-  "f": "I_c=beta*I_B"
+  "f": "I_c=beta*I_B",
+  "scope": "m58602",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Result of energy conservation",
-  "f": "W=Q_h-Q_c"
+  "f": "W=Q_h-Q_c",
+  "scope": "m58408",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "Q_h": "J",
+   "W": "J",
+   "Q_c": "J"
+  }
  },
  {
   "name": "Resulting efficiency of a Carnot cycle",
-  "f": "e=1-((T_c)/(T_h))"
+  "f": "e=1-((T_c)/(T_h))",
+  "scope": "m58408",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Performance coefficient of a reversible refrigerator",
-  "f": "K_R=((T_c)/(T_h-T_c))"
+  "f": "K_R=((T_c)/(T_h-T_c))",
+  "scope": "m58408",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Performance coefficient of a reversible heat pump",
-  "f": "K_P=((T_h)/(T_h-T_c))"
+  "f": "K_P=((T_h)/(T_h-T_c))",
+  "scope": "m58408",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Entropy of a system undergoing a reversible process at a constant temperature",
-  "f": "Delta*S=((Q)/(T))"
+  "f": "Delta*S=((Q)/(T))",
+  "scope": "m58408",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "First law of thermodynamics",
-  "f": "Delta*E_int=Q-W"
+  "f": "Delta*E_int=Q-W",
+  "scope": "m58401",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Molar heat capacity at constant pressure",
-  "f": "C_p=C_V+R"
+  "f": "C_p=C_V+R",
+  "scope": "m58401",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Ratio of molar heat capacities",
-  "f": "gamma=C_p/C_V"
+  "f": "gamma=C_p/C_V",
+  "scope": "m58401",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Condition for an ideal gas in a quasi-static adiabatic process",
-  "f": "p*(V)^(gamma)=constant"
+  "f": "p*(V)^(gamma)=constant",
+  "scope": "m58401",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Capacitance",
-  "f": "C=((Q)/(V))"
+  "f": "C=((Q)/(V))",
+  "scope": "m58452",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Capacitance of a parallel-plate capacitor",
-  "f": "C=epsilon_0*((A)/(d))"
+  "f": "C=epsilon_0*((A)/(d))",
+  "scope": "m58452",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Capacitance of a vacuum spherical capacitor",
-  "f": "C=4*pi*epsilon_0*((R_1*R_2)/(R_2-R_1))"
+  "f": "C=4*pi*epsilon_0*((R_1*R_2)/(R_2-R_1))",
+  "scope": "m58452",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Energy density",
-  "f": "u_E=((1)/(2))*epsilon_0*(E)^(2)"
+  "f": "u_E=((1)/(2))*epsilon_0*(E)^(2)",
+  "scope": "m58452",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Time of flight",
-  "f": "T_tof=((2(v_0*sin(theta_0)))/(g))"
+  "f": "T_tof=((2(v_0*sin(theta_0)))/(g))",
+  "scope": "m58293",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Range",
-  "f": "R=((v02sin(2)*theta_0)/(g))"
+  "f": "R=((v02sin(2)*theta_0)/(g))",
+  "scope": "m58293",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Centripetal acceleration",
-  "f": "a_C=(((v)^(2))/(r))"
+  "f": "a_C=(((v)^(2))/(r))",
+  "scope": "m58293",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Maximum number of electrons in a subshell ofa hydrogen atom",
-  "f": "N=4*l+2"
+  "f": "N=4*l+2",
+  "scope": "m62593",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Conservative force is the negative derivative of potential energy",
-  "f": "F_l=-((d*U)/(d*l))"
+  "f": "F_l=-((d*U)/(d*l))",
+  "scope": "m58661",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Momentum of a charged particle in a cyclotron",
-  "f": "p=0.3*B*r"
+  "f": "p=0.3*B*r",
+  "scope": "m58776",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Approximate time for exchange of a virtual particle between two other particles",
-  "f": "Delta*t=((h)/(E))"
+  "f": "Delta*t=((h)/(E))",
+  "scope": "m58776",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Hubble\u2019s law",
-  "f": "v=H_0*d"
+  "f": "v=H_0*d",
+  "scope": "m58776",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Cosmological space-time metric",
-  "f": "d*(s)^(2)=(c)^(2)*d*(t)^(2)-a*((t))^(2)*d*(Sigma)^(2)"
+  "f": "d*(s)^(2)=(c)^(2)*d*(t)^(2)-a*((t))^(2)*d*(Sigma)^(2)",
+  "scope": "m58776",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Rocket equation",
-  "f": "Delta*v=u*ln(((m_i)/(m)))"
+  "f": "Delta*v=u*ln(((m_i)/(m)))",
+  "scope": "m58324",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Lorentz factor",
-  "f": "gamma=((1)/(sqrt(1-(((v)^(2))/((c)^(2))))))"
+  "f": "gamma=((1)/(sqrt(1-(((v)^(2))/((c)^(2))))))",
+  "scope": "m58572",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Relativistic Doppler effect for wavelength",
-  "f": "lambda_obs=lambda_s*sqrt(((1+((v)/(c)))/(1-((v)/(c)))))"
+  "f": "lambda_obs=lambda_s*sqrt(((1+((v)/(c)))/(1-((v)/(c)))))",
+  "scope": "m58572",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Relativistic Doppler effect for frequency",
-  "f": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))"
+  "f": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))",
+  "scope": "m58572",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Potential energy of a two-charge system",
-  "f": "U(r)=k_e*((q*Q)/(r))"
+  "f": "U(r)=k_e*((q*Q)/(r))",
+  "scope": "m58778",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Electric potential of a point charge",
-  "f": "V=((k_e*q)/(r))"
+  "f": "V=((k_e*q)/(r))",
+  "scope": "m58778",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "k_e": "V*m/C",
+   "r": "m",
+   "V": "V",
+   "q": "C"
+  }
  },
  {
   "name": "Velocity of a wave",
-  "f": "v=f*lambda"
+  "f": "v=f*lambda",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "v": "m/s",
+   "f": "Hz",
+   "lambda": "m"
+  }
  },
  {
   "name": "Speed of sound in a fluid",
-  "f": "v=sqrt(((B)/(rho)))"
+  "f": "v=sqrt(((B)/(rho)))",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Speed of sound in a solid",
-  "f": "v=sqrt(((Y)/(rho)))"
+  "f": "v=sqrt(((Y)/(rho)))",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Speed of sound in an ideal gas",
-  "f": "v=sqrt(((gamma*R*T)/(M)))"
+  "f": "v=sqrt(((gamma*R*T)/(M)))",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Decrease in intensity as a spherical wave expands",
-  "f": "I_2=I_1*((((r_1)/(r_2))))^(2)"
+  "f": "I_2=I_1*((((r_1)/(r_2))))^(2)",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Intensity of sound",
-  "f": "I=((((Delta*p_max))^(2))/(2*rho*v))"
+  "f": "I=((((Delta*p_max))^(2))/(2*rho*v))",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Sound intensity level",
-  "f": "beta*(d*B)=10*log_10*(((I)/(I_0)))"
+  "f": "beta*(d*B)=10*log_10*(((I)/(I_0)))",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Beat frequency produced by two waves thatdiffer in frequency",
-  "f": "f_beat=|f_2-f_1|"
+  "f": "f_beat=|f_2-f_1|",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Mach number",
-  "f": "M=((v_s)/(v))"
+  "f": "M=((v_s)/(v))",
+  "scope": "m58382",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Density of a sample at constant density",
-  "f": "rho=((m)/(V))"
+  "f": "rho=((m)/(V))",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "rho": "kg/m^3",
+   "V": "m^3",
+   "m": "kg"
+  }
  },
  {
   "name": "Pressure",
-  "f": "p=((F)/(A))"
+  "f": "p=((F)/(A))",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Pressure at a depth h in a fluid of constant density",
-  "f": "p=p_0+rho*g*h"
+  "f": "p=p_0+rho*g*h",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "p_0": "Pa",
+   "g": "m/s^2",
+   "p": "Pa",
+   "rho": "kg/m^3",
+   "h": "m"
+  }
  },
  {
   "name": "Absolute pressure",
-  "f": "p_abs=p_g+p_atm"
+  "f": "p_abs=p_g+p_atm",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Volume flow rate",
-  "f": "Q=((d*V)/(d*t))"
+  "f": "Q=((d*V)/(d*t))",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Continuity equation (constant density)",
-  "f": "A_1*v_1=A_2*v_2"
+  "f": "A_1*v_1=A_2*v_2",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Continuity equation (general form)",
-  "f": "rho_1*A_1*v_1=rho_2*A_2*v_2"
+  "f": "rho_1*A_1*v_1=rho_2*A_2*v_2",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Bernoulli\u2019s equation",
-  "f": "p+((1)/(2))*rho*(v)^(2)+rho*g*y=constant"
+  "f": "p+((1)/(2))*rho*(v)^(2)+rho*g*y=constant",
+  "scope": "m58359",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Relationship between frequency and period",
-  "f": "f=((1)/(T))"
+  "f": "f=((1)/(T))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Position in SHM with\u03d5=0.00",
-  "f": "x*(t)=A*cos(omega*t)"
+  "f": "x*(t)=A*cos(omega*t)",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Maximum displacement (amplitude) of SHM",
-  "f": "x_max=A"
+  "f": "x_max=A",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular frequency of a mass-spring system in SHM",
-  "f": "omega=sqrt(((k)/(m)))"
+  "f": "omega=sqrt(((k)/(m)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Period of a mass-spring system in SHM",
-  "f": "T=2*pi*sqrt(((m)/(k)))"
+  "f": "T=2*pi*sqrt(((m)/(k)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Frequency of a mass-spring system in SHM",
-  "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))"
+  "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular frequency for a simple pendulum",
-  "f": "omega=sqrt(((g)/(L)))"
+  "f": "omega=sqrt(((g)/(L)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Period of a simple pendulum",
-  "f": "T=2*pi*sqrt(((L)/(g)))"
+  "f": "T=2*pi*sqrt(((L)/(g)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular frequency of a physical pendulum",
-  "f": "omega=sqrt(((m*g*L)/(I)))"
+  "f": "omega=sqrt(((m*g*L)/(I)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Period of a physical pendulum",
-  "f": "T=2*pi*sqrt(((I)/(m*g*L)))"
+  "f": "T=2*pi*sqrt(((I)/(m*g*L)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Newton\u2019s second law for harmonic motion",
-  "f": "m*(((d)^(2)*x)/(d*(t)^(2)))+b*((d*x)/(d*t))+k*x=0"
+  "f": "m*(((d)^(2)*x)/(d*(t)^(2)))+b*((d*x)/(d*t))+k*x=0",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Natural angular frequency of amass-spring system",
-  "f": "omega_0=sqrt(((k)/(m)))"
+  "f": "omega_0=sqrt(((k)/(m)))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular frequency of underdampedharmonic motion",
-  "f": "omega=sqrt(omega02-((((b)/(2*m))))^(2))"
+  "f": "omega=sqrt(omega02-((((b)/(2*m))))^(2))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Amplitude of system undergoing forced,damped oscillations",
-  "f": "A=((F_o)/(sqrt((m)^(2)*(((omega)^(2)-omegao2))^(2)+(b)^(2)*(omega)^(2))))"
+  "f": "A=((F_o)/(sqrt((m)^(2)*(((omega)^(2)-omegao2))^(2)+(b)^(2)*(omega)^(2))))",
+  "scope": "m58366",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Self-inductance in terms of magnetic flux",
-  "f": "N*Phi_m=L*I"
+  "f": "N*Phi_m=L*I",
+  "scope": "m58756",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Self-inductance of a solenoid",
-  "f": "L_solenoid=((mu_0*(N)^(2)*A)/(l))"
+  "f": "L_solenoid=((mu_0*(N)^(2)*A)/(l))",
+  "scope": "m58756",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Energy stored in an inductor",
-  "f": "U=((1)/(2))*L*(I)^(2)"
+  "f": "U=((1)/(2))*L*(I)^(2)",
+  "scope": "m58756",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Time constant for a RL circuit",
-  "f": "tau_L=L/R"
+  "f": "tau_L=L/R",
+  "scope": "m58756",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular frequency in LC circuits",
-  "f": "omega=sqrt(((1)/(L*C)))"
+  "f": "omega=sqrt(((1)/(L*C)))",
+  "scope": "m58756",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Field amplitude in the diffraction pattern",
-  "f": "E=N*Delta*E_0*((sin(beta))/(beta))"
+  "f": "E=N*Delta*E_0*((sin(beta))/(beta))",
+  "scope": "m58552",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Intensity in the diffraction pattern",
-  "f": "I=I_0*((((sin(beta))/(beta))))^(2)"
+  "f": "I=I_0*((((sin(beta))/(beta))))^(2)",
+  "scope": "m58552",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Rayleigh criterion for circular apertures",
-  "f": "theta=1.22*((lambda)/(D))"
+  "f": "theta=1.22*((lambda)/(D))",
+  "scope": "m58552",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Ideal gas law in terms of molecules",
-  "f": "p*V=N*k_B*T"
+  "f": "p*V=N*k_B*T",
+  "scope": "m58394",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Ideal gas law in terms of moles",
-  "f": "p*V=n*R*T"
+  "f": "p*V=n*R*T",
+  "scope": "m58394",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Mean free time",
-  "f": "tau=((k_B*T)/(4*sqrt(2)*pi*(r)^(2)*p*v_rms))"
+  "f": "tau=((k_B*T)/(4*sqrt(2)*pi*(r)^(2)*p*v_rms))",
+  "scope": "m58394",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Heat in terms of molar heat capacity at constant volume",
-  "f": "Q=n*C_V*Delta*T"
+  "f": "Q=n*C_V*Delta*T",
+  "scope": "m58394",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Molar heat capacity at constant volume for an ideal gas with d degrees of freedom",
-  "f": "C_V=((d)/(2))*R"
+  "f": "C_V=((d)/(2))*R",
+  "scope": "m58394",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Average electrical current",
-  "f": "I_ave=((Delta*Q)/(Delta*t))"
+  "f": "I_ave=((Delta*Q)/(Delta*t))",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Electrical current",
-  "f": "I=((d*Q)/(d*t))"
+  "f": "I=((d*Q)/(d*t))",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Drift velocity",
-  "f": "v_d=((I)/(n*q*A))"
+  "f": "v_d=((I)/(n*q*A))",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Resistivity",
-  "f": "rho=((E)/(J))"
+  "f": "rho=((E)/(J))",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Common expression of Ohm\u2019s law",
-  "f": "V=I*R"
+  "f": "V=I*R",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "R": "ohm",
+   "I": "A",
+   "V": "V"
+  }
  },
  {
   "name": "Resistance of a cylinder of material",
-  "f": "R=rho*((L)/(A))"
+  "f": "R=rho*((L)/(A))",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Temperature dependence of resistance",
-  "f": "R=R_0*(1+alpha*Delta*T)"
+  "f": "R=R_0*(1+alpha*Delta*T)",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Electric power",
-  "f": "P=I*V"
+  "f": "P=I*V",
+  "scope": "m58735",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Wien\u2019s displacement law",
-  "f": "lambda_max*T=2.898*(10)^(-3)*m*K"
+  "f": "lambda_max*T=2.898*(10)^(-3)*m*K",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Stefan\u2019s law",
-  "f": "P(T)=sigma*A*(T)^(4)"
+  "f": "P(T)=sigma*A*(T)^(4)",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Energy quantum of radiation",
-  "f": "Delta*E=h*f"
+  "f": "Delta*E=h*f",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Maximum kinetic energyof a photoelectron",
-  "f": "K_max=e*Delta*V_s"
+  "f": "K_max=e*Delta*V_s",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Energy of a photon",
-  "f": "E_f=h*f"
+  "f": "E_f=h*f",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Energy-momentum relationfor photon",
-  "f": "p_f=((E_f)/(c))"
+  "f": "p_f=((E_f)/(c))",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnitude of photon\u2019s momentum",
-  "f": "p_f=((h)/(lambda))"
+  "f": "p_f=((h)/(lambda))",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "The Compton shift",
-  "f": "Delta*lambda=lambda_c(1-cos(theta))"
+  "f": "Delta*lambda=lambda_c(1-cos(theta))",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Bohr\u2019s second quantization condition",
-  "f": "h*f=|E_n-E_m|"
+  "f": "h*f=|E_n-E_m|",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Bohr\u2019s radius of the nth orbit",
-  "f": "r_n=a_0*(n)^(2)"
+  "f": "r_n=a_0*(n)^(2)",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Electron\u2019s energy inthe nth orbit",
-  "f": "E_n=-E_0*((1)/((n)^(2)))"
+  "f": "E_n=-E_0*((1)/((n)^(2)))",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "The nth orbit ofhydrogen-like ion",
-  "f": "r_n=((a_0)/(Z))*(n)^(2)"
+  "f": "r_n=((a_0)/(Z))*(n)^(2)",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "The nth energyof hydrogen-like ion",
-  "f": "E_n=-(Z)^(2)*E_0*((1)/((n)^(2)))"
+  "f": "E_n=-(Z)^(2)*E_0*((1)/((n)^(2)))",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Energy of a matter wave",
-  "f": "E=h*f"
+  "f": "E=h*f",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "f": "Hz",
+   "h": "J*s",
+   "E": "J"
+  }
  },
  {
   "name": "The de Broglie wavelength",
-  "f": "lambda=((h)/(p))"
+  "f": "lambda=((h)/(p))",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "The frequency-wavelength relationfor matter waves",
-  "f": "lambda*f=((c)/(beta))"
+  "f": "lambda*f=((c)/(beta))",
+  "scope": "m58766",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular position",
-  "f": "theta=((s)/(r))"
+  "f": "theta=((s)/(r))",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Tangential speed",
-  "f": "v_t=r*omega"
+  "f": "v_t=r*omega",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Tangential acceleration",
-  "f": "a_t=r*alpha"
+  "f": "a_t=r*alpha",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular velocity from constant angular acceleration",
-  "f": "omega_f=omega_0+alpha*t"
+  "f": "omega_f=omega_0+alpha*t",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Angular velocity from displacement andconstant angular acceleration",
-  "f": "theta_f=theta_0+omega_0*t+((1)/(2))*alpha*(t)^(2)"
+  "f": "theta_f=theta_0+omega_0*t+((1)/(2))*alpha*(t)^(2)",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Change in angular velocity",
-  "f": "omegaf2=omega02+2*alpha(Delta*theta)"
+  "f": "omegaf2=omega02+2*alpha(Delta*theta)",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Rotational kinetic energy in terms of themoment of inertia of a rigid body",
-  "f": "K=((1)/(2))*I*(omega)^(2)"
+  "f": "K=((1)/(2))*I*(omega)^(2)",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Parallel-axis theorem",
-  "f": "I_parallelaxis=I_centerofmass+m*(d)^(2)"
+  "f": "I_parallelaxis=I_centerofmass+m*(d)^(2)",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Work-energy theorem",
-  "f": "W_AB=K_B-K_A"
+  "f": "W_AB=K_B-K_A",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Rotational power",
-  "f": "P=tau*omega"
+  "f": "P=tau*omega",
+  "scope": "m58333",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "tau": "N*m",
+   "omega": "1/s",
+   "P": "W"
+  }
  },
  {
   "name": "Atomic mass number",
-  "f": "A=Z+N"
+  "f": "A=Z+N",
+  "scope": "m58614",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Nuclear radius, where r0 is the radius of a single proton",
-  "f": "r=r_0*(A)^(1/3)"
+  "f": "r=r_0*(A)^(1/3)",
+  "scope": "m58614",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Mass defect",
-  "f": "Delta*m=Z*m_p+(A-Z)m_n-m_nuc"
+  "f": "Delta*m=Z*m_p+(A-Z)m_n-m_nuc",
+  "scope": "m58614",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Binding energy",
-  "f": "E=(Delta*m)(c)^(2)"
+  "f": "E=(Delta*m)(c)^(2)",
+  "scope": "m58614",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Binding energy per nucleon",
-  "f": "B*E*N=((E_b)/(A))"
+  "f": "B*E*N=((E_b)/(A))",
+  "scope": "m58614",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Decay constant",
-  "f": "lambda=((0.693)/(T_12))"
+  "f": "lambda=((0.693)/(T_12))",
+  "scope": "m58614",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "The magnitude of the electric field just outside the surface of a conductor",
-  "f": "E=((sigma)/(epsilon_0))"
+  "f": "E=((sigma)/(epsilon_0))",
+  "scope": "m58426",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "epsilon_0": "C^2/(N*m^2)",
+   "E": "V/m",
+   "sigma": "C/m^2"
+  }
  },
  {
   "name": "Terminal voltage of a single voltage source",
-  "f": "V_terminal=epsilon-I*r_eq"
+  "f": "V_terminal=epsilon-I*r_eq",
+  "scope": "m58458",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Time constant",
-  "f": "tau=R*C"
+  "f": "tau=R*C",
+  "scope": "m58458",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Charge on a discharging capacitor",
-  "f": "q*(t)=Q*(e)^(-((t)/(tau)))"
+  "f": "q*(t)=Q*(e)^(-((t)/(tau)))",
+  "scope": "m58458",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Current during discharging of a capacitor",
-  "f": "I*(t)=-((Q)/(R*C))*(e)^(-((t)/(tau)))"
+  "f": "I*(t)=-((Q)/(R*C))*(e)^(-((t)/(tau)))",
+  "scope": "m58458",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Contribution to magnetic fieldfrom a current element",
-  "f": "d*B=((mu_0)/(4*pi))*((I*d*l*sin(theta))/((r)^(2)))"
+  "f": "d*B=((mu_0)/(4*pi))*((I*d*l*sin(theta))/((r)^(2)))",
+  "scope": "m58467",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnetic field due to along straight wire",
-  "f": "B=((mu_0*I)/(2*pi*R))"
+  "f": "B=((mu_0*I)/(2*pi*R))",
+  "scope": "m58467",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnetic field of a current loop",
-  "f": "B=((mu_0*I)/(2*R))*(atcenterofloop)"
+  "f": "B=((mu_0*I)/(2*R))*(atcenterofloop)",
+  "scope": "m58467",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnetic field strengthinside a solenoid",
-  "f": "B=mu_0*n*I"
+  "f": "B=mu_0*n*I",
+  "scope": "m58467",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnetic field strength inside a toroid",
-  "f": "B=((mu_o*N*I)/(2*pi*r))"
+  "f": "B=((mu_o*N*I)/(2*pi*r))",
+  "scope": "m58467",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnetic field of a solenoidfilled with paramagnetic material",
-  "f": "B=mu*n*I"
+  "f": "B=mu*n*I",
+  "scope": "m58467",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "AC voltage",
-  "f": "v=V_0*sin(omega)*t"
+  "f": "v=V_0*sin(omega)*t",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "AC current",
-  "f": "i=I_0*sin(omega)*t"
+  "f": "i=I_0*sin(omega)*t",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "rms voltage",
-  "f": "V_rms=((V_0)/(sqrt(2)))"
+  "f": "V_rms=((V_0)/(sqrt(2)))",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "rms current",
-  "f": "I_rms=((I_0)/(sqrt(2)))"
+  "f": "I_rms=((I_0)/(sqrt(2)))",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "AC version of Ohm\u2019s law",
-  "f": "I_0=((V_0)/(Z))"
+  "f": "I_0=((V_0)/(Z))",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Impedance of an RLC series circuit",
-  "f": "Z=sqrt((R)^(2)+((X_L-X_C))^(2))"
+  "f": "Z=sqrt((R)^(2)+((X_L-X_C))^(2))",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Resonant angular frequency of a circuit",
-  "f": "omega_0=sqrt(((1)/(L*C)))"
+  "f": "omega_0=sqrt(((1)/(L*C)))",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Quality factor of a circuit",
-  "f": "Q=((omega_0)/(Delta*omega))"
+  "f": "Q=((omega_0)/(Delta*omega))",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Quality factor of a circuit in terms of the circuit parameters",
-  "f": "Q=((omega_0*L)/(R))"
+  "f": "Q=((omega_0*L)/(R))",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Transformer equation with current",
-  "f": "I_S=((N_P)/(N_S))*I_P"
+  "f": "I_S=((N_P)/(N_S))*I_P",
+  "scope": "m58494",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "N_P": "1",
+   "N_S": "1",
+   "I_P": "A",
+   "I_S": "A"
+  }
  },
  {
   "name": "Potential-energy function of a harmonic oscillator",
-  "f": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)"
+  "f": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "scope": "m58582",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Linear mass density",
-  "f": "mu=((massofthestring)/(lengthofthestring))"
+  "f": "mu=((massofthestring)/(lengthofthestring))",
+  "scope": "m58373",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Wave speed",
-  "f": "v=((omega)/(k))"
+  "f": "v=((omega)/(k))",
+  "scope": "m58373",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Intensity",
-  "f": "I=((P)/(A))"
+  "f": "I=((P)/(A))",
+  "scope": "m58373",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Intensity for a spherical wave",
-  "f": "I=((P)/(4*pi*(r)^(2)))"
+  "f": "I=((P)/(4*pi*(r)^(2)))",
+  "scope": "m58373",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Index of refraction",
-  "f": "n=((c)/(v))"
+  "f": "n=((c)/(v))",
+  "scope": "m58525",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Law of reflection",
-  "f": "theta_r=theta_i"
+  "f": "theta_r=theta_i",
+  "scope": "m58525",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Law of refraction (Snell\u2019s law)",
-  "f": "n_1*sin(theta_1)=n_2*sin(theta_2)"
+  "f": "n_1*sin(theta_1)=n_2*sin(theta_2)",
+  "scope": "m58525",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Malus\u2019s law",
-  "f": "I=I_0*(cos)^(2)*theta"
+  "f": "I=I_0*(cos)^(2)*theta",
+  "scope": "m58525",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Linear thermal expansion",
-  "f": "Delta*L=alpha*L*Delta*T"
+  "f": "Delta*L=alpha*L*Delta*T",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Thermal expansion in two dimensions",
-  "f": "Delta*A=2*alpha*A*Delta*T"
+  "f": "Delta*A=2*alpha*A*Delta*T",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Thermal expansion in three dimensions",
-  "f": "Delta*V=beta*V*Delta*T"
+  "f": "Delta*V=beta*V*Delta*T",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Heat transfer",
-  "f": "Q=m*c*Delta*T"
+  "f": "Q=m*c*Delta*T",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Transfer of heat in a calorimeter",
-  "f": "Q_cold+Q_hot=0"
+  "f": "Q_cold+Q_hot=0",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Heat due to phase change (melting and freezing)",
-  "f": "Q=m*L_f"
+  "f": "Q=m*L_f",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Heat due to phase change (evaporation and condensation)",
-  "f": "Q=m*L_v"
+  "f": "Q=m*L_v",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Rate of conductive heat transfer",
-  "f": "P=((k*A*(T_h-T_c))/(d))"
+  "f": "P=((k*A*(T_h-T_c))/(d))",
+  "scope": "m58389",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Magnitude of magnetic force",
-  "f": "F=q*v*B*sin(theta)"
+  "f": "F=q*v*B*sin(theta)",
+  "scope": "m58745",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Radius of a particle\u2019s path in a magnetic field",
-  "f": "r=((m*v)/(q*B))"
+  "f": "r=((m*v)/(q*B))",
+  "scope": "m58745",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Period of a particle\u2019s motion in a magnetic field",
-  "f": "T=((2*pi*m)/(q*B))"
+  "f": "T=((2*pi*m)/(q*B))",
+  "scope": "m58745",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Drift velocity in crossed electric and magnetic fields",
-  "f": "v_d=((E)/(B))"
+  "f": "v_d=((E)/(B))",
+  "scope": "m58745",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "v_d": "m/s",
+   "B": "T",
+   "E": "V/m"
+  }
  },
  {
   "name": "Hall potential",
-  "f": "V=((I*B*l)/(n*e*A))"
+  "f": "V=((I*B*l)/(n*e*A))",
+  "scope": "m58745",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Hall potential in terms of drift velocity",
-  "f": "V=B*l*v_d"
+  "f": "V=B*l*v_d",
+  "scope": "m58745",
+  "title": "osbooks-university-physics-bundle",
+  "units": {
+   "v_d": "m/s",
+   "l": "m",
+   "B": "T",
+   "V": "V"
+  }
  },
  {
   "name": "Maximum speed of a particle in a cyclotron",
-  "f": "v_max=((q*B*R)/(m))"
+  "f": "v_max=((q*B*R)/(m))",
+  "scope": "m58745",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Path length difference for waves from two slits to a common point on a screen",
-  "f": "Delta*l=d*sin(theta)"
+  "f": "Delta*l=d*sin(theta)",
+  "scope": "m58541",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Distance from central maximum to the mth bright fringe",
-  "f": "y_m=((m*lambda*D)/(d))"
+  "f": "y_m=((m*lambda*D)/(d))",
+  "scope": "m58541",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Displacement measured by a Michelson interferometer",
-  "f": "Delta*d=m*((lambda_0)/(2))"
+  "f": "Delta*d=m*((lambda_0)/(2))",
+  "scope": "m58541",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Work-energy theorem",
-  "f": "W_net=K_B-K_A"
+  "f": "W_net=K_B-K_A",
+  "scope": "m58310",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Power as rate of doing work",
-  "f": "P=((d*W)/(d*t))"
+  "f": "P=((d*W)/(d*t))",
+  "scope": "m58310",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Linear relation betweenstress and strain",
-  "f": "stress=(elasticmodulus)*strain"
+  "f": "stress=(elasticmodulus)*strain",
+  "scope": "m58343",
+  "title": "osbooks-university-physics-bundle"
  },
  {
   "name": "Hooke\u2019s law",
-  "f": "F=-k*x"
+  "f": "F=-k*x",
+  "scope": "m54154",
+  "title": "osbooks-physics"
  },
  {
   "name": "rearranged mirror/lens equation",
-  "f": "d_i=((f*d_o)/(d_o-f))"
+  "f": "d_i=((f*d_o)/(d_o-f))",
+  "scope": "m54361",
+  "title": "osbooks-physics"
  },
  {
   "name": "lens/mirror equation (solved version)",
-  "f": "f=((d_i*d_o)/(d_o+d_i))"
+  "f": "f=((d_i*d_o)/(d_o+d_i))",
+  "scope": "m54357",
+  "title": "osbooks-physics"
  },
  {
   "name": "angle of displacement",
-  "f": "theta=(tan)^(-1)(y/x)"
+  "f": "theta=(tan)^(-1)(y/x)",
+  "scope": "m54162",
+  "title": "osbooks-physics"
  },
  {
   "name": "velocity",
-  "f": "v=sqrt(vx2+vy2)"
+  "f": "v=sqrt(vx2+vy2)",
+  "scope": "m54162",
+  "title": "osbooks-physics"
  },
  {
   "name": "angle of velocity",
-  "f": "theta_v=(tan)^(-1)(v_y/v_x)"
+  "f": "theta_v=(tan)^(-1)(v_y/v_x)",
+  "scope": "m54162",
+  "title": "osbooks-physics"
  },
  {
   "name": "maximum height",
-  "f": "h=((v0*y2)/(2g))"
+  "f": "h=((v0*y2)/(2g))",
+  "scope": "m54162",
+  "title": "osbooks-physics"
  },
  {
   "name": "momentum of a photon (deBroglie relation)",
-  "f": "p=((h)/(lambda))"
+  "f": "p=((h)/(lambda))",
+  "scope": "m54552",
+  "title": "osbooks-physics",
+  "units": {
+   "h": "J*s",
+   "p": "kg*m/s",
+   "lambda": "m"
+  }
  },
  {
   "name": "quadratic formula",
-  "f": "y=a*(x)^(2)+b*x+c"
+  "f": "y=a*(x)^(2)+b*x+c",
+  "scope": "m54599",
+  "title": "osbooks-physics"
  },
  {
   "name": "positive exponential formula",
-  "f": "y=(a)^(x)"
+  "f": "y=(a)^(x)",
+  "scope": "m54599",
+  "title": "osbooks-physics"
  },
  {
   "name": "negative exponential formula",
-  "f": "y=(a)^(-x)"
+  "f": "y=(a)^(-x)",
+  "scope": "m54599",
+  "title": "osbooks-physics"
  },
  {
   "name": "normal force for a nonaccelerating horizontal surface",
-  "f": "N=mg"
+  "f": "N=mg",
+  "scope": "m54131",
+  "title": "osbooks-physics"
  },
  {
   "name": "tension for an object at rest",
-  "f": "T=mg"
+  "f": "T=mg",
+  "scope": "m54131",
+  "title": "osbooks-physics"
  },
  {
   "name": "beat frequency",
-  "f": "f_B=|f_1-f_2|"
+  "f": "f_B=|f_1-f_2|",
+  "scope": "m54335",
+  "title": "osbooks-physics"
  },
  {
   "name": "Newton's first law of motion",
-  "f": "F_net=0"
+  "f": "F_net=0",
+  "scope": "m54138",
+  "title": "osbooks-physics"
  },
  {
   "name": "speed of light, frequency, and wavelength",
-  "f": "c=f*lambda"
+  "f": "c=f*lambda",
+  "scope": "m54369",
+  "title": "osbooks-physics"
  },
  {
   "name": "change of wavelength with index of refraction",
-  "f": "lambda_n=((lambda)/(n))"
+  "f": "lambda_n=((lambda)/(n))",
+  "scope": "m54369",
+  "title": "osbooks-physics"
  },
  {
   "name": "two-slit constructive interference",
-  "f": "d*sin(theta)=m*lambda"
+  "f": "d*sin(theta)=m*lambda",
+  "scope": "m54369",
+  "title": "osbooks-physics"
  },
  {
   "name": "one-slit destructive interference",
-  "f": "D*sin(theta)=m*lambda"
+  "f": "D*sin(theta)=m*lambda",
+  "scope": "m54369",
+  "title": "osbooks-physics"
  },
  {
   "name": "sound intensity",
-  "f": "I=((((Delta*p))^(2))/(2*rho*v_w))"
+  "f": "I=((((Delta*p))^(2))/(2*rho*v_w))",
+  "scope": "m54333",
+  "title": "osbooks-physics"
  },
  {
   "name": "sound intensity level",
-  "f": "beta*(dB)=10*log_10*(((I)/(I_0)))"
+  "f": "beta*(dB)=10*log_10*(((I)/(I_0)))",
+  "scope": "m54333",
+  "title": "osbooks-physics"
  },
  {
   "name": "ideal gas law",
-  "f": "P*V=N*k*T"
+  "f": "P*V=N*k*T",
+  "scope": "m54305",
+  "title": "osbooks-physics"
  },
  {
   "name": "first law of thermodynamics",
-  "f": "Delta*U=Q-W"
+  "f": "Delta*U=Q-W",
+  "scope": "m54305",
+  "title": "osbooks-physics"
  },
  {
   "name": "pressure",
-  "f": "P=((F)/(A))"
+  "f": "P=((F)/(A))",
+  "scope": "m54305",
+  "title": "osbooks-physics",
+  "units": {
+   "A": "m^2",
+   "F": "N",
+   "P": "Pa"
+  }
  },
  {
   "name": "pressure\u2013volume work",
-  "f": "W=P*Delta*V"
+  "f": "W=P*Delta*V",
+  "scope": "m54305",
+  "title": "osbooks-physics"
  },
  {
   "name": "Displacement",
-  "f": "Deltad=d_f-d_0"
+  "f": "Deltad=d_f-d_0",
+  "scope": "m54108",
+  "title": "osbooks-physics"
  },
  {
   "name": "change in electric potential energy for a charge that moves in a constant electric field",
-  "f": "Delta*U_E=-q*E*(x_f-x_i)"
+  "f": "Delta*U_E=-q*E*(x_f-x_i)",
+  "scope": "m54426",
+  "title": "osbooks-physics"
  },
  {
   "name": "electric potential energy of a charge a distance r from a point charge or sphere of uniform charge",
-  "f": "U_E=((k*Q*q)/(r))"
+  "f": "U_E=((k*Q*q)/(r))",
+  "scope": "m54426",
+  "title": "osbooks-physics"
  },
  {
   "name": "definition of electric potential",
-  "f": "V=((U_E)/(q))"
+  "f": "V=((U_E)/(q))",
+  "scope": "m54426",
+  "title": "osbooks-physics"
  },
  {
   "name": "change in electric potential for a charge that moves in a constant electric field",
-  "f": "Delta*V=-E*(x_f-x_i)"
+  "f": "Delta*V=-E*(x_f-x_i)",
+  "scope": "m54426",
+  "title": "osbooks-physics"
  },
  {
   "name": "electric potential of a charge a distance r from a point charge or sphere of uniform charge",
-  "f": "V=((k*Q)/(r))"
+  "f": "V=((k*Q)/(r))",
+  "scope": "m54426",
+  "title": "osbooks-physics"
  },
  {
   "name": "magnitude of electric field of point charge",
-  "f": "E=((k*|Q|)/((r)^(2)))"
+  "f": "E=((k*|Q|)/((r)^(2)))",
+  "scope": "m54428",
+  "title": "osbooks-physics"
  },
  {
   "name": "impulse\u2013momentum theorem",
-  "f": "Deltap=F_net*Delta*t"
+  "f": "Deltap=F_net*Delta*t",
+  "scope": "m54215",
+  "title": "osbooks-physics"
  },
  {
   "name": "linear momentum",
-  "f": "p=mv"
+  "f": "p=mv",
+  "scope": "m54215",
+  "title": "osbooks-physics"
  },
  {
   "name": "Newton\u2019s second law in terms of momentum",
-  "f": "F_net=((Deltap)/(Delta*t))"
+  "f": "F_net=((Deltap)/(Delta*t))",
+  "scope": "m54215",
+  "title": "osbooks-physics"
  },
  {
   "name": "equation for work",
-  "f": "W=fd"
+  "f": "W=fd",
+  "scope": "m54271",
+  "title": "osbooks-physics"
  },
  {
   "name": "kinetic energy",
-  "f": "K*E=((1)/(2))*m*(v)^(2)"
+  "f": "K*E=((1)/(2))*m*(v)^(2)",
+  "scope": "m54271",
+  "title": "osbooks-physics"
  },
  {
   "name": "power",
-  "f": "P=((W)/(t))"
+  "f": "P=((W)/(t))",
+  "scope": "m54271",
+  "title": "osbooks-physics",
+  "units": {
+   "t": "s",
+   "W": "J",
+   "P": "W"
+  }
  },
  {
   "name": "elapsed time",
-  "f": "Delta*t=gamma*Delta*t_0"
+  "f": "Delta*t=gamma*Delta*t_0",
+  "scope": "m54282",
+  "title": "osbooks-physics"
  },
  {
   "name": "relativistic factor",
-  "f": "gamma=((1)/(sqrt(1-(((u)^(2))/((c)^(2))))))"
+  "f": "gamma=((1)/(sqrt(1-(((u)^(2))/((c)^(2))))))",
+  "scope": "m54282",
+  "title": "osbooks-physics"
  },
  {
   "name": "length contraction",
-  "f": "L=((L_0)/(gamma))"
+  "f": "L=((L_0)/(gamma))",
+  "scope": "m54282",
+  "title": "osbooks-physics"
  },
  {
   "name": "relativistic momentum",
-  "f": "p=gamma*mu"
+  "f": "p=gamma*mu",
+  "scope": "m54282",
+  "title": "osbooks-physics"
  },
  {
   "name": "relativistic energy",
-  "f": "E=gamma*m*(c)^(2)"
+  "f": "E=gamma*m*(c)^(2)",
+  "scope": "m54282",
+  "title": "osbooks-physics"
  },
  {
   "name": "rest energy",
-  "f": "E_0=m*(c)^(2)"
+  "f": "E_0=m*(c)^(2)",
+  "scope": "m54282",
+  "title": "osbooks-physics"
  },
  {
   "name": "magnetic flux",
-  "f": "Phi=B*A*cos(theta)"
+  "f": "Phi=B*A*cos(theta)",
+  "scope": "m54456",
+  "title": "osbooks-physics"
  },
  {
   "name": "emf",
-  "f": "epsilon=-N*((Delta*Phi)/(Delta*t))"
+  "f": "epsilon=-N*((Delta*Phi)/(Delta*t))",
+  "scope": "m54456",
+  "title": "osbooks-physics"
  },
  {
   "name": "Velocity",
-  "f": "v=v_0+a*t"
+  "f": "v=v_0+a*t",
+  "scope": "m54094",
+  "title": "osbooks-physics"
  },
  {
   "name": "Acceleration",
-  "f": "a=((Deltav)/(Delta*t))"
+  "f": "a=((Deltav)/(Delta*t))",
+  "scope": "m54094",
+  "title": "osbooks-physics"
  },
  {
   "name": "roentgen equivalent man",
-  "f": "rem=rad*RBE"
+  "f": "rem=rad*RBE",
+  "scope": "m54578",
+  "title": "osbooks-physics"
  },
  {
   "name": "wave velocity",
-  "f": "v_w=((lambda)/(T))"
+  "f": "v_w=((lambda)/(T))",
+  "scope": "m54321",
+  "title": "osbooks-physics"
  },
  {
   "name": "period",
-  "f": "T=((1)/(f))"
+  "f": "T=((1)/(f))",
+  "scope": "m54321",
+  "title": "osbooks-physics"
  },
  {
   "name": "resultant magnitude",
-  "f": "R=sqrt(Rx2+Ry2)"
+  "f": "R=sqrt(Rx2+Ry2)",
+  "scope": "m54147",
+  "title": "osbooks-physics"
  },
  {
   "name": "resultant direction",
-  "f": "theta=(tan)^(-1)(R_y/R_x)"
+  "f": "theta=(tan)^(-1)(R_y/R_x)",
+  "scope": "m54147",
+  "title": "osbooks-physics"
  },
  {
   "name": "x-component of a vector A (when an angle is given relative to the horizontal)",
-  "f": "A_x=A*cos(theta)"
+  "f": "A_x=A*cos(theta)",
+  "scope": "m54147",
+  "title": "osbooks-physics"
  },
  {
   "name": "y-component of a vector A (when an angle is given relative to the horizontal)",
-  "f": "A_y=A*sin(theta)"
+  "f": "A_y=A*sin(theta)",
+  "scope": "m54147",
+  "title": "osbooks-physics"
  },
  {
   "name": "addition of vectors",
-  "f": "A_x+A_y=A"
+  "f": "A_x+A_y=A",
+  "scope": "m54147",
+  "title": "osbooks-physics"
  },
  {
   "name": "Angle of rotation",
-  "f": "Delta*theta=((Delta*s)/(r))"
+  "f": "Delta*theta=((Delta*s)/(r))",
+  "scope": "m54176",
+  "title": "osbooks-physics"
  },
  {
   "name": "Angular speed:",
-  "f": "omega=((Delta*theta)/(Delta*t))"
+  "f": "omega=((Delta*theta)/(Delta*t))",
+  "scope": "m54176",
+  "title": "osbooks-physics"
  },
  {
   "name": "Tangential speed:",
-  "f": "v=r*omega"
+  "f": "v=r*omega",
+  "scope": "m54176",
+  "title": "osbooks-physics"
  },
  {
   "name": "thermal efficiency of a heat engine",
-  "f": "E*f*f=((W)/(Q_h))"
+  "f": "E*f*f=((W)/(Q_h))",
+  "scope": "m54307",
+  "title": "osbooks-physics"
  },
  {
   "name": "Average speed",
-  "f": "v_avg=((distance)/(time))"
+  "f": "v_avg=((distance)/(time))",
+  "scope": "m54104",
+  "title": "osbooks-physics"
  },
  {
   "name": "radioactive half-life",
-  "f": "N=N_O*(e)^(-lambda*t)"
+  "f": "N=N_O*(e)^(-lambda*t)",
+  "scope": "m63183",
+  "title": "osbooks-physics"
  },
  {
   "name": "force of kinetic friction",
-  "f": "f_k=mu_kN"
+  "f": "f_k=mu_kN",
+  "scope": "m54159",
+  "title": "osbooks-physics"
  },
  {
   "name": "energy stored in a capacitor",
-  "f": "U_E=((1)/(2))*C*(V)^(2)"
+  "f": "U_E=((1)/(2))*C*(V)^(2)",
+  "scope": "m63179",
+  "title": "osbooks-physics"
  },
  {
   "name": "eccentricity",
-  "f": "e=((f)/(a))"
+  "f": "e=((f)/(a))",
+  "scope": "m54192",
+  "title": "osbooks-physics"
  },
  {
   "name": "area of an ellipse",
-  "f": "A=pi*a*b"
+  "f": "A=pi*a*b",
+  "scope": "m54192",
+  "title": "osbooks-physics",
+  "units": {
+   "b": "m",
+   "A": "m^2",
+   "a": "m"
+  }
  },
  {
   "name": "semi-major axis of an ellipse",
-  "f": "a=(r_a+r_p)/2"
+  "f": "a=(r_a+r_p)/2",
+  "scope": "m54192",
+  "title": "osbooks-physics"
  },
  {
   "name": "semi-minor axis of an ellipse",
-  "f": "b=sqrt(r_a*r_p)"
+  "f": "b=sqrt(r_a*r_p)",
+  "scope": "m54192",
+  "title": "osbooks-physics"
  },
  {
   "name": "quantum energy",
-  "f": "E=n*h*f"
+  "f": "E=n*h*f",
+  "scope": "m54566",
+  "title": "osbooks-physics"
  },
  {
   "name": "maximum kinetic energy of a photoelectron",
-  "f": "K*E_e=h*f-B*E"
+  "f": "K*E_e=h*f-B*E",
+  "scope": "m54559",
+  "title": "osbooks-physics"
  },
  {
   "name": "binding energy of an electron",
-  "f": "B*E=h*f_O"
+  "f": "B*E=h*f_O",
+  "scope": "m54559",
+  "title": "osbooks-physics"
  },
  {
   "name": "conservation of energy",
-  "f": "K*E_1+P*E_1=K*E_2+P*E_2"
+  "f": "K*E_1+P*E_1=K*E_2+P*E_2",
+  "scope": "m54273",
+  "title": "osbooks-physics"
  },
  {
   "name": "Celsius to Fahrenheit conversion",
-  "f": "T_F=((9)/(5))*T_C+32"
+  "f": "T_F=((9)/(5))*T_C+32",
+  "scope": "m54287",
+  "title": "osbooks-physics"
  },
  {
   "name": "Fahrenheit to Celsius conversion",
-  "f": "T_C=((5)/(9))*(T_F-32)"
+  "f": "T_C=((5)/(9))*(T_F-32)",
+  "scope": "m54287",
+  "title": "osbooks-physics"
  },
  {
   "name": "Celsius to Kelvin conversion",
-  "f": "T_K=T_C+273.15"
+  "f": "T_K=T_C+273.15",
+  "scope": "m54287",
+  "title": "osbooks-physics"
  },
  {
   "name": "Kelvin to Celsius conversion",
-  "f": "T_C=T_K-273.15"
+  "f": "T_C=T_K-273.15",
+  "scope": "m54287",
+  "title": "osbooks-physics"
  },
  {
   "name": "Fahrenheit to Kelvin conversion",
-  "f": "T_K=((5)/(9))*(T_F-32)+273.15"
+  "f": "T_K=((5)/(9))*(T_F-32)+273.15",
+  "scope": "m54287",
+  "title": "osbooks-physics"
  },
  {
   "name": "Kelvin to Fahrenheit conversion",
-  "f": "T_F=((9)/(5))*(T_K-273.15)+32"
+  "f": "T_F=((9)/(5))*(T_K-273.15)+32",
+  "scope": "m54287",
+  "title": "osbooks-physics"
  },
  {
   "name": "speed of light",
-  "f": "v=lambda*f"
+  "f": "v=lambda*f",
+  "scope": "m54280",
+  "title": "osbooks-physics"
  },
  {
   "name": "constant value for the speed of light",
-  "f": "c=3.00*(10)^(8)*m/s"
+  "f": "c=3.00*(10)^(8)*m/s",
+  "scope": "m54280",
+  "title": "osbooks-physics"
  },
  {
   "name": "ideal mechanical advantage (lever)",
-  "f": "I*M*A=((L_e)/(L_r))"
+  "f": "I*M*A=((L_e)/(L_r))",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "ideal mechanical advantage (wheel and axle)",
-  "f": "I*M*A=((R)/(r))"
+  "f": "I*M*A=((R)/(r))",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "ideal mechanical advantage (inclined plane)",
-  "f": "I*M*A=((L)/(h))"
+  "f": "I*M*A=((L)/(h))",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "ideal mechanical advantage (wedge)",
-  "f": "I*M*A=((L)/(t))"
+  "f": "I*M*A=((L)/(t))",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "ideal mechanical advantage (pulley)",
-  "f": "I*M*A=N"
+  "f": "I*M*A=N",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "ideal mechanical advantage (screw)",
-  "f": "I*M*A=((2*pi*L)/(P))"
+  "f": "I*M*A=((2*pi*L)/(P))",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "input work",
-  "f": "W_i=F_i*d_i"
+  "f": "W_i=F_i*d_i",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "output work",
-  "f": "W_o=F_o*d_o"
+  "f": "W_o=F_o*d_o",
+  "scope": "m54274",
+  "title": "osbooks-physics"
  },
  {
   "name": "Coulomb\u2019s law",
-  "f": "F=((k*q_1*q_2)/((r)^(2)))"
+  "f": "F=((k*q_1*q_2)/((r)^(2)))",
+  "scope": "m54414",
+  "title": "osbooks-physics"
  },
  {
   "name": "for a given current I flowing through a resistance R, the electric power dissipated",
-  "f": "P=(I)^(2)*R"
+  "f": "P=(I)^(2)*R",
+  "scope": "m54446",
+  "title": "osbooks-physics"
  },
  {
   "name": "for a given voltage difference V across a resistor R, the electric power dissipated",
-  "f": "P=(((V)^(2))/(R))"
+  "f": "P=(((V)^(2))/(R))",
+  "scope": "m54446",
+  "title": "osbooks-physics"
  },
  {
   "name": "electric current I is the charge \u0394Q that passes a plane per unit time \u0394t",
-  "f": "I=((Delta*Q)/(Delta*t))"
+  "f": "I=((Delta*Q)/(Delta*t))",
+  "scope": "m54437",
+  "title": "osbooks-physics"
  },
  {
   "name": "the magnitude of the magnetic field created by a long, straight current-carrying wire",
-  "f": "B_straightwire=((mu_0*I)/(2*pi*r))"
+  "f": "B_straightwire=((mu_0*I)/(2*pi*r))",
+  "scope": "m54465",
+  "title": "osbooks-physics"
  },
  {
   "name": "illuminance",
-  "f": "illuminance=((P)/(4*pi*(r)^(2)))"
+  "f": "illuminance=((P)/(4*pi*(r)^(2)))",
+  "scope": "m54346",
+  "title": "osbooks-physics"
  },
  {
   "name": "Angular acceleration",
-  "f": "alpha=((Deltaomega)/(Delta*t))"
+  "f": "alpha=((Deltaomega)/(Delta*t))",
+  "scope": "m54180",
+  "title": "osbooks-physics"
  },
  {
   "name": "Rotational kinematic equations",
-  "f": "theta=omegat"
+  "f": "theta=omegat",
+  "scope": "m54180",
+  "title": "osbooks-physics"
  },
  {
   "name": "Tangential (linear) acceleration",
-  "f": "a=ralpha"
+  "f": "a=ralpha",
+  "scope": "m54180",
+  "title": "osbooks-physics"
  },
  {
   "name": "Torque",
-  "f": "tau=rFsin(theta)"
+  "f": "tau=rFsin(theta)",
+  "scope": "m54180",
+  "title": "osbooks-physics"
  },
  {
   "name": "Newton\u2019s second law of motion",
-  "f": "F_net=ma"
+  "f": "F_net=ma",
+  "scope": "m54142",
+  "title": "osbooks-physics"
  },
  {
   "name": "Newton\u2019s second law of motion to solve weight",
-  "f": "W=mg"
+  "f": "W=mg",
+  "scope": "m54142",
+  "title": "osbooks-physics"
  },
  {
   "name": "Newton\u2019s universal law of gravitation",
-  "f": "F=G*((m*M)/((r)^(2)))"
+  "f": "F=G*((m*M)/((r)^(2)))",
+  "scope": "m54189",
+  "title": "osbooks-physics"
  },
  {
   "name": "acceleration due to gravity",
-  "f": "g=G*((M)/((r)^(2)))"
+  "f": "g=G*((M)/((r)^(2)))",
+  "scope": "m54189",
+  "title": "osbooks-physics"
  },
  {
   "name": "Displacement with constant acceleration",
-  "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)"
+  "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)",
+  "scope": "m54116",
+  "title": "osbooks-physics"
  },
  {
   "name": "Centripetal acceleration",
-  "f": "a_c=(((v)^(2))/(r))"
+  "f": "a_c=(((v)^(2))/(r))",
+  "scope": "m54181",
+  "title": "osbooks-physics"
  },
  {
   "name": "Centripetal force",
-  "f": "F_c=m*a_c"
+  "f": "F_c=m*a_c",
+  "scope": "m54181",
+  "title": "osbooks-physics",
+  "units": {
+   "F_c": "N",
+   "m": "kg",
+   "a_c": "m/s^2"
+  }
  },
  {
   "name": "energy\u2013mass conversion",
-  "f": "E=m*(c)^(2)"
+  "f": "E=m*(c)^(2)",
+  "scope": "m54574",
+  "title": "osbooks-physics"
  },
  {
   "name": "Displacement",
-  "f": "d=d_0+vt"
+  "f": "d=d_0+vt",
+  "scope": "m54110",
+  "title": "osbooks-physics"
  },
  {
   "name": "arc length",
-  "f": "s=r*theta"
+  "f": "s=r*theta",
+  "scope": "m51283",
+  "title": "osbooks-college-algebra-bundle",
+  "units": {
+   "theta": "1",
+   "r": "m",
+   "s": "m"
+  }
  },
  {
   "name": "area of a sector",
-  "f": "A=((1)/(2))*theta*(r)^(2)"
+  "f": "A=((1)/(2))*theta*(r)^(2)",
+  "scope": "m51283",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "angular speed",
-  "f": "omega=((theta)/(t))"
+  "f": "omega=((theta)/(t))",
+  "scope": "m51283",
+  "title": "osbooks-college-algebra-bundle",
+  "units": {
+   "omega": "1/s",
+   "theta": "1",
+   "t": "s"
+  }
  },
  {
   "name": "linear speed",
-  "f": "v=((s)/(t))"
+  "f": "v=((s)/(t))",
+  "scope": "m51283",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "General Form equation of a conic section",
-  "f": "A*(x)^(2)+B*x*y+C*(y)^(2)+D*x+E*y+F=0"
+  "f": "A*(x)^(2)+B*x*y+C*(y)^(2)+D*x+E*y+F=0",
+  "scope": "m49441",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "explicit formula for nth term of a geometric sequence",
-  "f": "a_n=a_1*(r)^(n-1)"
+  "f": "a_n=a_1*(r)^(n-1)",
+  "scope": "m49446",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "sum of the first n terms of an arithmetic series",
-  "f": "S_n=((n(a_1+a_n))/(2))"
+  "f": "S_n=((n(a_1+a_n))/(2))",
+  "scope": "m49447",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "General Form for the Translation of the Parent Logarithmic Function f(x)= log b ( x )",
-  "f": "f(x)=a*log_b*(x+c)+d"
+  "f": "f(x)=a*log_b*(x+c)+d",
+  "scope": "m49364",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "general form of a quadratic function",
-  "f": "f(x)=a*(x)^(2)+b*x+c"
+  "f": "f(x)=a*(x)^(2)+b*x+c",
+  "scope": "m49337",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "standard form of a quadratic function",
-  "f": "f(x)=a*((x-h))^(2)+k"
+  "f": "f(x)=a*((x-h))^(2)+k",
+  "scope": "m49337",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Identity function",
-  "f": "f*(x)=x"
+  "f": "f*(x)=x",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Absolute value function",
-  "f": "f*(x)=|x|"
+  "f": "f*(x)=|x|",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Quadratic function",
-  "f": "f*(x)=(x)^(2)"
+  "f": "f*(x)=(x)^(2)",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Cubic function",
-  "f": "f*(x)=(x)^(3)"
+  "f": "f*(x)=(x)^(3)",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Reciprocal function",
-  "f": "f*(x)=((1)/(x))"
+  "f": "f*(x)=((1)/(x))",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Reciprocal squared function",
-  "f": "f*(x)=((1)/((x)^(2)))"
+  "f": "f*(x)=((1)/((x)^(2)))",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Square root function",
-  "f": "f*(x)=sqrt(x)"
+  "f": "f*(x)=sqrt(x)",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Cube root function",
-  "f": "f*(x)=x3"
+  "f": "f*(x)=x3",
+  "scope": "m49301",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "General Form for the Translation of the Parent Function f(x)= b x",
-  "f": "f(x)=a*(b)^(x+c)+d"
+  "f": "f(x)=a*(b)^(x+c)+d",
+  "scope": "m49362",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "The Product Rule for Logarithms",
-  "f": "log_b(M*N)=log_b*(M)+log_b*(N)"
+  "f": "log_b(M*N)=log_b*(M)+log_b*(N)",
+  "scope": "m49365",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "The Quotient Rule for Logarithms",
-  "f": "log_b*(((M)/(N)))=log_b*M-log_b*N"
+  "f": "log_b*(((M)/(N)))=log_b*M-log_b*N",
+  "scope": "m49365",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "The Power Rule for Logarithms",
-  "f": "log_b*((M)^(n))=n*log_b*M"
+  "f": "log_b*((M)^(n))=n*log_b*M",
+  "scope": "m49365",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "slope-intercept form of a line",
-  "f": "f(x)=m*x+b"
+  "f": "f(x)=m*x+b",
+  "scope": "m49324",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Vertical shift",
-  "f": "g(x)=f(x)+k"
+  "f": "g(x)=f(x)+k",
+  "scope": "m49312",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Horizontal shift",
-  "f": "g(x)=f(x-h)"
+  "f": "g(x)=f(x-h)",
+  "scope": "m49312",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Vertical reflection",
-  "f": "g(x)=-f(x)"
+  "f": "g(x)=-f(x)",
+  "scope": "m49312",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Horizontal reflection",
-  "f": "g(x)=f(-x)"
+  "f": "g(x)=f(-x)",
+  "scope": "m49312",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Vertical stretch",
-  "f": "g(x)=a*f(x)"
+  "f": "g(x)=a*f(x)",
+  "scope": "m49312",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Horizontal stretch",
-  "f": "g(x)=f(b*x)"
+  "f": "g(x)=f(b*x)",
+  "scope": "m49312",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Division Algorithm",
-  "f": "f(x)=d(x)q(x)+r(x)"
+  "f": "f(x)=d(x)q(x)+r(x)",
+  "scope": "m49348",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "average rate of change",
-  "f": "AROC=((f*(a+h)-f*(a))/(h))"
+  "f": "AROC=((f*(a+h)-f*(a))/(h))",
+  "scope": "m49455",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "explicit formula for nth term of an arithmetic sequence",
-  "f": "a_n=a_1+d(n-1)"
+  "f": "a_n=a_1+d(n-1)",
+  "scope": "m49445",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Secant function",
-  "f": "sec*t=((1)/(cos(t)))"
+  "f": "sec*t=((1)/(cos(t)))",
+  "scope": "m51286",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Cosecant function",
-  "f": "csc*t=((1)/(sin(t)))"
+  "f": "csc*t=((1)/(sin(t)))",
+  "scope": "m51286",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Shifted, compressed, and/or stretched tangent function",
-  "f": "y=A*tan(B*x-C)+D"
+  "f": "y=A*tan(B*x-C)+D",
+  "scope": "m49389",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Shifted, compressed, and/or stretched secant function",
-  "f": "y=A*sec*(B*x-C)+D"
+  "f": "y=A*sec*(B*x-C)+D",
+  "scope": "m49389",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Shifted, compressed, and/or stretched cosecant function",
-  "f": "y=A*csc*(B*x-C)+D"
+  "f": "y=A*csc*(B*x-C)+D",
+  "scope": "m49389",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Shifted, compressed, and/or stretched cotangent function",
-  "f": "y=A*cot*(B*x-C)+D"
+  "f": "y=A*cot*(B*x-C)+D",
+  "scope": "m49389",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "probability of an event with equally likely outcomes",
-  "f": "P(E)=((n(E))/(n(S)))"
+  "f": "P(E)=((n(E))/(n(S)))",
+  "scope": "m49450",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Distance",
-  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))"
+  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
+  "scope": "m51256",
+  "title": "osbooks-college-algebra-bundle"
  },
  {
   "name": "Slope of a line",
-  "f": "m=((y_2-y_1)/(x_2-x_1))"
+  "f": "m=((y_2-y_1)/(x_2-x_1))",
+  "scope": "m51256",
+  "title": "osbooks-college-algebra-bundle"
  }
 ]
