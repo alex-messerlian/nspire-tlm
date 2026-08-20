@@ -215,8 +215,13 @@ void memory_map_weights(TransformerWeights *w, Config* p, void* ptr, uint8_t sha
     ptr = (void*)fptr; // now cast the pointer back to void*
     w->q_tokens = init_quantized_tensors(&ptr, 1, p->vocab_size * p->dim);
     // dequantize token embedding table
+#ifdef _TINSPIRE
+    /* 35.2 MB at vocab 32000 -- impossible here. Dequantize per row in forward() instead. */
+    w->token_embedding_table = NULL;
+#else
     w->token_embedding_table = malloc(p->vocab_size * p->dim * sizeof(float));
     dequantize(w->q_tokens, w->token_embedding_table, p->vocab_size * p->dim);
+#endif
 
     w->wq = init_quantized_tensors(&ptr, p->n_layers, p->dim * (p->n_heads * head_size));
     w->wk = init_quantized_tensors(&ptr, p->n_layers, p->dim * (p->n_kv_heads * head_size));
@@ -391,7 +396,15 @@ float* forward(Transformer* transformer, int token, int pos) {
     int head_size = dim / p->n_heads;
 
     // copy the token embedding into x
+#ifdef _TINSPIRE
+    /* Same arithmetic dequantize() would have done for this row, done on demand. */
+    for (int _i = 0; _i < dim; _i++) {
+        int _j = token * dim + _i;
+        x[_i] = w->q_tokens->q[_j] * w->q_tokens->s[_j / GS];
+    }
+#else
     memcpy(x, w->token_embedding_table + token*dim, dim * sizeof(float));
+#endif
 
     // forward all the layers
     for(int l = 0; l < p->n_layers; l++) {
