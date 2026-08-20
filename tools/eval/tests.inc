@@ -43,6 +43,20 @@ static void run_tests(void) {
     T("<tool>eval<arg>sin(0)</tool>",                  "0");
     T("<tool>eval<arg>max(3,7)</tool>",                "7");
 
+    /* ---- implicit multiplication binds tighter than / (physics unit notation) ---- */
+    /* Regression: these all returned inverted denominators before 2026-08-20 and would have put
+     * wrong units through the whole physics corpus. Found by design review, not by these tests. */
+    T("<tool>eval<arg>100 m/10 s</tool>",              "10 m/s");
+    T("<tool>eval<arg>12 V/0.25 A</tool>",             "48 ohm");
+    T("<tool>eval<arg>20 N/4 kg</tool>",               "5 m/s^2");
+    T("<tool>eval<arg>6 m/2 s</tool>",                 "3 m/s");
+    T("<tool>conv<arg>500 J/25 s<arg>W</tool>",        "20 W");
+    T("<tool>eval<arg>60 km/2 h</tool>",               "8.333333333 m/s");
+    /* explicit operators keep strict left-to-right */
+    T("<tool>evalat<arg>1/2*x<arg>x<arg>8</tool>",     "4");
+    T("<tool>eval<arg>100/10/2</tool>",                "5");
+    T("<tool>eval<arg>2*3 x</tool>",                   "!expr");   /* x unbound, but parses */
+
     /* ---- units ---- */
     T("<tool>eval<arg>9.8 m/s^2 * 3 s</tool>",         "29.4 m/s");
     T("<tool>eval<arg>2 kg * 3 m/s^2</tool>",          "6 N");     /* coherent derived unit */

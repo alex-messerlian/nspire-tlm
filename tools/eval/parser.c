@@ -180,23 +180,42 @@ static int starts_primary(P *p) {
     return isdigit((unsigned char)c) || isalpha((unsigned char)c) || c == '_' || c == '(';
 }
 
-static node_t *parse_mul(P *p, int depth) {
+/* IMPLICIT multiplication binds TIGHTER than explicit '*' and '/'.
+ *
+ * This is a deliberate departure from strict left-to-right, and it exists for units. With equal
+ * precedence, "100 m/10 s" parses as ((100*m)/10)*s = 10 m*s -- arithmetically defensible and
+ * physically nonsense. Every quantity written the natural way (m/s, km/h, N/m^2) came out with an
+ * inverted denominator, which would have put wrong units through the entire physics corpus.
+ *
+ * Binding implicit multiplication tighter gives "100 m/10 s" -> (100*m)/(10*s) = 10 m/s, which is
+ * what the notation means to a physicist and what every CAS does with "a/bc".
+ *
+ * KNOWN COST, accepted: "1/2 x" now means 1/(2*x), not (1/2)*x. In a physics corpus that form is
+ * rare -- coefficients are written 0.5x or x/2 -- and unit correctness is worth far more.
+ * Explicit operators are unaffected: "1/2*x" is still (1/2)*x. */
+static node_t *parse_imul(P *p, int depth) {
     node_t *l = parse_unary(p, depth);
+    if (!l) return NULL;
+    while (starts_primary(p)) {
+        node_t *r = parse_unary(p, depth + 1);
+        if (!r) return NULL;
+        l = ar_bin(p->a, N_MUL, l, r);
+        if (!l) { p->err = E_RANGE; return NULL; }
+    }
+    return l;
+}
+
+static node_t *parse_mul(P *p, int depth) {
+    node_t *l = parse_imul(p, depth);
     if (!l) return NULL;
     for (;;) {
         char c = peek(p);
-        if (c == '*' || c == '/') {
-            p->p++;
-            node_t *r = parse_unary(p, depth + 1);
-            if (!r) return NULL;
-            l = ar_bin(p->a, c == '*' ? N_MUL : N_DIV, l, r);
-            if (!l) { p->err = E_RANGE; return NULL; }
-        } else if (starts_primary(p)) {
-            node_t *r = parse_unary(p, depth + 1);
-            if (!r) return NULL;
-            l = ar_bin(p->a, N_MUL, l, r);
-            if (!l) { p->err = E_RANGE; return NULL; }
-        } else break;
+        if (c != '*' && c != '/') break;
+        p->p++;
+        node_t *r = parse_imul(p, depth + 1);
+        if (!r) return NULL;
+        l = ar_bin(p->a, c == '*' ? N_MUL : N_DIV, l, r);
+        if (!l) { p->err = E_RANGE; return NULL; }
     }
     return l;
 }
