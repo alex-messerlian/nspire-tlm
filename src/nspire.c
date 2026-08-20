@@ -89,7 +89,9 @@ void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long 
             if (g_nspire_log) { fprintf(g_nspire_log, "load_pct=%u\n", pct); fflush(g_nspire_log); }
         }
     }
+    STEP("mmap:read-loop-done");
     fclose(fp);
+    STEP("mmap:fclose-done");
     g_map_ptr = p;
     g_map_len = len;
     return p;

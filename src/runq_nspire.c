@@ -267,15 +267,30 @@ void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weigh
 #endif
     *data = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, *fd, 0);
     if (*data == MAP_FAILED) { fprintf(stderr, "mmap failed!\n"); exit(EXIT_FAILURE); }
+#ifdef _TINSPIRE
+    printf("  stage: mmap returned\n");
+#endif
     void* weights_ptr = ((char*)*data) + header_size; // skip header bytes. char is 1 byte
+#ifdef _TINSPIRE
+    printf("  stage: memory_map_weights...\n");
+#endif
     memory_map_weights(weights, config, weights_ptr, shared_classifier);
+#ifdef _TINSPIRE
+    printf("  stage: memory_map_weights done\n");
+#endif
 }
 
 void build_transformer(Transformer *t, char* checkpoint_path) {
     // read in the Config and the Weights from the checkpoint
     read_checkpoint(checkpoint_path, &t->config, &t->weights, &t->fd, &t->data, &t->file_size);
     // allocate the RunState buffers
+#ifdef _TINSPIRE
+    printf("  stage: malloc_run_state (needs ~3.7MB)...\n");
+#endif
     malloc_run_state(&t->state, &t->config);
+#ifdef _TINSPIRE
+    printf("  stage: malloc_run_state done\n");
+#endif
 }
 
 void free_transformer(Transformer* t) {
@@ -1103,11 +1118,23 @@ int llama2_main(int argc, char *argv[]) {
 
     // build the Tokenizer via the tokenizer .bin file
     Tokenizer tokenizer;
+#ifdef _TINSPIRE
+    printf("  stage: build_tokenizer...\n");
+#endif
     build_tokenizer(&tokenizer, tokenizer_path, transformer.config.vocab_size);
+#ifdef _TINSPIRE
+    printf("  stage: tokenizer done\n");
+#endif
 
     // build the Sampler
     Sampler sampler;
+#ifdef _TINSPIRE
+    printf("  stage: build_sampler...\n");
+#endif
     build_sampler(&sampler, transformer.config.vocab_size, temperature, topp, rng_seed);
+#ifdef _TINSPIRE
+    printf("  stage: sampler done -- generating, first token is the slow one\n");
+#endif
 
     // run!
     if (strcmp(mode, "generate") == 0) {
