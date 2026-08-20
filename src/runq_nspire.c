@@ -1082,7 +1082,15 @@ int llama2_main(int argc, char *argv[]) {
     }
 
     // parameter validation/overrides
+#ifdef _TINSPIRE
+    if (rng_seed <= 0) {
+        printf("FATAL: no seed given; time() hangs on Ndless\n");
+        return 1;
+    }
+    printf("args parsed, seed=%llu\n", rng_seed);
+#else
     if (rng_seed <= 0) rng_seed = (unsigned int)time(NULL);
+#endif
     if (temperature < 0.0) temperature = 0.0;
     if (topp < 0.0 || 1.0 < topp) topp = 0.9;
     if (steps < 0) steps = 0;
