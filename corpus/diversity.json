@@ -1,6 +1,6 @@
 {
- "distinct_4gram_ratio": 0.516879075281565,
+ "distinct_4gram_ratio": 0.3605020789297843,
  "head_coverage": 0.9847328244274809,
  "heads_used": 129,
- "mean_phrasing_entropy_bits": 4.473668575142696
+ "mean_phrasing_entropy_bits": 4.8131230025788225
 }
