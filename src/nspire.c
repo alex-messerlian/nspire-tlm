@@ -5,6 +5,7 @@
 #undef clock_gettime
 #include <stdlib.h>
 #include <stdio.h>
+#include "nspire_screen.h"
 #include <unistd.h>
 
 extern FILE *g_nspire_log;   /* progress goes to the log too, so a reset still leaves evidence */

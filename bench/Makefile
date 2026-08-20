@@ -7,13 +7,13 @@
 # emit ldmia/smlabb, so readability is a real requirement here, not a preference.
 
 BENCHES  := bench_platform bench_mem bench_mac bench_flash
-CFLAGS   := -O2 -Wall -Wextra -std=gnu99 -marm -mcpu=arm926ej-s -ffreestanding
+CFLAGS   := -O2 -Wall -Wextra -std=gnu99 -marm -mcpu=arm926ej-s -ffreestanding -I../include -I../vendor/Ndless/ndless-sdk/thirdparty/nspire-io/include
 LDFLAGS  :=
 
 all: $(addsuffix .tns,$(BENCHES))
 
 %.elf: %.c common.h
-	nspire-gcc $(CFLAGS) $< -o $@ $(LDFLAGS)
+	nspire-gcc $(CFLAGS) $< -o $@ $(LDFLAGS) -lnspireio
 
 %.tns: %.elf
 	genzehn --input $< --output $@.zehn --name $*

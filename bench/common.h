@@ -16,6 +16,7 @@
 #define BENCH_COMMON_H
 
 #include <libndls.h>
+#include "nspire_screen.h"   /* printf -> on-screen console; plain printf shows nothing */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -154,6 +155,7 @@ static inline const char *power_state_guess(uint32_t hz) {
 static FILE *g_log = NULL;
 
 static inline void bench_open(const char *bench_name) {
+    screen_init();
     g_log = fopen(BENCH_LOG_PATH, "a");
     uint32_t hz = cpu_clock_hz();
     printf("=== %s ===\n", bench_name);
@@ -184,6 +186,7 @@ static inline void bench_result(const char *key, const char *fmt, ...) {
 
 static inline void bench_close(void) {
     if (g_log) { fflush(g_log); fclose(g_log); g_log = NULL; }
+    screen_flush();
     printf("\nlog: %s\nPress any key.\n", BENCH_LOG_PATH);
     wait_key_pressed();
 }
