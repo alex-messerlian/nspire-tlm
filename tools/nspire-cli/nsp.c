@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 static nspire_handle_t *H = NULL;
 
@@ -142,6 +143,9 @@ static void usage(void) {
         "  push  <local> <remote>   upload one file\n"
         "  pull  <remote> <local>   download one file\n"
         "  rm    <remote>           delete one file\n"
+        "  rmdir <remote-dir>       delete one (empty) directory\n"
+        "\nNOTE: mkdir at the documents ROOT fails on the device (0xFF0F). A two-component path\n"
+        "works and creates parents, so 'mkdir /bench/tmp' is how you get /bench.\n"
         "\nRemote paths are absolute: /documents/bench/results.txt.tns\n"
         "Programs are NOT launched by this tool -- benchmarks must run with USB disconnected.\n");
 }
@@ -149,7 +153,18 @@ static void usage(void) {
 int main(int argc, char **argv) {
     if (argc < 2) { usage(); return 1; }
 
-    int e = nspire_init(&H);
+    /* Retry on Busy. nsp is a short-lived process that opens and closes the device each run, and
+     * back-to-back invocations collide before the previous handle is released -- the device reports
+     * Busy. Without this retry, a scripted push/pull sequence fails a step SILENTLY and any
+     * subsequent read returns stale content, which looks exactly like data corruption. That cost an
+     * hour of chasing a phantom 17 MB corruption; the transfer was fine, the second open was not. */
+    int e = 0;
+    for (int attempt = 0; attempt < 40; attempt++) {
+        e = nspire_init(&H);
+        if (e != -NSPIRE_ERR_BUSY && e != NSPIRE_ERR_BUSY) break;
+        struct timespec ts = { 0, 250 * 1000 * 1000 };   /* 250 ms */
+        nanosleep(&ts, NULL);
+    }
     if (e) return die("init", e);
 
     int rc = 1;
@@ -161,6 +176,10 @@ int main(int argc, char **argv) {
     else if (!strcmp(c, "mkdir") && argc == 3) {
         e = nspire_dir_create(H, argv[2]);
         rc = e ? die(argv[2], e) : (fprintf(stderr, "mkdir %s ok\n", argv[2]), 0);
+    }
+    else if (!strcmp(c, "rmdir") && argc == 3) {
+        e = nspire_dir_delete(H, argv[2]);
+        rc = e ? die(argv[2], e) : (fprintf(stderr, "rmdir %s ok\n", argv[2]), 0);
     }
     else if (!strcmp(c, "rm")    && argc == 3) {
         e = nspire_file_delete(H, argv[2]);

@@ -3,6 +3,14 @@
 #
 # Missing files are reported, not fatal: a partial session is normal and the point is to get
 # whatever was produced.
+#
+# PATH MAPPING, verified on hardware 2026-08-19:
+#   libnspire's root "/" IS the device's "/documents/".
+# Proof: Ndless's own source reads "/documents/themes.csv", and `nsp ls /` shows that file at
+# "/themes.csv"; the ndless folder created at the top of Documents shows at "/ndless".
+# So a file pushed to "/bench/x.tns" is opened by an Ndless program as "/documents/bench/x.tns".
+# The C programs' hardcoded /documents/... paths are CORRECT and must not be changed -- only these
+# transfer paths drop the prefix.
 set -u
 cd "$(dirname "$0")/../.."
 NSP=tools/nspire-cli/nsp
@@ -10,7 +18,7 @@ OUT=results/$(date +%Y%m%d-%H%M%S)
 mkdir -p "$OUT"
 
 for f in eval_device.txt results.txt llama2_device.txt; do
-    if $NSP pull "/documents/bench/${f}.tns" "$OUT/$f" 2>/dev/null; then :; else
+    if $NSP pull "/bench/${f}.tns" "$OUT/$f" 2>/dev/null; then :; else
         echo "  MISSING: $f  (that program may not have run)"
     fi
 done
