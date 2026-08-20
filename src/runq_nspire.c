@@ -97,6 +97,13 @@ typedef struct {
     // kv cache
     float* key_cache;   // (layer, seq_len, dim)
     float* value_cache; // (layer, seq_len, dim)
+#ifdef KV_INT8
+    int8_t *key_cache_q, *value_cache_q;   /* int8 KV, per-row scale */
+    float  *key_scale,  *value_scale;
+#define KV_ALLOC_FAILED (!s->key_cache_q || !s->value_cache_q || !s->key_scale || !s->value_scale)
+#else
+#define KV_ALLOC_FAILED (!s->key_cache || !s->value_cache)
+#endif
 } RunState;
 
 typedef struct {
@@ -124,12 +131,19 @@ void malloc_run_state(RunState* s, Config* p) {
     s->v = calloc(kv_dim, sizeof(float));
     s->att = calloc(p->n_heads * p->seq_len, sizeof(float));
     s->logits = calloc(p->vocab_size, sizeof(float));
+#ifdef KV_INT8
+    s->key_cache_q   = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(int8_t));
+    s->value_cache_q = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(int8_t));
+    s->key_scale     = calloc(p->n_layers * p->seq_len, sizeof(float));
+    s->value_scale   = calloc(p->n_layers * p->seq_len, sizeof(float));
+    s->key_cache = NULL; s->value_cache = NULL;
+#else
     s->key_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
     s->value_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
+#endif
     // ensure all mallocs went fine
     if (!s->x || !s->xb || !s->xb2 || !s->hb || !s->hb2 || !s->q
-     || !s->k || !s->v || !s->att || !s->logits || !s->key_cache
-     || !s->value_cache) {
+     || !s->k || !s->v || !s->att || !s->logits || KV_ALLOC_FAILED) {
         fprintf(stderr, "malloc failed!\n");
         exit(EXIT_FAILURE);
     }
@@ -454,8 +468,28 @@ float* forward(Transformer* transformer, int token, int pos) {
         int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
         float* key_cache_row = s->key_cache + loff + pos * kv_dim;
         float* value_cache_row = s->value_cache + loff + pos * kv_dim;
+#ifdef KV_INT8
+        {   int row = l * p->seq_len + pos;
+            int8_t *kq = s->key_cache_q   + (size_t)row * kv_dim;
+            int8_t *vq = s->value_cache_q + (size_t)row * kv_dim;
+            float kmax = 0.0f, vmax = 0.0f;
+            for (int i = 0; i < kv_dim; i++) {
+                float ak = fabsf(s->k[i]); if (ak > kmax) kmax = ak;
+                float av = fabsf(s->v[i]); if (av > vmax) vmax = av;
+            }
+            float ks = kmax / 127.0f, vs = vmax / 127.0f;
+            s->key_scale[row] = ks; s->value_scale[row] = vs;
+            float ki = ks > 0.0f ? 1.0f/ks : 0.0f, vi = vs > 0.0f ? 1.0f/vs : 0.0f;
+            for (int i = 0; i < kv_dim; i++) {
+                float a = s->k[i]*ki, b = s->v[i]*vi;
+                kq[i] = (int8_t)(a >= 0 ? a + 0.5f : a - 0.5f);
+                vq[i] = (int8_t)(b >= 0 ? b + 0.5f : b - 0.5f);
+            }
+        }
+#else
         memcpy(key_cache_row, s->k, kv_dim * sizeof(*key_cache_row));
         memcpy(value_cache_row, s->v, kv_dim * sizeof(*value_cache_row));
+#endif
 
         // multihead attention. iterate over all heads
         int h;
@@ -463,17 +497,37 @@ float* forward(Transformer* transformer, int token, int pos) {
         for (h = 0; h < p->n_heads; h++) {
             // get the query vector for this head
             float* q = s->q + h * head_size;
+#ifdef KV_INT8
+            int8_t qq[256]; float qs = 0.0f;
+            {   float qmax = 0.0f;
+                for (int i = 0; i < head_size; i++) { float a = fabsf(q[i]); if (a>qmax) qmax=a; }
+                qs = qmax / 127.0f;
+                float qi = qs > 0.0f ? 1.0f/qs : 0.0f;
+                for (int i = 0; i < head_size; i++) {
+                    float a = q[i]*qi;
+                    qq[i] = (int8_t)(a >= 0 ? a + 0.5f : a - 0.5f);
+                }
+            }
+#endif
             // attention scores for this head
             float* att = s->att + h * p->seq_len;
             // iterate over all timesteps, including the current one
             for (int t = 0; t <= pos; t++) {
                 // get the key vector for this head and at this timestep
+#ifdef KV_INT8
+                int   krow = l * p->seq_len + t;
+                const int8_t *k = s->key_cache_q + (size_t)krow * kv_dim + (h / kv_mul) * head_size;
+                int32_t iacc = 0;
+                for (int i = 0; i < head_size; i++) iacc += (int32_t)qq[i] * (int32_t)k[i];
+                float score = (float)iacc * qs * s->key_scale[krow];
+#else
                 float* k = s->key_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
                 // calculate the attention score as the dot product of q and k
                 float score = 0.0f;
                 for (int i = 0; i < head_size; i++) {
                     score += q[i] * k[i];
                 }
+#endif
                 score /= sqrtf(head_size);
                 // save the score to the attention buffer
                 att[t] = score;
@@ -487,12 +541,22 @@ float* forward(Transformer* transformer, int token, int pos) {
             memset(xb, 0, head_size * sizeof(float));
             for (int t = 0; t <= pos; t++) {
                 // get the value vector for this head and at this timestep
+#ifdef KV_INT8
+                int   vrow = l * p->seq_len + t;
+                const int8_t *vq8 = s->value_cache_q + (size_t)vrow * kv_dim + (h / kv_mul) * head_size;
+                float vsc = s->value_scale[vrow];
+#else
                 float* v = s->value_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
+#endif
                 // get the attention weight for this timestep
                 float a = att[t];
                 // accumulate the weighted value into xb
                 for (int i = 0; i < head_size; i++) {
+#ifdef KV_INT8
+                    xb[i] += (a * vsc) * (float)vq8[i];
+#else
                     xb[i] += a * v[i];
+#endif
                 }
             }
         }
