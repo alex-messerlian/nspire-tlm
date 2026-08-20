@@ -21,19 +21,31 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 fail=0
 
+# Verify by reading back and comparing. Retry the READ, not the write.
+#
+# Observed twice with the 17 MB model: a read-back issued immediately after a large write returns
+# data that does not match, while an independent read moments later matches exactly. The device has
+# not finished committing the write when the read starts. Re-pushing on that signal is the wrong
+# response -- it rewrites a file that was already correct, and doubles the time. Retry the read.
 verify() {   # verify <local> <remote>
-    if ! $NSP pull "$2" "$TMP/v.bin" >/dev/null 2>&1; then
-        echo "  VERIFY FAILED (could not read back): $2"; fail=1; return
-    fi
-    if cmp -s "$1" "$TMP/v.bin"; then
-        echo "  verified $2"
+    attempt=1
+    while [ "$attempt" -le 3 ]; do
+        sleep 1
+        if $NSP pull "$2" "$TMP/v.bin" >/dev/null 2>&1 && cmp -s "$1" "$TMP/v.bin"; then
+            [ "$attempt" -eq 1 ] && echo "  verified $2" || echo "  verified $2 (read attempt $attempt)"
+            return
+        fi
+        attempt=$((attempt + 1))
+    done
+    # Three clean reads all disagreed -- now it is worth suspecting the write.
+    echo "  read-back disagreed 3x on $2 -- re-pushing once"
+    $NSP rm "$2" >/dev/null 2>&1 || true
+    $NSP push "$1" "$2" >/dev/null 2>&1 || true
+    sleep 2
+    if $NSP pull "$2" "$TMP/v.bin" >/dev/null 2>&1 && cmp -s "$1" "$TMP/v.bin"; then
+        echo "  verified $2 (after re-push)"
     else
-        echo "  *** HASH MISMATCH: $2 -- re-pushing once"
-        $NSP rm "$2" >/dev/null 2>&1 || true
-        $NSP push "$1" "$2" >/dev/null 2>&1 || true
-        $NSP pull "$2" "$TMP/v.bin" >/dev/null 2>&1 || true
-        if cmp -s "$1" "$TMP/v.bin"; then echo "  verified $2 (after retry)";
-        else echo "  *** STILL CORRUPT AFTER RETRY: $2"; fail=1; fi
+        echo "  *** STILL CORRUPT AFTER RE-PUSH: $2"; fail=1
     fi
 }
 
