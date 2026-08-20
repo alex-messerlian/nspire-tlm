@@ -46,12 +46,25 @@ static void run_tests(void) {
     /* ---- implicit multiplication binds tighter than / (physics unit notation) ---- */
     /* Regression: these all returned inverted denominators before 2026-08-20 and would have put
      * wrong units through the whole physics corpus. Found by design review, not by these tests. */
-    T("<tool>eval<arg>100 m/10 s</tool>",              "10 m/s");
-    T("<tool>eval<arg>12 V/0.25 A</tool>",             "48 ohm");
-    T("<tool>eval<arg>20 N/4 kg</tool>",               "5 m/s^2");
-    T("<tool>eval<arg>6 m/2 s</tool>",                 "3 m/s");
-    T("<tool>conv<arg>500 J/25 s<arg>W</tool>",        "20 W");
-    T("<tool>eval<arg>60 km/2 h</tool>",               "8.333333333 m/s");
+    /* AMBIGUOUS -- refused, not guessed. "100 m/10 s" wants (100 m)/(10 s) while "1/2 m v^2"
+     * wants (1/2)*m*v^2; no precedence satisfies both, so we reject rather than silently pick one.
+     * Same principle as solve() returning !nosol instead of an unreliable root. */
+    T("<tool>eval<arg>100 m/10 s</tool>",              "!expr");
+    T("<tool>eval<arg>12 V/0.25 A</tool>",             "!expr");
+    T("<tool>eval<arg>20 N/4 kg</tool>",               "!expr");
+    T("<tool>eval<arg>1/2 2 3</tool>",                 "!expr");
+    /* parenthesised forms are unambiguous and must work */
+    T("<tool>eval<arg>100 m/(10 s)</tool>",            "10 m/s");
+    T("<tool>eval<arg>12 V/(0.25 A)</tool>",           "48 ohm");
+    T("<tool>eval<arg>20 N/(4 kg)</tool>",             "5 m/s^2");
+    T("<tool>conv<arg>500 J/(25 s)<arg>W</tool>",      "20 W");
+    T("<tool>eval<arg>60 km/(2 h)</tool>",             "8.333333333 m/s");
+    /* single-factor denominators stay unambiguous */
+    T("<tool>eval<arg>9.8 m/s^2 * 3 s</tool>",         "29.4 m/s");
+    T("<tool>eval<arg>100 km/h</tool>",                "27.77777778 m/s");
+    /* canonical form: numeric factors pulled left regardless of nesting */
+    T("<tool>diff<arg>m*x^2<arg>x</tool>",             "2*m*x");
+    T("<tool>diff<arg>a*b*x^2<arg>x</tool>",           "2*a*b*x");
     /* explicit operators keep strict left-to-right */
     T("<tool>evalat<arg>1/2*x<arg>x<arg>8</tool>",     "4");
     T("<tool>eval<arg>100/10/2</tool>",                "5");

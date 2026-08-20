@@ -193,27 +193,44 @@ static int starts_primary(P *p) {
  * KNOWN COST, accepted: "1/2 x" now means 1/(2*x), not (1/2)*x. In a physics corpus that form is
  * rare -- coefficients are written 0.5x or x/2 -- and unit correctness is worth far more.
  * Explicit operators are unaffected: "1/2*x" is still (1/2)*x. */
-static node_t *parse_imul(P *p, int depth) {
+static node_t *parse_imul(P *p, int depth, int *nfactors) {
     node_t *l = parse_unary(p, depth);
     if (!l) return NULL;
+    int n = 1;
     while (starts_primary(p)) {
         node_t *r = parse_unary(p, depth + 1);
         if (!r) return NULL;
         l = ar_bin(p->a, N_MUL, l, r);
         if (!l) { p->err = E_RANGE; return NULL; }
+        n++;
     }
+    if (nfactors) *nfactors = n;
     return l;
 }
 
 static node_t *parse_mul(P *p, int depth) {
-    node_t *l = parse_imul(p, depth);
+    int dummy;
+    node_t *l = parse_imul(p, depth, &dummy);
     if (!l) return NULL;
     for (;;) {
         char c = peek(p);
         if (c != '*' && c != '/') break;
         p->p++;
-        node_t *r = parse_imul(p, depth + 1);
+        int nf = 1;
+        node_t *r = parse_imul(p, depth + 1, &nf);
         if (!r) return NULL;
+        /* AMBIGUITY GUARD -- refuse rather than guess.
+         *
+         * A '/' followed by an implicit-multiplication group of 2+ factors has no agreed reading:
+         *     100 m/10 s   a physicist means (100 m)/(10 s)   -> implicit binds TIGHTER
+         *     1/2 m v^2    a physicist means (1/2)*m*v^2      -> implicit binds LOOSER
+         * No single precedence satisfies both, and either choice silently produces a wrong answer
+         * in the other case. So we reject, exactly as solve() returns !nosol rather than an
+         * unreliable root. The generator emits explicit parentheses and is unaffected; a human
+         * typing an ambiguous form gets !expr instead of a confident wrong number.
+         *
+         * Single-factor denominators are unambiguous and still work: m/s, km/h, 9.8 m/s^2. */
+        if (c == '/' && nf > 1) { p->err = E_EXPR; return NULL; }
         l = ar_bin(p->a, c == '*' ? N_MUL : N_DIV, l, r);
         if (!l) { p->err = E_RANGE; return NULL; }
     }

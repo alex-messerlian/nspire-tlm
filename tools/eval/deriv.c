@@ -180,6 +180,13 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
             *changed = 1;
             return ar_bin(a, N_MUL, ar_num(a, l->num * r->kid[0]->num), r->kid[1]);
         }
+        /* Pull a numeric factor out of a right-nested product: m*(2*x) -> 2*(m*x). Without this,
+         * d/dx(m*x^2) renders "m*2*x" while d/dx(2*x^2) renders "4*x" -- equivalent expressions in
+         * different canonical forms, which puts both spellings into the corpus. */
+        if (!is_anynum(l) && r && r->t == N_MUL && is_anynum(r->kid[0])) {
+            *changed = 1;
+            return ar_bin(a, N_MUL, r->kid[0], ar_bin(a, N_MUL, l, r->kid[1]));
+        }
         /* Hoist negation out of a product: 2*(-x) -> -(2*x). Keeps MUL free of NEG children, which
          * is what lets the renderer drop parens around a leading unary minus safely. */
         if (l && l->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_MUL, l->kid[0], r)); }
