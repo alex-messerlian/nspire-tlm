@@ -59,7 +59,41 @@ static inline void screen_flush(void) {
     if (g_screen_ready) nio_fflush(nio_get_default());
 }
 
-#define printf screen_printf
+/* stderr and stdout both BLOCK under Ndless -- there is no console behind them. runq.c reports every
+ * error via fprintf(stderr, ...), so an error path would hang instead of reporting. Route those to
+ * the console; leave real file streams alone so log writes still work. */
+static inline int screen_fprintf(FILE *f, const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    int n;
+    if (f == stderr || f == stdout) {
+        char b[512];
+        n = vsnprintf(b, sizeof b, fmt, ap);
+        if (g_screen_ready) nio_puts(b);
+    } else {
+        n = vfprintf(f, fmt, ap);
+    }
+    va_end(ap);
+    return n;
+}
+
+static inline int screen_puts(const char *s) {
+    if (!g_screen_ready) return 0;
+    nio_puts(s); nio_puts("\n");
+    return 0;
+}
+
+static inline int screen_putchar(int c) {
+    if (!g_screen_ready) return c;
+    char b[2] = { (char)c, 0 };
+    nio_puts(b);
+    return c;
+}
+
+#define printf   screen_printf
+#define fprintf  screen_fprintf
+#define puts     screen_puts
+#define putchar  screen_putchar
 #endif /* NSPIRE_HOST_TEST */
 
 #endif

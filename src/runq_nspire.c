@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #if defined _TINSPIRE
     #include "nspire.h"
+    #include "nspire_screen.h"
 #elif defined _WIN32
     #include "win.h"
 #else
