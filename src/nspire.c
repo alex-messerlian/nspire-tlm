@@ -27,7 +27,14 @@ void nspire_set_checkpoint_path(const char *p) {
 
 void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long off) {
     (void)addr; (void)prot; (void)flags;
+    /* STEP TRACE. Three separate freezes have now cost a device round-trip each because "frozen
+     * during load" did not say WHERE. Every step announces itself to both screen and log. */
+    #define STEP(msg) do { printf("  " msg "\n"); screen_flush(); \
+        if (g_nspire_log) { fprintf(g_nspire_log, "step=" msg "\n"); fflush(g_nspire_log); } } while (0)
+
+    STEP("mmap:entry");
     void *p = malloc(len);
+    STEP("mmap:malloc-returned");
     if (!p) {
         /* Print via printf, NOT stderr: stderr is not routed to the nspireio console, so an
          * out-of-memory message on stderr is invisible and looks identical to a hang. */
@@ -52,8 +59,10 @@ void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long 
      * after 30 minutes, and no progress line was ever printed. bench_flash reads an 8 MB file
      * happily using plain fopen() with 64 KB chunks, so use exactly that proven route. The fd
      * runq.c opened is left alone; runq.c closes it itself. */
-    if (!g_ckpt_path[0]) { free(p); return MAP_FAILED; }
+    if (!g_ckpt_path[0]) { STEP("mmap:no-path"); free(p); return MAP_FAILED; }
+    STEP("mmap:before-fopen");
     FILE *fp = fopen(g_ckpt_path, "rb");
+    STEP("mmap:fopen-returned");
     if (!fp) {
         printf("cannot open %s\n", g_ckpt_path);
         screen_flush();
@@ -61,6 +70,7 @@ void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long 
         return MAP_FAILED;
     }
     if (off) fseek(fp, off, SEEK_SET);
+    STEP("mmap:before-first-read");
 
     unsigned char *q = (unsigned char *)p;
     size_t remaining = len, done = 0;
@@ -68,6 +78,7 @@ void *nspire_mmap(void *addr, size_t len, int prot, int flags, int fildes, long 
     while (remaining) {
         size_t want = remaining > CHUNK ? CHUNK : remaining;
         size_t got = fread(q, 1, want, fp);
+        if (done == 0) STEP("mmap:first-read-returned");
         if (got == 0) { free(p); return MAP_FAILED; }
         q += got; remaining -= got; done += got;
         unsigned pct = (unsigned)((done * 100) / len);

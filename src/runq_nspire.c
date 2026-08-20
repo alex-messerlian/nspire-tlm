@@ -258,8 +258,12 @@ void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weigh
 #ifdef _TINSPIRE
     nspire_set_checkpoint_path(checkpoint);
 #endif
+#ifdef _TINSPIRE
+    *fd = -1;   /* the shim opens the file itself; see nspire.c */
+#else
     *fd = open(checkpoint, O_RDONLY); // open in read only mode
     if (*fd == -1) { fprintf(stderr, "open failed!\n"); exit(EXIT_FAILURE); }
+#endif
     *data = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, *fd, 0);
     if (*data == MAP_FAILED) { fprintf(stderr, "mmap failed!\n"); exit(EXIT_FAILURE); }
     void* weights_ptr = ((char*)*data) + header_size; // skip header bytes. char is 1 byte
