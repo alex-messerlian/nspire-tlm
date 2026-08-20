@@ -943,7 +943,12 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         token = next;
 
         // init the timer here because the first iteration can be slower
+#ifdef _TINSPIRE
+        { long _now = time_in_ms();      /* poll every step; see port_runq.py edit 14 */
+          if (start == 0) { start = _now; } }
+#else
         if (start == 0) { start = time_in_ms(); }
+#endif
     }
     printf("\n");
 
