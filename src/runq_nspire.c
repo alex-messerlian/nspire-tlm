@@ -597,6 +597,12 @@ char* decode(Tokenizer* t, int prev_token, int token) {
 }
 
 void safe_printf(char *piece) {
+#ifdef _TINSPIRE
+    if (g_nspire_log && piece != NULL && piece[0] != '\0') {
+        fprintf(g_nspire_log, "%s", piece);
+        fflush(g_nspire_log);
+    }
+#endif
     // piece might be a raw byte token, and we only want to print printable chars or whitespace
     // because some of the other bytes can be various control codes, backspace, etc.
     if (piece == NULL) { return; }

@@ -47,7 +47,10 @@ static inline int screen_printf(const char *fmt, ...) {
     va_start(ap, fmt);
     int n = vsnprintf(buf, sizeof buf, fmt, ap);
     va_end(ap);
-    nio_puts(buf);
+    /* nio_fputs, NOT nio_puts: nio_puts follows C's puts() and APPENDS A NEWLINE. generate() emits
+     * one token per printf, so nio_puts put every token -- and every BPE sub-word fragment -- on its
+     * own line. The text was correct; the layout was not. */
+    nio_fputs(buf, nio_get_default());
     return n;
 }
 
@@ -65,7 +68,7 @@ static inline int screen_fprintf(FILE *f, const char *fmt, ...) {
     if (f == stderr || f == stdout) {
         char b[512];
         n = vsnprintf(b, sizeof b, fmt, ap);
-        if (g_screen_ready) nio_puts(b);
+        if (g_screen_ready) nio_fputs(b, nio_get_default());
     } else {
         n = vfprintf(f, fmt, ap);
     }
@@ -73,16 +76,18 @@ static inline int screen_fprintf(FILE *f, const char *fmt, ...) {
     return n;
 }
 
+/* Matches C's puts(): appends a newline, unlike screen_printf. */
 static inline int screen_puts(const char *s) {
     if (!g_screen_ready) return 0;
-    nio_puts(s); nio_puts("\n");
+    nio_fputs(s, nio_get_default());
+    nio_fputs("\n", nio_get_default());
     return 0;
 }
 
 static inline int screen_putchar(int c) {
     if (!g_screen_ready) return c;
     char b[2] = { (char)c, 0 };
-    nio_puts(b);
+    nio_fputs(b, nio_get_default());
     return c;
 }
 
