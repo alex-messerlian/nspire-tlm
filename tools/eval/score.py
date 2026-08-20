@@ -111,20 +111,32 @@ def score(item, output):
     return r
 
 def aggregate(rows, items):
+    """Metrics where LOW is good are ambiguous on their own: over_answer_rate reads 0.0 both when
+    the model refuses correctly and when nothing was parsed at all. Five of eight metrics share
+    that property, including result_span_leak. So aggregate() computes a LIVENESS figure first and
+    returns the low-is-good metrics as None when the pipeline is dead -- 'undefined' rather than a
+    number that reads as success. Found by positive_control.py after skip_special_tokens silently
+    stripped every tag score.py regexes on."""
     by = lambda c: [r for r in rows if r["cat"] == c]
     n  = lambda c: max(1, len(by(c)))
     A, B, C, D, E = (by(c) for c in "ABCDE")
+    calls_seen  = sum(r.get("n_calls", 0) for r in rows)
+    spans_seen  = sum(1 for r in rows if r.get("calls_valid") is not None)
+    alive = calls_seen > 0 and len(rows) > 0
+    nd = (lambda v: v if alive else None)          # None, not 0, when nothing was measured
     Efail = [r for r in E if items[r["id"]]["expect"] != "recover"]
     Erec  = [r for r in E if items[r["id"]]["expect"] == "recover"]
     return {
       "answer_accuracy":       sum(r["pass"] for r in A + B + C) / max(1, len(A + B + C)),
-      "over_answer_rate":      sum(not r["pass"] for r in D) / n("D"),
-      "over_refusal_rate":     sum(r.get("refused", False) for r in A) / n("A"),
-      "false_positive_call":   sum(r.get("emitted_call", False) for r in C) / n("C"),
+      "over_answer_rate": nd(sum(not r["pass"] for r in D) / n("D")),
+      "over_refusal_rate": nd(sum(r.get("refused", False) for r in A) / n("A")),
+      "false_positive_call": nd(sum(r.get("emitted_call", False) for r in C) / n("C")),
       "tool_call_validity":    sum(r.get("calls_valid", False) for r in A + B) / max(1, len(A + B)),
       "recovery_rate":         sum(r["pass"] for r in Erec) / max(1, len(Erec)),
-      "spurious_retry_rate":   sum(r.get("retried", False) for r in Efail) / max(1, len(Efail)),
-      "result_span_leak":      sum(r["result_span_leak"] for r in rows),
+      "spurious_retry_rate": nd(sum(r.get("retried", False) for r in Efail) / max(1, len(Efail))),
+      "result_span_leak":      nd(sum(r["result_span_leak"] for r in rows)),
+      "pipeline_alive":        alive,
+      "calls_seen":            calls_seen,
     }
 
 if __name__ == "__main__":

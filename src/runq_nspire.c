@@ -941,9 +941,28 @@ float random_f32(unsigned long long *state) { // random float32 in [0,1)
     return (random_u32(state) >> 8) / 16777216.0f;
 }
 
+/* Reserved ids 0-9 per PROMPT_FORMAT section 6; <res>=8, </res>=9. Fixed independently of
+ * vocabulary size, which is why this could be built before the vocab freeze. Declared here
+ * rather than in nspire.h because that header is device-only and the HOST build is the
+ * golden reference -- the ban must be identical on both or the transcripts diverge. */
+#ifdef NS_BAN_RES
+#define NS_NBANNED 2
+static const int NS_BANNED[NS_NBANNED] = { 8, 9 };
+#endif
+
 int sample(Sampler* sampler, float* logits) {
     // sample the token given the logits and some hyperparameters
     int next;
+#ifdef NS_BAN_RES
+    /* TOOL_SPEC 8.3: the model may never author a result span. Ban both ids outright.
+     * Gated on NS_BAN_RES because ids 8/9 are OUR reserved tokens only. The stories15M
+     * golden reference uses the Llama-2 vocabulary where 8 and 9 are ordinary tokens, so
+     * an unconditional ban would corrupt the transcript this port is validated against. */
+    for (int b = 0; b < NS_NBANNED; b++) {
+        int t = NS_BANNED[b];
+        if (t >= 0 && t < sampler->vocab_size) logits[t] = -1e30f;
+    }
+#endif
     if (sampler->temperature == 0.0f) {
         // greedy argmax sampling: take the token with the highest probability
         next = sample_argmax(logits, sampler->vocab_size);
