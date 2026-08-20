@@ -95,6 +95,8 @@ static const unit_t UNITS[] = {
 #define NUNITS ((int)(sizeof UNITS / sizeof UNITS[0]))
 
 int units_lookup(const char *name, quant_t *q, double *offset) {
+    if (q) q->ang = 0;                            /* no table unit is angle-tainted; deg/rad/rev
+                                                     are handled as constants in numeric.c */
     for (int i = 0; i < NUNITS; i++) {
         if (strcmp(UNITS[i].name, name) == 0) {
             q->v = UNITS[i].scale;

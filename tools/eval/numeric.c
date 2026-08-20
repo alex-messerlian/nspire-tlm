@@ -39,6 +39,7 @@ static err_t do_pow(quant_t base, quant_t ex, quant_t *out) {
 }
 
 static err_t call_fn(const char *name, quant_t *a, int n, quant_t *out) {
+    out->ang = 0;
     /* Everything here is dimensionless in and out. A transcendental of a dimensioned quantity is a
      * category error, so it is E_UNITS rather than a silent strip. */
     if (strcmp(name, "min") == 0 || strcmp(name, "max") == 0) {
@@ -59,7 +60,7 @@ static err_t call_fn(const char *name, quant_t *a, int n, quant_t *out) {
         if (a[0].v < 0) return E_DOMAIN;
         for (int i = 0; i < DIM_COUNT; i++) if (a[0].d.e[i] % 2) return E_UNITS;
         out->v = sqrt(a[0].v);
-        out->d = a[0].d;
+        out->d = a[0].d; out->ang = a[0].ang;
         for (int i = 0; i < DIM_COUNT; i++) out->d.e[i] = (signed char)(out->d.e[i] / 2);
         return E_NONE;
     }
@@ -91,11 +92,16 @@ static err_t call_fn(const char *name, quant_t *a, int n, quant_t *out) {
     if (isnan(r)) return E_DOMAIN;
     if (isinf(r)) return E_RANGE;
     out->v = r; out->d = DIM_NONE;
+    /* sin/cos/tan CONSUME an angle -- sin(30 deg) is a pure ratio, and (5 rev)/(2 s) is not.
+     * asin/acos/atan PRODUCE one, so naming their result in deg stays legal. */
+    out->ang = (strcmp(name, "asin") == 0 || strcmp(name, "acos") == 0 ||
+                strcmp(name, "atan") == 0) ? 1 : 0;
     return E_NONE;
 }
 
 err_t num_eval(const node_t *n, const binds_t *b, int use_units, quant_t *out) {
     if (!n) return E_EXPR;
+    out->ang = 0;                                 /* default-clear; only the cases below set it */
     quant_t l, r;
     err_t e;
 
@@ -113,9 +119,9 @@ err_t num_eval(const node_t *n, const binds_t *b, int use_units, quant_t *out) {
          * (m g h t s T A V C F N K) collide with the variables of every mechanics formula. No
          * physics variable is called deg, rad or rev, so there is nothing to collide with, and
          * exempting them keeps sin(30 deg) working -- degrees are pervasive in physics. */
-        if (strcmp(n->name, "deg") == 0) { out->v = 0.017453292519943295; out->d = DIM_NONE; return E_NONE; }
-        if (strcmp(n->name, "rad") == 0) { out->v = 1.0;                  out->d = DIM_NONE; return E_NONE; }
-        if (strcmp(n->name, "rev") == 0) { out->v = 6.283185307179586;    out->d = DIM_NONE; return E_NONE; }
+        if (strcmp(n->name, "deg") == 0) { out->v = 0.017453292519943295; out->d = DIM_NONE; out->ang = 1; return E_NONE; }
+        if (strcmp(n->name, "rad") == 0) { out->v = 1.0;                  out->d = DIM_NONE; out->ang = 1; return E_NONE; }
+        if (strcmp(n->name, "rev") == 0) { out->v = 6.283185307179586;    out->d = DIM_NONE; out->ang = 1; return E_NONE; }
         if (use_units) {
             quant_t q; double off;
             if (units_lookup(n->name, &q, &off)) {
@@ -128,27 +134,27 @@ err_t num_eval(const node_t *n, const binds_t *b, int use_units, quant_t *out) {
 
     case N_NEG:
         e = num_eval(n->kid[0], b, use_units, &l); if (e) return e;
-        out->v = -l.v; out->d = l.d; return E_NONE;
+        out->v = -l.v; out->d = l.d; out->ang = l.ang; return E_NONE;
 
     case N_ADD: case N_SUB:
         e = num_eval(n->kid[0], b, use_units, &l); if (e) return e;
         e = num_eval(n->kid[1], b, use_units, &r); if (e) return e;
         if (!dim_eq(l.d, r.d)) return E_UNITS;
         out->v = (n->t == N_ADD) ? l.v + r.v : l.v - r.v;
-        out->d = l.d;
+        out->d = l.d; out->ang = l.ang | r.ang;
         break;
 
     case N_MUL:
         e = num_eval(n->kid[0], b, use_units, &l); if (e) return e;
         e = num_eval(n->kid[1], b, use_units, &r); if (e) return e;
-        out->v = l.v * r.v; out->d = dim_add(l.d, r.d);
+        out->v = l.v * r.v; out->d = dim_add(l.d, r.d); out->ang = l.ang | r.ang;
         break;
 
     case N_DIV:
         e = num_eval(n->kid[0], b, use_units, &l); if (e) return e;
         e = num_eval(n->kid[1], b, use_units, &r); if (e) return e;
         if (r.v == 0.0) return E_DOMAIN;
-        out->v = l.v / r.v; out->d = dim_sub(l.d, r.d);
+        out->v = l.v / r.v; out->d = dim_sub(l.d, r.d); out->ang = l.ang | r.ang;
         break;
 
     case N_POW:

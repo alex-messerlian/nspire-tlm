@@ -43,7 +43,11 @@ enum { DIM_M, DIM_KG, DIM_S, DIM_A, DIM_K, DIM_MOL, DIM_CD, DIM_COUNT };
 
 typedef struct { signed char e[DIM_COUNT]; } dim_t;
 
-typedef struct { double v; dim_t d; } quant_t;   /* v is always in SI base units */
+/* `ang` marks a value that carries a SURVIVING angle factor -- one contributed by deg/rad/rev and
+ * not yet consumed by a trigonometric function. Angles are dimensionless, so `d` cannot see them,
+ * which is how (5 rev)/(2 s) came to render as "15.70796327 Hz" when the frequency is 2.5 Hz.
+ * See TOOL_SPEC section 8 invariant 6. Consumed by sin/cos/tan; produced by asin/acos/atan. */
+typedef struct { double v; dim_t d; unsigned char ang; } quant_t;   /* v is always in SI base units */
 
 int   dim_eq(dim_t a, dim_t b);
 int   dim_is_scalar(dim_t d);

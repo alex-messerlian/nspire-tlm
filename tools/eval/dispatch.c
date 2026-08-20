@@ -41,6 +41,21 @@ static err_t scalar_arg(const char *s, double *v) {
 
 /* Match "<scalar expression> <affine-unit-name>", e.g. "25 degC". Returns 1 and fills `q` with the
  * SI (kelvin) value, plus the unit's offset, on success. */
+static void strip_parens_inplace(char *s) {
+    for (;;) {
+        size_t L = strlen(s), b = 0;
+        while (s[b] == ' ') b++;
+        while (L > b && s[L-1] == ' ') L--;
+        if (L - b >= 2 && s[b] == '(' && s[L-1] == ')') {
+            int d = 0; size_t i;
+            for (i = b; i < L; i++) { if (s[i]=='(') d++; else if (s[i]==')') { d--; if (!d) break; } }
+            if (i != L - 1) { memmove(s, s + b, L - b); s[L-b] = 0; return; }
+            memmove(s, s + b + 1, L - b - 2); s[L-b-2] = 0; continue;
+        }
+        memmove(s, s + b, L - b); s[L-b] = 0; return;
+    }
+}
+
 static int affine_operand(const char *s, quant_t *q, double *offset) {
     size_t L = strlen(s);
     if (L == 0 || L >= MAX_ARG_BYTES) return 0;
@@ -68,6 +83,46 @@ static int affine_operand(const char *s, quant_t *q, double *offset) {
     *offset = off;
     return 1;
 }
+
+/* A DIFFERENCE of two absolute temperatures is a legitimate interval, even though each operand
+ * alone is affine and neither may enter a compound expression. Q=m*c*dT is unreachable without it:
+ * "heat 2 kg of water from 20 degC to 50 degC" has no expressible dT. Recognised shape is exactly
+ * "<scalar> <affine> - <scalar> <affine>" with the SAME unit on both sides; the result is an
+ * interval in K, so the offsets cancel and only the scale applies. A SUM of two absolute
+ * temperatures stays refused -- it has no physical meaning. */
+static int affine_difference(const char *s, quant_t *q) {
+    const char *m = NULL;
+    int depth = 0;
+    for (const char *c = s; *c; c++) {
+        if (*c == '(') depth++;
+        else if (*c == ')') depth--;
+        else if (*c == '-' && depth == 0 && c != s) {
+            const char *pv = c - 1;
+            while (pv > s && *pv == ' ') pv--;
+            if (*pv == '(' || *pv == '*' || *pv == '/' || *pv == '^' || *pv == '-' ||
+                *pv == '+' || *pv == 'e' || *pv == 'E') continue;   /* sign, not subtraction */
+            m = c;                                                   /* last top-level '-' wins */
+        }
+    }
+    if (!m) return 0;
+
+    char lhs[MAX_ARG_BYTES], rhs[MAX_ARG_BYTES];
+    size_t ln = (size_t)(m - s);
+    if (ln >= sizeof lhs || strlen(m + 1) >= sizeof rhs) return 0;
+    memcpy(lhs, s, ln); lhs[ln] = 0;
+    snprintf(rhs, sizeof rhs, "%s", m + 1);
+    strip_parens_inplace(lhs); strip_parens_inplace(rhs);
+
+    quant_t a, b; double oa = 0, ob = 0;
+    if (!affine_operand(lhs, &a, &oa)) return 0;
+    if (!affine_operand(rhs, &b, &ob)) return 0;
+    if (oa != ob) return 0;                       /* mixing degC and degF: refuse, do not guess */
+
+    q->v = a.v - b.v;                             /* both already converted to K by affine_operand */
+    q->d = a.d; q->ang = 0;
+    return 1;
+}
+
 
 static int valid_ident(const char *s) {
     if (!s || !*s || strlen(s) >= MAX_IDENT) return 0;
@@ -165,7 +220,7 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
          * is the only place a temperature conversion can be well defined. Handle that shape here:
          * "<scalar> <affine-unit>". */
         double from_off = 0;
-        if (!affine_operand(args[0], &from, &from_off)) {
+        if (!affine_operand(args[0], &from, &from_off) && !affine_difference(args[0], &from)) {
             if ((e = parse_expr(&g_arena, args[0], 0, &n))) return fail(e, out, out_sz);
             if ((e = num_eval(n, &nb, 1, &from))) return fail(e, out, out_sz);
         }
@@ -182,6 +237,13 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
         }
         if (!dim_eq(from.d, to.d)) return fail(E_UNITS, out, out_sz);
         if (to.v == 0)             return fail(E_UNITS, out, out_sz);
+
+        /* TOOL_SPEC section 8 invariant 6: no angle constant inside a rate. A surviving angle
+         * factor makes Hz wrong by exactly 2*pi -- (5 rev)/(2 s) is 15.708 rad/s and 2.5 Hz, and
+         * the dimension vector 1/s cannot tell those apart. Refuse rather than name it. A syntactic
+         * scan of the argument text would be wrong here: sin(30 deg)/(2 s) IS a legitimate 0.25 Hz,
+         * because sin consumed the angle. Only the taint bit distinguishes them. */
+        if (from.ang && !strcmp(args[1], "Hz")) return fail(E_UNITS, out, out_sz);
 
         double v = off != 0.0 ? (from.v - off) / to.v : from.v / to.v;
         char num[64];
