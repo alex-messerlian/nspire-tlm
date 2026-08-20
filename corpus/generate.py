@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+"""Synthetic document generator + diversity metrics.
+
+Token count is the wrong instrument: 310k documents from 27 record heads is 27 patterns repeated,
+and the token count looks identical to a genuinely varied corpus. Everything here is reported
+alongside three diversity measures, never alone."""
+import json, re, random, subprocess, collections, math, sys, time, pathlib
+
+VAR = re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
+RES = {"pi","e","sin","cos","tan","ln","log","sqrt","exp","d","f","x","t"}
+
+def usable(r):
+    """Physics-relation shape. The FIRST version of this filter passed Blv_d=55.0 and
+    Dsintheta=mlambda -- fluent documents in which three variables had been collapsed into one
+    identifier by the MathML converter. The diversity metrics scored that run as healthy
+    (0.62 distinct 4-gram, 95% head coverage), because diversity cannot see semantic garbage.
+    These two clauses are what catch it, and they are why a semantic gate exists separately."""
+    f = r["f"]
+    if "(" in f.split("=")[0]: return False               # f(x)= is a definition, not a relation
+    if re.search(r"[A-Za-z_]\d*\s*\*?\(", f): return False  # function application, incl. f*(x)
+    lhs, rhs = f.split("=", 1)
+    if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", lhs): return False
+    vs = {v for v in VAR.findall(rhs)} - {"pi","e"}
+    # SEMANTIC GATE: the answer must require arithmetic, not just echo a substituted value,
+    # and a relation with one variable teaches nothing about combining quantities.
+    if not re.search(r"[+\-*/^]", rhs): return False
+    # Prefix operators that the converter cannot distinguish from multiplication: Delta*V is
+    # "change in V", not Delta times V; d*x/d*t is a derivative, not four multiplied symbols.
+    # 7% of gated records. Dropped rather than shipped wrong -- the physics is silently altered
+    # otherwise, and no downstream gate would catch it.
+    if re.search(r"\b(Delta|d|partial|Sigma|nabla)\s*\*", f): return False
+    return 2 <= len(vs) <= 4 and len(rhs) <= 40
+
+recs = [r for r in json.load(open("corpus/records_raw.json")) if usable(r)]
+print(f"records usable as physics relations: {len(recs)} of 379 gated  "
+      f"(vs 27 heads in the eval set = {len(recs)/27:.1f}x)")
+
+# ---- phrasing templates. Style varies, facts do not. -------------------------
+ASK = ["What is the {q}?", "Find the {q}.", "Calculate the {q}.", "Determine the {q}.",
+       "Work out the {q}.", "Give the {q}.", "How large is the {q}?", "Compute the {q}."]
+GIVE = ["Given {g}, ", "With {g}, ", "If {g}, ", "For {g}, ", "Where {g}, ",
+        "Suppose {g}. ", "Take {g}. ", "A system has {g}. "]
+CLOSE = ["{v} = {a}. {why}", "The {q} is {a}. {why}", "{a}. {why}", "That gives {a}. {why}"]
+WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}.",
+       "This follows from {f}.", "{f} gives it."]
+
+def gen(n, seed=0):
+    rng = random.Random(seed)
+    docs, calls = [], []
+    for i in range(n):
+        r = rng.choice(recs)
+        lhs, rhs = r["f"].split("=", 1)
+        vs = sorted({v for v in VAR.findall(rhs)} - {"pi", "e"})
+        vals = {v: round(rng.uniform(1.5, 95), rng.choice([0, 1, 2])) or 2.0 for v in vs}
+        expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
+        g = ", ".join(f"{v} = {vals[v]}" for v in vs)
+        stem = rng.choice(GIVE).format(g=g)
+        ask  = rng.choice(ASK).format(q=r["name"].lower())
+        q = stem + (ask if stem.endswith(", ") and False else
+                    (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask))
+        docs.append({"q": q, "rec": f"{r['f']} | {' '.join(vs)}", "lhs": lhs,
+                     "name": r["name"], "head": r["f"],
+                     "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
+        calls.append(f"<tool>eval<arg>{expr}</tool>")
+    out = re.findall(r"<res>(.*?)</res>",
+          subprocess.run(["tools/eval/evalcli","-"], input="\n".join(calls)+"\n",
+                         capture_output=True, text=True).stdout, re.S)
+    built, dropped = [], 0
+    for d, c, res in zip(docs, calls, out):
+        if res.startswith("!"): dropped += 1; continue        # TOOL_SPEC 8.1: drop, never guess
+        ans = d["close"].format(v=d["lhs"], a=res, q=d["name"].lower(), why=d["why"])
+        built.append({"head": d["head"],
+                      "text": f"<q>{d['q']}</q><r>{d['rec']}{c}<res>{res}</res><a>{ans}<end>",
+                      "ans": ans})
+    return built, dropped
+
+# ---- diversity metrics -------------------------------------------------------
+def ngrams(s, n=4):
+    w = s.split()
+    return [tuple(w[i:i+n]) for i in range(max(0, len(w)-n+1))]
+
+def diversity(docs):
+    allg = [g for d in docs for g in ngrams(d["text"])]
+    heads = collections.Counter(d["head"] for d in docs)
+    # phrasing entropy per head: how many distinct answer shapes each head appears in
+    per = collections.defaultdict(set)
+    for d in docs: per[d["head"]].add(re.sub(r"[-\d.]+", "#", d["ans"]))
+    ent = []
+    for h, shapes in per.items():
+        c = collections.Counter()
+        for d in docs:
+            if d["head"] == h: c[re.sub(r"[-\d.]+", "#", d["ans"])] += 1
+        tot = sum(c.values())
+        ent.append(-sum((v/tot)*math.log2(v/tot) for v in c.values()) if tot > 1 else 0.0)
+    return {"distinct_4gram_ratio": len(set(allg))/max(1, len(allg)),
+            "head_coverage": len(heads)/len(recs),
+            "heads_used": len(heads),
+            "mean_phrasing_entropy_bits": sum(ent)/max(1, len(ent))}
+
+if __name__ == "__main__":
+    N = int(sys.argv[1]) if len(sys.argv) > 1 else 10000
+    t0 = time.time(); docs, dropped = gen(N, seed=20260820); el = time.time()-t0
+    chars = sum(len(d["text"]) for d in docs)
+    D = diversity(docs)
+    print(f"\ngenerated {len(docs):,} documents ({dropped} dropped on evaluator error) in {el:.1f}s")
+    print(f"  THROUGHPUT      {len(docs)/el:,.0f} docs/s   ->  185M tokens in "
+          f"{185e6*4.15/(chars/len(docs))/(len(docs)/el)/3600:.2f} h")
+    print(f"  chars/doc       {chars/len(docs):.0f}")
+    print(f"  tokens @4.15    {chars/4.15/1e6:.2f}M from this run")
+    print(f"\n  DIVERSITY  (never report the token count without these)")
+    print(f"    distinct 4-gram ratio        {D['distinct_4gram_ratio']:.4f}")
+    print(f"    head coverage                {D['head_coverage']*100:.1f}%  ({D['heads_used']} heads)")
+    print(f"    mean phrasing entropy        {D['mean_phrasing_entropy_bits']:.2f} bits/head")
+    pathlib.Path("corpus/synth_sample.jsonl").write_text(
+        "\n".join(json.dumps(d) for d in docs))
+    json.dump(D, open("corpus/diversity.json","w"), indent=1)
+    print("\n  sample:"); [print("   ", d["text"][:150]) for d in docs[:3]]
