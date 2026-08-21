@@ -934,8 +934,8 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "K_R": "1",
-   "T_c": "s",
-   "T_h": "s"
+   "T_c": "K",
+   "T_h": "K"
   },
   "units_unknown": []
  },
@@ -945,7 +945,7 @@
   "scope": "m58408",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "K_P": "J",
+   "K_P": "1",
    "T_c": "K",
    "T_h": "K"
   },
@@ -957,7 +957,7 @@
   "scope": "m58408",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Delta_S": "K",
+   "Delta_S": "J/K",
    "Q": "J",
    "T": "K"
   },
@@ -981,7 +981,7 @@
   "scope": "m58401",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "C_p": "J",
+   "C_p": "J/(mol*K)",
    "C_V": "J/(mol*K)",
    "R": "J/(mol*K)"
   },
@@ -993,7 +993,7 @@
   "scope": "m58401",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "gamma": "J",
+   "gamma": "J/(mol*K)",
    "C_V": "J/(mol*K)",
    "C_p": "J/(mol*K)"
   },
@@ -1006,12 +1006,12 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "V": "m^3",
+   "gamma": "1",
    "p": "Pa"
   },
   "units_unknown": [
    "p*(V)^(gamma)",
-   "constant",
-   "gamma"
+   "constant"
   ]
  },
  {
@@ -1021,7 +1021,7 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "C": "F",
-   "Q": "J",
+   "Q": "C",
    "V": "V"
   },
   "units_unknown": []
@@ -1034,11 +1034,10 @@
   "units_draft": {
    "C": "F",
    "A": "m^2",
-   "d": "m"
+   "d": "m",
+   "epsilon_0": "C^2/(N*m^2)"
   },
-  "units_unknown": [
-   "epsilon_0"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Capacitance of a vacuum spherical capacitor",
@@ -1048,11 +1047,10 @@
   "units_draft": {
    "C": "F",
    "R_1": "ohm",
-   "R_2": "ohm"
+   "R_2": "ohm",
+   "epsilon_0": "C^2/(N*m^2)"
   },
-  "units_unknown": [
-   "epsilon_0"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Energy density",
@@ -1307,11 +1305,11 @@
   "units_draft": {
    "v": "m/s",
    "R": "J/(mol*K)",
-   "T": "K"
+   "T": "K",
+   "gamma": "1"
   },
   "units_unknown": [
-   "M",
-   "gamma"
+   "M"
   ]
  },
  {
@@ -1334,7 +1332,7 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "I": "W/m^2",
-   "Delta_p_max": "kg*m/s",
+   "Delta_p_max": "Pa",
    "rho": "kg/m^3",
    "v": "m/s"
   },
@@ -1349,11 +1347,11 @@
    "B": "T",
    "I": "W/m^2",
    "I_0": "W/m^2",
+   "beta": "1",
    "d": "m"
   },
   "units_unknown": [
    "beta*(d*B)",
-   "beta",
    "log_10"
   ]
  },
@@ -1415,7 +1413,7 @@
    "p": "m",
    "g": "m/s^2",
    "h": "m",
-   "p_0": "kg*m/s",
+   "p_0": "Pa",
    "rho": "kg/m^3"
   },
   "units_unknown": []
@@ -1427,8 +1425,8 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "p_abs": "Pa",
-   "p_atm": "kg*m/s",
-   "p_g": "kg*m/s"
+   "p_atm": "Pa",
+   "p_g": "Pa"
   },
   "units_unknown": []
  },
@@ -1438,7 +1436,7 @@
   "scope": "m58359",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Q": "m^3",
+   "Q": "m^3/s",
    "V": "m^3",
    "d": "m",
    "t": "s"
@@ -1697,14 +1695,13 @@
   "scope": "m58756",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "L_solenoid": "H",
+   "L_solenoid": "m",
    "A": "m^2",
    "N": "1",
-   "l": "m"
+   "l": "m",
+   "mu_0": "T*m/A"
   },
-  "units_unknown": [
-   "mu_0"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Energy stored in an inductor",
@@ -1738,7 +1735,7 @@
   "units_draft": {
    "omega": "1/s",
    "C": "F",
-   "L": "kg*m^2/s"
+   "L": "H"
   },
   "units_unknown": []
  },
@@ -1791,7 +1788,7 @@
    "N": "1",
    "T": "K",
    "V": "m^3",
-   "k_B": "J/K",
+   "k_B": "N/m",
    "p": "Pa"
   },
   "units_unknown": [
@@ -1835,7 +1832,7 @@
   "scope": "m58394",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Q": "J",
+   "Q": "J/(mol*K)",
    "C_V": "J/(mol*K)",
    "Delta_T": "K",
    "n": "mol"
@@ -1848,9 +1845,9 @@
   "scope": "m58394",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "C_V": "J",
+   "C_V": "J/(mol*K)",
    "R": "J/(mol*K)",
-   "d": "m"
+   "d": "1"
   },
   "units_unknown": []
  },
@@ -1888,7 +1885,7 @@
    "v_d": "m/s",
    "A": "m^2",
    "I": "A",
-   "n": "1",
+   "n": "1/m^3",
    "q": "C"
   },
   "units_unknown": []
@@ -2243,7 +2240,7 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "K": "kg*m^2",
-   "I": "kg*m^2",
+   "I": "A",
    "omega": "1/s"
   },
   "units_unknown": []
@@ -2410,7 +2407,7 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "q*(t)": "C",
-   "Q": "J",
+   "Q": "C",
    "q": "C",
    "t": "s",
    "tau": "N*m"
@@ -2425,9 +2422,9 @@
   "units_draft": {
    "I*(t)": "A",
    "C": "F",
-   "I": "kg*m^2",
-   "Q": "J",
-   "R": "m",
+   "I": "A",
+   "Q": "C",
+   "R": "ohm",
    "t": "s",
    "tau": "N*m"
   },
@@ -2459,7 +2456,7 @@
   "units_draft": {
    "B": "T",
    "I": "A",
-   "R": "ohm",
+   "R": "m",
    "mu_0": "T*m/A"
   },
   "units_unknown": []
@@ -2472,11 +2469,11 @@
   "units_draft": {
    "B": "A",
    "I": "A",
-   "R": "ohm"
+   "R": "m",
+   "mu_0": "T*m/A"
   },
   "units_unknown": [
-   "atcenterofloop",
-   "mu_0"
+   "atcenterofloop"
   ]
  },
  {
@@ -2485,10 +2482,10 @@
   "scope": "m58467",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "B": "T",
+   "B": "V/m",
    "I": "A",
    "mu_0": "T*m/A",
-   "n": "1"
+   "n": "1/m"
   },
   "units_unknown": []
  },
@@ -2498,7 +2495,7 @@
   "scope": "m58467",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "B": "T",
+   "B": "V/m",
    "I": "A",
    "N": "1",
    "mu_0": "T*m/A",
@@ -2514,7 +2511,7 @@
   "units_draft": {
    "B": "T",
    "I": "A",
-   "n": "1"
+   "n": "1/m"
   },
   "units_unknown": [
    "mu"
@@ -2575,11 +2572,10 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "I_0": "A",
-   "V_0": "V"
+   "V_0": "V",
+   "Z": "ohm"
   },
-  "units_unknown": [
-   "Z"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Impedance of an RLC series circuit",
@@ -2603,7 +2599,7 @@
   "units_draft": {
    "omega_0": "1/s",
    "C": "F",
-   "L": "kg*m^2/s"
+   "L": "H"
   },
   "units_unknown": []
  },
@@ -2613,7 +2609,7 @@
   "scope": "m58494",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Q": "J",
+   "Q": "1",
    "Delta_omega": "1/s",
    "omega_0": "1/s"
   },
@@ -2625,7 +2621,7 @@
   "scope": "m58494",
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
-   "Q": "J",
+   "Q": "1",
    "L": "H",
    "R": "ohm",
    "omega_0": "1/s"
@@ -2678,7 +2674,7 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "v": "m/s",
-   "k": "N/m",
+   "k": "1/m",
    "omega": "1/s"
   },
   "units_unknown": []
@@ -2763,9 +2759,9 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "Delta_L": "m",
-   "Delta_T": "K",
+   "Delta_T": "s",
    "L": "m",
-   "alpha": "1/s^2"
+   "alpha": "1/K"
   },
   "units_unknown": []
  },
@@ -2777,8 +2773,8 @@
   "units_draft": {
    "Delta_A": "m^2",
    "A": "m^2",
-   "Delta_T": "K",
-   "alpha": "1/s^2"
+   "Delta_T": "s",
+   "alpha": "1/K"
   },
   "units_unknown": []
  },
@@ -2789,12 +2785,11 @@
   "title": "osbooks-university-physics-bundle",
   "units_draft": {
    "Delta_V": "m^3",
-   "Delta_T": "K",
-   "V": "m^3"
+   "Delta_T": "s",
+   "V": "m^3",
+   "beta": "1/K"
   },
-  "units_unknown": [
-   "beta"
-  ]
+  "units_unknown": []
  },
  {
   "name": "Heat transfer",
@@ -3275,7 +3270,7 @@
   "title": "osbooks-physics",
   "units_draft": {
    "I": "W/m^2",
-   "Delta_p": "kg*m/s",
+   "Delta_p": "Pa",
    "rho": "kg/m^3",
    "v_w": "m/s"
   },
@@ -3288,11 +3283,11 @@
   "title": "osbooks-physics",
   "units_draft": {
    "I": "W/m^2",
-   "I_0": "W/m^2"
+   "I_0": "W/m^2",
+   "beta": "1"
   },
   "units_unknown": [
    "beta*(dB)",
-   "beta",
    "dB",
    "log_10"
   ]
@@ -3304,7 +3299,7 @@
   "title": "osbooks-physics",
   "units_draft": {
    "N": "1",
-   "P": "Pa",
+   "P": "W",
    "T": "K",
    "V": "m^3",
    "k": "N/m"
@@ -3367,8 +3362,8 @@
   "scope": "m54426",
   "title": "osbooks-physics",
   "units_draft": {
-   "Delta_U_E": "J",
-   "E": "J",
+   "Delta_U_E": "V/m",
+   "E": "V/m",
    "q": "C",
    "x_f": "m",
    "x_i": "m"
@@ -3407,8 +3402,8 @@
   "scope": "m54426",
   "title": "osbooks-physics",
   "units_draft": {
-   "Delta_V": "C",
-   "E": "J",
+   "Delta_V": "V/m",
+   "E": "V/m",
    "x_f": "m",
    "x_i": "m"
   },
@@ -3433,7 +3428,7 @@
   "scope": "m54428",
   "title": "osbooks-physics",
   "units_draft": {
-   "E": "C",
+   "E": "V/m",
    "Q": "J",
    "k": "N/m",
    "r": "m"
@@ -4204,7 +4199,7 @@
   "title": "osbooks-physics",
   "units_draft": {
    "I": "s",
-   "Delta_Q": "J",
+   "Delta_Q": "C",
    "Delta_t": "s"
   },
   "units_unknown": []

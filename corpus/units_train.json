@@ -1,103 +1,101 @@
 [
  {
-  "f": "Delta_E_int=Q-W",
-  "name": "First law of thermodynamics",
+  "f": "K*E=((1)/(2))*m*(v)^(2)",
+  "name": "kinetic energy",
   "units": {
-   "Delta_E_int": "J",
-   "Q": "J",
-   "W": "J"
-  },
-  "scope": "m58401"
- },
- {
-  "f": "Delta_t=((h)/(E))",
-  "name": "Approximate time for exchange of a virtual particle between two other particles",
-  "units": {
-   "Delta_t": "s",
+   "K*E": "J",
    "E": "J",
-   "h": "J*s"
+   "K": "J",
+   "m": "kg",
+   "v": "m/s"
   },
-  "scope": "m58776"
+  "scope": "m54271"
  },
  {
-  "f": "F_c=m*a_c",
-  "name": "Centripetal force",
+  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
+  "name": "Distance",
   "units": {
-   "F_c": "N",
-   "a_c": "m/s^2",
-   "m": "kg"
+   "d": "m",
+   "x_1": "m",
+   "x_2": "m",
+   "y_1": "m",
+   "y_2": "m"
   },
-  "scope": "m54181"
+  "scope": "m51256"
  },
  {
-  "f": "W_o=F_o*d_o",
-  "name": "output work",
+  "f": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "name": "Potential-energy function of a harmonic oscillator",
   "units": {
-   "W_o": "J",
-   "F_o": "N",
+   "U(x)": "J",
+   "m": "kg",
+   "omega": "1/s",
+   "x": "m"
+  },
+  "scope": "m58582"
+ },
+ {
+  "f": "N=m*g*cos(theta)",
+  "name": "Normal force on an object resting on aninclined plane, scalar form",
+  "units": {
+   "N": "N",
+   "g": "m/s^2",
+   "m": "kg",
+   "theta": "1"
+  },
+  "scope": "m58301"
+ },
+ {
+  "f": "W=Q_h-Q_c",
+  "name": "Result of energy conservation",
+  "units": {
+   "W": "J",
+   "Q_c": "J",
+   "Q_h": "J"
+  },
+  "scope": "m58408"
+ },
+ {
+  "f": "F_l=-((d*U)/(d*l))",
+  "name": "Conservative force is the negative derivative of potential energy",
+  "units": {
+   "F_l": "N",
+   "U": "J",
+   "d": "m",
+   "l": "m"
+  },
+  "scope": "m58661"
+ },
+ {
+  "f": "W_net=K_B-K_A",
+  "name": "Work-energy theorem",
+  "units": {
+   "W_net": "J",
+   "K_A": "J",
+   "K_B": "J"
+  },
+  "scope": "m58310"
+ },
+ {
+  "f": "f=((d_i*d_o)/(d_o+d_i))",
+  "name": "lens/mirror equation (solved version)",
+  "units": {
+   "f": "m",
+   "d_i": "m",
    "d_o": "m"
   },
-  "scope": "m54274"
+  "scope": "m54357"
  },
  {
-  "f": "v_CM=R*omega",
-  "name": "Velocity of center of mass of rolling object",
+  "f": "I_2=I_1*((((r_1)/(r_2))))^(2)",
+  "name": "Decrease in intensity as a spherical wave expands",
   "units": {
-   "v_CM": "m/s",
-   "R": "m",
-   "omega": "1/s"
+   "I_2": "W/m^2",
+   "I_1": "W/m^2",
+   "r_1": "m",
+   "r_2": "m"
   },
-  "scope": "m58338"
- },
- {
-  "f": "Delta_d=d_f-d_0",
-  "name": "Displacement",
-  "units": {
-   "Delta_d": "m",
-   "d_0": "m",
-   "d_f": "m"
-  },
-  "scope": "m54108"
- },
- {
-  "f": "a_c=(((v)^(2))/(r))",
-  "name": "Centripetal acceleration",
-  "units": {
-   "a_c": "m/s^2",
-   "r": "m",
-   "v": "m/s"
-  },
-  "scope": "m54181"
- },
- {
-  "f": "P=((1)/(f))",
-  "name": "Optical power",
-  "units": {
-   "P": "1/m",
-   "f": "m"
-  },
-  "scope": "m58534"
- },
- {
-  "f": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))",
-  "name": "Relativistic Doppler effect for frequency",
-  "units": {
-   "f_obs": "Hz",
-   "c": "m/s",
-   "f_s": "Hz",
-   "v": "m/s"
-  },
-  "scope": "m58572"
- },
- {
-  "f": "alpha=((Delta_omega)/(Delta_t))",
-  "name": "Angular acceleration",
-  "units": {
-   "alpha": "1/s^2",
-   "Delta_omega": "1/s",
-   "Delta_t": "s"
-  },
-  "scope": "m54180"
+  "scope": "m58382"
  },
  {
   "f": "Delta_E=h*f",
@@ -110,6 +108,50 @@
   "scope": "m58766"
  },
  {
+  "f": "A=((1)/(2))*theta*(r)^(2)",
+  "name": "area of a sector",
+  "units": {
+   "A": "m^2",
+   "r": "m",
+   "theta": "1"
+  },
+  "scope": "m51283"
+ },
+ {
+  "f": "d_CM=R*theta",
+  "name": "Displacement of center of mass of rolling object",
+  "units": {
+   "d_CM": "m",
+   "R": "m",
+   "theta": "1"
+  },
+  "scope": "m58338"
+ },
+ {
+  "f": "C=epsilon_0*((A)/(d))",
+  "name": "Capacitance of a parallel-plate capacitor",
+  "units": {
+   "C": "F",
+   "A": "m^2",
+   "d": "m",
+   "epsilon_0": "C^2/(N*m^2)"
+  },
+  "scope": "m58452"
+ },
+ {
+  "f": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))",
+  "name": "Acceleration of an object rolling without slipping",
+  "units": {
+   "a_CM": "m/s^2",
+   "I_CM": "kg*m^2",
+   "g": "m/s^2",
+   "m": "kg",
+   "r": "m",
+   "theta": "1"
+  },
+  "scope": "m58338"
+ },
+ {
   "f": "v=((s)/(t))",
   "name": "linear speed",
   "units": {
@@ -120,15 +162,103 @@
   "scope": "m51283"
  },
  {
-  "f": "omega_f=omega_0+alpha*t",
-  "name": "Angular velocity from constant angular acceleration",
+  "f": "v_CM=R*omega",
+  "name": "Velocity of center of mass of rolling object",
   "units": {
-   "omega_f": "1/s",
-   "alpha": "1/s^2",
-   "omega_0": "1/s",
-   "t": "s"
+   "v_CM": "m/s",
+   "R": "m",
+   "omega": "1/s"
   },
-  "scope": "m58333"
+  "scope": "m58338"
+ },
+ {
+  "f": "e=1-((T_c)/(T_h))",
+  "name": "Resulting efficiency of a Carnot cycle",
+  "units": {
+   "e": "1",
+   "T_c": "K",
+   "T_h": "K"
+  },
+  "scope": "m58408"
+ },
+ {
+  "f": "s=r*theta",
+  "name": "arc length",
+  "units": {
+   "s": "m",
+   "r": "m",
+   "theta": "1"
+  },
+  "scope": "m51283"
+ },
+ {
+  "f": "P=((1)/(f))",
+  "name": "Optical power",
+  "units": {
+   "P": "1/m",
+   "f": "m"
+  },
+  "scope": "m58534"
+ },
+ {
+  "f": "T_tof=((2(v_0*sin(theta_0)))/(g))",
+  "name": "Time of flight",
+  "units": {
+   "T_tof": "s",
+   "g": "m/s^2",
+   "theta_0": "1",
+   "v_0": "m/s"
+  },
+  "scope": "m58293"
+ },
+ {
+  "f": "V_rms=((V_0)/(sqrt(2)))",
+  "name": "rms voltage",
+  "units": {
+   "V_rms": "V",
+   "V_0": "V"
+  },
+  "scope": "m58494"
+ },
+ {
+  "f": "v=((omega)/(k))",
+  "name": "Wave speed",
+  "units": {
+   "v": "m/s",
+   "k": "1/m",
+   "omega": "1/s"
+  },
+  "scope": "m58373"
+ },
+ {
+  "f": "F_c=m*a_c",
+  "name": "Centripetal force",
+  "units": {
+   "F_c": "N",
+   "a_c": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m54181"
+ },
+ {
+  "f": "a=((Delta_v)/(Delta_t))",
+  "name": "Acceleration",
+  "units": {
+   "a": "m/s^2",
+   "Delta_t": "s",
+   "Delta_v": "m/s"
+  },
+  "scope": "m54094"
+ },
+ {
+  "f": "tau=R*C",
+  "name": "Time constant",
+  "units": {
+   "tau": "s",
+   "C": "F",
+   "R": "ohm"
+  },
+  "scope": "m58458"
  },
  {
   "f": "a_CM=R*alpha",
@@ -141,34 +271,33 @@
   "scope": "m58338"
  },
  {
-  "f": "v=lambda*f",
-  "name": "speed of light",
+  "f": "f_B=|f_1-f_2|",
+  "name": "beat frequency",
   "units": {
-   "v": "m/s",
-   "f": "Hz",
-   "lambda": "m"
+   "f_B": "Hz",
+   "f_1": "Hz",
+   "f_2": "Hz"
   },
-  "scope": "m54280"
+  "scope": "m54335"
  },
  {
-  "f": "I=((P)/(4*pi*(r)^(2)))",
-  "name": "Intensity for a spherical wave",
+  "f": "T_F=((E_F)/(k_B))",
+  "name": "Fermi temperature",
   "units": {
-   "I": "W/m^2",
-   "P": "W",
-   "r": "m"
+   "T_F": "K",
+   "E_F": "J",
+   "k_B": "J/K"
   },
-  "scope": "m58373"
+  "scope": "m58602"
  },
  {
-  "f": "E=(Delta_m)(c)^(2)",
-  "name": "Binding energy",
+  "f": "I_rms=((I_0)/(sqrt(2)))",
+  "name": "rms current",
   "units": {
-   "E": "J",
-   "Delta_m": "kg",
-   "c": "m/s"
+   "I_rms": "A",
+   "I_0": "A"
   },
-  "scope": "m58614"
+  "scope": "m58494"
  },
  {
   "f": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
@@ -193,14 +322,14 @@
   "scope": "m58301"
  },
  {
-  "f": "v=f*lambda",
-  "name": "Velocity of a wave",
+  "f": "a_C=(((v)^(2))/(r))",
+  "name": "Centripetal acceleration",
   "units": {
-   "v": "m/s",
-   "f": "Hz",
-   "lambda": "m"
+   "a_C": "m/s^2",
+   "r": "m",
+   "v": "m/s"
   },
-  "scope": "m58382"
+  "scope": "m58293"
  },
  {
   "f": "U_form=E_transfer+U_coul+U_ex",
@@ -214,173 +343,88 @@
   "scope": "m58602"
  },
  {
-  "f": "e=1-((T_c)/(T_h))",
-  "name": "Resulting efficiency of a Carnot cycle",
-  "units": {
-   "e": "1",
-   "T_c": "K",
-   "T_h": "K"
-  },
-  "scope": "m58408"
- },
- {
-  "f": "T=((1)/(f))",
-  "name": "period",
+  "f": "T=2*pi*sqrt(((m)/(k)))",
+  "name": "Period of a mass-spring system in SHM",
   "units": {
    "T": "s",
-   "f": "Hz"
+   "k": "N/m",
+   "m": "kg"
   },
-  "scope": "m54321"
+  "scope": "m58366"
  },
  {
-  "f": "v_t=r*omega",
-  "name": "Tangential speed",
+  "f": "F=q*v*B*sin(theta)",
+  "name": "Magnitude of magnetic force",
   "units": {
-   "v_t": "m/s",
-   "omega": "1/s",
-   "r": "m"
-  },
-  "scope": "m58333"
- },
- {
-  "f": "P=tau*omega",
-  "name": "Rotational power",
-  "units": {
-   "P": "W",
-   "omega": "1/s",
-   "tau": "N*m"
-  },
-  "scope": "m58333"
- },
- {
-  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
-  "name": "Distance",
-  "units": {
-   "d": "m",
-   "x_1": "m",
-   "x_2": "m",
-   "y_1": "m",
-   "y_2": "m"
-  },
-  "scope": "m51256"
- },
- {
-  "f": "T=((2*pi*m)/(q*B))",
-  "name": "Period of a particle\u2019s motion in a magnetic field",
-  "units": {
-   "T": "s",
+   "F": "N",
    "B": "T",
-   "m": "kg",
-   "q": "C"
+   "q": "C",
+   "theta": "1",
+   "v": "m/s"
   },
   "scope": "m58745"
  },
  {
-  "f": "B=((mu_0*N*I)/(2*pi*r))",
-  "name": "Magnetic field strength inside a toroid",
+  "f": "Q=((d*V)/(d*t))",
+  "name": "Volume flow rate",
   "units": {
-   "B": "T",
-   "I": "A",
-   "N": "1",
-   "mu_0": "T*m/A",
-   "r": "m"
+   "Q": "m^3/s",
+   "V": "m^3",
+   "d": "m",
+   "t": "s"
   },
-  "scope": "m58467"
+  "scope": "m58359"
  },
  {
-  "f": "W_net=K_B-K_A",
+  "f": "W_o=F_o*d_o",
+  "name": "output work",
+  "units": {
+   "W_o": "J",
+   "F_o": "N",
+   "d_o": "m"
+  },
+  "scope": "m54274"
+ },
+ {
+  "f": "h_i=(((n_2)/(n_1)))*h_o",
+  "name": "Apparent depth equation",
+  "units": {
+   "h_i": "m",
+   "h_o": "m",
+   "n_1": "1",
+   "n_2": "1"
+  },
+  "scope": "m58534"
+ },
+ {
+  "f": "p_abs=p_g+p_atm",
+  "name": "Absolute pressure",
+  "units": {
+   "p_abs": "Pa",
+   "p_atm": "Pa",
+   "p_g": "Pa"
+  },
+  "scope": "m58359"
+ },
+ {
+  "f": "v=lambda*f",
+  "name": "speed of light",
+  "units": {
+   "v": "m/s",
+   "f": "Hz",
+   "lambda": "m"
+  },
+  "scope": "m54280"
+ },
+ {
+  "f": "W_AB=K_B-K_A",
   "name": "Work-energy theorem",
   "units": {
-   "W_net": "J",
+   "W_AB": "J",
    "K_A": "J",
    "K_B": "J"
   },
-  "scope": "m58310"
- },
- {
-  "f": "L=I*omega",
-  "name": "Angular momentum of a rotating rigid body",
-  "units": {
-   "L": "kg*m^2/s",
-   "I": "kg*m^2",
-   "omega": "1/s"
-  },
-  "scope": "m58338"
- },
- {
-  "f": "n_1*sin(theta_1)=n_2*sin(theta_2)",
-  "name": "Law of refraction (Snell\u2019s law)",
-  "units": {
-   "n_1*sin(theta_1)": "1",
-   "n_1": "1",
-   "n_2": "1",
-   "theta_1": "1",
-   "theta_2": "1"
-  },
-  "scope": "m58525"
- },
- {
-  "f": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))",
-  "name": "Acceleration of an object rolling without slipping",
-  "units": {
-   "a_CM": "m/s^2",
-   "I_CM": "kg*m^2",
-   "g": "m/s^2",
-   "m": "kg",
-   "r": "m",
-   "theta": "1"
-  },
-  "scope": "m58338"
- },
- {
-  "f": "T_F=((E_F)/(k_B))",
-  "name": "Fermi temperature",
-  "units": {
-   "T_F": "K",
-   "E_F": "J",
-   "k_B": "J/K"
-  },
-  "scope": "m58602"
- },
- {
-  "f": "F=-k*x",
-  "name": "Hooke\u2019s law",
-  "units": {
-   "F": "N",
-   "k": "N/m",
-   "x": "m"
-  },
-  "scope": "m54154"
- },
- {
-  "f": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
-  "name": "Potential-energy function of a harmonic oscillator",
-  "units": {
-   "U(x)": "J",
-   "m": "kg",
-   "omega": "1/s",
-   "x": "m"
-  },
-  "scope": "m58582"
- },
- {
-  "f": "p_f=((h)/(lambda))",
-  "name": "Magnitude of photon\u2019s momentum",
-  "units": {
-   "p_f": "kg*m/s",
-   "h": "J*s",
-   "lambda": "m"
-  },
-  "scope": "m58766"
- },
- {
-  "f": "f=((R)/(2))",
-  "name": "Focal length for a spherical mirror",
-  "units": {
-   "f": "m",
-   "R": "m"
-  },
-  "scope": "m58534"
+  "scope": "m58333"
  },
  {
   "f": "B*E=h*f_O",
@@ -395,6 +439,35 @@
   "scope": "m54559"
  },
  {
+  "f": "omega=sqrt(((k)/(m)))",
+  "name": "Angular frequency of a mass-spring system in SHM",
+  "units": {
+   "omega": "1/s",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366"
+ },
+ {
+  "f": "f=((R)/(2))",
+  "name": "Focal length for a spherical mirror",
+  "units": {
+   "f": "m",
+   "R": "m"
+  },
+  "scope": "m58534"
+ },
+ {
+  "f": "U_E=((1)/(2))*C*(V)^(2)",
+  "name": "energy stored in a capacitor",
+  "units": {
+   "U_E": "J",
+   "C": "F",
+   "V": "V"
+  },
+  "scope": "m63179"
+ },
+ {
   "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)",
   "name": "Displacement with constant acceleration",
   "units": {
@@ -407,23 +480,35 @@
   "scope": "m54116"
  },
  {
-  "f": "lambda_n=((lambda)/(n))",
-  "name": "change of wavelength with index of refraction",
+  "f": "theta_r=theta_i",
+  "name": "Law of reflection",
   "units": {
-   "lambda_n": "m",
-   "lambda": "m",
-   "n": "1"
+   "theta_r": "1",
+   "theta_i": "1"
   },
-  "scope": "m54369"
+  "scope": "m58525"
  },
  {
-  "f": "V_rms=((V_0)/(sqrt(2)))",
-  "name": "rms voltage",
+  "f": "v_t=r*omega",
+  "name": "Tangential speed",
   "units": {
-   "V_rms": "V",
-   "V_0": "V"
+   "v_t": "m/s",
+   "omega": "1/s",
+   "r": "m"
   },
-  "scope": "m58494"
+  "scope": "m58333"
+ },
+ {
+  "f": "n_1*sin(theta_1)=n_2*sin(theta_2)",
+  "name": "Law of refraction (Snell\u2019s law)",
+  "units": {
+   "n_1*sin(theta_1)": "1",
+   "n_1": "1",
+   "n_2": "1",
+   "theta_1": "1",
+   "theta_2": "1"
+  },
+  "scope": "m58525"
  },
  {
   "f": "Delta_U=Q-W",
@@ -436,44 +521,14 @@
   "scope": "m54305"
  },
  {
-  "f": "E_0=m*(c)^(2)",
-  "name": "rest energy",
+  "f": "omega=((theta)/(t))",
+  "name": "angular speed",
   "units": {
-   "E_0": "J",
-   "c": "m/s",
-   "m": "kg"
-  },
-  "scope": "m54282"
- },
- {
-  "f": "s=r*theta",
-  "name": "arc length",
-  "units": {
-   "s": "m",
-   "r": "m",
+   "omega": "1/s",
+   "t": "s",
    "theta": "1"
   },
   "scope": "m51283"
- },
- {
-  "f": "omega=((Delta_theta)/(Delta_t))",
-  "name": "Angular speed:",
-  "units": {
-   "omega": "1/s",
-   "Delta_t": "s",
-   "Delta_theta": "1"
-  },
-  "scope": "m54176"
- },
- {
-  "f": "f=((d_i*d_o)/(d_o+d_i))",
-  "name": "lens/mirror equation (solved version)",
-  "units": {
-   "f": "m",
-   "d_i": "m",
-   "d_o": "m"
-  },
-  "scope": "m54357"
  },
  {
   "f": "v=v_0+a*t",
@@ -487,6 +542,26 @@
   "scope": "m54094"
  },
  {
+  "f": "I=((P)/(A))",
+  "name": "Intensity",
+  "units": {
+   "I": "W/m^2",
+   "A": "m^2",
+   "P": "W"
+  },
+  "scope": "m58373"
+ },
+ {
+  "f": "F=-k*x",
+  "name": "Hooke\u2019s law",
+  "units": {
+   "F": "N",
+   "k": "N/m",
+   "x": "m"
+  },
+  "scope": "m54154"
+ },
+ {
   "f": "M=((theta_image)/(theta_object))",
   "name": "Angular magnification M of a simple magnifier",
   "units": {
@@ -497,13 +572,134 @@
   "scope": "m58534"
  },
  {
-  "f": "I_rms=((I_0)/(sqrt(2)))",
-  "name": "rms current",
+  "f": "a_t=r*alpha",
+  "name": "Tangential acceleration",
   "units": {
-   "I_rms": "A",
-   "I_0": "A"
+   "a_t": "m/s^2",
+   "alpha": "1/s^2",
+   "r": "m"
+  },
+  "scope": "m58333"
+ },
+ {
+  "f": "I_0=((V_0)/(Z))",
+  "name": "AC version of Ohm\u2019s law",
+  "units": {
+   "I_0": "A",
+   "V_0": "V",
+   "Z": "ohm"
   },
   "scope": "m58494"
+ },
+ {
+  "f": "omega_0=sqrt(((k)/(m)))",
+  "name": "Natural angular frequency of amass-spring system",
+  "units": {
+   "omega_0": "1/s",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366"
+ },
+ {
+  "f": "Delta_l=d*sin(theta)",
+  "name": "Path length difference for waves from two slits to a common point on a screen",
+  "units": {
+   "Delta_l": "m",
+   "d": "m",
+   "theta": "1"
+  },
+  "scope": "m58541"
+ },
+ {
+  "f": "W_i=F_i*d_i",
+  "name": "input work",
+  "units": {
+   "W_i": "J",
+   "F_i": "N",
+   "d_i": "m"
+  },
+  "scope": "m54274"
+ },
+ {
+  "f": "C=((Q)/(V))",
+  "name": "Capacitance",
+  "units": {
+   "C": "F",
+   "Q": "C",
+   "V": "V"
+  },
+  "scope": "m58452"
+ },
+ {
+  "f": "a_c=(((v)^(2))/(r))",
+  "name": "Centripetal acceleration",
+  "units": {
+   "a_c": "m/s^2",
+   "r": "m",
+   "v": "m/s"
+  },
+  "scope": "m54181"
+ },
+ {
+  "f": "T=((1)/(f))",
+  "name": "period",
+  "units": {
+   "T": "s",
+   "f": "Hz"
+  },
+  "scope": "m54321"
+ },
+ {
+  "f": "Delta_d=d_f-d_0",
+  "name": "Displacement",
+  "units": {
+   "Delta_d": "m",
+   "d_0": "m",
+   "d_f": "m"
+  },
+  "scope": "m54108"
+ },
+ {
+  "f": "v=r*omega",
+  "name": "Tangential speed:",
+  "units": {
+   "v": "m/s",
+   "omega": "1/s",
+   "r": "m"
+  },
+  "scope": "m54176"
+ },
+ {
+  "f": "omega_f=omega_0+alpha*t",
+  "name": "Angular velocity from constant angular acceleration",
+  "units": {
+   "omega_f": "1/s",
+   "alpha": "1/s^2",
+   "omega_0": "1/s",
+   "t": "s"
+  },
+  "scope": "m58333"
+ },
+ {
+  "f": "F_net=m*a",
+  "name": "Newton\u2019s second law, scalar form",
+  "units": {
+   "F_net": "N",
+   "a": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m58301"
+ },
+ {
+  "f": "I=((P)/(4*pi*(r)^(2)))",
+  "name": "Intensity for a spherical wave",
+  "units": {
+   "I": "W/m^2",
+   "P": "W",
+   "r": "m"
+  },
+  "scope": "m58373"
  },
  {
   "f": "r=((m*v)/(q*B))",
@@ -518,26 +714,14 @@
   "scope": "m58745"
  },
  {
-  "f": "theta=((s)/(r))",
-  "name": "Angular position",
+  "f": "lambda=((h)/(p))",
+  "name": "The de Broglie wavelength",
   "units": {
-   "theta": "1",
-   "r": "m",
-   "s": "m"
+   "lambda": "m",
+   "h": "J*s",
+   "p": "kg*m/s"
   },
-  "scope": "m58333"
- },
- {
-  "f": "K*E=((1)/(2))*m*(v)^(2)",
-  "name": "kinetic energy",
-  "units": {
-   "K*E": "J",
-   "E": "J",
-   "K": "J",
-   "m": "kg",
-   "v": "m/s"
-  },
-  "scope": "m54271"
+  "scope": "m58766"
  },
  {
   "f": "P=(I)^(2)*R",
@@ -548,107 +732,6 @@
    "R": "ohm"
   },
   "scope": "m54446"
- },
- {
-  "f": "F_l=-((d*U)/(d*l))",
-  "name": "Conservative force is the negative derivative of potential energy",
-  "units": {
-   "F_l": "N",
-   "U": "J",
-   "d": "m",
-   "l": "m"
-  },
-  "scope": "m58661"
- },
- {
-  "f": "U_E=((1)/(2))*C*(V)^(2)",
-  "name": "energy stored in a capacitor",
-  "units": {
-   "U_E": "J",
-   "C": "F",
-   "V": "V"
-  },
-  "scope": "m63179"
- },
- {
-  "f": "I_S=((N_P)/(N_S))*I_P",
-  "name": "Transformer equation with current",
-  "units": {
-   "I_S": "A",
-   "I_P": "A",
-   "N_P": "1",
-   "N_S": "1"
-  },
-  "scope": "m58494"
- },
- {
-  "f": "F_net=m*a",
-  "name": "Newton\u2019s second law, scalar form",
-  "units": {
-   "F_net": "N",
-   "a": "m/s^2",
-   "m": "kg"
-  },
-  "scope": "m58301"
- },
- {
-  "f": "p=((h)/(lambda))",
-  "name": "momentum of a photon (deBroglie relation)",
-  "units": {
-   "p": "kg*m/s",
-   "h": "J*s",
-   "lambda": "m"
-  },
-  "scope": "m54552"
- },
- {
-  "f": "V=((U_E)/(q))",
-  "name": "definition of electric potential",
-  "units": {
-   "V": "V",
-   "U_E": "J",
-   "q": "C"
-  },
-  "scope": "m54426"
- },
- {
-  "f": "tau=R*C",
-  "name": "Time constant",
-  "units": {
-   "tau": "s",
-   "C": "F",
-   "R": "ohm"
-  },
-  "scope": "m58458"
- },
- {
-  "f": "Delta_theta=((Delta_s)/(r))",
-  "name": "Angle of rotation",
-  "units": {
-   "Delta_theta": "1",
-   "Delta_s": "m",
-   "r": "m"
-  },
-  "scope": "m54176"
- },
- {
-  "f": "theta_r=theta_i",
-  "name": "Law of reflection",
-  "units": {
-   "theta_r": "1",
-   "theta_i": "1"
-  },
-  "scope": "m58525"
- },
- {
-  "f": "E=m*(c)^(2)",
-  "name": "energy\u2013mass conversion",
-  "units": {
-   "E": "J",
-   "c": "m/s",
-   "m": "kg"
-  },
-  "scope": "m54574"
  },
  {
   "f": "E=n*h*f",
@@ -662,6 +745,67 @@
   "scope": "m54566"
  },
  {
+  "f": "lambda_n=((lambda)/(n))",
+  "name": "change of wavelength with index of refraction",
+  "units": {
+   "lambda_n": "m",
+   "lambda": "m",
+   "n": "1"
+  },
+  "scope": "m54369"
+ },
+ {
+  "f": "B=((mu_0*I)/(2*pi*R))",
+  "name": "Magnetic field due to along straight wire",
+  "units": {
+   "B": "T",
+   "I": "A",
+   "R": "m",
+   "mu_0": "T*m/A"
+  },
+  "scope": "m58467"
+ },
+ {
+  "f": "E=m*(c)^(2)",
+  "name": "energy\u2013mass conversion",
+  "units": {
+   "E": "J",
+   "c": "m/s",
+   "m": "kg"
+  },
+  "scope": "m54574"
+ },
+ {
+  "f": "V=((U_E)/(q))",
+  "name": "definition of electric potential",
+  "units": {
+   "V": "V",
+   "U_E": "J",
+   "q": "C"
+  },
+  "scope": "m54426"
+ },
+ {
+  "f": "p=((h)/(lambda))",
+  "name": "momentum of a photon (deBroglie relation)",
+  "units": {
+   "p": "kg*m/s",
+   "h": "J*s",
+   "lambda": "m"
+  },
+  "scope": "m54552"
+ },
+ {
+  "f": "P=tau*omega",
+  "name": "Rotational power",
+  "units": {
+   "P": "W",
+   "omega": "1/s",
+   "tau": "N*m"
+  },
+  "scope": "m58333"
+ },
+ {
   "f": "v_w=((lambda)/(T))",
   "name": "wave velocity",
   "units": {
@@ -672,63 +816,46 @@
   "scope": "m54321"
  },
  {
-  "f": "I=((P)/(A))",
-  "name": "Intensity",
+  "f": "v=f*lambda",
+  "name": "Velocity of a wave",
   "units": {
-   "I": "W/m^2",
-   "A": "m^2",
-   "P": "W"
-  },
-  "scope": "m58373"
- },
- {
-  "f": "P=(((V)^(2))/(R))",
-  "name": "for a given voltage difference V across a resistor R, the electric power dissipated",
-  "units": {
-   "P": "W",
-   "R": "ohm",
-   "V": "V"
-  },
-  "scope": "m54446"
- },
- {
-  "f": "f=((1)/(T))",
-  "name": "Relationship between frequency and period",
-  "units": {
+   "v": "m/s",
    "f": "Hz",
-   "T": "s"
+   "lambda": "m"
   },
-  "scope": "m58366"
+  "scope": "m58382"
  },
  {
-  "f": "W_i=F_i*d_i",
-  "name": "input work",
+  "f": "E_0=m*(c)^(2)",
+  "name": "rest energy",
   "units": {
-   "W_i": "J",
-   "F_i": "N",
-   "d_i": "m"
+   "E_0": "J",
+   "c": "m/s",
+   "m": "kg"
   },
-  "scope": "m54274"
+  "scope": "m54282"
  },
  {
-  "f": "Delta_p=F_net*Delta_t",
-  "name": "impulse\u2013momentum theorem",
+  "f": "T=((2*pi*m)/(q*B))",
+  "name": "Period of a particle\u2019s motion in a magnetic field",
   "units": {
-   "Delta_p": "kg*m/s",
-   "Delta_t": "s",
-   "F_net": "N"
+   "T": "s",
+   "B": "T",
+   "m": "kg",
+   "q": "C"
   },
-  "scope": "m54215"
+  "scope": "m58745"
  },
  {
-  "f": "Delta_l=d*sin(theta)",
-  "name": "Path length difference for waves from two slits to a common point on a screen",
+  "f": "I_S=((N_P)/(N_S))*I_P",
+  "name": "Transformer equation with current",
   "units": {
-   "Delta_l": "m",
-   "d": "m",
-   "theta": "1"
+   "I_S": "A",
+   "I_P": "A",
+   "N_P": "1",
+   "N_S": "1"
   },
-  "scope": "m58541"
+  "scope": "m58494"
  },
  {
   "f": "rho=((m)/(V))",

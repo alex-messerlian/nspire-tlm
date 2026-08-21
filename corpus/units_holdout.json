@@ -1,138 +1,14 @@
 [
  {
-  "f": "I_2=I_1*((((r_1)/(r_2))))^(2)",
-  "name": "Decrease in intensity as a spherical wave expands",
+  "f": "I=((((Delta_p_max))^(2))/(2*rho*v))",
+  "name": "Intensity of sound",
   "units": {
-   "I_2": "W/m^2",
-   "I_1": "W/m^2",
-   "r_1": "m",
-   "r_2": "m"
-  },
-  "scope": "m58382"
- },
- {
-  "f": "W_AB=K_B-K_A",
-  "name": "Work-energy theorem",
-  "units": {
-   "W_AB": "J",
-   "K_A": "J",
-   "K_B": "J"
-  },
-  "scope": "m58333"
- },
- {
-  "f": "N=m*g*cos(theta)",
-  "name": "Normal force on an object resting on aninclined plane, scalar form",
-  "units": {
-   "N": "N",
-   "g": "m/s^2",
-   "m": "kg",
-   "theta": "1"
-  },
-  "scope": "m58301"
- },
- {
-  "f": "F=q*v*B*sin(theta)",
-  "name": "Magnitude of magnetic force",
-  "units": {
-   "F": "N",
-   "B": "T",
-   "q": "C",
-   "theta": "1",
+   "I": "W/m^2",
+   "Delta_p_max": "Pa",
+   "rho": "kg/m^3",
    "v": "m/s"
   },
-  "scope": "m58745"
- },
- {
-  "f": "f_B=|f_1-f_2|",
-  "name": "beat frequency",
-  "units": {
-   "f_B": "Hz",
-   "f_1": "Hz",
-   "f_2": "Hz"
-  },
-  "scope": "m54335"
- },
- {
-  "f": "E_f=h*f",
-  "name": "Energy of a photon",
-  "units": {
-   "E_f": "J",
-   "f": "Hz",
-   "h": "J*s"
-  },
-  "scope": "m58766"
- },
- {
-  "f": "v=r*omega",
-  "name": "Tangential speed:",
-  "units": {
-   "v": "m/s",
-   "omega": "1/s",
-   "r": "m"
-  },
-  "scope": "m54176"
- },
- {
-  "f": "f_beat=|f_2-f_1|",
-  "name": "Beat frequency produced by two waves thatdiffer in frequency",
-  "units": {
-   "f_beat": "Hz",
-   "f_1": "Hz",
-   "f_2": "Hz"
-  },
   "scope": "m58382"
- },
- {
-  "f": "d_CM=R*theta",
-  "name": "Displacement of center of mass of rolling object",
-  "units": {
-   "d_CM": "m",
-   "R": "m",
-   "theta": "1"
-  },
-  "scope": "m58338"
- },
- {
-  "f": "T_tof=((2(v_0*sin(theta_0)))/(g))",
-  "name": "Time of flight",
-  "units": {
-   "T_tof": "s",
-   "g": "m/s^2",
-   "theta_0": "1",
-   "v_0": "m/s"
-  },
-  "scope": "m58293"
- },
- {
-  "f": "w=m*g",
-  "name": "Definition of weight, scalar form",
-  "units": {
-   "w": "N",
-   "g": "m/s^2",
-   "m": "kg"
-  },
-  "scope": "m58301"
- },
- {
-  "f": "T=2*pi*sqrt(((m)/(k)))",
-  "name": "Period of a mass-spring system in SHM",
-  "units": {
-   "T": "s",
-   "k": "N/m",
-   "m": "kg"
-  },
-  "scope": "m58366"
- },
- {
-  "f": "p=((F)/(A))",
-  "name": "Pressure",
-  "units": {
-   "p": "Pa",
-   "A": "m^2",
-   "F": "N"
-  },
-  "scope": "m58359"
  },
  {
   "f": "E_n=-E_0*((1)/((n)^(2)))",
@@ -145,55 +21,136 @@
   "scope": "m58766"
  },
  {
-  "f": "a=((Delta_v)/(Delta_t))",
-  "name": "Acceleration",
+  "f": "p=((F)/(A))",
+  "name": "Pressure",
   "units": {
-   "a": "m/s^2",
-   "Delta_t": "s",
-   "Delta_v": "m/s"
+   "p": "Pa",
+   "A": "m^2",
+   "F": "N"
   },
-  "scope": "m54094"
+  "scope": "m58359"
  },
  {
-  "f": "omega=sqrt(((k)/(m)))",
-  "name": "Angular frequency of a mass-spring system in SHM",
+  "f": "Delta_t=((h)/(E))",
+  "name": "Approximate time for exchange of a virtual particle between two other particles",
   "units": {
-   "omega": "1/s",
+   "Delta_t": "s",
+   "E": "J",
+   "h": "J*s"
+  },
+  "scope": "m58776"
+ },
+ {
+  "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+  "name": "Frequency of a mass-spring system in SHM",
+  "units": {
+   "f": "Hz",
    "k": "N/m",
    "m": "kg"
   },
   "scope": "m58366"
  },
  {
-  "f": "h_i=(((n_2)/(n_1)))*h_o",
-  "name": "Apparent depth equation",
+  "f": "C_V=((d)/(2))*R",
+  "name": "Molar heat capacity at constant volume for an ideal gas with d degrees of freedom",
   "units": {
-   "h_i": "m",
-   "h_o": "m",
-   "n_1": "1",
-   "n_2": "1"
+   "C_V": "J/(mol*K)",
+   "R": "J/(mol*K)",
+   "d": "1"
   },
-  "scope": "m58534"
+  "scope": "m58394"
  },
  {
-  "f": "a_t=r*alpha",
-  "name": "Tangential acceleration",
+  "f": "E=(Delta_m)(c)^(2)",
+  "name": "Binding energy",
   "units": {
-   "a_t": "m/s^2",
-   "alpha": "1/s^2",
-   "r": "m"
+   "E": "J",
+   "Delta_m": "kg",
+   "c": "m/s"
   },
-  "scope": "m58333"
+  "scope": "m58614"
  },
  {
-  "f": "n=((c)/(v))",
-  "name": "Index of refraction",
+  "f": "f=((1)/(T))",
+  "name": "Relationship between frequency and period",
   "units": {
-   "n": "1",
+   "f": "Hz",
+   "T": "s"
+  },
+  "scope": "m58366"
+ },
+ {
+  "f": "Delta_p=F_net*Delta_t",
+  "name": "impulse\u2013momentum theorem",
+  "units": {
+   "Delta_p": "kg*m/s",
+   "Delta_t": "s",
+   "F_net": "N"
+  },
+  "scope": "m54215"
+ },
+ {
+  "f": "v_d=((I)/(n*q*A))",
+  "name": "Drift velocity",
+  "units": {
+   "v_d": "m/s",
+   "A": "m^2",
+   "I": "A",
+   "n": "1/m^3",
+   "q": "C"
+  },
+  "scope": "m58735"
+ },
+ {
+  "f": "p_f=((h)/(lambda))",
+  "name": "Magnitude of photon\u2019s momentum",
+  "units": {
+   "p_f": "kg*m/s",
+   "h": "J*s",
+   "lambda": "m"
+  },
+  "scope": "m58766"
+ },
+ {
+  "f": "w=m*g",
+  "name": "Definition of weight, scalar form",
+  "units": {
+   "w": "N",
+   "g": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m58301"
+ },
+ {
+  "f": "C_p=C_V+R",
+  "name": "Molar heat capacity at constant pressure",
+  "units": {
+   "C_p": "J/(mol*K)",
+   "C_V": "J/(mol*K)",
+   "R": "J/(mol*K)"
+  },
+  "scope": "m58401"
+ },
+ {
+  "f": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))",
+  "name": "Relativistic Doppler effect for frequency",
+  "units": {
+   "f_obs": "Hz",
    "c": "m/s",
+   "f_s": "Hz",
    "v": "m/s"
   },
-  "scope": "m58525"
+  "scope": "m58572"
+ },
+ {
+  "f": "omega=((Delta_theta)/(Delta_t))",
+  "name": "Angular speed:",
+  "units": {
+   "omega": "1/s",
+   "Delta_t": "s",
+   "Delta_theta": "1"
+  },
+  "scope": "m54176"
  },
  {
   "f": "epsilon=B*l*v",
@@ -207,44 +164,15 @@
   "scope": "m58482"
  },
  {
-  "f": "A=((1)/(2))*theta*(r)^(2)",
-  "name": "area of a sector",
+  "f": "I=((((Delta_p))^(2))/(2*rho*v_w))",
+  "name": "sound intensity",
   "units": {
-   "A": "m^2",
-   "r": "m",
-   "theta": "1"
+   "I": "W/m^2",
+   "Delta_p": "Pa",
+   "rho": "kg/m^3",
+   "v_w": "m/s"
   },
-  "scope": "m51283"
- },
- {
-  "f": "omega_0=sqrt(((k)/(m)))",
-  "name": "Natural angular frequency of amass-spring system",
-  "units": {
-   "omega_0": "1/s",
-   "k": "N/m",
-   "m": "kg"
-  },
-  "scope": "m58366"
- },
- {
-  "f": "W=Q_h-Q_c",
-  "name": "Result of energy conservation",
-  "units": {
-   "W": "J",
-   "Q_c": "J",
-   "Q_h": "J"
-  },
-  "scope": "m58408"
- },
- {
-  "f": "lambda=((h)/(p))",
-  "name": "The de Broglie wavelength",
-  "units": {
-   "lambda": "m",
-   "h": "J*s",
-   "p": "kg*m/s"
-  },
-  "scope": "m58766"
+  "scope": "m54333"
  },
  {
   "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
@@ -259,24 +187,24 @@
   "scope": "m58287"
  },
  {
-  "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
-  "name": "Frequency of a mass-spring system in SHM",
+  "f": "Delta_S=((Q)/(T))",
+  "name": "Entropy of a system undergoing a reversible process at a constant temperature",
   "units": {
-   "f": "Hz",
-   "k": "N/m",
-   "m": "kg"
+   "Delta_S": "J/K",
+   "Q": "J",
+   "T": "K"
   },
-  "scope": "m58366"
+  "scope": "m58408"
  },
  {
-  "f": "a_C=(((v)^(2))/(r))",
-  "name": "Centripetal acceleration",
+  "f": "Delta_theta=((Delta_s)/(r))",
+  "name": "Angle of rotation",
   "units": {
-   "a_C": "m/s^2",
-   "r": "m",
-   "v": "m/s"
+   "Delta_theta": "1",
+   "Delta_s": "m",
+   "r": "m"
   },
-  "scope": "m58293"
+  "scope": "m54176"
  },
  {
   "f": "Delta_x=x_f-x_i",
@@ -289,24 +217,93 @@
   "scope": "m58287"
  },
  {
-  "f": "omega=((theta)/(t))",
-  "name": "angular speed",
+  "f": "theta=((s)/(r))",
+  "name": "Angular position",
   "units": {
-   "omega": "1/s",
-   "t": "s",
-   "theta": "1"
+   "theta": "1",
+   "r": "m",
+   "s": "m"
   },
-  "scope": "m51283"
+  "scope": "m58333"
  },
  {
-  "f": "Q=n*C_V*Delta_T",
-  "name": "Heat in terms of molar heat capacity at constant volume",
+  "f": "f_beat=|f_2-f_1|",
+  "name": "Beat frequency produced by two waves thatdiffer in frequency",
   "units": {
-   "Q": "J",
-   "C_V": "J/(mol*K)",
-   "Delta_T": "K",
-   "n": "mol"
+   "f_beat": "Hz",
+   "f_1": "Hz",
+   "f_2": "Hz"
   },
-  "scope": "m58394"
+  "scope": "m58382"
+ },
+ {
+  "f": "P=(((V)^(2))/(R))",
+  "name": "for a given voltage difference V across a resistor R, the electric power dissipated",
+  "units": {
+   "P": "W",
+   "R": "ohm",
+   "V": "V"
+  },
+  "scope": "m54446"
+ },
+ {
+  "f": "L=I*omega",
+  "name": "Angular momentum of a rotating rigid body",
+  "units": {
+   "L": "kg*m^2/s",
+   "I": "kg*m^2",
+   "omega": "1/s"
+  },
+  "scope": "m58338"
+ },
+ {
+  "f": "Delta_E_int=Q-W",
+  "name": "First law of thermodynamics",
+  "units": {
+   "Delta_E_int": "J",
+   "Q": "J",
+   "W": "J"
+  },
+  "scope": "m58401"
+ },
+ {
+  "f": "Q=((omega_0)/(Delta_omega))",
+  "name": "Quality factor of a circuit",
+  "units": {
+   "Q": "1",
+   "Delta_omega": "1/s",
+   "omega_0": "1/s"
+  },
+  "scope": "m58494"
+ },
+ {
+  "f": "E_f=h*f",
+  "name": "Energy of a photon",
+  "units": {
+   "E_f": "J",
+   "f": "Hz",
+   "h": "J*s"
+  },
+  "scope": "m58766"
+ },
+ {
+  "f": "alpha=((Delta_omega)/(Delta_t))",
+  "name": "Angular acceleration",
+  "units": {
+   "alpha": "1/s^2",
+   "Delta_omega": "1/s",
+   "Delta_t": "s"
+  },
+  "scope": "m54180"
+ },
+ {
+  "f": "n=((c)/(v))",
+  "name": "Index of refraction",
+  "units": {
+   "n": "1",
+   "c": "m/s",
+   "v": "m/s"
+  },
+  "scope": "m58525"
  }
 ]

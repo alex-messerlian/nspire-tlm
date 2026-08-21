@@ -186,11 +186,14 @@ if __name__ == "__main__":
     print(f"  chars/doc       {chars/len(docs):.0f}")
     print(f"  tokens @4.15    {chars/4.15/1e6:.2f}M from this run")
     print(f"\n  DIVERSITY  (never report the token count without these)")
-    print(f"    distinct 4-gram ratio        {D['distinct_4gram_ratio']:.4f}")
+    print(f"    composite (RETIRED)          {D['distinct_4gram_ratio']:.4f} @{len(docs):,} docs")
     print(f"    head coverage                {D['head_coverage']*100:.1f}%  ({D['heads_used']} heads)")
     print(f"    mean phrasing entropy        {D['mean_phrasing_entropy_bits']:.2f} bits/head")
     SP = diversity_by_span(docs)
-    print(f"    per-span 4-gram ratio        question {SP['question']:.4f}   "
+    # Corpus size is stamped on every diversity figure: these ratios fall with document count, so
+    # a figure quoted without its N is not comparable to any other. I once compared a 200k run
+    # against 100k arm figures and read a real gain as a loss.
+    print(f"    per-span 4-gram @{len(docs):,} docs  question {SP['question']:.4f}   "
           f"record {SP['record']:.4f}   answer {SP['answer']:.4f}")
     print(f"      (the composite above is dragged down by the record span, which is a canonical")
     print(f"       retrieval record and is SUPPOSED to repeat -- bounded by head count alone)")

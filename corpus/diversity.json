@@ -1,9 +1,9 @@
 {
- "distinct_4gram_ratio": 0.29797299360185253,
- "head_coverage": 0.9830508474576272,
- "heads_used": 58,
- "mean_phrasing_entropy_bits": 4.784062476304625,
- "span_question": 0.21223508215341833,
- "span_record": 0.00046142828666140024,
- "span_answer": 0.5047385149642681
+ "distinct_4gram_ratio": 0.2767920889507839,
+ "head_coverage": 0.9841269841269841,
+ "heads_used": 62,
+ "mean_phrasing_entropy_bits": 4.775297599845049,
+ "span_question": 0.18705386494323925,
+ "span_record": 0.0002461648633225543,
+ "span_answer": 0.47818024795550895
 }
