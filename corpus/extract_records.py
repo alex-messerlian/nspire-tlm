@@ -83,6 +83,10 @@ for mod in pathlib.Path("corpus/raw").rglob("index.cnxml"):
             # here is one rewrite instead of 37 annotation decisions, and it removes the artifact
             # from the corpus at the same time.
             expr = re.sub(r"\bDelta\*([A-Za-z][A-Za-z0-9_]*)", r"Delta_\1", expr)
+            # Delta also arrives FUSED with no operator at all -- Deltap, Deltav, Deltaomega --
+            # when the source markup put both in one <mi>. Same quantity, same fold.
+            expr = re.sub(r"\bDelta([a-z][A-Za-z0-9_]*)", r"Delta_\1", expr)
+            expr = re.sub(r"\bmu_o\b", "mu_0", expr)          # source typo for the permeability
             if expr.count("=") != 1: continue
             if not expr or expr in seen: continue
             seen.add(expr); rows.append({"name": name, "f": expr,

@@ -55,7 +55,8 @@ def usable(r):
 # TRAINING formulas only. The held-out set is reserved strictly for measuring generalisation
 # across unseen formulas and must never reach the corpus.
 _ann = {r["f"]: r for r in json.load(open("corpus/units_train.json"))}
-recs = [r for r in json.load(open("corpus/records_raw.json")) if usable(r) and r["f"] in _ann]
+recs = [r for r in json.load(open("corpus/records_raw.json"))
+        if usable(r) and r["f"] in _ann and not r.get("drop")]
 for r in recs: r["units"] = _ann[r["f"]]["units"]
 
 # Applicability conditions, drafted per subject. THIN by design and flagged as such: these are the
