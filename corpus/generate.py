@@ -52,7 +52,9 @@ def usable(r):
 # FORMULA | VAR VAR -- no units, no condition. That made every eval prompt out-of-distribution and
 # meant the applicability condition, which licenses every D-category refusal, never appeared in
 # training at all.
-_ann = {r["f"]: r for r in json.load(open("corpus/units_batch1.json"))}
+# TRAINING formulas only. The held-out set is reserved strictly for measuring generalisation
+# across unseen formulas and must never reach the corpus.
+_ann = {r["f"]: r for r in json.load(open("corpus/units_train.json"))}
 recs = [r for r in json.load(open("corpus/records_raw.json")) if usable(r) and r["f"] in _ann]
 for r in recs: r["units"] = _ann[r["f"]]["units"]
 
@@ -80,10 +82,15 @@ print(f"records usable as physics relations: {len(recs)} of 379 gated  "
       f"(vs 27 heads in the eval set = {len(recs)/27:.1f}x)")
 
 # ---- phrasing templates. Style varies, facts do not. -------------------------
-ASK = ["What is the {q}?", "Find the {q}.", "Calculate the {q}.", "Determine the {q}.",
-       "Work out the {q}.", "Give the {q}.", "How large is the {q}?", "Compute the {q}."]
+# ASK templates come from the DEVELOPMENT population -- real OpenStax question openings, mined in
+# corpus/stems.py. The eval set is NEVER used to select templates: it is the only held-out phrasing
+# distribution we have, and tuning against it would destroy the honest read on whether variety
+# closes the 25pp generator-vs-eval gap.
+ASK = json.load(open("corpus/asks_dev.json"))
 GIVE = ["Given {g}, ", "With {g}, ", "If {g}, ", "For {g}, ", "Where {g}, ",
-        "Suppose {g}. ", "Take {g}. ", "A system has {g}. "]
+        "Suppose {g}. ", "Take {g}. ", "A system has {g}. ", "Assume {g}. ",
+        "Consider a case where {g}. ", "In a setup with {g}, ", "Measurements give {g}. ",
+        "You are told {g}. ", "The values are {g}. ", "Starting from {g}, ", "Using {g}, "]
 CLOSE = ["{v} = {a}. {why}", "The {q} is {a}. {why}", "{a}. {why}", "That gives {a}. {why}"]
 WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}.",
        "This follows from {f}.", "{f} gives it."]
@@ -102,8 +109,13 @@ def gen(n, seed=0):
         g = ", ".join(f"{v} = {vals[v]:g}" for v in free)
         stem = rng.choice(GIVE).format(g=g)
         ask  = rng.choice(ASK).format(q=r["name"].lower())
-        q = stem + (ask if stem.endswith(", ") and False else
-                    (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask))
+        # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
+        # real problems, and ordering moves 4-gram diversity more than the verb does.
+        if rng.random() < 0.35:
+            q = ask.rstrip(".?") + ("?" if ask.rstrip().endswith("?") else ".") + " " + \
+                stem.strip().rstrip(",").rstrip(".") + "."
+        else:
+            q = stem + (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask)
         umap = " ".join(f"{v}:{r['units'][v]}" for v in vs if v in r["units"])
         docs.append({"q": q, "rec": f"{r['f']} | {umap} | {r['cond']}", "lhs": lhs,
                      "name": r["name"], "head": r["f"],
@@ -127,6 +139,22 @@ def gen(n, seed=0):
 def ngrams(s, n=4):
     w = s.split()
     return [tuple(w[i:i+n]) for i in range(max(0, len(w)-n+1))]
+
+def diversity_by_span(docs):
+    """Per-span diversity. The composite ratio averages over spans with DIFFERENT ROLES and is
+    therefore the wrong instrument: the record span is a canonical retrieval record and is SUPPOSED
+    to repeat -- it carries 25% of the corpus's 4-grams at a ratio of 0.0002, dragging the composite
+    down for a reason that is not a defect. Question and answer diversity are what the model must
+    learn from; record diversity is bounded by head count and nothing else."""
+    def ng(s, n=4):
+        w = s.split(); return [tuple(w[i:i+n]) for i in range(max(0, len(w)-n+1))]
+    out = {}
+    for lab, get in (("question", lambda d: d["text"].split("<q>")[1].split("</q>")[0]),
+                     ("record",   lambda d: d["text"].split("<r>")[1].split("<tool>")[0]),
+                     ("answer",   lambda d: d["ans"])):
+        gs = [g for d in docs for g in ng(get(d))]
+        out[lab] = len(set(gs)) / max(1, len(gs))
+    return out
 
 def diversity(docs):
     allg = [g for d in docs for g in ngrams(d["text"])]
@@ -160,6 +188,12 @@ if __name__ == "__main__":
     print(f"    distinct 4-gram ratio        {D['distinct_4gram_ratio']:.4f}")
     print(f"    head coverage                {D['head_coverage']*100:.1f}%  ({D['heads_used']} heads)")
     print(f"    mean phrasing entropy        {D['mean_phrasing_entropy_bits']:.2f} bits/head")
+    SP = diversity_by_span(docs)
+    print(f"    per-span 4-gram ratio        question {SP['question']:.4f}   "
+          f"record {SP['record']:.4f}   answer {SP['answer']:.4f}")
+    print(f"      (the composite above is dragged down by the record span, which is a canonical")
+    print(f"       retrieval record and is SUPPOSED to repeat -- bounded by head count alone)")
+    D.update({"span_"+k: v for k, v in SP.items()})
     pathlib.Path("corpus/synth_sample.jsonl").write_text(
         "\n".join(json.dumps(d) for d in docs))
     json.dump(D, open("corpus/diversity.json","w"), indent=1)

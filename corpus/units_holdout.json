@@ -1,0 +1,308 @@
+[
+ {
+  "f": "Delta_t=((h)/(E))",
+  "name": "Approximate time for exchange of a virtual particle between two other particles",
+  "units": {
+   "Delta_t": "s",
+   "E": "J",
+   "h": "J*s"
+  },
+  "scope": "m58776"
+ },
+ {
+  "f": "Delta_E=h*f",
+  "name": "Energy quantum of radiation",
+  "units": {
+   "Delta_E": "J",
+   "f": "Hz",
+   "h": "J*s"
+  },
+  "scope": "m58766"
+ },
+ {
+  "f": "h_i=(((n_2)/(n_1)))*h_o",
+  "name": "Apparent depth equation",
+  "units": {
+   "h_i": "m",
+   "h_o": "m",
+   "n_1": "1",
+   "n_2": "1"
+  },
+  "scope": "m58534"
+ },
+ {
+  "f": "omega=sqrt(((k)/(m)))",
+  "name": "Angular frequency of a mass-spring system in SHM",
+  "units": {
+   "omega": "1/s",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366"
+ },
+ {
+  "f": "s=r*theta",
+  "name": "arc length",
+  "units": {
+   "s": "m",
+   "r": "m",
+   "theta": "1"
+  },
+  "scope": "m51283"
+ },
+ {
+  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
+  "name": "Distance",
+  "units": {
+   "d": "m",
+   "x_1": "m",
+   "x_2": "m",
+   "y_1": "m",
+   "y_2": "m"
+  },
+  "scope": "m51256"
+ },
+ {
+  "f": "T=((1)/(f))",
+  "name": "period",
+  "units": {
+   "T": "s",
+   "f": "Hz"
+  },
+  "scope": "m54321"
+ },
+ {
+  "f": "V_rms=((V_0)/(sqrt(2)))",
+  "name": "rms voltage",
+  "units": {
+   "V_rms": "V",
+   "V_0": "V"
+  },
+  "scope": "m58494"
+ },
+ {
+  "f": "omega=((theta)/(t))",
+  "name": "angular speed",
+  "units": {
+   "omega": "1/s",
+   "t": "s",
+   "theta": "1"
+  },
+  "scope": "m51283"
+ },
+ {
+  "f": "I_S=((N_P)/(N_S))*I_P",
+  "name": "Transformer equation with current",
+  "units": {
+   "I_S": "A",
+   "I_P": "A",
+   "N_P": "1",
+   "N_S": "1"
+  },
+  "scope": "m58494"
+ },
+ {
+  "f": "omega_0=sqrt(((k)/(m)))",
+  "name": "Natural angular frequency of amass-spring system",
+  "units": {
+   "omega_0": "1/s",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366"
+ },
+ {
+  "f": "omega=((Delta_theta)/(Delta_t))",
+  "name": "Angular speed:",
+  "units": {
+   "omega": "1/s",
+   "Delta_t": "s",
+   "Delta_theta": "1"
+  },
+  "scope": "m54176"
+ },
+ {
+  "f": "E=(Delta_m)(c)^(2)",
+  "name": "Binding energy",
+  "units": {
+   "E": "J",
+   "Delta_m": "kg",
+   "c": "m/s"
+  },
+  "scope": "m58614"
+ },
+ {
+  "f": "tau=R*C",
+  "name": "Time constant",
+  "units": {
+   "tau": "s",
+   "C": "F",
+   "R": "ohm"
+  },
+  "scope": "m58458"
+ },
+ {
+  "f": "W_net=K_B-K_A",
+  "name": "Work-energy theorem",
+  "units": {
+   "W_net": "J",
+   "K_A": "J",
+   "K_B": "J"
+  },
+  "scope": "m58310"
+ },
+ {
+  "f": "V=((U_E)/(q))",
+  "name": "definition of electric potential",
+  "units": {
+   "V": "V",
+   "U_E": "J",
+   "q": "C"
+  },
+  "scope": "m54426"
+ },
+ {
+  "f": "Delta_x=x_f-x_i",
+  "name": "Displacement",
+  "units": {
+   "Delta_x": "m",
+   "x_f": "m",
+   "x_i": "m"
+  },
+  "scope": "m58287"
+ },
+ {
+  "f": "T=((2*pi*m)/(q*B))",
+  "name": "Period of a particle\u2019s motion in a magnetic field",
+  "units": {
+   "T": "s",
+   "B": "T",
+   "m": "kg",
+   "q": "C"
+  },
+  "scope": "m58745"
+ },
+ {
+  "f": "U_form=E_transfer+U_coul+U_ex",
+  "name": "Energy change associated with ionic bonding",
+  "units": {
+   "U_form": "J",
+   "E_transfer": "J",
+   "U_coul": "J",
+   "U_ex": "J"
+  },
+  "scope": "m58602"
+ },
+ {
+  "f": "f=((1)/(T))",
+  "name": "Relationship between frequency and period",
+  "units": {
+   "f": "Hz",
+   "T": "s"
+  },
+  "scope": "m58366"
+ },
+ {
+  "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
+  "name": "Height of free fall",
+  "units": {
+   "y": "m",
+   "g": "m/s^2",
+   "t": "s",
+   "v_0": "m/s",
+   "y_0": "m"
+  },
+  "scope": "m58287"
+ },
+ {
+  "f": "v=lambda*f",
+  "name": "speed of light",
+  "units": {
+   "v": "m/s",
+   "f": "Hz",
+   "lambda": "m"
+  },
+  "scope": "m54280"
+ },
+ {
+  "f": "a_C=(((v)^(2))/(r))",
+  "name": "Centripetal acceleration",
+  "units": {
+   "a_C": "m/s^2",
+   "r": "m",
+   "v": "m/s"
+  },
+  "scope": "m58293"
+ },
+ {
+  "f": "T=2*pi*sqrt(((m)/(k)))",
+  "name": "Period of a mass-spring system in SHM",
+  "units": {
+   "T": "s",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366"
+ },
+ {
+  "f": "p_f=((h)/(lambda))",
+  "name": "Magnitude of photon\u2019s momentum",
+  "units": {
+   "p_f": "kg*m/s",
+   "h": "J*s",
+   "lambda": "m"
+  },
+  "scope": "m58766"
+ },
+ {
+  "f": "v=f*lambda",
+  "name": "Velocity of a wave",
+  "units": {
+   "v": "m/s",
+   "f": "Hz",
+   "lambda": "m"
+  },
+  "scope": "m58382"
+ },
+ {
+  "f": "F_l=-((d*U)/(d*l))",
+  "name": "Conservative force is the negative derivative of potential energy",
+  "units": {
+   "F_l": "N",
+   "U": "J",
+   "d": "m",
+   "l": "m"
+  },
+  "scope": "m58661"
+ },
+ {
+  "f": "d_CM=R*theta",
+  "name": "Displacement of center of mass of rolling object",
+  "units": {
+   "d_CM": "m",
+   "R": "m",
+   "theta": "1"
+  },
+  "scope": "m58338"
+ },
+ {
+  "f": "v_CM=R*omega",
+  "name": "Velocity of center of mass of rolling object",
+  "units": {
+   "v_CM": "m/s",
+   "R": "m",
+   "omega": "1/s"
+  },
+  "scope": "m58338"
+ },
+ {
+  "f": "N=m*g",
+  "name": "Normal force on an object resting on ahorizontal surface, scalar form",
+  "units": {
+   "N": "N",
+   "g": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m58301"
+ }
+]
