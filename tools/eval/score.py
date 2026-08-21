@@ -106,13 +106,14 @@ def score(item, output):
 
     if cat == "B":                                   # symbolic
         got = results[-1] if results else ""
-        r["equivalent"] = equivalent(item["answer"], got) is True
+        want = item.get("answer") or (item.get("ref") or [""])[-1]
+        r["equivalent"] = equivalent(want, got) is True
         r["pass"] = r["calls_valid"] and r["equivalent"]
         return r
 
     if cat == "E":                                   # recovery / spurious-retry twin
         errs = [x for x in results if x.startswith("!")]
-        r["retried"] = len(calls) > item["min_calls"]
+        r["retried"] = len(calls) > item.get("min_calls", 1)
         if item["expect"] == "recover":
             r["pass"] = bool(errs) and r["retried"] and not results[-1].startswith("!")
         else:                                        # E2: must NOT retry a good call
@@ -120,7 +121,15 @@ def score(item, output):
         return r
 
     # A: numeric. Compare the executed result AND the number the model wrote in prose.
-    ref = as_num(run_calls([item["call"]])[0])
+    # items.json stores `calls` (a list) and `ref` (the evaluator's own answers). Reading a
+    # singular `call` meant score.py had never been run against the real eval set -- every test
+    # passed it a hand-built dict. Accept both shapes, and prefer the RECORDED reference so the
+    # scorer does not re-execute what the generator already verified.
+    if "ref" in item and item["ref"]:
+        ref = as_num(item["ref"][-1])
+    else:
+        c = item.get("call") or (item.get("calls") or [None])[-1]
+        ref = as_num(run_calls([c])[0]) if c else None
     r["call_result_correct"] = close(as_num(results[-1]) if results else None, ref)
     # "About 13 m/s" is a legitimate rendering of 12.5. Compare at the ANSWER's own written
     # precision, as provenance.c does -- a fixed rel=1e-3 rejects every rounded answer. That

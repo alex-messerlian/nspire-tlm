@@ -30,3 +30,31 @@ assert dead["over_answer_rate"] is None and dead["result_span_leak"] is None, de
 print(f"  ok  liveness guard: dead pipeline reports None, not 0.0")
 print("FAIL" if fail else "all score.py regressions pass")
 sys.exit(1 if fail else 0)
+
+# REGRESSION: score.py must run against the REAL items.json, not only hand-built dicts.
+# It never had. items.json stores `calls` (plural) and score.py read `call` (singular), so the
+# scorer the ladder depends on was incompatible with the file it scores -- and every test I had
+# written passed it a synthetic dict that hid this.
+import json as _j
+_items = {i["id"]: i for i in _j.load(open("tools/eval/items.json"))}
+# END-TO-END POSITIVE CONTROL: build a known-good transcript for every one of the 200 items from
+# the item's own recorded evaluator reference, interleaving call and result as the runtime does.
+# A working scorer must report near-1.0 accuracy and 0 on every low-is-good metric. Before this
+# existed, score.py had never been run against items.json at all.
+_good = {}
+for _k, _i in _items.items():
+    if _i["expect"] == "refuse":    _good[_k] = "<a>I cannot answer -- the data is not given.<end>"
+    elif _i["expect"] == "clarify": _good[_k] = "<a>Which quantity do you want?<end>"
+    elif not _i["calls"]:           _good[_k] = "<a>It is a definition.<end>"
+    else:
+        _body = "".join(f"{c}<res>{r}</res>" for c, r in zip(_i["calls"], _i.get("ref", [])))
+        _good[_k] = f"{_body}<a>{(_i.get('ref') or [''])[-1]}.<end>"
+_rows = [score.score(_items[k], v) for k, v in _good.items()]
+_agg = score.aggregate(_rows, _items)
+assert _agg["pipeline_alive"], "scorer reports a dead pipeline on a known-good run"
+assert _agg["answer_accuracy"] > 0.95, f"accuracy {_agg['answer_accuracy']} on known-good"
+assert _agg["tool_call_validity"] == 1.0, _agg["tool_call_validity"]
+assert _agg["result_span_leak"] == 0, f"leak {_agg['result_span_leak']} on known-good"
+assert _agg["over_answer_rate"] == 0.0 and _agg["false_positive_call"] == 0.0, _agg
+print(f"  ok  end-to-end on the real items.json: acc {_agg['answer_accuracy']:.3f}, "
+      f"validity {_agg['tool_call_validity']:.2f}, leak {_agg['result_span_leak']}")
