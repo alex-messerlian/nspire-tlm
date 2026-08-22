@@ -317,6 +317,44 @@ Per call site:
 
 The response-level cap of 8 calls is independent and absolute.
 
+### 6.2b Format-failure retry — a different mechanism from §6.2
+
+**§6.2 governs TOOL errors: the evaluator returned `!code` and the model gets one corrected call.
+This section governs the model's OWN OUTPUT being unparseable, which §6.2 does not describe and
+which the runtime must detect for itself.** Measured: failures are not deterministic under sampling
+— at T=0.8, 63% of failing items pass on some attempt — so retry is a real lever for the shipping
+path. It is **forbidden inside ladder measurements** (`LADDER_METRICS.md`).
+
+**Unparseable is defined structurally**, and this list is closed:
+
+1. no `<a>` span, or no `<end>`;
+2. `<tool>` and `</tool>` counts unequal;
+3. a `<tool>` with fewer `<arg>` than the function's arity;
+4. a model-authored `<res>` — should be unreachable given the §8.3 decode-time ban, and if seen
+   means the ban is not wired;
+5. generation cap reached without `<end>`.
+
+**Attempts: 3 maximum**, the whole response, not per call site. The §6.2 per-call-site retry is
+independent and unchanged; the two limits compose, and the response-level cap of 8 calls still binds.
+
+**Temperature policy is per attempt**, because a repeated attempt at the same temperature under
+greedy decoding is bit-identical and buys nothing:
+
+| Attempt | Temperature | Rationale |
+|---|---|---|
+| 1 | **0** (greedy) | Highest single-shot adherence; deterministic |
+| 2 | **0.8** | Measured to decorrelate: deterministic-failure fraction falls 87% → 37% |
+| 3 | **0.8**, different seed | Independent draw from the same distribution |
+
+**Degradation when all three fail:** emit the tool results already obtained, in the §5 canonical
+form, with a single sentence stating that the answer could not be composed. **Never emit a partial
+or repaired document** — a half-formed `<tool>` span reaching the user is worse than an honest
+failure, because the runtime cannot distinguish it from a real call.
+
+**Latency:** each retry is a full generation cycle. See `LATENCY_BUDGET.md` — at 23% raw failure a
+3-attempt policy costs roughly 0.23 + 0.23·(1−p₂) extra cycles per question, which is real seconds
+and not free.
+
 ### 6.3 Never crash
 
 Every entry point returns a status. No `assert`, no `abort`, no unchecked allocation, no unbounded
