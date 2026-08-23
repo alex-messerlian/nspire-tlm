@@ -40,6 +40,50 @@ static double round_sig(double v, int sig) {
     return floor(fabs(v) * m + 0.5) / m * (v < 0 ? -1.0 : 1.0);
 }
 
+/* Every numeric literal in a <tool> ARGUMENT must trace to the question or the record.
+ *
+ * Checking only the answer verifies the arithmetic and not the PREMISES: a model can invent its
+ * inputs, the evaluator faithfully computes on them, and the answer then traces cleanly to a result
+ * span the model manufactured itself. Observed for real -- a capacitance record and a question about
+ * car speed produced <tool>eval<arg>(6.0)/(4.0)</tool>, with 6.0 and 4.0 appearing nowhere in the
+ * question, and provenance reported 0 unsourced.
+ *
+ * Sources are the question and the record ONLY -- never a result span, because results come after
+ * the call and cannot license its inputs. The record legitimately supplies constants (g=9.81) and
+ * the formula's own literals (the 0.5 in 0.5*m*v^2), so both trace correctly. */
+int prov_call_unsourced(const char *doc, double *first) {
+    const char *qend = strstr(doc, "</q>");
+    const char *aopen = strstr(doc, "<a>");
+    if (!qend) return -1;
+    const char *src_end = aopen ? aopen : doc + strlen(doc);
+    const char *rec = qend + 4;
+
+    double src[MAX_NUMS]; int ssig[MAX_NUMS];
+    int ns = scan_nums(doc, qend, src, ssig, MAX_NUMS);          /* the question */
+    {   /* the record: everything from </q> to the first <tool>, or to <a> if no call */
+        const char *r_end = strstr(rec, "<tool>");
+        if (!r_end || r_end > src_end) r_end = src_end;
+        double r2[MAX_NUMS]; int s2[MAX_NUMS];
+        int n2 = scan_nums(rec, r_end, r2, s2, MAX_NUMS);
+        for (int i = 0; i < n2 && ns < MAX_NUMS; i++) { src[ns] = r2[i]; ssig[ns] = s2[i]; ns++; }
+    }
+    int bad = 0;
+    for (const char *p = doc; (p = strstr(p, "<tool>")); ) {
+        const char *e = strstr(p, "</tool>");
+        if (!e) break;
+        double a[MAX_NUMS]; int asig[MAX_NUMS];
+        int na = scan_nums(p, e, a, asig, MAX_NUMS);
+        for (int i = 0; i < na; i++) {
+            int ok = 0;
+            for (int j = 0; j < ns && !ok; j++)
+                if (round_sig(src[j], asig[i]) == round_sig(a[i], asig[i])) ok = 1;
+            if (!ok) { if (bad == 0 && first) *first = a[i]; bad++; }
+        }
+        p = e + 7;
+    }
+    return bad;
+}
+
 /* doc: the full document. Returns count of UNSOURCED numbers in the answer span; 0 means clean.
  * If `first` is non-NULL, the first unsourced value is written there. */
 int prov_unsourced(const char *doc, double *first) {
