@@ -342,9 +342,29 @@ greedy decoding is bit-identical and buys nothing:
 
 | Attempt | Temperature | Rationale |
 |---|---|---|
-| 1 | **0** (greedy) | Highest single-shot adherence; deterministic |
-| 2 | **0.8** | Measured to decorrelate: deterministic-failure fraction falls 87% → 37% |
-| 3 | **0.8**, different seed | Independent draw from the same distribution |
+| 1 | **0.8** | Measured: dominates greedy |
+| 2 | **0.8**, new seed | Independent draw |
+| 3 | **0.8**, new seed | Independent draw |
+
+**Corrected — attempt 1 was specified as greedy and that was wrong.** The matched sweep shows T=0.8
+dominating greedy on every axis that matters:
+
+| | greedy | T=0.8 |
+|---|---|---|
+| single-shot | 72.2% | 69.2% (−3.0 pp) |
+| effective @3 | 72.2% (retry impossible) | **83.2% (+11.0 pp)** |
+| seed variance | ±17.7 pp | **±8.8 pp** |
+| deterministic failures | 28.0% | **9.0%** |
+
+Greedy costs 11 pp of effective adherence and doubles the variance, in exchange for 3 pp of
+single-shot. **Sampling also averages over the per-item determinism that makes greedy brittle**,
+which is why its variance is half.
+
+> **Every measurement in this repo taken before this correction was made under greedy decoding —
+> a decoder we will not ship.** That includes the L2 arms, both capability curves, and every
+> adherence figure quoted for the 4,000- and 8,000-step runs. Those numbers are valid *as
+> greedy measurements* and are **not** the shipped configuration. Any figure carried forward must be
+> re-measured at T=0.8 or labelled `[greedy]`.
 
 **Degradation when all three fail:** emit the tool results already obtained, in the §5 canonical
 form, with a single sentence stating that the answer could not be composed. **Never emit a partial
