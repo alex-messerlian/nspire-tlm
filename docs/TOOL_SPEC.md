@@ -340,11 +340,16 @@ independent and unchanged; the two limits compose, and the response-level cap of
 **Temperature policy is per attempt**, because a repeated attempt at the same temperature under
 greedy decoding is bit-identical and buys nothing:
 
-| Attempt | Temperature | Rationale |
-|---|---|---|
-| 1 | **0.8** | Measured: dominates greedy |
-| 2 | **0.8**, new seed | Independent draw |
-| 3 | **0.8**, new seed | Independent draw |
+**All attempts at T=0.8, new seed each time. Cap 8.**
+
+**Varied per-attempt temperature (0.8/1.0/1.2) is REMOVED.** It looked better on one seed and failed
+to replicate three times — at 140 heads (95.0% vs 95.0% at 8 attempts), across the three-seed sweep
+(fixed won at 3 attempts, varied at 5, tie at 8, all inside their spreads), and at 230 heads
+(95.0% vs 97.2%, fixed winning). **The hypothesis is dead and the spec should not carry it.**
+
+Cap 8 rather than 5: the questions that wait longest are the same questions at every cap, so raising
+it does not expose more questions to long waits. 8 buys +6.7 pp of effective adherence for +0.1 s
+expected, and only 0.03% of questions — 1 in 3,554 — reach the final attempt.
 
 **Corrected — attempt 1 was specified as greedy and that was wrong.** The matched sweep shows T=0.8
 dominating greedy on every axis that matters:
