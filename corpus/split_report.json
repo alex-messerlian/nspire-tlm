@@ -1,0 +1,482 @@
+[
+ {
+  "id": "v=((omega)-0",
+  "q": "Calculate the mass of chlorine produced from {n}. Given k = 30, omega = 3, find the wave speed.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "E=n*h*f-1",
+  "q": "How would you determine whether the charge on a particular rod is positive or negative? Given f = 30, h = 8, n = 30, find the quantum energy.",
+  "record": "E=n*h*f | f:Hz h:J*s n:1 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "T=((1)/(f)-2",
+  "q": "What is electrical charge, how is it associated with objects, and what forces does it create? Given f = 5, find the period.",
+  "record": "T=((1)/(f)) | f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B=((mu_0*I-3",
+  "q": "How did your work creating one fountain in part {n} help with your process in part {n} where you created multiple fountains? Given I = 5, R = 12, mu_0 = 30, find the magnetic field due to along straight wire.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_c=(((v)^-4",
+  "q": "What is the charge on the outer surface of the conductor? Given r = 20, v = 3, find the centripetal acceleration.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_n2=a_n+a-5",
+  "q": "However, unless its speed is tens of thousands of kilometers per second, the star does not appear noticeably bluer or redder than normal. Given a_n = 20, a_n1 = 25, find the (from worked example).",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "R_eqv=R_1+-6",
+  "q": "How much energy does it require to bring a q = {n}. Given R_1 = 5, R_2 = 20, find the (from worked example).",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "r=((m*v)/(-7",
+  "q": "What mass of glucose, C {n} H {n} O {n} , is required to make {n}. Given B = 10, m = 3, q = 3, v = 12, find the radius of a particle\u2019s path in a magnetic field.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "w=m*g-8",
+  "q": "Calculate the necessary heat of vaporization of {n} g of water: Q = mL v = {n} . Given g = 10, m = 2, find the definition of weight, scalar form.",
+  "record": "w=m*g | g:m/s^2 m:kg | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B*E=h*f_O-9",
+  "q": "What patterns and insights are gained from an examination of the binding energy of various nuclides? Given f_O = 10, h = 10, find the binding energy of an electron.",
+  "record": "B*E=h*f_O | f_O:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Q=((d*V)/(-10",
+  "q": "However, because the current in a wire is confined to a wire, the direction in which the charges move does not change. Given V = 20, d = 15, t = 2, find the volume flow rate.",
+  "record": "Q=((d*V)/(d*t)) | V:m^3 d:m t:s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "lambda=((c-11",
+  "q": "Find the gravitational force F acting on the block of cement that counterbalances the sum F {n} + F {n} + F {n} of the forces of tension in the cables. Given c = 5, f = 20, find the deriving and using the wave equation.",
+  "record": "lambda=((c)/(f)) | c:m/s f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "v_w=((lamb-12",
+  "q": "Calculate the wavelength of light that has its second-order maximum at {n} . Given T = 5, lambda = 20, find the wave velocity.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "d_2=((2*A)-13",
+  "q": "What determines the outcome\u2014bang or whimper\u2014is the mass of the star when it is ready to die , not the mass it was born with. Given A = 3, d_1 = 20, find the (from worked example).",
+  "record": "d_2=((2*A)/(d_1)) | A:m^2 d_1:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Delta_E=h*-14",
+  "q": "What is the maximum electric force it experiences? Given f = 12, h = 8, find the energy quantum of radiation.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "v=((omega)-15",
+  "q": "Estimate the mass of the object that formed Meteor Crater in Arizona. Given k = 2, omega = 3, find the wave speed.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "E=n*h*f-16",
+  "q": "Find Julian\u2019s uphill and downhill speed. Given f = 20, h = 2, n = 25, find the quantum energy.",
+  "record": "E=n*h*f | f:Hz h:J*s n:1 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "T=((1)/(f)-17",
+  "q": "Calculate the pressure due to the ocean at the bottom of this trench, given its depth is {n}. Given f = 8, find the period.",
+  "record": "T=((1)/(f)) | f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B=((mu_0*I-18",
+  "q": "However, the products of the mass and the change of velocity are equal (in magnitude): m {n} d v \u2192 {n} d t = \u2212 m {n} d v \u2192 {n} d t . Given I = 30, R = 8, mu_0 = 10, find the magnetic field due to along straight wire.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_c=(((v)^-19",
+  "q": "Find the rate of the motor boat in still water and the rate of the current. Given r = 30, v = 15, find the centripetal acceleration.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_n2=a_n+a-20",
+  "q": "Find the magnitude and direction of the resulting acceleration. Given a_n = 12, a_n1 = 8, find the (from worked example).",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "R_eqv=R_1+-21",
+  "q": "What is the potential inside the metal sphere in ? Given R_1 = 12, R_2 = 25, find the (from worked example).",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "r=((m*v)/(-22",
+  "q": "How long does it take you to reach merging speed at {n} mph? Given B = 15, m = 15, q = 5, v = 3, find the radius of a particle\u2019s path in a magnetic field.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "w=m*g-23",
+  "q": "Find the Current through Parallel Resistors The three circuits below are equivalent. Given g = 2, m = 25, find the definition of weight, scalar form.",
+  "record": "w=m*g | g:m/s^2 m:kg | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B*E=h*f_O-24",
+  "q": "Calculate the wavelength of light that has its third minimum at an angle of {n} . Given f_O = 20, h = 15, find the binding energy of an electron.",
+  "record": "B*E=h*f_O | f_O:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Q=((d*V)/(-25",
+  "q": "What is emerging in these observations is a connection between magnetic and electric fields. Given V = 2, d = 25, t = 2, find the volume flow rate.",
+  "record": "Q=((d*V)/(d*t)) | V:m^3 d:m t:s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "lambda=((c-26",
+  "q": "Determine the magnitude of the magnetic field at the center of the loop. Given c = 5, f = 30, find the deriving and using the wave equation.",
+  "record": "lambda=((c)/(f)) | c:m/s f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "v_w=((lamb-27",
+  "q": "Find the magnitude and direction angle from the positive x -axis of the resultant force. Given T = 2, lambda = 3, find the wave velocity.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "d_2=((2*A)-28",
+  "q": "Find the magnitude of this force so that the sphere remains in static equilibrium. Given A = 25, d_1 = 5, find the (from worked example).",
+  "record": "d_2=((2*A)/(d_1)) | A:m^2 d_1:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Delta_E=h*-29",
+  "q": "What was the initial speed of the car prior to the collision, assuming the car is at rest at the end of the time interval? Given f = 8, h = 25, find the energy quantum of radiation.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "v=((omega)-30",
+  "q": "What mass of water will provide the same amount of heat when cooled from {n}. Given k = 12, omega = 25, find the wave speed.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "E=n*h*f-31",
+  "q": "Calculate the heat transferred from the change in air temperature: Q = mc \u0394 T so that Q = {n} kg {n} J/kg \u22c5\u00ba C {n}. Given f = 10, h = 30, n = 10, find the quantum energy.",
+  "record": "E=n*h*f | f:Hz h:J*s n:1 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "T=((1)/(f)-32",
+  "q": "How much time is required for a particle on the string to move through a distance of {n}. Given f = 8, find the period.",
+  "record": "T=((1)/(f)) | f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B=((mu_0*I-33",
+  "q": "However, most of the functions we will work with in this book will have numbers as inputs and outputs. Given I = 5, R = 30, mu_0 = 20, find the magnetic field due to along straight wire.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_c=(((v)^-34",
+  "q": "How would angular velocity affect angular momentum? Given r = 8, v = 2, find the centripetal acceleration.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_n2=a_n+a-35",
+  "q": "What is the temperature of the patch, and what is the rate of heat loss through it? Given a_n = 10, a_n1 = 15, find the (from worked example).",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "R_eqv=R_1+-36",
+  "q": "What is \u03b3 for a proton having a mass energy of {n}. Given R_1 = 5, R_2 = 5, find the (from worked example).",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "r=((m*v)/(-37",
+  "q": "Determine the first time when the distance moved is {n}. Given B = 10, m = 10, q = 12, v = 10, find the radius of a particle\u2019s path in a magnetic field.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "w=m*g-38",
+  "q": "How much more power is dissipated in the copper wires than it would be in superconducting wires? Given g = 30, m = 25, find the definition of weight, scalar form.",
+  "record": "w=m*g | g:m/s^2 m:kg | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B*E=h*f_O-39",
+  "q": "What is the molar mass of the gas? Given f_O = 20, h = 3, find the binding energy of an electron.",
+  "record": "B*E=h*f_O | f_O:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Q=((d*V)/(-40",
+  "q": "However, the system will have a great deal of kinetic energy after the explosion, although it had none before. Given V = 15, d = 15, t = 2, find the volume flow rate.",
+  "record": "Q=((d*V)/(d*t)) | V:m^3 d:m t:s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "lambda=((c-41",
+  "q": "Find the energy in MeV of a photon having a wavelength of a picometer. Given c = 15, f = 25, find the deriving and using the wave equation.",
+  "record": "lambda=((c)/(f)) | c:m/s f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "v_w=((lamb-42",
+  "q": "What is the momentum of the {n}. Given T = 10, lambda = 2, find the wave velocity.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "d_2=((2*A)-43",
+  "q": "What all these galaxies have in common is some activity in their nuclei that produces an enormous amount of energy in a very small volume of space. Given A = 10, d_1 = 20, find the (from worked example).",
+  "record": "d_2=((2*A)/(d_1)) | A:m^2 d_1:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Delta_E=h*-44",
+  "q": "Find the equation of motion if the mass is released from equilibrium with an upward velocity of {n} m/sec. Given f = 3, h = 12, find the energy quantum of radiation.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "v=((omega)-45",
+  "q": "What are the electric and magnetic forces on the proton at that instant? Given k = 20, omega = 12, find the wave speed.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "E=n*h*f-46",
+  "q": "Calculate the force exerted on a test charge by an electric field. Given f = 10, h = 25, n = 5, find the quantum energy.",
+  "record": "E=n*h*f | f:Hz h:J*s n:1 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "T=((1)/(f)-47",
+  "q": "What is the amplitude of the resultant wave? Given f = 30, find the period.",
+  "record": "T=((1)/(f)) | f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B=((mu_0*I-48",
+  "q": "What is the best way to explain the loss of kinetic energy of the ball during the collision? Given I = 3, R = 8, mu_0 = 25, find the magnetic field due to along straight wire.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_c=(((v)^-49",
+  "q": "However, some phenomena require analysis and explanations based on the wave characteristics of light. Given r = 2, v = 8, find the centripetal acceleration.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "a_n2=a_n+a-50",
+  "q": "Find the force F {n} acting on the box such that the box is in static equilibrium. Given a_n = 3, a_n1 = 5, find the (from worked example).",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "R_eqv=R_1+-51",
+  "q": "What is the power delivered to the electron at the instant that its displacement is {n}. Given R_1 = 12, R_2 = 15, find the (from worked example).",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "r=((m*v)/(-52",
+  "q": "What is the potential difference between the shells? Given B = 30, m = 3, q = 25, v = 15, find the radius of a particle\u2019s path in a magnetic field.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "w=m*g-53",
+  "q": "What if the gravitational potential energy was {n}. Given g = 15, m = 8, find the definition of weight, scalar form.",
+  "record": "w=m*g | g:m/s^2 m:kg | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "B*E=h*f_O-54",
+  "q": "What will be the net charge of the object? Given f_O = 12, h = 10, find the binding energy of an electron.",
+  "record": "B*E=h*f_O | f_O:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Q=((d*V)/(-55",
+  "q": "How does it affect the resolving power? Given V = 8, d = 15, t = 2, find the volume flow rate.",
+  "record": "Q=((d*V)/(d*t)) | V:m^3 d:m t:s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "lambda=((c-56",
+  "q": "What will its speed be just before it hits our atmosphere? Given c = 12, f = 8, find the deriving and using the wave equation.",
+  "record": "lambda=((c)/(f)) | c:m/s f:Hz | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "v_w=((lamb-57",
+  "q": "What charge q must be placed at the origin so that the electric field vanishes at x = {n} , y = {n}. Given T = 5, lambda = 20, find the wave velocity.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "d_2=((2*A)-58",
+  "q": "What is the pressure of the air? Given A = 20, d_1 = 25, find the (from worked example).",
+  "record": "d_2=((2*A)/(d_1)) | A:m^2 d_1:m | standard conditions",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "Delta_E=h*-59",
+  "q": "What property of a reaction can we use to predict the effect of a change in temperature on the value of an equilibrium constant? Given f = 20, h = 3, find the energy quantum of radiation.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | standard conditions",
+  "calls": [
+   "x"
+  ]
+ }
+]
