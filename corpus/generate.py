@@ -108,6 +108,12 @@ def gen(n, seed=0):
         free = [v for v in vs if v not in CONST]
         if not free: continue                          # nothing left to ask about
         g = ", ".join(f"{v} = {vals[v]:g}" for v in free)
+        # Decide AFTER the question exists, not before. withheld -> the document is a refusal.
+        withhold = rng.random() < 0.15 and len(vs) >= 2
+        if withhold:
+            drop = rng.choice(vs)
+            free_w = [v for v in free if v != drop]
+            g = ", ".join(f"{v} = {vals[v]:g}" for v in free_w) if free_w else g
         stem = rng.choice(GIVE).format(g=g)
         ask  = rng.choice(ASK).format(q=r["name"].lower())
         # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
@@ -118,7 +124,8 @@ def gen(n, seed=0):
         else:
             q = stem + (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask)
         umap = " ".join(f"{v}:{r['units'][v]}" for v in vs if v in r["units"])
-        docs.append({"q": q, "rec": f"{r['f']} | {umap} | {r['cond']}", "lhs": lhs,
+        docs.append({"q": q, "withhold": drop if withhold else None,
+                     "rec": f"{r['f']} | {umap} | {r['cond']} | fit:high", "lhs": lhs,
                      "name": r["name"], "head": r["f"],
                      "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
@@ -127,6 +134,12 @@ def gen(n, seed=0):
                          capture_output=True, text=True).stdout, re.S)
     built, dropped = [], 0
     for d, c, res in zip(docs, calls, out):
+        if d.get("withhold"):
+            # Same question, same vocabulary, same record -- one given absent and a refusal answer.
+            ans = f"I cannot answer that — {d['withhold']} is not given."
+            built.append({"head": d["head"], "kind": "D1",
+                          "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>", "ans": ans})
+            continue
         if res.startswith("!"): dropped += 1; continue        # TOOL_SPEC 8.1: drop, never guess
         try:   res = f"{float(res):.4g}"            # signed off: 4 significant figures
         except ValueError: pass
@@ -198,20 +211,6 @@ if __name__ == "__main__":
     print(f"      (the composite above is dragged down by the record span, which is a canonical")
     print(f"       retrieval record and is SUPPOSED to repeat -- bounded by head count alone)")
     D.update({"span_"+k: v for k, v in SP.items()})
-    # Refusal documents at 15% -- D1 10%, D2 5%, D3 0% per REFUSAL_DESIGN.md. Kept separate
-    # from the no-tool conceptual fraction: C says "here is the concept", D says "I cannot,
-    # because X is missing", and folding them teaches one behaviour where two are needed.
-    try:
-        ref = json.load(open("corpus/refusal_docs.json"))
-        want = int(len(docs) * 0.15 / 0.85)
-        rng2 = random.Random(20260823)
-        pick = [rng2.choice(ref) for _ in range(want)]
-        docs = docs + [{"head": "REFUSAL", "text": r["text"], "ans": "", "kind": r["type"]}
-                       for r in pick]
-        rng2.shuffle(docs)
-        print(f"    refusal docs added: {len(pick)} = {100*len(pick)/len(docs):.0f}% of corpus")
-    except FileNotFoundError:
-        print("    WARNING: no refusal_docs.json -- corpus has NO refusal documents")
     pathlib.Path("corpus/synth_sample.jsonl").write_text(
         "\n".join(json.dumps(d) for d in docs))
     json.dump(D, open("corpus/diversity.json","w"), indent=1)

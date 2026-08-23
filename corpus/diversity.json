@@ -1,9 +1,9 @@
 {
- "distinct_4gram_ratio": 0.2783167625461868,
+ "distinct_4gram_ratio": 0.2335235301627177,
  "head_coverage": 0.9871794871794872,
  "heads_used": 77,
- "mean_phrasing_entropy_bits": 4.7686918764913715,
- "span_question": 0.1887955797784987,
- "span_record": 0.00029812618643268685,
- "span_answer": 0.4701197791040922
+ "mean_phrasing_entropy_bits": 4.818463241210567,
+ "span_question": 0.18970606761298292,
+ "span_record": 0.00041648519811605895,
+ "span_answer": 0.36994927802461824
 }
