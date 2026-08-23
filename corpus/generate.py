@@ -198,6 +198,20 @@ if __name__ == "__main__":
     print(f"      (the composite above is dragged down by the record span, which is a canonical")
     print(f"       retrieval record and is SUPPOSED to repeat -- bounded by head count alone)")
     D.update({"span_"+k: v for k, v in SP.items()})
+    # Refusal documents at 15% -- D1 10%, D2 5%, D3 0% per REFUSAL_DESIGN.md. Kept separate
+    # from the no-tool conceptual fraction: C says "here is the concept", D says "I cannot,
+    # because X is missing", and folding them teaches one behaviour where two are needed.
+    try:
+        ref = json.load(open("corpus/refusal_docs.json"))
+        want = int(len(docs) * 0.15 / 0.85)
+        rng2 = random.Random(20260823)
+        pick = [rng2.choice(ref) for _ in range(want)]
+        docs = docs + [{"head": "REFUSAL", "text": r["text"], "ans": "", "kind": r["type"]}
+                       for r in pick]
+        rng2.shuffle(docs)
+        print(f"    refusal docs added: {len(pick)} = {100*len(pick)/len(docs):.0f}% of corpus")
+    except FileNotFoundError:
+        print("    WARNING: no refusal_docs.json -- corpus has NO refusal documents")
     pathlib.Path("corpus/synth_sample.jsonl").write_text(
         "\n".join(json.dumps(d) for d in docs))
     json.dump(D, open("corpus/diversity.json","w"), indent=1)
