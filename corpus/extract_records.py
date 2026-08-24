@@ -101,6 +101,6 @@ ok = [r for r, o in zip(rows, out) if not o.startswith("!")]
 err = collections.Counter(o.split()[0] for o in out if o.startswith("!"))
 print(f"GATE A (parses + solvable for LHS): {len(ok)}/{len(rows)} = {100*len(ok)/max(1,len(rows)):.0f}%")
 print("  rejects:", dict(err))
-json.dump(ok, open("corpus/records_raw.json","w"), indent=1)
+_wj("corpus/records_raw.json", ok, indent=1)
 print("\nsample survivors:")
 for r in ok[:12]: print(f"  {r['f']:<34} {r['name'][:52]}")

@@ -4,6 +4,10 @@
 Token count is the wrong instrument: 310k documents from 27 record heads is 27 patterns repeated,
 and the token count looks identical to a genuinely varied corpus. Everything here is reported
 alongside three diversity measures, never alone."""
+import json
+import sys as _sys, pathlib as _pl
+_sys.path.insert(0, str(_pl.Path(__file__).parent))
+from atomic import write_json as _wj, write_text as _wt
 import json, re, random, subprocess, collections, math, sys, time, pathlib
 
 # Universal constants are NOT free variables. The hand-read of 30 found 8 documents assigning
@@ -232,7 +236,7 @@ if __name__ == "__main__":
     print(f"      (the composite above is dragged down by the record span, which is a canonical")
     print(f"       retrieval record and is SUPPOSED to repeat -- bounded by head count alone)")
     D.update({"span_"+k: v for k, v in SP.items()})
-    pathlib.Path("corpus/synth_sample.jsonl").write_text(
+    _wt("corpus/synth_sample.jsonl", 
         "\n".join(json.dumps(d) for d in docs))
-    json.dump(D, open("corpus/diversity.json","w"), indent=1)
+    _wj("corpus/diversity.json", D, indent=1)
     print("\n  sample:"); [print("   ", d["text"][:150]) for d in docs[:3]]
