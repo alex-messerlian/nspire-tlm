@@ -1,482 +1,642 @@
 [
  {
-  "q": "The beam has A = 3, d = 10, epsilon_0 = 3. What is the capacitance of a parallel-plate capacitor of beam?",
-  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | standard conditions",
-  "id": "C=epsilo|99d244",
+  "id": "REP-001",
+  "q": "An ideal gas at 300 K is compressed isothermally to one-fifth its original volume. B = 5, m = 10, q = 12, v = 5.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The car has x_1 = 25, x_2 = 3, y_1 = 10, y_2 = 15. What does distance the car to be in 25?",
-  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | standard conditions",
-  "id": "d=sqrt((|9505e3",
+  "id": "REP-002",
+  "q": "Find the amount of money in the account after 10 years and after 20 years. k = 8, m = 5.",
+  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The lens has k = 20, omega = 8. Find the wave speed of the lens 20.",
-  "record": "v=((omega)/(k)) | k:1/m omega:1/s | standard conditions",
-  "id": "v=((omeg|ea61cb",
+  "id": "REP-003",
+  "q": "How many people who donated blood do not have the Rh + blood factor? g = 20, theta_0 = 10, v_0 = 10.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The pendulum has Delta_f = 25, h = 12. Atomic transitions 25 pendulum 12 pendulum?",
-  "record": "Delta_E=h*Delta_f | Delta_f:Hz h:J*s | standard conditions",
-  "id": "Delta_E=|a53853",
+  "id": "REP-004",
+  "q": "The independent variable ( x ) is the number of hours Svetlana tutors each session. I = 8, R = 12, mu_0 = 5.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The block has k = 10, m = 12. How many natural angular frequency of amass-spring system and how many block does block have?",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | standard conditions",
-  "id": "omega_0=|e92726",
+  "id": "REP-005",
+  "q": "The part completed by Corey plus the part completed by Casey equals the amount completed together. a_n = 10, a_n1 = 12.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The pendulum has A = 20, I = 2, n = 10, q = 20. A what is the drift velocity of the pendulum?",
-  "record": "v_d=((I)/(n*q*A)) | A:m^2 I:A n:1/m^3 q:C | standard conditions",
-  "id": "v_d=((I)|b1f181",
+  "id": "REP-006",
+  "q": "How do such properties as specific heat and thermal conductivity affect the use of each material as a thermometer? f = 8, lambda = 8.",
+  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The lens has c = 2, f = 25. Deriving and using the wave equation what is the lens in lens?",
-  "record": "lambda=((c)/(f)) | c:m/s f:Hz | standard conditions",
-  "id": "lambda=(|af6a10",
+  "id": "REP-007",
+  "q": "The probabilities for A and for B are P ( A ) = 3 4 and P ( B ) = 1 4 . A = 2, d = 10, epsilon_0 = 5.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The beam has g = 5, m = 5. How much definition of weight, scalar form was beam in 5 beam?",
-  "record": "w=m*g | g:m/s^2 m:kg | standard conditions",
-  "id": "w=m*g|fed7d7",
+  "id": "REP-008",
+  "q": "If you draw 3 slips, what is the probability that the letters will spell out (in order) the word BAD? f = 12, lambda = 2.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The coil has f = 2. Period what is coil these coil?",
-  "record": "T=((1)/(f)) | f:Hz | standard conditions",
-  "id": "T=((1)/(|730532",
+  "id": "REP-009",
+  "q": "The amount collected is 1 , 000 ( 30 ) + 2 , 500 ( 40 ) , which is 30 , 000 + 100 , 000 or 130,000. f = 20, h = 5.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The wire has Delta_t = 15, Delta_theta = 30. What angular speed: of wire is this?",
-  "record": "omega=((Delta_theta)/(Delta_t)) | Delta_t:s Delta_theta:1 | standard conditions",
-  "id": "omega=((|fb4f4b",
+  "id": "REP-010",
+  "q": "The system is acted on by an external force of 8 sin ( 4 t ) lb. k = 2, omega = 2.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The circuit has g = 30, t = 8, v_0 = 2, y_0 = 15. Determine the height of free fall for the circuit.",
-  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | standard conditions",
-  "id": "y=y_0+v_|01b036",
+  "id": "REP-011",
+  "q": "a k = ( k k + ln k ) k ( Hint: a k = ( 1 + ln k k ) \u2212 ( k / ln k ) ln k \u2248 e \u2212 ln k . g = 8, t = 5, v_0 = 10, y_0 = 2.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The beam has f = 20, lambda = 8. Calculate the strategy for the beam.",
-  "record": "c=f*lambda | f:Hz lambda:m | standard conditions",
-  "id": "c=f*lamb|3680d6",
+  "id": "REP-012",
+  "q": "Find the length of the curve r ( t ) = \u2329 2 sin t , 5 t , 2 cos t \u232a for t \u2208 [ \u221210 , 10 ] . x_1 = 12, x_2 = 5, y_1 = 20, y_2 = 2.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The rod has a_1 = 25, n = 5. What do series solutions to differential equations the rod?",
-  "record": "a_n=((a_1)/(n!)) | a_1:m/s^2 n:1 | standard conditions",
-  "id": "a_n=((a_|0ff7a3",
+  "id": "REP-013",
+  "q": "The expectation value of momentum in the x -direction also requires an integral. R_1 = 10, R_2 = 8.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The disc has f_O = 12, h = 10. How much did binding energy of an electron to disc the disc?",
-  "record": "B*E=h*f_O | f_O:Hz h:J*s | standard conditions",
-  "id": "B*E=h*f_|5857b6",
+  "id": "REP-014",
+  "q": "Would the cell potential increase, decrease, or remain the same? f = 3.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The car has t = 2, v_0y = 15, v_y = 20, y_0 = 2. What is the a fireworks projectile explodes high and away in car?",
-  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | standard conditions",
-  "id": "y=y_0+((|49d89f",
+  "id": "REP-015",
+  "q": "What force does he apply if the stone accelerates at a rate of 1. T = 20, lambda = 12.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The cart has f = 10, h = 8, n = 10. Find the quantum energy of the two cart.",
-  "record": "E=n*h*f | f:Hz h:J*s n:1 | standard conditions",
-  "id": "E=n*h*f|27994a",
+  "id": "REP-016",
+  "q": "The graph is a vertical line crossing the x -axis at \u22123 . B = 2, m = 3, q = 20, v = 3.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The spring has r = 25, v = 12. How many centripetal acceleration are in the spring?",
-  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | standard conditions",
-  "id": "a_c=(((v|cffed6",
+  "id": "REP-017",
+  "q": "If many random samples were taken of size 14, what percent of the confidence intervals constructed should contain the population mean worth of coupons? k = 8, m = 20.",
+  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The wire has Delta_E = 30, c = 25. How many calculating the mass of a pion did wire?",
-  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | standard conditions",
-  "id": "m=Delta_|c8230e",
+  "id": "REP-018",
+  "q": "An artist wants to make a small monument in the shape of a square base topped by a right triangle, as shown below. g = 5, theta_0 = 8, v_0 = 3.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The pendulum has V = 20, d = 25, t = 10. What are the volume flow rate of the pendulum?",
-  "record": "Q=((d*V)/(d*t)) | V:m^3 d:m t:s | standard conditions",
-  "id": "Q=((d*V)|200493",
+  "id": "REP-019",
+  "q": "A compass needle is placed to the north of the bar magnet. I = 12, R = 10, mu_0 = 3.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The wire has U = 15, d = 2, l = 15. A what is the conservative force is the negative derivative of potential energy of this wire?",
-  "record": "F_l=-((d*U)/(d*l)) | U:J d:m l:m | standard conditions",
-  "id": "F_l=-((d|d4f53f",
+  "id": "REP-020",
+  "q": "6 \u00d7 10 6 J) of electricity would be required to provide the heat necessary to heat the house? a_n = 20, a_n1 = 5.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The cart has f = 5, h = 3. Find the energy quantum of radiation of each cart.",
-  "record": "Delta_E=h*f | f:Hz h:J*s | standard conditions",
-  "id": "Delta_E=|5b24b9",
+  "id": "REP-021",
+  "q": "When will the potato hit the ground, or have a height of zero feet? f = 5, lambda = 3.",
+  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The disc has A = 20, d = 2, epsilon_0 = 12. What capacitance of a parallel-plate capacitor of disc to disc?",
-  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | standard conditions",
-  "id": "C=epsilo|e0ac00",
+  "id": "REP-022",
+  "q": "Why do infrared or radio telescopes work better? A = 8, d = 20, epsilon_0 = 2.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The spring has x_1 = 30, x_2 = 8, y_1 = 5, y_2 = 30. How many distance are in a spring?",
-  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | standard conditions",
-  "id": "d=sqrt((|4f9ec8",
+  "id": "REP-023",
+  "q": "Find the 95% Confidence Interval for the true population mean for the amount of soda served. f = 12, lambda = 12.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The beam has Delta_f = 10, h = 8. Is the atomic transitions a beam?",
-  "record": "Delta_E=h*Delta_f | Delta_f:Hz h:J*s | standard conditions",
-  "id": "Delta_E=|7f63b2",
+  "id": "REP-024",
+  "q": "The magnitudes of charge of the proton and the electron are equal, but the charge of the proton is negative, whereas the charge of the electron is positive. f = 12, h = 2.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The spring has A = 5, I = 2, n = 3, q = 20. Find the drift velocity of the three spring of the spring.",
-  "record": "v_d=((I)/(n*q*A)) | A:m^2 I:A n:1/m^3 q:C | standard conditions",
-  "id": "v_d=((I)|988338",
+  "id": "REP-025",
+  "q": "What are the values of its magnetic field at r = 8. k = 5, omega = 12.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The piston has c = 30, f = 10. How many deriving and using the wave equation of piston have to piston?",
-  "record": "lambda=((c)/(f)) | c:m/s f:Hz | standard conditions",
-  "id": "lambda=(|9d616b",
+  "id": "REP-026",
+  "q": "Find the probability that there are fewer than 130 that favor a charter school for grades K through 5. g = 5, t = 3, v_0 = 12, y_0 = 20.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The cart has g = 3, m = 15. How long definition of weight, scalar form a cart of the cart be?",
-  "record": "w=m*g | g:m/s^2 m:kg | standard conditions",
-  "id": "w=m*g|b5f533",
+  "id": "REP-027",
+  "q": "The temperature of the calorimeter increases from 26. x_1 = 5, x_2 = 8, y_1 = 10, y_2 = 2.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The capacitor has Delta_t = 10, Delta_theta = 8. What is the angular speed: and capacitor of the capacitor?",
-  "record": "omega=((Delta_theta)/(Delta_t)) | Delta_t:s Delta_theta:1 | standard conditions",
-  "id": "omega=((|8e42c9",
+  "id": "REP-028",
+  "q": "Can you have a finite absolute maximum for y = a x 2 + b x + c over ( \u2212 \u221e , \u221e ) ? R_1 = 8, R_2 = 10.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The rod has I = 3, R = 8, mu_0 = 12. Magnetic field due to along straight wire what is this rod in rod?",
-  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | standard conditions",
-  "id": "B=((mu_0|0e9d93",
+  "id": "REP-029",
+  "q": "The results of the sample data _____________________________________. f = 8.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The rod has T = 5, lambda = 12. Find wave velocity 5, rod 12, and rod 5.",
-  "record": "v_w=((lambda)/(T)) | T:s lambda:m | standard conditions",
-  "id": "v_w=((la|1ae531",
+  "id": "REP-030",
+  "q": "Qu\u00e9 gemelo ganar\u00e1 m\u00e1s intereses al momento en que tengan 55 a\u00f1os? T = 2, lambda = 8.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The wheel has f = 30, lambda = 3. Is this a strategy or wheel?",
-  "record": "c=f*lambda | f:Hz lambda:m | standard conditions",
-  "id": "c=f*lamb|1a7680",
+  "id": "REP-031",
+  "q": "Find the quotient: ( \u22126 a 6 b 9 ) ( \u22128 a 5 b 8 ) \u221212 a 10 b 12 . B = 20, m = 2, q = 5, v = 20.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The block has a_1 = 25, n = 5. Series solutions to differential equations, block a block?",
-  "record": "a_n=((a_1)/(n!)) | a_1:m/s^2 n:1 | standard conditions",
-  "id": "a_n=((a_|64251e",
+  "id": "REP-032",
+  "q": "A loop of wire should be placed at angle greater than 90\u00b0 to the vacuum cleaner wire to maximize the magnetic flux through the loop. k = 8, m = 5.",
+  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The pendulum has f_O = 15, h = 12. Binding energy of an electron is the pendulum or pendulum?",
-  "record": "B*E=h*f_O | f_O:Hz h:J*s | standard conditions",
-  "id": "B*E=h*f_|d7b306",
+  "id": "REP-033",
+  "q": "Find the average velocity v avg of the rock for when the rock is released and the rock hits the ground. g = 20, theta_0 = 5, v_0 = 8.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The cart has f = 5, lambda = 3. Find the velocity of a wave between the two cart.",
-  "record": "v=f*lambda | f:Hz lambda:m | standard conditions",
-  "id": "v=f*lamb|8c3571",
+  "id": "REP-034",
+  "q": "The formula for the perimeter of a rectangle relates all the information. I = 10, R = 10, mu_0 = 12.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The block has t = 12, v_0y = 3, v_y = 3, y_0 = 12. What is the a fireworks projectile explodes high and away of the block on the block?",
-  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | standard conditions",
-  "id": "y=y_0+((|3af6d0",
+  "id": "REP-035",
+  "q": "A farmer picks pumpkins from a large field. a_n = 10, a_n1 = 10.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The satellite has g = 15, theta_0 = 5, v_0 = 15. 15 time of flight 5 15 15 5?",
-  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | standard conditions",
-  "id": "T_tof=((|c48ce0",
+  "id": "REP-036",
+  "q": "The solubility of NaHCO 3 in hot water of 60 \u00b0C is 164 g/L. f = 20, lambda = 20.",
+  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The wire has k = 5, m = 12. How many period of a mass-spring system in shm and how many wire did wire?",
-  "record": "T=2*pi*sqrt(((m)/(k))) | k:N/m m:kg | standard conditions",
-  "id": "T=2*pi*s|d2a7fa",
+  "id": "REP-037",
+  "q": "How can you decide if a wire is infinite? A = 8, d = 10, epsilon_0 = 2.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The circuit has B = 5, m = 15, q = 15, v = 8. Is this a radius of a particle\u2019s path in a magnetic field, circuit, or circuit?",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | standard conditions",
-  "id": "r=((m*v)|4e9071",
+  "id": "REP-038",
+  "q": "What charge is stored in the capacitor in ? f = 2, lambda = 20.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The wheel has V = 25, d = 30, t = 15. What is the volume flow rate of wheel?",
-  "record": "Q=((d*V)/(d*t)) | V:m^3 d:m t:s | standard conditions",
-  "id": "Q=((d*V)|99d244",
+  "id": "REP-039",
+  "q": "--> Can a virtual image be projected onto a screen with additional lenses or mirrors? f = 5, h = 12.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The satellite has U = 30, d = 15, l = 8. What does conservative force is the negative derivative of potential energy the satellite to be in 30?",
-  "record": "F_l=-((d*U)/(d*l)) | U:J d:m l:m | standard conditions",
-  "id": "F_l=-((d|9505e3",
+  "id": "REP-040",
+  "q": "Finding Zeros and y -Intercepts of a Function Consider the function f ( x ) = \u22124 x + 2 . k = 12, omega = 3.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
   "calls": [
    "x"
   ]
  },
  {
-  "q": "The circuit has f = 2, h = 5. What is the energy quantum of radiation of this circuit?",
-  "record": "Delta_E=h*f | f:Hz h:J*s | standard conditions",
-  "id": "Delta_E=|a79da1",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-041",
+  "q": "The instructor surveys 84 of students in the class and finds that 11 of them attended the midnight showing. g = 8, t = 3, v_0 = 12, y_0 = 5.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The beam has A = 5, d = 12, epsilon_0 = 15. Find the capacitance of a parallel-plate capacitor of the beam 5.",
-  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | standard conditions",
-  "id": "C=epsilo|ea61cb",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-042",
+  "q": "The polynomial \u221216 t 2 + 275 gives the height of the squeegee t seconds after it was dropped. x_1 = 2, x_2 = 12, y_1 = 12, y_2 = 8.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The car has x_1 = 10, x_2 = 20, y_1 = 5, y_2 = 20. Distance 10 car 20 car?",
-  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | standard conditions",
-  "id": "d=sqrt((|a53853",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-043",
+  "q": "(c) What mass of 235 U is fissioned in 1 year of full-power operation? R_1 = 20, R_2 = 20.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The beam has k = 8, omega = 2. How many wave speed and how many beam does beam have?",
-  "record": "v=((omega)/(k)) | k:1/m omega:1/s | standard conditions",
-  "id": "v=((omeg|e92726",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-044",
+  "q": "The polynomial h ( t ) = \u221216 t 2 + 200 gives the height of the ball, in feet, t seconds after it is dropped. f = 5.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The gas sample has Delta_f = 8, h = 15. A what is the atomic transitions of the gas sample?",
-  "record": "Delta_E=h*Delta_f | Delta_f:Hz h:J*s | standard conditions",
-  "id": "Delta_E=|b1f181",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-045",
+  "q": "Calculate the heat of formation, \u0394 H f \u00b0 of propane given that \u0394 H f \u00b0 of H 2 O( l ) = \u2212285. T = 3, lambda = 2.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The beam has k = 30, m = 15. How much natural angular frequency of amass-spring system was beam in 30 beam?",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | standard conditions",
-  "id": "omega_0=|fed7d7",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-046",
+  "q": "A balloon filled with helium gas takes 6 hours to deflate to 50% of its original volume. B = 12, m = 5, q = 2, v = 2.",
+  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The cart has A = 12, I = 2, n = 30, q = 10. Drift velocity what is cart these cart?",
-  "record": "v_d=((I)/(n*q*A)) | A:m^2 I:A n:1/m^3 q:C | standard conditions",
-  "id": "v_d=((I)|730532",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-047",
+  "q": "(b) What is the magnitude of the force exerted on the ship by the artillery shell, and why? k = 8, m = 12.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The beam has c = 5, f = 15. What deriving and using the wave equation of beam is this?",
-  "record": "lambda=((c)/(f)) | c:m/s f:Hz | standard conditions",
-  "id": "lambda=(|fb4f4b",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-048",
+  "q": "Is any new information gained by applying the junction rule at e? g = 10, theta_0 = 20, v_0 = 3.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The cart has g = 30, m = 15. Determine the definition of weight, scalar form for the cart.",
-  "record": "w=m*g | g:m/s^2 m:kg | standard conditions",
-  "id": "w=m*g|01b036",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-049",
+  "q": "The mean weaning age was nine months (3/4 year) with a standard deviation of 4 months. I = 5, R = 8, mu_0 = 20.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The rod has g = 25, t = 10, v_0 = 8, y_0 = 15. Calculate the height of free fall for the rod.",
-  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | standard conditions",
-  "id": "y=y_0+v_|3680d6",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-050",
+  "q": "How can it be demonstrated that colloidal particles are electrically charged? a_n = 5, a_n1 = 12.",
+  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The container has I = 2, R = 3, mu_0 = 25. What do magnetic field due to along straight wire the container?",
-  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | standard conditions",
-  "id": "B=((mu_0|0ff7a3",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-051",
+  "q": "The correct conversion factors are those that cancel the unwanted units and leave the desired units in their place. f = 10, lambda = 8.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The car has T = 30, lambda = 3. How much did wave velocity to car the car?",
-  "record": "v_w=((lambda)/(T)) | T:s lambda:m | standard conditions",
-  "id": "v_w=((la|5857b6",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-052",
+  "q": "(b) How many homes could be supplied at the 500 kW\u00b7h per month rate for one year by the energy from the described mass conversion? A = 5, d = 10, epsilon_0 = 5.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The pendulum has a_1 = 8, n = 30. What is the series solutions to differential equations in pendulum?",
-  "record": "a_n=((a_1)/(n!)) | a_1:m/s^2 n:1 | standard conditions",
-  "id": "a_n=((a_|49d89f",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-053",
+  "q": "Find the quotient: ( x 4 \u2212 11 x 2 \u2212 7 x \u2212 6 ) \u00f7 ( x + 3 ) . f = 8, lambda = 20.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The capacitor has f_O = 2, h = 12. Find the binding energy of an electron of the two capacitor.",
-  "record": "B*E=h*f_O | f_O:Hz h:J*s | standard conditions",
-  "id": "B*E=h*f_|27994a",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-054",
+  "q": "What was the sales tax rate for this purchase? f = 20, h = 2.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The wire has f = 8, lambda = 8. What is the final velocity of a wave of the wire?",
-  "record": "v=f*lambda | f:Hz lambda:m | standard conditions",
-  "id": "v=f*lamb|1876ce",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-055",
+  "q": "Show algebraically that c \u2212 P ( t ) P ( t ) = c \u2212 P 0 P 0 e \u2212 b t . k = 8, omega = 10.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The piston has t = 15, v_0y = 20, v_y = 2, y_0 = 10. How many a fireworks projectile explodes high and away are in the piston?",
-  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | standard conditions",
-  "id": "y=y_0+((|cffed6",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-056",
+  "q": "Determine la longitud del arco de un c\u00edrculo de radio 10 cent\u00edmetros subtendido por el \u00e1ngulo central de 50\u00b0. g = 2, t = 8, v_0 = 8, y_0 = 8.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The block has r = 25, v = 12. How many centripetal acceleration did block?",
-  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | standard conditions",
-  "id": "a_c=(((v|c8230e",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-057",
+  "q": "The resultant wave form when you add the two functions is y R = 2 A sin ( k x + \u03d5 2 ) cos ( \u03c9 t + \u03d5 2 ) . x_1 = 10, x_2 = 2, y_1 = 10, y_2 = 12.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The beam has k = 8, m = 5. What are the period of a mass-spring system in shm of the beam?",
-  "record": "T=2*pi*sqrt(((m)/(k))) | k:N/m m:kg | standard conditions",
-  "id": "T=2*pi*s|200493",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-058",
+  "q": "(a) If at time t = 0 the origins coincide, what is the position of the origin O \u2032 in the S frame as a function of time? R_1 = 3, R_2 = 8.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The car has Delta_E = 30, c = 25. A what is the calculating the mass of a pion of this car?",
-  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | standard conditions",
-  "id": "m=Delta_|d4f53f",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-059",
+  "q": "The earthbound observer measures \u0394 t as given by the equation \u0394 t = \u03b3 \u0394 \u03c4 . f = 20.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  },
  {
-  "q": "The capacitor has B = 25, m = 2, q = 30, v = 3. Find the radius of a particle\u2019s path in a magnetic field of each capacitor.",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | standard conditions",
-  "id": "r=((m*v)|5b24b9",
-  "calls": [
-   "x"
-  ]
+  "id": "REP-060",
+  "q": "The lower bound z = x 2 + y 2 is the upper half of a cone and the upper bound z = 18 \u2212 x 2 \u2212 y 2 is the upper half of a sphere. T = 12, lambda = 10.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-061",
+  "q": "A spring attached to a ceiling is pulled down 11 cm from equilibrium and released. B = 8, m = 3, q = 2, v = 12.",
+  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-062",
+  "q": "50 from each customer, how much will they have in the tip jar if they serve n more customers during the shift? k = 20, m = 10.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-063",
+  "q": "The frequencies of two successive modes of standing waves on a string are 258. g = 12, theta_0 = 5, v_0 = 3.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-064",
+  "q": "The Forum Research surveyed 1,046 Torontonians. I = 3, R = 8, mu_0 = 12.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-065",
+  "q": "a n = ( 1 \u2212 2 n ) n Since ( 1 + 1 / n ) n \u2192 e , one has ( 1 \u2212 2 / n ) n \u2248 ( 1 + k ) \u22122 k \u2192 e \u22122 as k \u2192 \u221e . a_n = 10, a_n1 = 3.",
+  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-066",
+  "q": "The amount of work the force does is the scalar product F \u2192 \u00b7 D \u2192 . f = 10, lambda = 20.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-067",
+  "q": "The greenhouse effect comes from the difference between the atmosphere\u2019s transmission of visible light and its rather strong absorption of infrared. A = 5, d = 2, epsilon_0 = 8.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-068",
+  "q": "If there is the same amount of almonds as cashews, how many of each item is in the trail mix? f = 5, lambda = 2.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-069",
+  "q": "The z -scores are \u20131 and +1 for 44 and 56, respectively. f = 12, h = 10.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-070",
+  "q": "How many pounds of prepared dishes can Kiran buy? k = 5, omega = 3.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-071",
+  "q": "The marital status distribution of the population of U. g = 20, t = 10, v_0 = 8, y_0 = 12.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-072",
+  "q": "Which of the gas giants has the largest icy/rocky core compared to its overall size? x_1 = 8, x_2 = 2, y_1 = 5, y_2 = 2.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-073",
+  "q": "Find the linear function that models the baby\u2019s weight W as a function of the age of the baby, in months, t . R_1 = 5, R_2 = 10.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-074",
+  "q": "How would you write each of the following scientific notation values in decimal form? f = 2.",
+  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-075",
+  "q": "The graph of the parametric equations is in red and the graph of the rectangular equation is drawn in blue dots on top of the parametric equations. T = 10, lambda = 2.",
+  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-076",
+  "q": "The number of 49-cent stamps was four less than three times the number of 20-cent stamps. B = 3, m = 12, q = 5, v = 8.",
+  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-077",
+  "q": "The rate (in degrees per foot) at which temperature is increasing or decreasing for a given height x . k = 10, m = 5.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-078",
+  "q": "How much greater is the internal energy of the helium in the ball than it would be at zero gauge pressure? g = 5, theta_0 = 20, v_0 = 20.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-079",
+  "q": "Finding the Zeros of an Absolute Value Function For the function f ( x ) = | 4 x + 1 | \u2212 7 , find the values of x such that f ( x ) = 0 . I = 10, R = 10, mu_0 = 3.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-080",
+  "q": "How much would it cost to bake a cake for 30 minutes if the electric rate is 14 cents per kilowatt-hour? a_n = 12, a_n1 = 8.",
+  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
  }
 ]

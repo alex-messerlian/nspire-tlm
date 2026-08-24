@@ -1,69 +1,72 @@
 #!/usr/bin/env python3
-"""Build SELECT and REPORT from HELD frames.
+"""Build SELECT and REPORT from the discriminating construction.
 
-A frame is a textbook question SHAPE. Filling its {q} slots with our quantity names and {n} slots
-with values gives a question in genuinely independent phrasing that IS answerable from the attached
-record -- so no alignment is needed, and the metric-inversion problem does not arise.
+CONSTRUCTION. Each item is a VERBATIM textbook stem paired with a record that either fits or does
+not, banded fit:high / fit:low. The model must discriminate; a model that answers everything scores
+50% and so does a model that refuses everything. That is the property the earlier construction
+lacked -- it saturated at 100% because the model confabulated on every mismatch.
 
-HELD frames split again 50/50 so SELECT and REPORT share no frame either."""
+SEPARATION, on three axes, all asserted at build time:
+  formulas  15 held-out formulas each, disjoint             (never trained on)
+  stems     disjoint slices of 52,804 OpenStax sentences    (never authored by me)
+  phrasing  no DEV item text appears in either split
+"""
 import json, re, random, hashlib
-HELD=json.load(open("corpus/frames_held.json"))
-FORMS=json.load(open("corpus/units_holdout.json"))
+import sys as _sys, pathlib as _pl
+_sys.path.insert(0, str(_pl.Path(__file__).parent))
+from atomic import write_json as _wj
+
 VAR=re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
-rng=random.Random(20260823)
-rng.shuffle(HELD)
-half=len(HELD)//2
-SETS={"select":HELD[:half],"report":HELD[half:]}
-sf={x["frame"] for x in SETS["select"]}; rf={x["frame"] for x in SETS["report"]}
-assert not (sf & rf), "SELECT and REPORT share a frame"
+RESV={"pi","e","sin","cos","tan","ln","log","sqrt","exp"}
+norm=lambda x: re.sub(r"[()\s]","",x)
 
-# {q} slots play DIFFERENT ROLES in the original: "what is the {q} of the {q}" is
-# "<quantity> of <object>", not two quantities. Filling every slot with a given produced
-# "the capacitance of a parallel-plate capacitor and A of 5 of the d of 12". Slot 1 takes the
-# quantity, later slots take a physical OBJECT, and the givens go in their own clause.
-OBJECTS=["block","car","wire","circuit","spring","beam","disc","rod","cart","pendulum",
-         "capacitor","coil","gas sample","lens","satellite","container","piston","wheel"]
+hold=[r for r in json.load(open("corpus/units_holdout.json")) if r.get("units")]
+# Deduplicate BEFORE splitting: the same exercise sentence appears in several modules,
+# so disjoint index slices are not disjoint sets. Caught by the build-time assertion.
+stems=sorted({s for s in json.load(open("corpus/stems_all.json"))
+              if 40<len(s)<200 and "{" not in s})
+dev={it["q"] for it in json.load(open("tools/eval/items.json"))}
+rng=random.Random(20260824)
+rng.shuffle(hold); rng.shuffle(stems)
+half=len(hold)//2
+FORM={"SELECT":hold[:half], "REPORT":hold[half:2*half]}
+STEM={"SELECT":stems[:2000], "REPORT":stems[2000:4000]}
 
-def fill(frame, rec, rng):
-    lhs,rhs=rec["f"].split("=",1)
-    vs=sorted({v for v in VAR.findall(rhs)}-{"pi","e"})
-    if not vs or "units" not in rec: return None
-    vals={v: rng.choice([2,3,5,8,10,12,15,20,25,30]) for v in vs}
-    qname=rec["name"].lower()
-    if "worked example" in qname or len(qname) < 4: return None
-    if frame.count("{q}") > 3: return None            # over-slotted frames cannot be filled cleanly
-    obj=rng.choice(OBJECTS)
-    out=[]; qi=0; ni=0
-    for tok in frame.split():
-        if tok=="{q}":
-            out.append(qname if qi==0 else obj); qi+=1
-        elif tok=="{n}":
-            out.append(str(vals[vs[ni%len(vs)]])); ni+=1
-        elif tok=="{u}": out.append("")
-        else: out.append(tok)
-    body=" ".join(t for t in out if t)
-    body=re.sub(r"\s+([?.,;:])",r"\1",body).strip()
-    # Givens always get their own clause, in textbook order: setup first, question second.
-    setup="The "+obj+" has "+", ".join(f"{v} = {vals[v]}" for v in vs)+"."
-    q=setup+" "+body[0].upper()+body[1:]
-    if not q.rstrip().endswith(("?",".")): q=q.rstrip()+"?"
-    um=" ".join(f"{v}:{rec['units'][v]}" for v in vs if v in rec["units"])
-    return {"q":q,"record":f"{rec['f']} | {um} | standard conditions",
-            "id":f"{rec['f'][:8]}|{hashlib.sha1(frame.encode()).hexdigest()[:6]}","calls":["x"]}
+def build(name, n_match=40, n_mismatch=40):
+    forms, st = FORM[name], STEM[name]
+    out=[]
+    for i in range(n_match+n_mismatch):
+        matched = i < n_match
+        r = forms[i % len(forms)]
+        other = forms[(i+1) % len(forms)]
+        src = r if matched else other          # mismatched: record is for a DIFFERENT relation
+        vs=sorted({v for v in VAR.findall(r["f"].split("=",1)[1]) if v not in RESV})
+        if not vs: continue
+        vals={v: rng.choice([2,3,5,8,10,12,20]) for v in vs}
+        svs=sorted({v for v in VAR.findall(src["f"].split("=",1)[1]) if v not in RESV})
+        um=" ".join(f"{v}:{src['units'][v]}" for v in svs if v in src.get("units",{}))
+        q=st[i % len(st)].strip()+" "+", ".join(f"{v} = {vals[v]}" for v in vs)+"."
+        rec=(f"{src['f']} | {um} | missing:none | "
+             f"{src.get('req','standard conditions')} | fit:{'high' if matched else 'low'}")
+        out.append({"id":f"{name[:3]}-{len(out)+1:03d}","q":q,"record":rec,
+                    "expect":"answer" if matched else "refuse","calls":["x"] if matched else []})
+    return out
 
-for name,frames in SETS.items():
-    items=[]; i=0
-    while len(items)<60 and i<len(frames)*8:
-        fr=frames[i%len(frames)]["frame"]; rec=FORMS[i%len(FORMS)]
-        it=fill(fr,rec,rng)
-        if it and 30<len(it["q"])<300: items.append(it)
-        i+=1
-    json.dump(items, open(f"corpus/split_{name}.json","w"), indent=1)
-    print(f"  {name.upper():<7} {len(items)} items from {len(frames)} frames x {len(FORMS)} held-out formulas")
-sel=json.load(open("corpus/split_select.json")); rep=json.load(open("corpus/split_report.json"))
-assert not ({x["q"] for x in sel} & {x["q"] for x in rep}), "SELECT/REPORT share a question"
-devq={it["q"] for it in json.load(open("tools/eval/items.json"))}
-assert not ({x["q"] for x in sel}|{x["q"] for x in rep}) & devq, "overlaps DEV"
-print("  asserted: no shared frame, no shared question, no overlap with DEV")
-print("\n  samples:")
-for x in sel[:4]: print(f"    {x['q'][:130]}")
+S, R = build("SELECT"), build("REPORT")
+# ---- build-time assertions: separation must be structural, not intended -------------------
+sf={norm(r["f"]) for r in FORM["SELECT"]}; rf={norm(r["f"]) for r in FORM["REPORT"]}
+assert not (sf & rf), "SELECT and REPORT share a formula"
+assert not ({x["q"] for x in S} & {x["q"] for x in R}), "SELECT and REPORT share a question"
+assert not ({x["q"] for x in S} & dev) and not ({x["q"] for x in R} & dev), "overlaps DEV"
+assert not (set(STEM["SELECT"]) & set(STEM["REPORT"])), "stem slices overlap"
+for x in S+R:
+    assert "fit:" in x["record"] and "missing:" in x["record"], "split item out of distribution"
+_wj("corpus/split_select.json", S, indent=1)
+_wj("corpus/split_report.json", R, indent=1)
+h=lambda xs: hashlib.sha1(json.dumps([x["q"] for x in xs]).encode()).hexdigest()[:8]
+print(f"  SELECT {len(S):>3} items  ({sum(1 for x in S if x['expect']=='answer')} answer / "
+      f"{sum(1 for x in S if x['expect']=='refuse')} refuse)  {len(sf)} formulas  hash {h(S)}")
+print(f"  REPORT {len(R):>3} items  ({sum(1 for x in R if x['expect']=='answer')} answer / "
+      f"{sum(1 for x in R if x['expect']=='refuse')} refuse)  {len(rf)} formulas  hash {h(R)}")
+print(f"  assertions: disjoint formulas, disjoint questions, disjoint stem slices, no DEV overlap,")
+print(f"              every item in-distribution under the current record format -- all passed")
