@@ -108,8 +108,14 @@ def gen(n, seed=0):
         free = [v for v in vs if v not in CONST]
         if not free: continue                          # nothing left to ask about
         g = ", ".join(f"{v} = {vals[v]:g}" for v in free)
-        # Decide AFTER the question exists, not before. withheld -> the document is a refusal.
-        withhold = rng.random() < 0.15 and len(vs) >= 2
+        # Decide AFTER the question exists, not before. Two refusal kinds, both from this path:
+        #   withhold -> a required given is absent      (D1, missing:X, fit:high)
+        #   mismatch -> the record does not fit         (D2, missing:none, fit:low)
+        # D2 was silently lost when the separate refusal.py path was disabled for one-path, and the
+        # checkpoint that produced a 50% zero-shot refusal on fit:low had never seen the token.
+        roll = rng.random()
+        withhold = roll < 0.10 and len(vs) >= 2
+        mismatch = 0.10 <= roll < 0.15
         if withhold:
             drop = rng.choice(vs)
             free_w = [v for v in free if v != drop]
@@ -127,8 +133,15 @@ def gen(n, seed=0):
         # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
         # becomes a token lookup, the same move as fit for D2 and the tool call for arithmetic.
         miss = drop if withhold else "none"
+        band = "low" if mismatch else "high"
+        rec_r = rng.choice(recs) if mismatch else r
+        if mismatch:
+            _vs=sorted({v for v in VAR.findall(rec_r["f"].split("=",1)[1]) if v not in RES})
+            umap=" ".join(f"{v}:{rec_r['units'][v]}" for v in _vs if v in rec_r.get("units",{}))
         docs.append({"q": q, "withhold": drop if withhold else None,
-                     "rec": f"{r['f']} | {umap} | missing:{miss} | {r['cond']} | fit:high", "lhs": lhs,
+                     "mismatch": (rec_r.get("display") or rec_r.get("name","that quantity")) if mismatch else None,
+                     "rec": f"{rec_r['f']} | {umap} | missing:{miss} | "
+                            f"{rec_r.get('req', r['cond'])} | fit:{band}", "lhs": lhs,
                      "name": r["name"], "head": r["f"],
                      "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
@@ -137,6 +150,11 @@ def gen(n, seed=0):
                          capture_output=True, text=True).stdout, re.S)
     built, dropped = [], 0
     for d, c, res in zip(docs, calls, out):
+        if d.get("mismatch"):
+            ans=f"I cannot answer that — the record gives {d['mismatch'].lower()}, which does not apply."
+            built.append({"head": d["head"], "kind": "D2",
+                          "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>", "ans": ans})
+            continue
         if d.get("withhold"):
             # Same question, same vocabulary, same record -- one given absent and a refusal answer.
             ans = f"I cannot answer that — {d['withhold']} is not given."
