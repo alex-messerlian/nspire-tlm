@@ -124,8 +124,11 @@ def gen(n, seed=0):
         else:
             q = stem + (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask)
         umap = " ".join(f"{v}:{r['units'][v]}" for v in vs if v in r["units"])
+        # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
+        # becomes a token lookup, the same move as fit for D2 and the tool call for arithmetic.
+        miss = drop if withhold else "none"
         docs.append({"q": q, "withhold": drop if withhold else None,
-                     "rec": f"{r['f']} | {umap} | {r['cond']} | fit:high", "lhs": lhs,
+                     "rec": f"{r['f']} | {umap} | missing:{miss} | {r['cond']} | fit:high", "lhs": lhs,
                      "name": r["name"], "head": r["f"],
                      "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
