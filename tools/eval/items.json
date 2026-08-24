@@ -2,7 +2,7 @@
  {
   "id": "A1-001",
   "q": "A sled is pushed 84 m in 7 s at constant speed. Find the speed.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>eval<arg>84/7</tool>"
   ],
@@ -15,7 +15,7 @@
  {
   "id": "A1-002",
   "q": "A 3.0 kg block accelerates at 4.5 m/s^2. What net force acts on it?",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>eval<arg>3.0*4.5</tool>"
   ],
@@ -28,7 +28,7 @@
  {
   "id": "A1-003",
   "q": "Find the kinetic energy of a 0.145 kg ball moving at 40 m/s.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>0.5*0.145*40^2</tool>"
   ],
@@ -41,7 +41,7 @@
  {
   "id": "A1-004",
   "q": "A 2.0 kg mass sits 3.5 m above the floor. Find its potential energy.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>2.0*9.81*3.5</tool>"
   ],
@@ -54,7 +54,7 @@
  {
   "id": "A1-005",
   "q": "A 1500 kg car moves at 22 m/s. Find its momentum.",
-  "record": "p=m*v | p:kg*m/s m:kg v:m/s | non-relativistic",
+  "record": "p=m*v | p:kg*m/s m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>1500*22</tool>"
   ],
@@ -67,7 +67,7 @@
  {
   "id": "A1-006",
   "q": "A 60 N force pushes a crate 12 m. How much work is done?",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | fit:high",
   "calls": [
    "<tool>eval<arg>60*12</tool>"
   ],
@@ -80,7 +80,7 @@
  {
   "id": "A1-007",
   "q": "A motor does 4500 J of work in 15 s. Find the average power.",
-  "record": "P=W/t | P:W W:J t:s | average power",
+  "record": "P=W/t | P:W W:J t:s | missing:none | average power | fit:high",
   "calls": [
    "<tool>eval<arg>4500/15</tool>"
   ],
@@ -93,7 +93,7 @@
  {
   "id": "A1-008",
   "q": "A car rounds a 50 m radius curve at 15 m/s. Find its centripetal acceleration.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | fit:high",
   "calls": [
    "<tool>eval<arg>15^2/50</tool>"
   ],
@@ -106,7 +106,7 @@
  {
   "id": "A1-009",
   "q": "A 12 V battery drives 0.25 A through a resistor. Find the resistance.",
-  "record": "V=I*R | V:V I:A R:ohm | ohmic conductor",
+  "record": "V=I*R | V:V I:A R:ohm | missing:none | ohmic conductor | fit:high",
   "calls": [
    "<tool>eval<arg>12/0.25</tool>"
   ],
@@ -119,7 +119,7 @@
  {
   "id": "A1-010",
   "q": "A 120 V appliance draws 6.5 A. Find the power.",
-  "record": "P=V*I | P:W V:V I:A | DC or RMS",
+  "record": "P=V*I | P:W V:V I:A | missing:none | DC or RMS | fit:high",
   "calls": [
    "<tool>eval<arg>120*6.5</tool>"
   ],
@@ -132,7 +132,7 @@
  {
   "id": "A1-011",
   "q": "A wave of frequency 256 Hz has wavelength 1.34 m. Find its speed.",
-  "record": "v=f*L | v:m/s f:Hz L:m | L is wavelength",
+  "record": "v=f*L | v:m/s f:Hz L:m | missing:none | L is wavelength | fit:high",
   "calls": [
    "<tool>eval<arg>256*1.34</tool>"
   ],
@@ -145,7 +145,7 @@
  {
   "id": "A1-012",
   "q": "A 0.75 kg object occupies 0.00025 m^3. Find its density.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:none | uniform density | fit:high",
   "calls": [
    "<tool>eval<arg>0.75/0.00025</tool>"
   ],
@@ -158,7 +158,7 @@
  {
   "id": "A1-013",
   "q": "A 400 N force acts over 0.02 m^2. Find the pressure.",
-  "record": "P=F/A | P:Pa F:N A:m^2 | force normal to area",
+  "record": "P=F/A | P:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
    "<tool>eval<arg>400/0.02</tool>"
   ],
@@ -171,7 +171,7 @@
  {
   "id": "A1-014",
   "q": "How much heat raises 2.5 kg of water (c=4186) by 30 K?",
-  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | no phase change",
+  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:none | no phase change | fit:high",
   "calls": [
    "<tool>eval<arg>2.5*4186*30</tool>"
   ],
@@ -184,7 +184,7 @@
  {
   "id": "A1-015",
   "q": "A spring with k=250 N/m is stretched 0.08 m. Find the force.",
-  "record": "F=k*x | F:N k:N/m x:m | Hooke's law, within elastic limit",
+  "record": "F=k*x | F:N k:N/m x:m | missing:none | Hooke's law, within elastic limit | fit:high",
   "calls": [
    "<tool>eval<arg>250*0.08</tool>"
   ],
@@ -197,7 +197,7 @@
  {
   "id": "A1-016",
   "q": "A 45 N force acts 0.30 m from a pivot. Find the torque.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | fit:high",
   "calls": [
    "<tool>eval<arg>0.30*45</tool>"
   ],
@@ -210,7 +210,7 @@
  {
   "id": "A1-017",
   "q": "A car speeds from 8 m/s to 26 m/s in 6 s. Find the acceleration.",
-  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | uniform acceleration",
+  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | missing:none | uniform acceleration | fit:high",
   "calls": [
    "<tool>eval<arg>(26-8)/6</tool>"
   ],
@@ -223,7 +223,7 @@
  {
   "id": "A1-018",
   "q": "Starting at 5 m/s with a=2 m/s^2, how far in 4 s?",
-  "record": "d=vi*t+0.5*a*t^2 | d:m vi:m/s a:m/s^2 t:s | uniform acceleration",
+  "record": "d=vi*t+0.5*a*t^2 | d:m vi:m/s a:m/s^2 t:s | missing:none | uniform acceleration | fit:high",
   "calls": [
    "<tool>eval<arg>5*4+0.5*2*4^2</tool>"
   ],
@@ -236,7 +236,7 @@
  {
   "id": "A1-019",
   "q": "A 0.05 kg dart moves at 18 m/s. Find its kinetic energy.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>0.5*0.05*18^2</tool>"
   ],
@@ -249,7 +249,7 @@
  {
   "id": "A1-020",
   "q": "A runner covers 400 m in 48 s. Find the average speed.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>eval<arg>400/48</tool>"
   ],
@@ -262,7 +262,7 @@
  {
   "id": "A1-021",
   "q": "A 900 kg car accelerates at 2.4 m/s^2. Find the net force.",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>eval<arg>900*2.4</tool>"
   ],
@@ -275,7 +275,7 @@
  {
   "id": "A1-022",
   "q": "A 70 kg climber ascends 18 m. Find the gain in potential energy.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>70*9.81*18</tool>"
   ],
@@ -288,7 +288,7 @@
  {
   "id": "A1-023",
   "q": "A pump delivers 9000 J in 45 s. Find the power.",
-  "record": "P=W/t | P:W W:J t:s | average power",
+  "record": "P=W/t | P:W W:J t:s | missing:none | average power | fit:high",
   "calls": [
    "<tool>eval<arg>9000/45</tool>"
   ],
@@ -301,7 +301,7 @@
  {
   "id": "A1-024",
   "q": "Find the momentum of a 0.30 kg ball at 12 m/s.",
-  "record": "p=m*v | p:kg*m/s m:kg v:m/s | non-relativistic",
+  "record": "p=m*v | p:kg*m/s m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>0.30*12</tool>"
   ],
@@ -314,7 +314,7 @@
  {
   "id": "A1-025",
   "q": "A 9 V source drives 0.03 A. Find the resistance.",
-  "record": "V=I*R | V:V I:A R:ohm | ohmic conductor",
+  "record": "V=I*R | V:V I:A R:ohm | missing:none | ohmic conductor | fit:high",
   "calls": [
    "<tool>eval<arg>9/0.03</tool>"
   ],
@@ -327,7 +327,7 @@
  {
   "id": "A1-026",
   "q": "A 240 Hz wave travels at 343 m/s. Find its wavelength.",
-  "record": "v=f*L | v:m/s f:Hz L:m | L is wavelength",
+  "record": "v=f*L | v:m/s f:Hz L:m | missing:none | L is wavelength | fit:high",
   "calls": [
    "<tool>eval<arg>343/240</tool>"
   ],
@@ -340,7 +340,7 @@
  {
   "id": "A2-001",
   "q": "A train covers 150 km in 1.5 h. Give its speed in m/s.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>(150 km)/(1.5 h)<arg>m/s</tool>"
   ],
@@ -353,7 +353,7 @@
  {
   "id": "A2-002",
   "q": "A car travels 88 m in 4.0 s. Give the speed in km/h.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>(88 m)/(4.0 s)<arg>km/h</tool>"
   ],
@@ -366,7 +366,7 @@
  {
   "id": "A2-003",
   "q": "Find the kinetic energy of a 1200 kg car at 90 km/h, in J.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>conv<arg>0.5*(1200 kg)*((90 km/h)^2)<arg>J</tool>"
   ],
@@ -379,7 +379,7 @@
  {
   "id": "A2-004",
   "q": "A 250 g ball moves at 15 m/s. Give its momentum in kg*m/s.",
-  "record": "p=m*v | p:kg*m/s m:kg v:m/s | non-relativistic",
+  "record": "p=m*v | p:kg*m/s m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>conv<arg>(250 g)*(15 m/s)<arg>kg*m/s</tool>"
   ],
@@ -392,7 +392,7 @@
  {
   "id": "A2-005",
   "q": "A 2.0 kW heater runs for 30 min. Give the energy in J.",
-  "record": "P=W/t | P:W W:J t:s | average power",
+  "record": "P=W/t | P:W W:J t:s | missing:none | average power | fit:high",
   "calls": [
    "<tool>conv<arg>(2.0 kW)*(30 min)<arg>J</tool>"
   ],
@@ -405,7 +405,7 @@
  {
   "id": "A2-006",
   "q": "Express 45 minutes in seconds.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>45 min<arg>s</tool>"
   ],
@@ -418,7 +418,7 @@
  {
   "id": "A2-007",
   "q": "A plate has area 250 cm^2 under 600 N. Give the pressure in Pa.",
-  "record": "P=F/A | P:Pa F:N A:m^2 | force normal to area",
+  "record": "P=F/A | P:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
    "<tool>conv<arg>(600 N)/(250 cm^2)<arg>Pa</tool>"
   ],
@@ -431,7 +431,7 @@
  {
   "id": "A2-008",
   "q": "A block has mass 850 g and volume 320 cm^3. Give density in kg/m^3.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:none | uniform density | fit:high",
   "calls": [
    "<tool>conv<arg>(850 g)/(320 cm^3)<arg>kg/m^3</tool>"
   ],
@@ -444,7 +444,7 @@
  {
   "id": "A2-009",
   "q": "Convert 5.5 feet to metres.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>5.5 ft<arg>m</tool>"
   ],
@@ -457,7 +457,7 @@
  {
   "id": "A2-010",
   "q": "A cyclist rides 12 km in 25 min. Give the speed in km/h.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>(12 km)/(25 min)<arg>km/h</tool>"
   ],
@@ -470,7 +470,7 @@
  {
   "id": "A2-011",
   "q": "Express 3.5 hours in minutes.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>3.5 h<arg>min</tool>"
   ],
@@ -483,7 +483,7 @@
  {
   "id": "A2-012",
   "q": "A 0.5 kg object at 72 km/h \u2014 give its kinetic energy in J.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>conv<arg>0.5*(0.5 kg)*((72 km/h)^2)<arg>J</tool>"
   ],
@@ -496,7 +496,7 @@
  {
   "id": "A2-013",
   "q": "Convert 2500 mm to metres.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>2500 mm<arg>m</tool>"
   ],
@@ -509,7 +509,7 @@
  {
   "id": "A2-014",
   "q": "A force of 3.5 kN acts over 2.0 m. Give the work in kJ.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | fit:high",
   "calls": [
    "<tool>conv<arg>(3.5 kN)*(2.0 m)<arg>kJ</tool>"
   ],
@@ -522,7 +522,7 @@
  {
   "id": "A2-015",
   "q": "Express 98.6 degrees Fahrenheit in degrees Celsius.",
-  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | no phase change",
+  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:none | no phase change | fit:high",
   "calls": [
    "<tool>conv<arg>98.6 degF<arg>degC</tool>"
   ],
@@ -535,7 +535,7 @@
  {
   "id": "A2-016",
   "q": "Convert 1.5 tonnes to kilograms.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:none | uniform density | fit:high",
   "calls": [
    "<tool>conv<arg>1.5 t<arg>kg</tool>"
   ],
@@ -548,7 +548,7 @@
  {
   "id": "A2-017",
   "q": "A satellite covers 7.8 km in 1 s. Give the speed in km/h.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>conv<arg>(7.8 km)/(1 s)<arg>km/h</tool>"
   ],
@@ -561,7 +561,7 @@
  {
   "id": "A2-018",
   "q": "Express 250 mL in cubic metres.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:none | uniform density | fit:high",
   "calls": [
    "<tool>conv<arg>250 mL<arg>m^3</tool>"
   ],
@@ -574,7 +574,7 @@
  {
   "id": "A3-001",
   "q": "A 30 N force acts 0.4 m from a pivot. State the torque with its unit.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm | label: torque, not energy -- both are kg*m^2/s^2",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | label: torque, not energy -- both are kg*m^2/s^2 | fit:high",
   "calls": [
    "<tool>conv<arg>(30 N)*(0.4 m)<arg>N*m</tool>"
   ],
@@ -588,7 +588,7 @@
  {
   "id": "A3-002",
   "q": "A 12 N force moves a box 2.5 m. State the work with its unit.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement | label: work, not torque",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | label: work, not torque | fit:high",
   "calls": [
    "<tool>conv<arg>(12 N)*(2.5 m)<arg>J</tool>"
   ],
@@ -602,7 +602,7 @@
  {
   "id": "A3-003",
   "q": "A wheel turns 5 revolutions in 2 s. State the frequency with its unit.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion | label: frequency, not angular velocity",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | label: frequency, not angular velocity | fit:high",
   "calls": [
    "<tool>conv<arg>5/(2 s)<arg>Hz</tool>"
   ],
@@ -616,7 +616,7 @@
  {
   "id": "A3-004",
   "q": "A wheel turns at 5 rev in 2 s. State the angular velocity in rad/s.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion | label: angular velocity, not frequency",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | label: angular velocity, not frequency | fit:high",
   "calls": [
    "<tool>conv<arg>2*pi*5/(2 s)<arg>rad/s</tool>"
   ],
@@ -630,7 +630,7 @@
  {
   "id": "A3-005",
   "q": "A 55 N force acts 0.22 m from an axle. Give the torque.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm | label: torque",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | label: torque | fit:high",
   "calls": [
    "<tool>conv<arg>(55 N)*(0.22 m)<arg>N*m</tool>"
   ],
@@ -644,7 +644,7 @@
  {
   "id": "A3-006",
   "q": "A 200 N force lifts a load 1.4 m. Give the work.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement | label: work",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | label: work | fit:high",
   "calls": [
    "<tool>conv<arg>(200 N)*(1.4 m)<arg>J</tool>"
   ],
@@ -658,7 +658,7 @@
  {
   "id": "A3-007",
   "q": "A rotor spins 1200 times per minute. Give the frequency in Hz.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion | label: frequency",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | label: frequency | fit:high",
   "calls": [
    "<tool>conv<arg>1200/(1 min)<arg>Hz</tool>"
   ],
@@ -672,7 +672,7 @@
  {
   "id": "A3-008",
   "q": "A rotor spins 1200 times per minute. Give the angular velocity in rad/s.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion | label: angular velocity",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | label: angular velocity | fit:high",
   "calls": [
    "<tool>conv<arg>2*pi*1200/(1 min)<arg>rad/s</tool>"
   ],
@@ -686,7 +686,7 @@
  {
   "id": "A3-009",
   "q": "A spanner applies 18 N at 0.35 m. Give the torque.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm | label: torque",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | label: torque | fit:high",
   "calls": [
    "<tool>conv<arg>(18 N)*(0.35 m)<arg>N*m</tool>"
   ],
@@ -700,7 +700,7 @@
  {
   "id": "A3-010",
   "q": "A 9.5 N force acts through 3.2 m. Give the energy transferred.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement | label: work",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | label: work | fit:high",
   "calls": [
    "<tool>conv<arg>(9.5 N)*(3.2 m)<arg>J</tool>"
   ],
@@ -714,7 +714,7 @@
  {
   "id": "A3-011",
   "q": "A pendulum completes 20 swings in 25 s. Give the frequency.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion | label: frequency",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | label: frequency | fit:high",
   "calls": [
    "<tool>conv<arg>20/(25 s)<arg>Hz</tool>"
   ],
@@ -728,7 +728,7 @@
  {
   "id": "A3-012",
   "q": "A disc rotates 3 rev in 0.5 s. Give the angular velocity.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion | label: angular velocity",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | label: angular velocity | fit:high",
   "calls": [
    "<tool>conv<arg>2*pi*3/(0.5 s)<arg>rad/s</tool>"
   ],
@@ -742,7 +742,7 @@
  {
   "id": "A3-013",
   "q": "A 40 N force acts 0.15 m from the hinge. Give the torque.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm | label: torque",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | label: torque | fit:high",
   "calls": [
    "<tool>conv<arg>(40 N)*(0.15 m)<arg>N*m</tool>"
   ],
@@ -756,7 +756,7 @@
  {
   "id": "A3-014",
   "q": "A 6 N force acts over 7 m of displacement. Give the work.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement | label: work",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | label: work | fit:high",
   "calls": [
    "<tool>conv<arg>(6 N)*(7 m)<arg>J</tool>"
   ],
@@ -770,7 +770,7 @@
  {
   "id": "A4-001",
   "q": "A 120 N net force acts on an 8 kg mass. Find the acceleration.",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>solve<arg>F=m*a<arg>a</tool>",
    "<tool>eval<arg>120/8</tool>"
@@ -785,7 +785,7 @@
  {
   "id": "A4-002",
   "q": "A 5.0 kg object has 250 J of kinetic energy. Find its speed.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>solve<arg>K=0.5*m*v^2<arg>v</tool>",
    "<tool>eval<arg>(2*250/5.0)^0.5</tool>"
@@ -800,7 +800,7 @@
  {
   "id": "A4-003",
   "q": "A 3.0 kg mass has 147 J of potential energy at g=9.81. Find its height.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>solve<arg>U=m*g*h<arg>h</tool>",
    "<tool>eval<arg>147/(3.0*9.81)</tool>"
@@ -815,7 +815,7 @@
  {
   "id": "A4-004",
   "q": "A car covers 240 m at 16 m/s. How long does it take?",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>solve<arg>v=d/t<arg>t</tool>",
    "<tool>eval<arg>240/16</tool>"
@@ -830,7 +830,7 @@
  {
   "id": "A4-005",
   "q": "600 J of work is done by a force over 7.5 m. Find the force.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | fit:high",
   "calls": [
    "<tool>solve<arg>W=F*d<arg>F</tool>",
    "<tool>eval<arg>600/7.5</tool>"
@@ -845,7 +845,7 @@
  {
   "id": "A4-006",
   "q": "A 2000 W motor does 50000 J of work. How long does it run?",
-  "record": "P=W/t | P:W W:J t:s | average power",
+  "record": "P=W/t | P:W W:J t:s | missing:none | average power | fit:high",
   "calls": [
    "<tool>solve<arg>P=W/t<arg>t</tool>",
    "<tool>eval<arg>50000/2000</tool>"
@@ -860,7 +860,7 @@
  {
   "id": "A4-007",
   "q": "An object at 20 m/s has centripetal acceleration 8 m/s^2. Find the radius.",
-  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | uniform circular motion",
+  "record": "a=v^2/r | a:m/s^2 v:m/s r:m | missing:none | uniform circular motion | fit:high",
   "calls": [
    "<tool>solve<arg>a=v^2/r<arg>r</tool>",
    "<tool>eval<arg>20^2/8</tool>"
@@ -875,7 +875,7 @@
  {
   "id": "A4-008",
   "q": "A resistor carries 0.4 A under 18 V. Find the resistance.",
-  "record": "V=I*R | V:V I:A R:ohm | ohmic conductor",
+  "record": "V=I*R | V:V I:A R:ohm | missing:none | ohmic conductor | fit:high",
   "calls": [
    "<tool>solve<arg>V=I*R<arg>R</tool>",
    "<tool>eval<arg>18/0.4</tool>"
@@ -890,7 +890,7 @@
  {
   "id": "A4-009",
   "q": "A 1500 W device runs on 120 V. Find the current.",
-  "record": "P=V*I | P:W V:V I:A | DC or RMS",
+  "record": "P=V*I | P:W V:V I:A | missing:none | DC or RMS | fit:high",
   "calls": [
    "<tool>solve<arg>P=V*I<arg>I</tool>",
    "<tool>eval<arg>1500/120</tool>"
@@ -905,7 +905,7 @@
  {
   "id": "A4-010",
   "q": "A 340 m/s wave has wavelength 0.85 m. Find the frequency.",
-  "record": "v=f*L | v:m/s f:Hz L:m | L is wavelength",
+  "record": "v=f*L | v:m/s f:Hz L:m | missing:none | L is wavelength | fit:high",
   "calls": [
    "<tool>solve<arg>v=f*L<arg>f</tool>",
    "<tool>eval<arg>340/0.85</tool>"
@@ -920,7 +920,7 @@
  {
   "id": "A4-011",
   "q": "A block of density 2700 kg/m^3 has mass 5.4 kg. Find its volume.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:none | uniform density | fit:high",
   "calls": [
    "<tool>solve<arg>rho=m/V<arg>V</tool>",
    "<tool>eval<arg>5.4/2700</tool>"
@@ -935,7 +935,7 @@
  {
   "id": "A4-012",
   "q": "A pressure of 5000 Pa acts over 0.06 m^2. Find the force.",
-  "record": "P=F/A | P:Pa F:N A:m^2 | force normal to area",
+  "record": "P=F/A | P:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
    "<tool>solve<arg>P=F/A<arg>F</tool>",
    "<tool>eval<arg>5000*0.06</tool>"
@@ -950,7 +950,7 @@
  {
   "id": "A4-013",
   "q": "A spring exerts 30 N when stretched 0.12 m. Find k.",
-  "record": "F=k*x | F:N k:N/m x:m | Hooke's law, within elastic limit",
+  "record": "F=k*x | F:N k:N/m x:m | missing:none | Hooke's law, within elastic limit | fit:high",
   "calls": [
    "<tool>solve<arg>F=k*x<arg>k</tool>",
    "<tool>eval<arg>30/0.12</tool>"
@@ -965,7 +965,7 @@
  {
   "id": "A4-014",
   "q": "A torque of 24 N*m comes from a force at 0.4 m. Find the force.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | fit:high",
   "calls": [
    "<tool>solve<arg>tau=r*F<arg>F</tool>",
    "<tool>eval<arg>24/0.4</tool>"
@@ -980,7 +980,7 @@
  {
   "id": "A4-015",
   "q": "A 0.6 kg ball has momentum 9.0 kg*m/s. Find its speed.",
-  "record": "p=m*v | p:kg*m/s m:kg v:m/s | non-relativistic",
+  "record": "p=m*v | p:kg*m/s m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>solve<arg>p=m*v<arg>v</tool>",
    "<tool>eval<arg>9.0/0.6</tool>"
@@ -995,7 +995,7 @@
  {
   "id": "A4-016",
   "q": "A photon has energy 3.98e-19 J. Find its frequency (h=6.626e-34).",
-  "record": "E=h*f | E:J h=6.626e-34 f:Hz | photon energy",
+  "record": "E=h*f | E:J h=6.626e-34 f:Hz | missing:none | photon energy | fit:high",
   "calls": [
    "<tool>solve<arg>E=h*f<arg>f</tool>",
    "<tool>eval<arg>3.98e-19/6.626e-34</tool>"
@@ -1010,7 +1010,7 @@
  {
   "id": "A4-017",
   "q": "A 4.0 kg mass gains 720 J of kinetic energy from rest. Find its speed.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>solve<arg>K=0.5*m*v^2<arg>v</tool>",
    "<tool>eval<arg>(2*720/4.0)^0.5</tool>"
@@ -1025,7 +1025,7 @@
  {
   "id": "A4-018",
   "q": "A wave of frequency 500 Hz has speed 1500 m/s. Find the wavelength.",
-  "record": "v=f*L | v:m/s f:Hz L:m | L is wavelength",
+  "record": "v=f*L | v:m/s f:Hz L:m | missing:none | L is wavelength | fit:high",
   "calls": [
    "<tool>solve<arg>v=f*L<arg>L</tool>",
    "<tool>eval<arg>1500/500</tool>"
@@ -1040,7 +1040,7 @@
  {
   "id": "A4-019",
   "q": "An 800 N force produces 4.0 m/s^2. Find the mass.",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>solve<arg>F=m*a<arg>m</tool>",
    "<tool>eval<arg>800/4.0</tool>"
@@ -1055,7 +1055,7 @@
  {
   "id": "A4-020",
   "q": "A heater transfers 41860 J to 2.0 kg of water (c=4186). Find the temperature rise.",
-  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | no phase change",
+  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:none | no phase change | fit:high",
   "calls": [
    "<tool>solve<arg>Q=m*c*dT<arg>dT</tool>",
    "<tool>eval<arg>41860/(2.0*4186)</tool>"
@@ -1070,7 +1070,7 @@
  {
   "id": "A4-021",
   "q": "A 25 kg mass is 12 m up. Find g if its potential energy is 2943 J.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>solve<arg>U=m*g*h<arg>g</tool>",
    "<tool>eval<arg>2943/(25*12)</tool>"
@@ -1085,7 +1085,7 @@
  {
   "id": "A4-022",
   "q": "A runner averages 5.5 m/s for 1320 s. How far?",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>solve<arg>v=d/t<arg>d</tool>",
    "<tool>eval<arg>5.5*1320</tool>"
@@ -1100,7 +1100,7 @@
  {
   "id": "A4-023",
   "q": "A 0.20 m lever arm gives 15 N*m of torque. Find the force.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | fit:high",
   "calls": [
    "<tool>solve<arg>tau=r*F<arg>F</tool>",
    "<tool>eval<arg>15/0.20</tool>"
@@ -1115,7 +1115,7 @@
  {
   "id": "A4-024",
   "q": "A 12 ohm resistor carries 2.5 A. Find the voltage.",
-  "record": "V=I*R | V:V I:A R:ohm | ohmic conductor",
+  "record": "V=I*R | V:V I:A R:ohm | missing:none | ohmic conductor | fit:high",
   "calls": [
    "<tool>solve<arg>V=I*R<arg>V</tool>",
    "<tool>eval<arg>2.5*12</tool>"
@@ -1130,7 +1130,7 @@
  {
   "id": "A4-025",
   "q": "A 60 W bulb draws 0.5 A. Find the voltage.",
-  "record": "P=V*I | P:W V:V I:A | DC or RMS",
+  "record": "P=V*I | P:W V:V I:A | missing:none | DC or RMS | fit:high",
   "calls": [
    "<tool>solve<arg>P=V*I<arg>V</tool>",
    "<tool>eval<arg>60/0.5</tool>"
@@ -1145,7 +1145,7 @@
  {
   "id": "A4-026",
   "q": "A 1.5 kg object has 48 J of kinetic energy. Find its speed.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>solve<arg>K=0.5*m*v^2<arg>v</tool>",
    "<tool>eval<arg>(2*48/1.5)^0.5</tool>"
@@ -1160,7 +1160,7 @@
  {
   "id": "A5-001",
   "q": "A 1200 kg car with 4 passengers travels 300 m in 20 s. Find its speed.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>eval<arg>300/20</tool>"
   ],
@@ -1173,7 +1173,7 @@
  {
   "id": "A5-002",
   "q": "A 2.0 kg ball painted with 3 stripes falls from 5.0 m. Find its potential energy.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>2.0*9.81*5.0</tool>"
   ],
@@ -1186,7 +1186,7 @@
  {
   "id": "A5-003",
   "q": "A 6.0 kg crate is pushed by a 30 N force for 12 s over 9.0 m. Find the work done.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | fit:high",
   "calls": [
    "<tool>eval<arg>30*9.0</tool>"
   ],
@@ -1199,7 +1199,7 @@
  {
   "id": "A5-004",
   "q": "Three students push a 40 kg cart at 5.0 m/s^2. Find the net force.",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>eval<arg>40*5.0</tool>"
   ],
@@ -1212,7 +1212,7 @@
  {
   "id": "A5-005",
   "q": "A 0.5 kg ball, one of 12 in the box, moves at 20 m/s. Find its kinetic energy.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>0.5*0.5*20^2</tool>"
   ],
@@ -1225,7 +1225,7 @@
  {
   "id": "A5-006",
   "q": "A 240 V, 3-phase-rated device draws 5 A. Find the power.",
-  "record": "P=V*I | P:W V:V I:A | DC or RMS",
+  "record": "P=V*I | P:W V:V I:A | missing:none | DC or RMS | fit:high",
   "calls": [
    "<tool>eval<arg>240*5</tool>"
   ],
@@ -1238,7 +1238,7 @@
  {
   "id": "A5-007",
   "q": "A 15 ohm resistor in a 4-resistor bank carries 2 A. Find the voltage across it.",
-  "record": "V=I*R | V:V I:A R:ohm | ohmic conductor",
+  "record": "V=I*R | V:V I:A R:ohm | missing:none | ohmic conductor | fit:high",
   "calls": [
    "<tool>eval<arg>2*15</tool>"
   ],
@@ -1251,7 +1251,7 @@
  {
   "id": "A5-008",
   "q": "A 500 Hz tone plays for 8 s and travels at 340 m/s. Find the wavelength.",
-  "record": "v=f*L | v:m/s f:Hz L:m | L is wavelength",
+  "record": "v=f*L | v:m/s f:Hz L:m | missing:none | L is wavelength | fit:high",
   "calls": [
    "<tool>eval<arg>340/500</tool>"
   ],
@@ -1264,7 +1264,7 @@
  {
   "id": "A5-009",
   "q": "A 3.0 kg mass on a 2.0 m table moves at 7.0 m/s. Find its momentum.",
-  "record": "p=m*v | p:kg*m/s m:kg v:m/s | non-relativistic",
+  "record": "p=m*v | p:kg*m/s m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>3.0*7.0</tool>"
   ],
@@ -1277,7 +1277,7 @@
  {
   "id": "A5-010",
   "q": "A pump rated 12 A delivers 6000 J in 30 s. Find the power.",
-  "record": "P=W/t | P:W W:J t:s | average power",
+  "record": "P=W/t | P:W W:J t:s | missing:none | average power | fit:high",
   "calls": [
    "<tool>eval<arg>6000/30</tool>"
   ],
@@ -1290,7 +1290,7 @@
  {
   "id": "A5-011",
   "q": "A 25 cm spanner applies 40 N at 0.25 m from the bolt. Find the torque.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | fit:high",
   "calls": [
    "<tool>eval<arg>0.25*40</tool>"
   ],
@@ -1303,7 +1303,7 @@
  {
   "id": "A5-012",
   "q": "A 4-wheeled 900 kg trailer accelerates at 1.5 m/s^2. Find the net force.",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>eval<arg>900*1.5</tool>"
   ],
@@ -1316,7 +1316,7 @@
  {
   "id": "A6-001",
   "q": "A 4.5 kg mass falls 20 m. Find the potential energy released.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>4.5*9.81*20</tool>"
   ],
@@ -1329,7 +1329,7 @@
  {
   "id": "A6-002",
   "q": "Find the gravitational force between two 1000 kg masses 5 m apart.",
-  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | point masses",
+  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | missing:none | point masses | fit:high",
   "calls": [
    "<tool>eval<arg>6.674e-11*1000*1000/5^2</tool>"
   ],
@@ -1342,7 +1342,7 @@
  {
   "id": "A6-003",
   "q": "A photon has frequency 5.0e14 Hz. Find its energy.",
-  "record": "E=h*f | E:J h=6.626e-34 f:Hz | photon energy",
+  "record": "E=h*f | E:J h=6.626e-34 f:Hz | missing:none | photon energy | fit:high",
   "calls": [
    "<tool>eval<arg>6.626e-34*5.0e14</tool>"
   ],
@@ -1355,7 +1355,7 @@
  {
   "id": "A6-004",
   "q": "A 12 kg object is raised 3.0 m. Find the work against gravity.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>12*9.81*3.0</tool>"
   ],
@@ -1368,7 +1368,7 @@
  {
   "id": "A6-005",
   "q": "Find the force between a 60 kg and a 70 kg mass 2 m apart.",
-  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | point masses",
+  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | missing:none | point masses | fit:high",
   "calls": [
    "<tool>eval<arg>6.674e-11*60*70/2^2</tool>"
   ],
@@ -1381,7 +1381,7 @@
  {
   "id": "A6-006",
   "q": "A photon of frequency 6.0e14 Hz \u2014 find its energy.",
-  "record": "E=h*f | E:J h=6.626e-34 f:Hz | photon energy",
+  "record": "E=h*f | E:J h=6.626e-34 f:Hz | missing:none | photon energy | fit:high",
   "calls": [
    "<tool>eval<arg>6.626e-34*6.0e14</tool>"
   ],
@@ -1394,7 +1394,7 @@
  {
   "id": "A6-007",
   "q": "A 0.8 kg book is 1.2 m above a desk. Find its potential energy.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>0.8*9.81*1.2</tool>"
   ],
@@ -1407,7 +1407,7 @@
  {
   "id": "A6-008",
   "q": "Two 500 kg masses are 10 m apart. Find the gravitational attraction.",
-  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | point masses",
+  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | missing:none | point masses | fit:high",
   "calls": [
    "<tool>eval<arg>6.674e-11*500*500/10^2</tool>"
   ],
@@ -1420,7 +1420,7 @@
  {
   "id": "A6-009",
   "q": "A 95 kg load descends 4.0 m. Find the potential energy lost.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>95*9.81*4.0</tool>"
   ],
@@ -1433,7 +1433,7 @@
  {
   "id": "A6-010",
   "q": "Find the energy of a 1.0e15 Hz photon.",
-  "record": "E=h*f | E:J h=6.626e-34 f:Hz | photon energy",
+  "record": "E=h*f | E:J h=6.626e-34 f:Hz | missing:none | photon energy | fit:high",
   "calls": [
    "<tool>eval<arg>6.626e-34*1.0e15</tool>"
   ],
@@ -1446,7 +1446,7 @@
  {
   "id": "A7-001",
   "q": "Five timings: 2.11, 2.09, 2.14, 2.08, 2.13 s. Find the mean.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>mean<arg>2.11,2.09,2.14,2.08,2.13</tool>"
   ],
@@ -1459,7 +1459,7 @@
  {
   "id": "A7-002",
   "q": "Same five timings. Find the sample standard deviation.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>sd<arg>2.11,2.09,2.14,2.08,2.13</tool>"
   ],
@@ -1472,7 +1472,7 @@
  {
   "id": "A7-003",
   "q": "Masses 4.2, 4.5, 4.1, 4.6, 4.3 kg. Find the mean.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>mean<arg>4.2,4.5,4.1,4.6,4.3</tool>"
   ],
@@ -1485,7 +1485,7 @@
  {
   "id": "A7-004",
   "q": "Masses 4.2, 4.5, 4.1, 4.6, 4.3 kg. Find the sample standard deviation.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>sd<arg>4.2,4.5,4.1,4.6,4.3</tool>"
   ],
@@ -1498,7 +1498,7 @@
  {
   "id": "A7-005",
   "q": "Readings 12, 15, 11, 19, 14, 13. Find the median.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>median<arg>12,15,11,19,14,13</tool>"
   ],
@@ -1511,7 +1511,7 @@
  {
   "id": "A7-006",
   "q": "Readings 12, 15, 11, 19, 14, 13. Find the mean.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>mean<arg>12,15,11,19,14,13</tool>"
   ],
@@ -1524,7 +1524,7 @@
  {
   "id": "A7-007",
   "q": "Lengths 0.51, 0.49, 0.52, 0.50 m. Find the mean.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>mean<arg>0.51,0.49,0.52,0.50</tool>"
   ],
@@ -1537,7 +1537,7 @@
  {
   "id": "A7-008",
   "q": "Lengths 0.51, 0.49, 0.52, 0.50 m. Find the sample standard deviation.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>sd<arg>0.51,0.49,0.52,0.50</tool>"
   ],
@@ -1550,7 +1550,7 @@
  {
   "id": "A7-009",
   "q": "Voltages 5.02, 4.98, 5.05, 4.95, 5.00. Find the median.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>median<arg>5.02,4.98,5.05,4.95,5.00</tool>"
   ],
@@ -1563,7 +1563,7 @@
  {
   "id": "A7-010",
   "q": "Voltages 5.02, 4.98, 5.05, 4.95, 5.00. Find the mean.",
-  "record": "stat over a measurement list | sample sd uses n-1",
+  "record": "stat over a measurement list | sample sd uses n-1 | missing:none | fit:high",
   "calls": [
    "<tool>stat<arg>mean<arg>5.02,4.98,5.05,4.95,5.00</tool>"
   ],
@@ -1576,7 +1576,7 @@
  {
   "id": "A8-001",
   "q": "A car does 150 m in 12 s. How fast is it going?",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>eval<arg>150/12</tool>"
   ],
@@ -1590,7 +1590,7 @@
  {
   "id": "A8-002",
   "q": "A 2 kg thing is up 5 m. What's the energy?",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>eval<arg>2*9.81*5</tool>"
   ],
@@ -1604,7 +1604,7 @@
  {
   "id": "B1-001",
   "q": "Solve F=m*a for a.",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>solve<arg>F=m*a<arg>a</tool>"
   ],
@@ -1617,7 +1617,7 @@
  {
   "id": "B1-002",
   "q": "Solve F=m*a for m.",
-  "record": "F=m*a | F:N m:kg a:m/s^2 | net force, inertial frame",
+  "record": "F=m*a | F:N m:kg a:m/s^2 | missing:none | net force, inertial frame | fit:high",
   "calls": [
    "<tool>solve<arg>F=m*a<arg>m</tool>"
   ],
@@ -1630,7 +1630,7 @@
  {
   "id": "B1-003",
   "q": "Solve v=d/t for d.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>solve<arg>v=d/t<arg>d</tool>"
   ],
@@ -1643,7 +1643,7 @@
  {
   "id": "B1-004",
   "q": "Solve v=d/t for t.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>solve<arg>v=d/t<arg>t</tool>"
   ],
@@ -1656,7 +1656,7 @@
  {
   "id": "B1-005",
   "q": "Solve K=0.5*m*v^2 for m.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>solve<arg>K=0.5*m*v^2<arg>m</tool>"
   ],
@@ -1669,7 +1669,7 @@
  {
   "id": "B1-006",
   "q": "Solve U=m*g*h for h.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>solve<arg>U=m*g*h<arg>h</tool>"
   ],
@@ -1682,7 +1682,7 @@
  {
   "id": "B1-007",
   "q": "Solve U=m*g*h for m.",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [
    "<tool>solve<arg>U=m*g*h<arg>m</tool>"
   ],
@@ -1695,7 +1695,7 @@
  {
   "id": "B1-008",
   "q": "Solve W=F*d for d.",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement",
+  "record": "W=F*d | W:J F:N d:m | missing:none | force parallel to displacement | fit:high",
   "calls": [
    "<tool>solve<arg>W=F*d<arg>d</tool>"
   ],
@@ -1708,7 +1708,7 @@
  {
   "id": "B1-009",
   "q": "Solve P=W/t for W.",
-  "record": "P=W/t | P:W W:J t:s | average power",
+  "record": "P=W/t | P:W W:J t:s | missing:none | average power | fit:high",
   "calls": [
    "<tool>solve<arg>P=W/t<arg>W</tool>"
   ],
@@ -1721,7 +1721,7 @@
  {
   "id": "B1-010",
   "q": "Solve P=W/t for t.",
-  "record": "P=W/t | P:W W:J t:s | average power",
+  "record": "P=W/t | P:W W:J t:s | missing:none | average power | fit:high",
   "calls": [
    "<tool>solve<arg>P=W/t<arg>t</tool>"
   ],
@@ -1734,7 +1734,7 @@
  {
   "id": "B1-011",
   "q": "Solve V=I*R for I.",
-  "record": "V=I*R | V:V I:A R:ohm | ohmic conductor",
+  "record": "V=I*R | V:V I:A R:ohm | missing:none | ohmic conductor | fit:high",
   "calls": [
    "<tool>solve<arg>V=I*R<arg>I</tool>"
   ],
@@ -1747,7 +1747,7 @@
  {
   "id": "B1-012",
   "q": "Solve P=V*I for I.",
-  "record": "P=V*I | P:W V:V I:A | DC or RMS",
+  "record": "P=V*I | P:W V:V I:A | missing:none | DC or RMS | fit:high",
   "calls": [
    "<tool>solve<arg>P=V*I<arg>I</tool>"
   ],
@@ -1760,7 +1760,7 @@
  {
   "id": "B1-013",
   "q": "Solve v=f*L for L.",
-  "record": "v=f*L | v:m/s f:Hz L:m | L is wavelength",
+  "record": "v=f*L | v:m/s f:Hz L:m | missing:none | L is wavelength | fit:high",
   "calls": [
    "<tool>solve<arg>v=f*L<arg>L</tool>"
   ],
@@ -1773,7 +1773,7 @@
  {
   "id": "B1-014",
   "q": "Solve rho=m/V for V.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:none | uniform density | fit:high",
   "calls": [
    "<tool>solve<arg>rho=m/V<arg>V</tool>"
   ],
@@ -1786,7 +1786,7 @@
  {
   "id": "B1-015",
   "q": "Solve rho=m/V for m.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:none | uniform density | fit:high",
   "calls": [
    "<tool>solve<arg>rho=m/V<arg>m</tool>"
   ],
@@ -1799,7 +1799,7 @@
  {
   "id": "B1-016",
   "q": "Solve P=F/A for A.",
-  "record": "P=F/A | P:Pa F:N A:m^2 | force normal to area",
+  "record": "P=F/A | P:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
    "<tool>solve<arg>P=F/A<arg>A</tool>"
   ],
@@ -1812,7 +1812,7 @@
  {
   "id": "B1-017",
   "q": "Solve Q=m*c*dT for dT.",
-  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | no phase change",
+  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:none | no phase change | fit:high",
   "calls": [
    "<tool>solve<arg>Q=m*c*dT<arg>dT</tool>"
   ],
@@ -1825,7 +1825,7 @@
  {
   "id": "B1-018",
   "q": "Solve Q=m*c*dT for c.",
-  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | no phase change",
+  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:none | no phase change | fit:high",
   "calls": [
    "<tool>solve<arg>Q=m*c*dT<arg>c</tool>"
   ],
@@ -1838,7 +1838,7 @@
  {
   "id": "B1-019",
   "q": "Solve F=k*x for x.",
-  "record": "F=k*x | F:N k:N/m x:m | Hooke's law, within elastic limit",
+  "record": "F=k*x | F:N k:N/m x:m | missing:none | Hooke's law, within elastic limit | fit:high",
   "calls": [
    "<tool>solve<arg>F=k*x<arg>x</tool>"
   ],
@@ -1851,7 +1851,7 @@
  {
   "id": "B1-020",
   "q": "Solve tau=r*F for r.",
-  "record": "tau=r*F | tau:N*m r:m F:N | force perpendicular to lever arm",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:none | force perpendicular to lever arm | fit:high",
   "calls": [
    "<tool>solve<arg>tau=r*F<arg>r</tool>"
   ],
@@ -1864,7 +1864,7 @@
  {
   "id": "B1-021",
   "q": "Solve a=(vf-vi)/t for vf.",
-  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | uniform acceleration",
+  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | missing:none | uniform acceleration | fit:high",
   "calls": [
    "<tool>solve<arg>a=(vf-vi)/t<arg>vf</tool>"
   ],
@@ -1877,7 +1877,7 @@
  {
   "id": "B1-022",
   "q": "Solve a=(vf-vi)/t for t.",
-  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | uniform acceleration",
+  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | missing:none | uniform acceleration | fit:high",
   "calls": [
    "<tool>solve<arg>a=(vf-vi)/t<arg>t</tool>"
   ],
@@ -1890,7 +1890,7 @@
  {
   "id": "C1-001",
   "q": "What is the difference between speed and velocity?",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1899,7 +1899,7 @@
  {
   "id": "C1-002",
   "q": "Define acceleration.",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1908,7 +1908,7 @@
  {
   "id": "C1-003",
   "q": "What does it mean for a collision to be elastic?",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1917,7 +1917,7 @@
  {
   "id": "C1-004",
   "q": "Define the newton.",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1926,7 +1926,7 @@
  {
   "id": "C1-005",
   "q": "What is meant by the centre of mass?",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1935,7 +1935,7 @@
  {
   "id": "C1-006",
   "q": "Define kinetic energy in words.",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1944,7 +1944,7 @@
  {
   "id": "C1-007",
   "q": "What is a scalar quantity?",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1953,7 +1953,7 @@
  {
   "id": "C1-008",
   "q": "What is the difference between mass and weight?",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1962,7 +1962,7 @@
  {
   "id": "C1-009",
   "q": "Define wavelength.",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1971,7 +1971,7 @@
  {
   "id": "C1-010",
   "q": "What is meant by thermal equilibrium?",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1980,7 +1980,7 @@
  {
   "id": "C1-011",
   "q": "What is an ohmic conductor?",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1989,7 +1989,7 @@
  {
   "id": "C1-012",
   "q": "Define the joule.",
-  "record": "definition | no computation required",
+  "record": "definition | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -1998,7 +1998,7 @@
  {
   "id": "C2-001",
   "q": "Why does a heavier object not fall faster in a vacuum?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2007,7 +2007,7 @@
  {
   "id": "C2-002",
   "q": "Why does a car need friction to turn a corner?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2016,7 +2016,7 @@
  {
   "id": "C2-003",
   "q": "Why is momentum conserved in a collision but kinetic energy is not always?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2025,7 +2025,7 @@
  {
   "id": "C2-004",
   "q": "Why does a spinning skater speed up when they pull their arms in?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2034,7 +2034,7 @@
  {
   "id": "C2-005",
   "q": "Why does a metal spoon feel colder than a wooden one at the same temperature?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2043,7 +2043,7 @@
  {
   "id": "C2-006",
   "q": "Why is the sky brighter near the horizon at sunset?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2052,7 +2052,7 @@
  {
   "id": "C2-007",
   "q": "Why does increasing the resistance in a circuit reduce the current at fixed voltage?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2061,7 +2061,7 @@
  {
   "id": "C2-008",
   "q": "Why does a wave slow down when it enters a denser medium?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2070,7 +2070,7 @@
  {
   "id": "C2-009",
   "q": "Why does a satellite in orbit not fall to Earth?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2079,7 +2079,7 @@
  {
   "id": "C2-010",
   "q": "Why is work zero when a force is perpendicular to the motion?",
-  "record": "explanation | no computation required",
+  "record": "explanation | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2088,7 +2088,7 @@
  {
   "id": "C3-001",
   "q": "To find the speed of a falling object, is energy conservation or kinematics simpler here?",
-  "record": "method selection | no computation required",
+  "record": "method selection | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2097,7 +2097,7 @@
  {
   "id": "C3-002",
   "q": "Should I use the mean or the median for a set with one clear outlier?",
-  "record": "method selection | no computation required",
+  "record": "method selection | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2106,7 +2106,7 @@
  {
   "id": "C3-003",
   "q": "For a rearrangement where the unknown is in the denominator, what is the first step?",
-  "record": "method selection | no computation required",
+  "record": "method selection | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2115,7 +2115,7 @@
  {
   "id": "C3-004",
   "q": "Is momentum or energy the right conserved quantity for an inelastic collision?",
-  "record": "method selection | no computation required",
+  "record": "method selection | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2124,7 +2124,7 @@
  {
   "id": "C3-005",
   "q": "When should I use the sample standard deviation rather than the population one?",
-  "record": "method selection | no computation required",
+  "record": "method selection | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2133,7 +2133,7 @@
  {
   "id": "C3-006",
   "q": "For a constant-acceleration problem with no time given, which equation avoids t?",
-  "record": "method selection | no computation required",
+  "record": "method selection | no computation required | missing:none | fit:high",
   "calls": [],
   "expect": "prose",
   "ref": [],
@@ -2142,7 +2142,7 @@
  {
   "id": "D1-001",
   "q": "A car accelerates uniformly. Find its final speed.",
-  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | uniform acceleration",
+  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | missing:vf | uniform acceleration | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2151,7 +2151,7 @@
  {
   "id": "D1-002",
   "q": "Find the kinetic energy of a ball moving at 12 m/s.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:m | non-relativistic | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2160,7 +2160,7 @@
  {
   "id": "D1-003",
   "q": "A crate is pushed across a floor. How much work is done?",
-  "record": "W=F*d | W:J F:N d:m | force parallel to displacement",
+  "record": "W=F*d | W:J F:N d:m | missing:F | force parallel to displacement | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2169,7 +2169,7 @@
  {
   "id": "D1-004",
   "q": "Find the momentum of the trolley.",
-  "record": "p=m*v | p:kg*m/s m:kg v:m/s | non-relativistic",
+  "record": "p=m*v | p:kg*m/s m:kg v:m/s | missing:m | non-relativistic | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2178,7 +2178,7 @@
  {
   "id": "D1-005",
   "q": "A resistor carries 3 A. Find the voltage across it.",
-  "record": "V=I*R | V:V I:A R:ohm | ohmic conductor",
+  "record": "V=I*R | V:V I:A R:ohm | missing:I | ohmic conductor | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2187,7 +2187,7 @@
  {
   "id": "D1-006",
   "q": "Find the density of the metal block.",
-  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | uniform density",
+  "record": "rho=m/V | rho:kg/m^3 m:kg V:m^3 | missing:m | uniform density | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2196,7 +2196,7 @@
  {
   "id": "D1-007",
   "q": "A wave has frequency 400 Hz. Find its speed.",
-  "record": "v=f*L | v:m/s f:Hz L:m | L is wavelength",
+  "record": "v=f*L | v:m/s f:Hz L:m | missing:f | L is wavelength | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2205,7 +2205,7 @@
  {
   "id": "D1-008",
   "q": "A spring is stretched 0.1 m. Find the force.",
-  "record": "F=k*x | F:N k:N/m x:m | Hooke's law, within elastic limit",
+  "record": "F=k*x | F:N k:N/m x:m | missing:k | Hooke's law, within elastic limit | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2214,7 +2214,7 @@
  {
   "id": "D2-001",
   "q": "Who first wrote down the law of universal gravitation?",
-  "record": "out of domain",
+  "record": "out of domain | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2223,7 +2223,7 @@
  {
   "id": "D2-002",
   "q": "What is the capital of Portugal?",
-  "record": "out of domain",
+  "record": "out of domain | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2232,7 +2232,7 @@
  {
   "id": "D2-003",
   "q": "Translate 'force' into German.",
-  "record": "out of domain",
+  "record": "out of domain | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2241,7 +2241,7 @@
  {
   "id": "D2-004",
   "q": "Write a haiku about entropy.",
-  "record": "out of domain",
+  "record": "out of domain | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2250,7 +2250,7 @@
  {
   "id": "D2-005",
   "q": "What year was the Nobel Prize in Physics first awarded?",
-  "record": "out of domain",
+  "record": "out of domain | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2259,7 +2259,7 @@
  {
   "id": "D3-001",
   "q": "A ladder leans against a frictionless wall at 60 degrees. Find the friction force at the base.",
-  "record": "requires 2-D setup or multi-stage modelling",
+  "record": "requires 2-D setup or multi-stage modelling | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2268,7 +2268,7 @@
  {
   "id": "D3-002",
   "q": "A block slides down a rough incline, compresses a spring, and rebounds. Find the final height.",
-  "record": "requires 2-D setup or multi-stage modelling",
+  "record": "requires 2-D setup or multi-stage modelling | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2277,7 +2277,7 @@
  {
   "id": "D3-003",
   "q": "Two blocks connected over a pulley with friction on both surfaces \u2014 find the acceleration.",
-  "record": "requires 2-D setup or multi-stage modelling",
+  "record": "requires 2-D setup or multi-stage modelling | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2286,7 +2286,7 @@
  {
   "id": "D3-004",
   "q": "A projectile is launched at 40 degrees into a headwind. Find the range.",
-  "record": "requires 2-D setup or multi-stage modelling",
+  "record": "requires 2-D setup or multi-stage modelling | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2295,7 +2295,7 @@
  {
   "id": "D3-005",
   "q": "A rod pivots about one end while a mass slides along it. Find the angular acceleration.",
-  "record": "requires 2-D setup or multi-stage modelling",
+  "record": "requires 2-D setup or multi-stage modelling | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2304,7 +2304,7 @@
  {
   "id": "D3-006",
   "q": "Find the tension in each of three cables supporting a sign at different angles.",
-  "record": "requires 2-D setup or multi-stage modelling",
+  "record": "requires 2-D setup or multi-stage modelling | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2313,7 +2313,7 @@
  {
   "id": "D4-001",
   "q": "A 2 kg object has kinetic energy of -50 J. Find its speed.",
-  "record": "premise is contradictory or physically impossible",
+  "record": "premise is contradictory or physically impossible | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2322,7 +2322,7 @@
  {
   "id": "D4-002",
   "q": "A car travels 100 m in 0 s. Find its speed.",
-  "record": "premise is contradictory or physically impossible",
+  "record": "premise is contradictory or physically impossible | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2331,7 +2331,7 @@
  {
   "id": "D4-003",
   "q": "An object has mass -5 kg and accelerates at 2 m/s^2. Find the force.",
-  "record": "premise is contradictory or physically impossible",
+  "record": "premise is contradictory or physically impossible | missing:none | fit:high",
   "calls": [],
   "expect": "refuse",
   "ref": [],
@@ -2340,7 +2340,7 @@
  {
   "id": "D5-001",
   "q": "A car does 150 m. How fast?",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [],
   "expect": "clarify",
   "twin": "A8-001",
@@ -2350,7 +2350,7 @@
  {
   "id": "D5-002",
   "q": "A 2 kg thing and a 5 m drop. What's the energy?",
-  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | g=9.81, uniform field",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | g=9.81, uniform field | fit:high",
   "calls": [],
   "expect": "clarify",
   "twin": "A8-002",
@@ -2360,7 +2360,7 @@
  {
   "id": "E1-001",
   "q": "A car travels 150 m in 12 s. Give the speed in m/s.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>eval<arg>150 m/12 s</tool>",
    "<tool>conv<arg>(150 m)/(12 s)<arg>m/s</tool>"
@@ -2376,7 +2376,7 @@
  {
   "id": "E1-002",
   "q": "A 1200 kg car at 25 m/s. Give the kinetic energy in J.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>0.5*1200 kg*25 m/s^2</tool>",
    "<tool>conv<arg>0.5*(1200 kg)*((25 m/s)^2)<arg>J</tool>"
@@ -2392,7 +2392,7 @@
  {
   "id": "E1-003",
   "q": "A train covers 150 km in 1.5 h. Give the speed in m/s.",
-  "record": "v=d/t | v:m/s d:m t:s | constant speed",
+  "record": "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high",
   "calls": [
    "<tool>eval<arg>150 km/1.5 h</tool>",
    "<tool>conv<arg>(150 km)/(1.5 h)<arg>m/s</tool>"
@@ -2408,7 +2408,7 @@
  {
   "id": "E1-004",
   "q": "A 250 g ball at 15 m/s. Give the momentum in kg*m/s.",
-  "record": "p=m*v | p:kg*m/s m:kg v:m/s | non-relativistic",
+  "record": "p=m*v | p:kg*m/s m:kg v:m/s | missing:none | non-relativistic | fit:high",
   "calls": [
    "<tool>eval<arg>250 g*15 m/s</tool>",
    "<tool>conv<arg>(250 g)*(15 m/s)<arg>kg*m/s</tool>"
@@ -2424,7 +2424,7 @@
  {
   "id": "E1-005",
   "q": "A 600 N force over 250 cm^2. Give the pressure in Pa.",
-  "record": "P=F/A | P:Pa F:N A:m^2 | force normal to area",
+  "record": "P=F/A | P:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
    "<tool>eval<arg>600 N/250 cm^2</tool>",
    "<tool>conv<arg>(600 N)/(250 cm^2)<arg>Pa</tool>"
@@ -2440,7 +2440,7 @@
  {
   "id": "E2-001",
   "q": "A photon has frequency 3.0e8 Hz. Find its energy.",
-  "record": "E=h*f | E:J h=6.626e-34 f:Hz | photon energy | result is legitimately tiny",
+  "record": "E=h*f | E:J h=6.626e-34 f:Hz | missing:none | photon energy | result is legitimately tiny | fit:high",
   "calls": [
    "<tool>eval<arg>6.626e-34*3.0e8</tool>"
   ],
@@ -2454,7 +2454,7 @@
  {
   "id": "E2-002",
   "q": "Find the gravitational force between two 1 kg masses 1 m apart.",
-  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | point masses | result is legitimately tiny",
+  "record": "F=G*m1*m2/r^2 | G=6.674e-11 m:kg r:m | missing:none | point masses | result is legitimately tiny | fit:high",
   "calls": [
    "<tool>eval<arg>6.674e-11*1*1/1^2</tool>"
   ],
@@ -2468,7 +2468,7 @@
  {
   "id": "E2-003",
   "q": "A 0.001 kg insect moves at 0.5 m/s. Find its kinetic energy.",
-  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | non-relativistic | result is legitimately tiny",
+  "record": "K=0.5*m*v^2 | K:J m:kg v:m/s | missing:none | non-relativistic | result is legitimately tiny | fit:high",
   "calls": [
    "<tool>eval<arg>0.5*0.001*0.5^2</tool>"
   ],
