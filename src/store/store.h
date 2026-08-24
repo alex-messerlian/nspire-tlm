@@ -13,7 +13,10 @@
 #ifndef NS_STORE_H
 #define NS_STORE_H
 
-#define NS_FIT_THRESHOLD_MILLI 350      /* 0.35 in integer milli-units; no float in the hot path */
+/* fit-v2: comparative banding. No absolute threshold -- see corpus/refusal.py band_v2().
+ * high iff matched >= min(2, nterms) AND matched > second-best matched. Monotone under term
+ * enrichment, which the v1 ratio was not. */
+#define NS_FIT_MIN_MATCH 2
 #define NS_MAX_VARS   8
 #define NS_MAX_TERMS  12
 
