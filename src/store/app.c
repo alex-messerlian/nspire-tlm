@@ -443,7 +443,8 @@ static void draw_sidebar(void) {
         gfx_text(R_NEW.x + 20, R_NEW.y + 2, "New chat", F_UIB, C_INK, nb);
     }
 
-    gfx_text(10, TOP_H + 26, "Chats", F_UI, C_INK3, C_SIDE);
+    /* A heading over nothing is furniture. */
+    if (NCHATS) gfx_text(10, TOP_H + 26, "Recents", F_UI, C_INK3, C_SIDE);
 
     /* The list SCROLLS. It used to break at the first row that did not fit, which silently hid up
      * to six of a twelve-session cap -- unreachable, with nothing on screen admitting it. Hiding
@@ -683,12 +684,24 @@ void app_event(const in_event *e) {
 /* ---- generation hooks -------------------------------------------------------------------------- */
 static app_turn *pending;
 
+/* Most-recently-used ordering, matching the web. A session reached the top of the list only when
+ * it was CREATED; sending into an older one left it in place, which is not what "recents" means.
+ * Moving the array element keeps CUR pointing at the same session. */
+static void touch_chat(void) {
+    if (CUR <= 0) return;
+    app_chat tmp = CHATS[CUR];
+    for (int i = CUR; i > 0; i--) CHATS[i] = CHATS[i - 1];
+    CHATS[0] = tmp;
+    CUR = 0;
+    CHAT_SCROLL = 0;                 /* the session just moved to the top: show it */
+}
+
 void app_begin_turn(const char *question) {
     app_chat *c;
     if (CUR < 0) {
         char t[64]; snprintf(t, sizeof t, "%s", question);
         c = new_chat(t);
-    } else c = &CHATS[CUR];
+    } else { touch_chat(); c = &CHATS[CUR]; }   /* answering in an old session brings it forward */
     if (c->nturns >= MAX_TURNS) return;
     pending = &c->turn[c->nturns++];
     memset(pending, 0, sizeof *pending);

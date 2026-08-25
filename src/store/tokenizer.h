@@ -16,4 +16,9 @@ void ns_tok_free(ns_tok *t);
 int  ns_tok_encode(const ns_tok *t, const char *text, int *out, int max);
 int  ns_tok_decode(const ns_tok *t, const int *ids, int n, char *out, int cap);
 const char *ns_tok_strerror(int code);
+/* Id of a special token by its literal text, or -1. The runtime needs these to steer generation:
+ * the model must never be allowed to EMIT <res> (the runtime supplies it), and </tool> is what
+ * says a call is complete and ready to execute. The host finds them with token_to_id; this is the
+ * device's equivalent, so both sides steer on the same ids rather than on hardcoded numbers. */
+int  ns_tok_special_id(const ns_tok *t, const char *literal);
 #endif

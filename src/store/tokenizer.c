@@ -247,6 +247,16 @@ int ns_tok_decode(const ns_tok *t, const int *ids, int n, char *out, int cap) {
     return w;
 }
 
+/* Id of a special token by literal text, or -1. The runtime steers on these: the model must never
+ * be allowed to EMIT <res> -- the runtime supplies it -- and </tool> is what says a call is
+ * complete. Looked up by text so both sides steer on the same ids rather than hardcoded numbers. */
+int ns_tok_special_id(const ns_tok *t, const char *literal) {
+    if (!t || !literal) return -1;
+    for (int i = 0; i < t->nspecial; i++)
+        if (t->special[i].s && strcmp(t->special[i].s, literal) == 0) return t->special[i].id;
+    return -1;
+}
+
 const char *ns_tok_strerror(int c) {
     switch (c) {
     case NST_OK: return "ok";

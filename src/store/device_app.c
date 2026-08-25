@@ -15,6 +15,7 @@
 #include "loader.h"
 #include "assemble.h"
 #include "tokenizer.h"
+#include "../../tools/eval/eval.h"
 
 FILE *g_nspire_log = 0;
 extern void  rq_build(const char *path);
@@ -118,16 +119,33 @@ static int keypad_poll(void) {
 /* ---- generation ------------------------------------------------------------------------------- */
 static int argmax(const float *v, int n) { int b = 0; for (int i = 1; i < n; i++) if (v[i] > v[b]) b = i; return b; }
 
-/* Kept, not deleted: the evaluator lands here when it is linked into the device build, and a
- * deleted stub would hide that the tool path is still unimplemented. */
-__attribute__((unused))
+/* Execute one tool call ON THE CALCULATOR.
+ *
+ * This is the whole thesis of the project: the model does not compute, it emits a call, and the
+ * runtime executes it. Until now this returned "!give" and the answer's number came from the model
+ * -- so the device was ASSERTING the architecture rather than demonstrating it.
+ *
+ * tool_call_text() is the same entry point the host cli uses (tools/eval/main.c:16), over the same
+ * CORE sources, which the evaluator's own Makefile already cross-compiles for ARMv5TE. Host and
+ * device therefore run identical arithmetic; TOOL_SPEC 5.1 requires the formatting to be
+ * byte-identical and tools/eval/device_main.c is the suite that checks it.
+ *
+ * A failure returns the evaluator's own refusal code. It never invents a value and never falls
+ * back to whatever the model was going to say. */
 static const char *run_call(const char *call) {
-    static char out[64];
-    /* the evaluator is a host tool; on device the call is executed by the same C the host uses.
-     * Until that is linked in, an unexecuted call is reported honestly rather than faked. */
-    (void)call;
-    snprintf(out, sizeof out, "!give");
+    static char out[MAX_RESULT];
+    out[0] = 0;
+    if (tool_call_text(call, out, sizeof out) != TB_OK || !out[0])
+        snprintf(out, sizeof out, "%s", out[0] ? out : "!give");
     return out;
+}
+
+/* Last occurrence of `needle`. The model can emit more than one call in a document, and the span to
+ * execute is the one that just closed, not the first one in the buffer. */
+static const char *rfind(const char *hay, const char *needle) {
+    const char *last = 0, *p = hay;
+    for (;;) { p = strstr(p, needle); if (!p) break; last = p; p++; }
+    return last;
 }
 
 /* ---- data location -----------------------------------------------------------------------------

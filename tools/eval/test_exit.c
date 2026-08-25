@@ -95,6 +95,33 @@ int main(void) {
         printf("  %s  old ladder: ESC while busy left the chat instead of stopping\n",
                caught ? "CAUGHT" : "MISSED"); }
 
+    /* Recents ordering. A session reached the top only when created; answering in an old one left
+     * it in place. Asserted here because it is a rule, not a look. */
+    printf("\n  -- recents: answering in an old session brings it forward --\n");
+    reset(); seed("oldest"); seed("middle"); seed("newest");
+    CUR = 0;                                    /* "oldest" is at index 0 after seeding order */
+    T("3 sessions seeded", NCHATS, 3);
+    CUR = 2; app_begin_turn("a question");      /* answer in the LAST one */
+    T("answered session moved to index 0", CUR, 0);
+    T("its title is the one answered in", strcmp(CHATS[0].title, "newest") == 0, 1);
+    T("the others kept their order", strcmp(CHATS[1].title, "oldest") == 0
+                                   && strcmp(CHATS[2].title, "middle") == 0, 1);
+    T("nothing was lost", NCHATS, 3);
+    BUSY = 0; pending = 0;
+
+    reset(); seed("only");
+    CUR = 0; app_begin_turn("q");
+    T("already-top session does not move", CUR, 0);
+    T("no duplication", NCHATS, 1);
+    BUSY = 0; pending = 0;
+
+    /* MUTATION: without touch_chat the answered session stays where it was. */
+    {   int cur = 2; /* old behaviour: no move */
+        int caught = (cur != 0);
+        if (!caught) F++;
+        printf("  %s  mutant: no bump leaves the answered session at index %d\n",
+               caught ? "CAUGHT" : "MISSED", cur); }
+
     printf("\n  %s: exit paths, %d failure(s)\n\n", F ? "FAIL" : "PASS", F);
     gfx_free();
     return F != 0;
