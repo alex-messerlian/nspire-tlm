@@ -227,6 +227,26 @@ int ns_tok_encode(const ns_tok *t, const char *text, int *out, int max) {
     return n + r;
 }
 
+/* Decode: concatenate the raw bytes of each id. Specials print as their literal text so a
+ * <tool> in the output is visible rather than silently dropped. Returns bytes written. */
+int ns_tok_decode(const ns_tok *t, const int *ids, int n, char *out, int cap) {
+    if (!t || !ids || !out || cap <= 0) return -1;
+    int w = 0;
+    for (int i = 0; i < n; i++) {
+        const unsigned char *b = 0; int len = 0;
+        for (int k = 0; k < t->nspecial; k++)
+            if (t->special[k].id == ids[i]) { b = (const unsigned char *)t->special[k].s;
+                                              len = t->special[k].len; break; }
+        if (!b) for (int k = 0; k < t->nvocab; k++)
+            if (t->vocab[k].id == ids[i]) { b = t->vocab[k].b; len = t->vocab[k].len; break; }
+        if (!b) continue;
+        if (w + len >= cap) break;
+        memcpy(out + w, b, (size_t)len); w += len;
+    }
+    out[w] = 0;
+    return w;
+}
+
 const char *ns_tok_strerror(int c) {
     switch (c) {
     case NST_OK: return "ok";

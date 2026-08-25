@@ -14,5 +14,6 @@ int  ns_tok_load(ns_tok *t, const char *path);
 void ns_tok_free(ns_tok *t);
 /* Returns token count, or a negative NST_ERR_*. Never partially fills on error. */
 int  ns_tok_encode(const ns_tok *t, const char *text, int *out, int max);
+int  ns_tok_decode(const ns_tok *t, const int *ids, int n, char *out, int cap);
 const char *ns_tok_strerror(int code);
 #endif

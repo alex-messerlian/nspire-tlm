@@ -1279,3 +1279,21 @@ int llama2_main(int argc, char *argv[]) {
     return 0;
 }
 #endif
+
+/* ---------------------------------------------------------------------------------------------
+ * Shim for the nspire-slm application. The engine's own main() drives a Tokenizer and Sampler we
+ * do not use: our tokenizer is byte-exact with the corpus (verified 9/9 on this device) and we
+ * decode greedily so a host/device mismatch stays falsifiable. This exposes just the three calls
+ * the app needs, without duplicating the Config/Transformer structs into another header. */
+static Transformer G_T;
+static int G_BUILT = 0;
+
+void rq_build(const char *path) {
+    if (G_BUILT) return;
+    build_transformer(&G_T, (char *)path);
+    G_BUILT = 1;
+}
+int rq_vocab(void) { return G_BUILT ? G_T.config.vocab_size : 0; }
+int rq_seqlen(void) { return G_BUILT ? G_T.config.seq_len : 0; }
+float *rq_forward(int token, int pos) { return G_BUILT ? forward(&G_T, token, pos) : 0; }
+void rq_free(void) { if (G_BUILT) { free_transformer(&G_T); G_BUILT = 0; } }
