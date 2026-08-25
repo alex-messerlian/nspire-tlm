@@ -3,7 +3,7 @@
 #include "gfx.h"
 #include "font_data.h"
 
-#ifndef SLM_HOST
+#ifndef TLM_HOST
 #include <libndls.h>
 #endif
 
@@ -13,12 +13,12 @@ static int CX0, CY0, CX1, CY1;      /* clip rect, half-open */
 void gfx_init(void) {
     FB = (uint16_t *)malloc((size_t)GFX_W * GFX_H * 2);
     gfx_clip_reset();
-#ifndef SLM_HOST
+#ifndef TLM_HOST
     lcd_init(SCR_320x240_565);
 #endif
 }
 void gfx_free(void) {
-#ifndef SLM_HOST
+#ifndef TLM_HOST
     lcd_init(SCR_TYPE_INVALID);      /* hand the panel back to the OS */
 #endif
     free(FB); FB = 0;
@@ -26,7 +26,7 @@ void gfx_free(void) {
 uint16_t *gfx_buf(void) { return FB; }
 
 void gfx_present(void) {
-#ifndef SLM_HOST
+#ifndef TLM_HOST
     lcd_blit(FB, SCR_320x240_565);
 #endif
 }
@@ -126,6 +126,14 @@ static inline uint16_t blend(uint16_t bg, uint16_t fg, int a /*0..15*/) {
     int fr = (fg >> 11) & 31, fgn = (fg >> 5) & 63, fb = fg & 31;
     int r = br + (fr - br) * a / 15, g = bgn + (fgn - bgn) * a / 15, b = bb + (fb - bb) * a / 15;
     return (uint16_t)((r << 11) | (g << 5) | b);
+}
+
+/* Scale the whole frame toward a colour. The modal scrim used a 50% checkerboard, which on a
+ * 320x240 panel reads as noise rather than as dimming -- and it cost 38400 gfx_fill calls. One
+ * pass of blend over 76800 pixels is both correct and cheaper. */
+void gfx_dim(uint16_t toward, int pct) {
+    int a = pct * 15 / 100;
+    for (int i = 0; i < GFX_W * GFX_H; i++) FB[i] = blend(FB[i], toward, a);
 }
 
 static int draw_glyph(int x, int y, const ns_glyph *g, fontref F, uint16_t fg, uint16_t bg) {

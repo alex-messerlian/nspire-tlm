@@ -11,3 +11,6 @@ models/*.pt
 vendor/libnspire/
 corpus/raw/
 .venv-tok/
+
+__pycache__/
+*.pyc

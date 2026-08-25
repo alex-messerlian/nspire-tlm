@@ -44,14 +44,23 @@ static int argmax(const float *v, int n) {
 
 int main(void) {
     screen_init();
-    LOG = fopen("/documents/slm/genlog.txt.tns", "w");
+static char GDIR[32] = "/documents/tlm/";
+    LOG = fopen("/documents/tlm/genlog.txt.tns", "w");
     g_nspire_log = LOG;
     say("== generate ==");
     say("printf works from this TU");
 
     ns_store2 st; ns_tok tk;
-    if (ns_load(&st, "/documents/slm/store.tns.tns") != NS_OK) { say("STOP: store"); goto done; }
-    if (ns_tok_load(&tk, "/documents/slm/tok4096.tok.tns") != NST_OK) { say("STOP: tok"); goto done; }
+    {   static const char *D[] = { "/documents/tlm/", "/documents/slm/", "/documents/ndless/" };
+        int found = 0;
+        for (unsigned i = 0; i < sizeof D / sizeof D[0] && !found; i++) {
+            char pb[80]; snprintf(pb, sizeof pb, "%sstore.tns.tns", D[i]);
+            if (ns_load(&st, pb) == NS_OK) { snprintf(GDIR, sizeof GDIR, "%s", D[i]); found = 1; }
+        }
+        if (!found) { say("STOP: store"); goto done; }
+    }
+    {   char pb[80]; snprintf(pb, sizeof pb, "%stok4096.tok.tns", GDIR);
+        if (ns_tok_load(&tk, pb) != NST_OK) { say("STOP: tok"); goto done; } }
     say("store %d records, vocab %d", st.n, tk.nvocab);
 
     int idx = -1;
@@ -69,7 +78,7 @@ int main(void) {
     if (n <= 0) { say("STOP: encode"); goto done; }
 
     say("loading model...");
-    rq_build("/documents/slm/model4096.bin.tns");
+    {   char pb[80]; snprintf(pb, sizeof pb, "%smodel4096.bin.tns", GDIR); rq_build(pb); }
     int V = rq_vocab();
     say("model loaded, vocab %d", V);
 

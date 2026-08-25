@@ -1,4 +1,4 @@
-# nspire-slm — a language model on a TI-Nspire CX II CAS
+# nspire-tlm — a language model on a TI-Nspire CX II CAS
 
 Mission, phases, and rules of engagement live in the project log.
 

@@ -1,6 +1,6 @@
 #ifndef NS_APP_H
 #define NS_APP_H
-/* The ChatSLM application: layout, state, input handling. Draws through gfx.c, so it renders
+/* The ChatTLM application: layout, state, input handling. Draws through gfx.c, so it renders
  * identically on the device and in the host harness. */
 #include "gfx.h"
 

@@ -1281,7 +1281,7 @@ int llama2_main(int argc, char *argv[]) {
 #endif
 
 /* ---------------------------------------------------------------------------------------------
- * Shim for the nspire-slm application. The engine's own main() drives a Tokenizer and Sampler we
+ * Shim for the nspire-tlm application. The engine's own main() drives a Tokenizer and Sampler we
  * do not use: our tokenizer is byte-exact with the corpus (verified 9/9 on this device) and we
  * decode greedily so a host/device mismatch stays falsifiable. This exposes just the three calls
  * the app needs, without duplicating the Config/Transformer structs into another header. */

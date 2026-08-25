@@ -153,6 +153,181 @@ static int draw_answer(int x, int y, int w, const char *raw, int draw) {
     return cy - y;
 }
 
+/* ---- search ------------------------------------------------------------------------------------
+ * The same CONTENT search the web UI runs, ported rather than reinvented: every term must appear
+ * somewhere in the session -- title OR any message -- and match KIND outranks position, so a whole
+ * word beats a word-start beats a mid-word substring. Scoring the title alone was the defect on the
+ * web side and it would have shipped here too.
+ *
+ * There is no dynamic allocation: the model owns the heap, so scoring lowercases one string at a
+ * time into a fixed scratch rather than building a per-session haystack. */
+static int  SEARCH_ON;
+static char SQ[40];
+static int  SQ_N;
+static int  SHIT[MAX_CHATS], NSHIT, SSEL;
+static gfx_rect R_SEARCH, R_SROW[MAX_CHATS];
+
+#define MAX_TERMS 5
+#define TERM_MAX  20
+
+static char LOWBUF[544];
+static const char *lowr(const char *s) {
+    int i = 0;
+    for (; s[i] && i < (int)sizeof LOWBUF - 1; i++) {
+        char c = s[i];
+        LOWBUF[i] = (c >= 'A' && c <= 'Z') ? (char)(c - 'A' + 'a') : c;
+    }
+    LOWBUF[i] = 0;
+    return LOWBUF;
+}
+static int wordch(char c) { return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'); }
+
+/* Best score for one term in one lowercased haystack, or -1 when absent. */
+static int term_score(const char *hay, const char *term, int base) {
+    int best = -1, tl = (int)strlen(term), hl = (int)strlen(hay);
+    if (!tl) return -1;
+    for (const char *p = strstr(hay, term); p; p = strstr(p + 1, term)) {
+        int i = (int)(p - hay);
+        int pre  = (i == 0) || !wordch(hay[i - 1]);
+        int post = (i + tl >= hl) || !wordch(hay[i + tl]);
+        int kind = (pre && post) ? 300 : pre ? 150 : 0;
+        int s = base + kind - (i > 200 ? 200 : i) / 10;
+        if (s > best) best = s;
+    }
+    return best;
+}
+static int split_terms(const char *q, char out[MAX_TERMS][TERM_MAX]) {
+    int n = 0, k = 0;
+    for (const char *p = q; ; p++) {
+        if (*p && *p != ' ') {
+            if (k < TERM_MAX - 1) {
+                char c = *p;
+                out[n][k++] = (c >= 'A' && c <= 'Z') ? (char)(c - 'A' + 'a') : c;
+            }
+        } else if (k) {
+            out[n][k] = 0; k = 0;
+            if (++n >= MAX_TERMS) break;
+        }
+        if (!*p) break;
+    }
+    return n;
+}
+static int chat_score(const app_chat *c, char terms[MAX_TERMS][TERM_MAX], int nt) {
+    long total = 0;
+    for (int i = 0; i < nt; i++) {
+        int s = term_score(lowr(c->title), terms[i], 1000);
+        for (int j = 0; j < c->nturns; j++) {
+            int v = term_score(lowr(c->turn[j].q), terms[i], 500); if (v > s) s = v;
+            v     = term_score(lowr(c->turn[j].a), terms[i], 500); if (v > s) s = v;
+        }
+        if (s < 0) return -1;                  /* AND: a term nobody has disqualifies the session */
+        total += s;
+    }
+    return nt ? (int)(total / nt) : 0;
+}
+/* Rebuild the ranked hit list. Insertion sort: MAX_CHATS is 12. */
+static void run_search(void) {
+    char terms[MAX_TERMS][TERM_MAX];
+    int nt = split_terms(SQ, terms);
+    int score[MAX_CHATS];
+    NSHIT = 0;
+    for (int i = 0; i < NCHATS; i++) {
+        int s = nt ? chat_score(&CHATS[i], terms, nt) : 0;
+        if (s < 0) continue;
+        int at = NSHIT;
+        while (at > 0 && score[at - 1] < s) { score[at] = score[at - 1]; SHIT[at] = SHIT[at - 1]; at--; }
+        score[at] = s; SHIT[at] = i; NSHIT++;
+    }
+    if (SSEL >= NSHIT) SSEL = 0;
+}
+/* Window around the earliest match in the earliest message that has one. */
+static void snippet_of(const app_chat *c, char terms[MAX_TERMS][TERM_MAX], int nt,
+                       char *out, int cap) {
+    out[0] = 0;
+    for (int j = 0; j < c->nturns; j++) {
+        for (int which = 0; which < 2; which++) {
+            const char *src = which ? c->turn[j].a : c->turn[j].q;
+            if (!src[0]) continue;
+            const char *low = lowr(src);
+            int at = -1;
+            for (int i = 0; i < nt; i++) {
+                const char *p = strstr(low, terms[i]);
+                if (p) { int k = (int)(p - low); if (at < 0 || k < at) at = k; }
+            }
+            if (at < 0) continue;
+            int from = at - 24; if (from < 0) from = 0;
+            /* snap forward to a word boundary: a window opening mid-number rendered ".3 m/s" and
+             * read as a decimal point rather than as elision */
+            if (from > 0) { while (src[from] && src[from] != ' ') from++; while (src[from] == ' ') from++; }
+            int n = 0;
+            if (from > 0) { for (int e = 0; e < 3 && n < cap - 1; e++) out[n++] = '.'; out[n++] = ' '; }
+            for (int i = from; src[i] && i < from + 74 && n < cap - 1; i++) out[n++] = src[i];
+            out[n] = 0;
+            return;
+        }
+    }
+    if (c->nturns) { strncpy(out, c->turn[0].q, cap - 1); out[cap - 1] = 0; }
+}
+
+/* A 9px lens. gfx_rrect_outline at r=4 degenerates to a diamond -- its corner test is a radius
+ * compare per row, which is right at r>=6 and visibly wrong below it. */
+static void magnifier(int x, int y, uint16_t c) {
+    const int R = 4;
+    for (int j = -R; j <= R; j++)
+        for (int i = -R; i <= R; i++) {
+            int d = i * i + j * j;
+            if (d <= R * R && d > (R - 2) * (R - 2)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
+        }
+    for (int k = 0; k < 4; k++) gfx_fill(x + 7 + k, y + 7 + k, 2, 1, c);   /* handle */
+}
+
+/* compose glyph for New chat: the web row has one and the device row did not, so the two rows sat
+ * on different text baselines. */
+static void pencil(int x, int y, uint16_t c) {
+    for (int k = 0; k < 7; k++) gfx_fill(x + 2 + k, y + 8 - k, 2, 1, c);   /* shaft */
+    gfx_fill(x + 1, y + 8, 2, 2, c);                                       /* tip  */
+    gfx_fill(x + 8, y + 1, 2, 2, c);                                       /* eraser */
+}
+
+static void draw_search(void) {
+    gfx_dim(HEX(0x000000), 28);            /* same scrim weight as the web popup */
+
+    const int SW = 260, SX = (GFX_W - SW) / 2, SY = 26;
+    int rows = NSHIT > 5 ? 5 : NSHIT;
+    int SH = 30 + (rows ? rows * 30 + 6 : 26);
+    gfx_rrect(SX - 1, SY - 1, SW + 2, SH + 2, 9, C_LINE);
+    gfx_rrect(SX, SY, SW, SH, 8, C_BG);
+
+    /* field */
+    gfx_hline(SX + 10, SY + 27, SW - 20, C_LINE);
+    magnifier(SX + 11, SY + 8, C_INK3);
+    if (SQ_N) gfx_text(SX + 28, SY + 7, SQ, F_UI, C_INK, C_BG);
+    else      gfx_text(SX + 28, SY + 7, "Search chats", F_UI, C_INK3, C_BG);
+    if (SQ_N) gfx_vline(SX + 29 + gfx_text_w(SQ, F_UI), SY + 8, 12, C_INK);
+
+    char terms[MAX_TERMS][TERM_MAX];
+    int nt = split_terms(SQ, terms);
+
+    if (!rows) {
+        gfx_text(SX + 12, SY + 36, SQ_N ? "No chats match" : "No chats yet", F_UI, C_INK3, C_BG);
+        return;
+    }
+    for (int i = 0; i < rows; i++) {
+        int y = SY + 34 + i * 30;
+        R_SROW[i] = (gfx_rect){ SX + 4, y - 2, SW - 8, 28 };
+        int hot = (i == SSEL) || (HOVER && inside(R_SROW[i], MX, MY));
+        uint16_t bg = hot ? C_SEL : C_BG;
+        if (hot) gfx_rrect(R_SROW[i].x, R_SROW[i].y, R_SROW[i].w, R_SROW[i].h, 5, bg);
+        const app_chat *c = &CHATS[SHIT[i]];
+        gfx_text_ellipsis(SX + 10, y, c->title, F_UIB, C_INK, bg, SW - 20);
+        if (nt) {
+            char sn[110];
+            snippet_of(c, terms, nt, sn, sizeof sn);
+            gfx_text_ellipsis(SX + 10, y + 13, sn, F_UI, C_INK2, bg, SW - 20);
+        }
+    }
+}
+
 static void draw_sidebar(void) {
     gfx_fill(0, 0, SIDE_W, GFX_H, C_SIDE);
     gfx_vline(SIDE_W, 0, GFX_H, C_LINE);
@@ -165,15 +340,26 @@ static void draw_sidebar(void) {
     gfx_vline(R_TOGGLE.x + 7, R_TOGGLE.y + 2, 12, C_INK2);
 
     R_NEW = (gfx_rect){ 4, TOP_H + 2, SIDE_W - 8, 18 };
-    if (HOVER && inside(R_NEW, MX, MY)) gfx_rrect(R_NEW.x, R_NEW.y, R_NEW.w, R_NEW.h, 5, C_SEL);
-    gfx_text(R_NEW.x + 6, R_NEW.y + 2, "New chat", F_UIB, C_INK,
-             (HOVER && inside(R_NEW, MX, MY)) ? C_SEL : C_SIDE);
+    {   int hot = HOVER && inside(R_NEW, MX, MY);
+        uint16_t nb = hot ? C_SEL : C_SIDE;
+        if (hot) gfx_rrect(R_NEW.x, R_NEW.y, R_NEW.w, R_NEW.h, 5, nb);
+        pencil(R_NEW.x + 5, R_NEW.y + 3, C_INK2);
+        gfx_text(R_NEW.x + 20, R_NEW.y + 2, "New chat", F_UIB, C_INK, nb);
+    }
 
-    gfx_text(10, TOP_H + 26, "Chats", F_UI, C_INK3, C_SIDE);
+    R_SEARCH = (gfx_rect){ 4, TOP_H + 22, SIDE_W - 8, 18 };
+    {   int hot = HOVER && inside(R_SEARCH, MX, MY);
+        uint16_t sb = hot ? C_SEL : C_SIDE;
+        if (hot) gfx_rrect(R_SEARCH.x, R_SEARCH.y, R_SEARCH.w, R_SEARCH.h, 5, sb);
+        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 3, C_INK2);
+        gfx_text(R_SEARCH.x + 20, R_SEARCH.y + 2, "Search", F_UIB, C_INK, sb);
+    }
+
+    gfx_text(10, TOP_H + 46, "Chats", F_UI, C_INK3, C_SIDE);
 
     NCHAT_ROWS = NCHATS;
     for (int i = 0; i < NCHATS; i++) {
-        int y = TOP_H + 42 + i * 18;
+        int y = TOP_H + 62 + i * 18;
         if (y > GFX_H - DOCK_H - 20) { NCHAT_ROWS = i; break; }
         R_CHAT[i]  = (gfx_rect){ 4, y - 2, SIDE_W - 8, 17 };
         R_TRASH[i] = (gfx_rect){ SIDE_W - 20, y - 1, 14, 14 };
@@ -204,8 +390,8 @@ static void draw_main(void) {
     int w  = GFX_W - x0;
     gfx_fill(x0, 0, w, GFX_H, C_BG);
 
-    /* top bar: ChatSLM when empty, the chat's title inside a chat */
-    const char *title = (CUR >= 0) ? CHATS[CUR].title : "ChatSLM";
+    /* top bar: ChatTLM when empty, the chat's title inside a chat */
+    const char *title = (CUR >= 0) ? CHATS[CUR].title : "ChatTLM";
     gfx_text_ellipsis(x0 + PAD, 4, title, F_BIG, C_INK, C_BG, w - 2 * PAD - 34);
     gfx_hline(x0, TOP_H, w, C_LINE);
 
@@ -261,8 +447,8 @@ static void draw_main(void) {
     for (int i = 0; i < 5; i++) gfx_hline(R_SEND.x + 8 - i, R_SEND.y + 5 + i, 1, C_BG);
     gfx_vline(R_SEND.x + 8, R_SEND.y + 5, 7, C_BG);
 
-    gfx_text(x0 + (w - gfx_text_w("ChatSLM can make mistakes.", F_UI)) / 2, GFX_H - 14,
-             "ChatSLM can make mistakes.", F_UI, C_INK3, C_BG);
+    gfx_text(x0 + (w - gfx_text_w("ChatTLM can make mistakes.", F_UI)) / 2, GFX_H - 14,
+             "ChatTLM can make mistakes.", F_UI, C_INK3, C_BG);
 }
 
 static void draw_cursor(void) {
@@ -280,6 +466,7 @@ void app_draw(void) {
     gfx_clear(C_BG);
     if (SIDEBAR) draw_sidebar();
     draw_main();
+    if (SEARCH_ON) draw_search();
     draw_cursor();
     gfx_present();
 }
@@ -291,7 +478,17 @@ void app_event(const in_event *e) {
 
     if (e->kind == IN_CLICK) {
         MX = e->x; MY = e->y;
+        if (SEARCH_ON) {                       /* the sheet is modal: it eats clicks under it */
+            int rows = NSHIT > 5 ? 5 : NSHIT;
+            for (int i = 0; i < rows; i++)
+                if (inside(R_SROW[i], MX, MY)) { CUR = SHIT[i]; SCROLL = 0; SEARCH_ON = 0; return; }
+            SEARCH_ON = 0;                     /* click outside a row closes, as on the web */
+            return;
+        }
         if (inside(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
+        if (SIDEBAR && inside(R_SEARCH, MX, MY)) {
+            SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); return;
+        }
         if (SIDEBAR) {
             if (inside(R_NEW, MX, MY)) { CUR = -1; SCROLL = 0; COMPOSE_N = 0; COMPOSE[0] = 0; return; }
             for (int i = 0; i < NCHAT_ROWS; i++) {
@@ -307,6 +504,17 @@ void app_event(const in_event *e) {
 
     if (e->kind == IN_KEY) {
         int k = e->key;
+        if (SEARCH_ON) {                       /* typing goes to the query, not the composer */
+            if (k == K_ESC)   { SEARCH_ON = 0; return; }
+            if (k == K_DOWN)  { if (SSEL + 1 < (NSHIT > 5 ? 5 : NSHIT)) SSEL++; return; }
+            if (k == K_UP)    { if (SSEL > 0) SSEL--; return; }
+            if (k == K_ENTER) { if (NSHIT) { CUR = SHIT[SSEL]; SCROLL = 0; } SEARCH_ON = 0; return; }
+            if (k == K_BACK)  { if (SQ_N) { SQ[--SQ_N] = 0; SSEL = 0; run_search(); } return; }
+            if (k >= 32 && k < 127 && SQ_N < (int)sizeof SQ - 1) {
+                SQ[SQ_N++] = (char)k; SQ[SQ_N] = 0; SSEL = 0; run_search();
+            }
+            return;
+        }
         if (k == K_ESC)  { if (CUR >= 0) CUR = -1; else QUIT = 1; return; }
         if (k == K_TAB)  { SIDEBAR = !SIDEBAR; return; }
         if (k == K_BACK) { if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0; return; }

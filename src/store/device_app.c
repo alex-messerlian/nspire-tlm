@@ -1,4 +1,4 @@
-/* ChatSLM on the calculator. Touchpad cursor, framebuffer UI, real model.
+/* ChatTLM on the calculator. Touchpad cursor, framebuffer UI, real model.
  *
  * The touchpad is an ABSOLUTE pointer: touchpad_scan() returns x, y, contact and proximity.
  * proximity is the finger near the pad without pressing, which is exactly a hover state -- so the
@@ -98,6 +98,34 @@ static const char *run_call(const char *call) {
     return out;
 }
 
+/* ---- data location -----------------------------------------------------------------------------
+ * The SLM->TLM rename moved every hardcoded path from /documents/slm/ to /documents/tlm/ while the
+ * calculator's copy of the data still sits in the old directory. A hardcoded path would have made
+ * the app exit 1 on launch with no message -- the exact silent-failure shape that cost five device
+ * cycles during Phase 2 bring-up.
+ *
+ * So resolve at runtime instead: try each candidate directory and keep the first where the STORE
+ * opens. Probing the store rather than the directory means a half-populated directory does not win.
+ * The chosen prefix is reported into the log so a wrong pick is visible without a round-trip. */
+static const char *DATA_DIRS[] = { "/documents/tlm/", "/documents/slm/", "/documents/ndless/",
+                                   "/documents/bench/", "/documents/" };
+static char DATA_DIR[32];
+
+static const char *dpath(const char *leaf) {
+    static char buf[80];
+    snprintf(buf, sizeof buf, "%s%s", DATA_DIR, leaf);
+    return buf;
+}
+/* Returns 1 when a directory holding the store was found. */
+static int resolve_data_dir(ns_store2 *st) {
+    for (unsigned i = 0; i < sizeof DATA_DIRS / sizeof DATA_DIRS[0]; i++) {
+        snprintf(DATA_DIR, sizeof DATA_DIR, "%s", DATA_DIRS[i]);
+        if (ns_load(st, dpath("store.tns.tns")) == NS_OK) return 1;
+    }
+    DATA_DIR[0] = 0;
+    return 0;
+}
+
 void app_request(const char *question, const char *rid) {
     (void)rid;
     app_begin_turn(question);
@@ -132,7 +160,7 @@ void app_request(const char *question, const char *rid) {
     if (ns_assemble(prompt, sizeof prompt, &ST.rec[idx], question, &in) < 0) {
         app_stream_token("<a> could not assemble a prompt<end>"); app_stream_end(); return;
     }
-    if (!MODEL_READY) { rq_build("/documents/slm/model4096.bin.tns"); MODEL_READY = 1; }
+    if (!MODEL_READY) { rq_build(dpath("model4096.bin.tns")); MODEL_READY = 1; }
     int V = rq_vocab();
 
     static int ids[NS_MAX_TOKENS];
@@ -165,8 +193,8 @@ void app_request(const char *question, const char *rid) {
 }
 
 int main(void) {
-    if (ns_load(&ST, "/documents/slm/store.tns.tns") != NS_OK) return 1;
-    if (ns_tok_load(&TK, "/documents/slm/tok4096.tok.tns") != NST_OK) return 1;
+    if (!resolve_data_dir(&ST)) return 1;
+    if (ns_tok_load(&TK, dpath("tok4096.tok.tns")) != NST_OK) return 1;
     gfx_init();
     pointer_init();
     app_init();

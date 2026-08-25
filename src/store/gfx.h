@@ -10,7 +10,7 @@
  * Everything renders into an off-screen buffer and is blitted once per frame. Drawing straight to
  * the panel tears, and on a 396 MHz core a torn frame during streaming is very visible.
  *
- * The same file builds on the host (SLM_HOST) against a plain malloc'd buffer, so the layout can
+ * The same file builds on the host (TLM_HOST) against a plain malloc'd buffer, so the layout can
  * be iterated and screenshotted without a device round-trip. */
 #include <stdint.h>
 
@@ -38,6 +38,9 @@ void gfx_vline(int x, int y, int h, uint16_t c);
 
 /* Clip rectangle: everything below is clipped to it. The transcript scrolls, so text has to stop
  * at the pane edge rather than painting over the composer. */
+/* Blend the whole frame toward a colour, 0..100 percent. Modal scrim. */
+void gfx_dim(uint16_t toward, int pct);
+
 void gfx_clip(int x, int y, int w, int h);
 void gfx_clip_reset(void);
 
