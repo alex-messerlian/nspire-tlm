@@ -157,37 +157,30 @@ static int chip(int x, int y, const char *label, const char *val, uint16_t bg, u
 }
 
 /* Draw one assistant answer; returns the height it occupies. draw=0 measures only. */
+/* Draw ONLY what the model says, never how it got there.
+ *
+ * The tool call and the result used to render as chips. They were the visible evidence that the
+ * number came from the evaluator rather than from the model -- but the reader asked for the answer,
+ * not the working, and a calculator screen is 320px wide. The spans are still PARSED (span_next
+ * consumes them) and still stored verbatim in app_turn.a, so the provenance data is intact for the
+ * write-up; it is only not drawn. */
 static int draw_answer(int x, int y, int w, const char *raw, int draw) {
     int lh = gfx_font_h(F_UI) + 2, cy = y;
     const char *p = raw;
     char buf[512]; sp_kind k;
-    int chip_x = x, row_open = 0;
     while ((p = span_next(p, &k, buf, sizeof buf)) != 0) {
-        if (k == SP_TOOL) {
-            char fn[24], arg[256];
-            split_call(buf, fn, sizeof fn, arg, sizeof arg);
-            int cw = chip(chip_x, cy, fn, arg, C_TOOL, C_TOOLLN, C_INK, draw);
-            chip_x += cw + 4; row_open = 1;
-        } else if (k == SP_RES) {
-            const char *v = buf; while (*v == ' ') v++;
-            int err = (*v == '!');
-            char lbl[64];
-            snprintf(lbl, sizeof lbl, "%s%.58s", err ? "" : "= ", v);
-            int cw = chip(chip_x, cy, 0, lbl, err ? C_ERR : C_RES, err ? C_ERR : C_RESLN,
-                          err ? C_ERRFG : C_RESFG, draw);
-            chip_x += cw + 4; row_open = 1;
-        } else {
-            const char *t = buf; while (*t == ' ') t++;
-            if (!*t) continue;
-            if (row_open) { cy += gfx_font_h(F_UI) + 8; chip_x = x; row_open = 0; }
-            int n = gfx_text_wrap(x, cy, t, F_UI, C_INK, C_BG, w, lh, draw);
-            cy += n * lh;
+        if (k == SP_TEXT) {
+            const char *s = buf; while (*s == ' ') s++;
+            if (*s) {
+                int n = gfx_text_wrap(x, cy, s, F_UI, C_INK, C_BG, w, lh, draw);
+                cy += n * lh;
+            }
         }
         if (!*p) break;
     }
-    if (row_open) cy += gfx_font_h(F_UI) + 8;
     return cy - y;
 }
+
 
 /* ---- search ------------------------------------------------------------------------------------
  * The same CONTENT search the web UI runs, ported rather than reinvented: every term must appear
