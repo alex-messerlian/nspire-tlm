@@ -17,7 +17,7 @@
 enum {
     P_BG, P_SIDE, P_LINE, P_INK, P_INK2, P_INK3, P_BUBBLE, P_SEL,
     P_TOOL, P_TOOLLN, P_RES, P_RESLN, P_RESFG, P_ERR, P_ERRFG,
-    P_SCRIM, P_TRASH_HOT, P_BAR, P_EXIT_HOT, P_FIELD_LN, P_SEND_OFF,
+    P_SCRIM, P_TRASH_HOT, P_BAR, P_EXIT_HOT, P_FIELD_LN, P_SEND_OFF, P_SHEET,
     P_N
 };
 extern uint16_t TLM_PAL[P_N];
@@ -43,6 +43,10 @@ extern uint16_t TLM_PAL[P_N];
 #define C_EXIT_HOT  TLM_PAL[P_EXIT_HOT]
 #define C_FIELD_LN  TLM_PAL[P_FIELD_LN]
 #define C_SEND_OFF  TLM_PAL[P_SEND_OFF]
+/* Modal surface. NOT the same token as the page, which is the mistake it exists to prevent: a
+ * scrim cannot darken a near-black ground -- 28% of nothing is nothing once RGB565 quantises it --
+ * so in dark the sheet must LIFT off the page instead of the page sinking behind it. */
+#define C_SHEET     TLM_PAL[P_SHEET]
 
 /* Three states, cycled by the header button, matching the web exactly:
  *   TH_AUTO   follow the device -- on the calculator that means the CLOCK, since the Nspire OS has

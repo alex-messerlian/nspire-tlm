@@ -67,16 +67,19 @@ $(BUILD)/hoststub.c: | $(BUILD)
 $(BUILD)/hoststub.o: $(BUILD)/hoststub.c
 	$(CC) $(HOSTFLAGS) -c $< -o $@
 
-$(addprefix $(BUILD)/,$(TESTS_APP)): $(BUILD)/%: tools/eval/%.c $(BUILD)/hoststub.o | $(BUILD)
+# These suites #include src/store/app.c to reach its file-scope state, so app.c and app.h are real
+# prerequisites. Without them a palette-only edit left build/test_theme "up to date" and the gate
+# passed on a stale binary -- a suite that cannot see your change is worse than no suite.
+$(addprefix $(BUILD)/,$(TESTS_APP)): $(BUILD)/%: tools/eval/%.c $(APP_SRC) src/store/app.h src/store/font_data.h $(BUILD)/hoststub.o | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< $(HOST_LINK) -lm
 
-$(BUILD)/render_app: tools/eval/render_app.c $(BUILD)/hoststub.o | $(BUILD)
+$(BUILD)/render_app: tools/eval/render_app.c $(APP_SRC) src/store/app.h $(BUILD)/hoststub.o | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< $(HOST_LINK) src/store/toolrun.c $(EVAL_CORE) -lm
 
-$(BUILD)/test_toolrun: tools/eval/test_toolrun.c | $(BUILD)
+$(BUILD)/test_toolrun: tools/eval/test_toolrun.c src/store/toolrun.c src/store/toolrun.h | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/toolrun.c $(EVAL_CORE) -lm
 
-$(BUILD)/test_chatstore: tools/eval/test_chatstore.c | $(BUILD)
+$(BUILD)/test_chatstore: tools/eval/test_chatstore.c src/store/chatstore.c src/store/chatstore.h | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/chatstore.c src/store/gfx.c -lm
 
 # ---- device ----------------------------------------------------------------------------------

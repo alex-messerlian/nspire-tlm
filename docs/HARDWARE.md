@@ -140,7 +140,7 @@ lever is clock and cycles-per-MAC.
 | # | Property | MEASURED |
 |---|---|---|
 | E1 | Does the clock drop under sustained load? | **YES, and it never reached 396.** 198 MHz on run 1, then 144 MHz on runs 2, 3 and 4. |
-| E2 | Battery voltage across a run | `UNMEASURED` — `nsp info` reported battery status "unknown" while tethered |
+| E2 | Battery level / charge state | **NOT READABLE — measured, see below.** `nsp info`'s "unknown" was ambiguous on its own; a raw probe settles it |
 | E3 | Does throughput degrade over a sustained run? | Implied yes by E1; not directly measured |
 
 **E1 is the most consequential finding of the session.** Every compute number above is ~2.75× lower
@@ -157,3 +157,51 @@ need to know before a judge does.
 - Zephray (Wenting Zhang), "On the way to overclock the TI nspire CX II": <https://www.zephray.me/post/on_the_way_to_overclock_nspire_cxii/> — NS2018, ARM926EJ-S, 396/288 MHz CPU, 198 MHz AHB, 99 MHz APB, 64 MB LPDDR, 128 MB SPI NAND, PMU at 0x90140000, 492 MHz overclock, CoreMark 1050.
 - Hackspire, "Memory-mapped I/O ports on CX II": <https://www.hackspire.org/Memory-mapped_IO_ports_on_CX_II/> — memory map, SP804 timer bases, SDRAM controller (FTDDR3030) at 0x90120000, PMU at 0x90140000.
 - Hackspire, "Hardware": <https://hackspire.org/index.php/Hardware> — 16 KB I-cache / 8 KB D-cache **for pre-CX II models only**.
+
+---
+
+## Battery LEVEL: NOT READABLE. Measured, not assumed.
+
+Distinct from the battery-POWER runs above: this is about reading the charge level, which the web
+UI shows for the host machine and the calculator UI shows not at all. That asymmetry rested on a
+code comment rather than evidence. Checked from both sides; the answer is no.
+
+**On device — no API exists.** `nm -g` over the BUILT ARCHIVES, not the headers:
+`vendor/Ndless/ndless-sdk/lib/libndls.a` (43 global symbols) and `libsyscalls.a` (291) return zero
+matches for `batt|charg|power|adc|volt|pmu`. `nm` was sanity-checked against the same archives and
+does list `_is_touchpad`, `clrscr`, `cfg_get`, so the tool was working — an empty result from a
+broken command is the trap here. `syscall-list.h` enumerates all 343 bridged OS syscalls plus 16
+Ndless extensions: zero hits. `driver_aladdin_pmu` and `get_pmu_driver` exist only as IDA
+`MakeName` annotations in reverse-engineering inputs — annotated OS-internal addresses, not
+exported symbols. `get_battery_door_detection_mode` appears only in classic (non-CX-II) IDC files
+and is absent from `OS_cascx2-6.4.0.74.idc`; a door switch is not a charge level in any case.
+
+**Over USB — the OS does not populate the field.** `nsp info` prints "battery unknown", but that
+string is the `default:` arm of a three-value switch (`tools/nspire-cli/nsp.c:49`) and would fire
+just as readily for an unnamed percentage, so on its own it proves nothing. A raw-byte probe of the
+same libnspire call, taken **while connected and charging**:
+
+| field | value |
+|---|---|
+| `batt_lvl` | `0xFF` (NSPIRE_BATT_UNKNOWN) |
+| `is_charging` | `0x00` |
+
+Not a struct-alignment artifact: `batt_lvl` sits at offset 32, between the storage/RAM figures
+(0–31) and the version arrays (36–47), and both neighbours decode correctly — storage
+62560256/96862208, ram 31629544/35650680, os 6.40.74, boot1 5.0.42, boot2 6.20.7. TI does not fill
+the field on CX II.
+
+**The one lead, and why it is probably not one.** PMU register `0x90140810` is readable from user
+code and already used two ways (`on_key_pressed()` reads bit 8 as the ON key; `bench/common.h` uses
+bit 4 as the clock div2 gate), so MMIO from an Ndless app is proven on this device. But it reads
+`0x00000111` in **all 11** recorded device runs across four sessions, spanning both PMU clock
+states — not one bit tracked the 396↔288 MHz transition. `0x111` is exactly bit0 + bit4 + bit8 with
+every other bit zero, which is itself mild evidence that no charger bit lives in that word. NOT
+decisive: USB-attach state was never logged alongside it, and the clock delta may be thermal (E1
+reads it that way).
+
+**Consequence for the UI:** no battery indicator on the calculator, and the host server's
+`host_stats()` reports THIS MACHINE's battery, which is what its comment already says. Any
+calculator battery figure would be invented. Chasing it further is a deliberate device experiment —
+log `0x810` with USB in and out, sweep neighbouring PMU words — not a UI task, and it should not
+block anything.

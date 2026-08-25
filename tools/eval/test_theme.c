@@ -37,7 +37,7 @@ int main(void) {
         /* P_SCRIM is legitimately black in both, so compare against its known value instead */
         T("light palette fully populated", zl - (PAL_LIGHT[P_SCRIM] == 0), 0);
         T("dark palette fully populated",  zd - (PAL_DARK[P_SCRIM] == 0), 0);
-        T("every index has a name", P_N, 21); }
+        T("every index has a name", P_N, 22); }
 
     printf("\n  -- the toggle cycles auto -> light -> dark -> auto --\n");
     app_set_theme(TH_AUTO);
@@ -104,6 +104,32 @@ int main(void) {
                        th ? "dark" : "light", S[i].n, P[S[i].a], P[S[i].b]);
             }
         }
+    }
+
+    /* SURFACE against SURFACE, not just text against surface.
+     *
+     * The contrast block above passed while the search sheet was byte-identical to the page behind
+     * it in dark: every text pair was fine because the text was fine, and nobody had asked whether
+     * the two SURFACES differed. A scrim cannot darken a near-black ground -- 28% of 0x0D0D0D
+     * quantises to no change at all in RGB565 -- so a modal has to lift, and that is a property of
+     * the palette, checkable here. */
+    printf("\n  -- a modal surface must be distinguishable from the page --\n");
+    /* Compared on the RENDERED framebuffer, not on the palette, because the two themes separate
+     * the sheet by DIFFERENT mechanisms: in light the sheet and page are both white and the SCRIM
+     * darkens the page behind it; in dark the scrim can do nothing -- 28% of 0x0D0D0D quantises to
+     * no change at all -- so the sheet has to lift instead. A palette-level assertion encodes the
+     * dark mechanism and is simply false for light, which is how the first version of this check
+     * failed on correct code. */
+    for (int th = TH_LIGHT; th <= TH_DARK; th++) {
+        app_set_theme(th);
+        gfx_clear(C_BG); gfx_dim(C_SCRIM, 28);
+        uint16_t page = gfx_buf()[10];
+        gfx_rrect(40, 40, 200, 100, 8, C_SHEET);
+        uint16_t sheet = gfx_buf()[70 * GFX_W + 120];
+        int ok = page != sheet;
+        if (!ok) F++;
+        printf("  %s  %-5s RENDERED page 0x%04X vs sheet 0x%04X\n", ok ? "PASS" : "FAIL",
+               th == TH_DARK ? "dark" : "light", page, sheet);
     }
 
     printf("\n  -- mutation pass --\n");

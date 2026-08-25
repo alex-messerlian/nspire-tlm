@@ -26,6 +26,7 @@ static const uint16_t PAL_LIGHT[P_N] = {
     [P_ERR] = HEX(0xFDF2F2), [P_ERRFG] = HEX(0xA8342C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0xE6E6E6), [P_BAR] = HEX(0xEDEDED),
     [P_EXIT_HOT] = HEX(0xF3D9D7), [P_FIELD_LN] = HEX(0xD9D9D9), [P_SEND_OFF] = HEX(0xD5D5D5),
+    [P_SHEET] = HEX(0xFFFFFF),   /* white on a dimmed page */
 };
 /* Dark is not inverted light. Surfaces LIFT as they come forward, as on the web -- and this panel
  * is 16-bit, so a near-black ground has only a few distinguishable steps above it before the
@@ -39,6 +40,7 @@ static const uint16_t PAL_DARK[P_N] = {
     [P_ERR] = HEX(0x2C1B1B), [P_ERRFG] = HEX(0xF0857C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0x3A3A3A), [P_BAR] = HEX(0x333333),
     [P_EXIT_HOT] = HEX(0x4A2A28), [P_FIELD_LN] = HEX(0x3A3A3A), [P_SEND_OFF] = HEX(0x3D3D3D),
+    [P_SHEET] = HEX(0x2E2E2E),   /* lifted OFF the page, since the scrim cannot sink it */
 };
 
 /* The clock decides only when the mode is AUTO. A negative hour means the clock could not be read;
@@ -111,17 +113,24 @@ void app_init(void) {
 }
 int app_should_quit(void) { return QUIT; }
 
+/* INDEX 0 IS NEWEST. touch_chat() and draw_sidebar() have always assumed that; new_chat did not.
+ *
+ * It appended at CHATS[NCHATS], so a brand-new session appeared at the BOTTOM of a list headed
+ * "Recents" -- and its eviction dropped CHATS[0], which under that same convention is the MOST
+ * recently used session, not the oldest, directly contradicting its own comment. Once sessions
+ * persisted to flash, a thirteenth chat silently and permanently deleted the one just demonstrated.
+ *
+ * Two conventions for one array, one of them written down and the other not. */
 static app_chat *new_chat(const char *title) {
-    if (NCHATS >= MAX_CHATS) {          /* oldest out; sessions are bounded on a 21 MB heap */
-        memmove(&CHATS[0], &CHATS[1], sizeof(app_chat) * (MAX_CHATS - 1));
-        NCHATS = MAX_CHATS - 1;
-    }
-    app_chat *c = &CHATS[NCHATS];
+    if (NCHATS >= MAX_CHATS) NCHATS = MAX_CHATS - 1;   /* drop the LAST: least recently used */
+    memmove(&CHATS[1], &CHATS[0], sizeof(app_chat) * (size_t)NCHATS);
+    app_chat *c = &CHATS[0];
     memset(c, 0, sizeof *c);
     snprintf(c->title, sizeof c->title, "%s", title);
     c->used = 1;
-    CUR = NCHATS;
+    CUR = 0;
     NCHATS++;
+    CHAT_SCROLL = 0;                    /* the new session is at the top: show it */
     return c;
 }
 static void delete_chat(int i) {
@@ -544,20 +553,20 @@ static void draw_search(void) {
     if (rows > SHEET_ROWS) rows = SHEET_ROWS;
     int SH = 30 + (rows ? rows * 30 + 6 : 26) + (NSHIT > SHEET_ROWS ? 14 : 0);
     gfx_rrect(SX - 1, SY - 1, SW + 2, SH + 2, 9, C_LINE);
-    gfx_rrect(SX, SY, SW, SH, 8, C_BG);
+    gfx_rrect(SX, SY, SW, SH, 8, C_SHEET);
 
     /* field */
     gfx_hline(SX + 10, SY + 27, SW - 20, C_LINE);
     magnifier(SX + 11, SY + 8, C_INK3);
-    if (SQ_N) gfx_text(SX + 28, SY + 7, SQ, F_UI, C_INK, C_BG);
-    else      gfx_text(SX + 28, SY + 7, "Search chats...", F_UI, C_INK3, C_BG);
+    if (SQ_N) gfx_text(SX + 28, SY + 7, SQ, F_UI, C_INK, C_SHEET);
+    else      gfx_text(SX + 28, SY + 7, "Search chats...", F_UI, C_INK3, C_SHEET);
     if (SQ_N) gfx_vline(SX + 29 + gfx_text_w(SQ, F_UI), SY + 8, 12, C_INK);
 
     char terms[MAX_TERMS][TERM_MAX];
     int nt = split_terms(SQ, terms);
 
     if (!rows) {
-        gfx_text(SX + 12, SY + 36, SQ_N ? "No chats match" : "No chats yet", F_UI, C_INK3, C_BG);
+        gfx_text(SX + 12, SY + 36, SQ_N ? "No chats match" : "No chats yet", F_UI, C_INK3, C_SHEET);
         return;
     }
     for (int i = 0; i < rows; i++) {
@@ -565,7 +574,7 @@ static void draw_search(void) {
         R_SROW[i] = (gfx_rect){ SX + 4, y - 2, SW - 8, 28 };
         int hit = SSCROLL + i;
         int hot = (hit == SSEL) || (HOVER && inside(R_SROW[i], MX, MY));
-        uint16_t bg = hot ? C_SEL : C_BG;
+        uint16_t bg = hot ? C_SEL : C_SHEET;
         if (hot) gfx_rrect(R_SROW[i].x, R_SROW[i].y, R_SROW[i].w, R_SROW[i].h, 5, bg);
         const app_chat *c = &CHATS[SHIT[hit]];
         gfx_text_ellipsis(SX + 10, y, c->title, F_UIB, C_INK, bg, SW - 20);
@@ -579,7 +588,7 @@ static void draw_search(void) {
     if (NSHIT > SHEET_ROWS) {
         char more[40];
         snprintf(more, sizeof more, "%d of %d  -  arrows for more", SSCROLL + rows, NSHIT);
-        gfx_text(SX + 10, SY + 34 + rows * 30 - 1, more, F_UI, C_INK3, C_BG);
+        gfx_text(SX + 10, SY + 34 + rows * 30 - 1, more, F_UI, C_INK3, C_SHEET);
     }
 }
 
@@ -951,7 +960,14 @@ void app_begin_turn(const char *question) {
     snprintf(pending->q, sizeof pending->q, "%s", question);
     BUSY = 1;
 }
+/* Follow the tail while generating.
+ *
+ * Only app_stream_end() ever scrolled to the bottom, and clamp_scroll() can only REDUCE an offset --
+ * so from the second turn onward the question, the status line and the streaming text all sat below
+ * a ~10-line viewport until the turn finished. On a 22-second turn that is a frozen screen, which
+ * defeats the entire point of having a status line. */
 void app_stream_token(const char *piece) {
+    SCROLL = 1 << 20;                   /* clamp_scroll pulls this back to the real bottom */
     if (!pending) return;
     int n = (int)strlen(pending->a), m = (int)strlen(piece);
     if (n + m < (int)sizeof pending->a - 1) { memcpy(pending->a + n, piece, (size_t)m); pending->a[n + m] = 0; }
@@ -1048,6 +1064,7 @@ int app_take_abort(void) { int a = ABORT; ABORT = 0; return a; }
 int app_busy(void) { return BUSY; }
 
 void app_status(const char *label, const char *mono) {
+    SCROLL = 1 << 20;                   /* a phase change must be visible, not scrolled past */
     snprintf(STATUS, sizeof STATUS, "%s", label ? label : "");
     snprintf(STATUS_MONO, sizeof STATUS_MONO, "%s", mono ? mono : "");
 }

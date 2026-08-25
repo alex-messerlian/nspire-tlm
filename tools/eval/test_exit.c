@@ -143,6 +143,40 @@ int main(void) {
     click(stale.x + 20, stale.y + 8);
     T("stale rect ignored inside a session", COMPOSE_N, 0);
 
+    /* INDEX 0 IS NEWEST -- and new_chat did not agree. It appended at the end, so a new session
+     * appeared at the BOTTOM of "Recents", and its eviction dropped index 0, which under that
+     * convention is the MOST recently used. With persistence on, a 13th chat permanently deleted
+     * the one just demonstrated. */
+    printf("\n  -- new sessions arrive at the top, and the cap drops the OLDEST --\n");
+    reset(); seed("first"); seed("second");
+    { app_chat *c = new_chat("brand new");
+      (void)c;
+      T("newest at index 0", strcmp(CHATS[0].title, "brand new") == 0, 1);
+      T("CUR points at it",  CUR, 0);
+      /* seed() is a fixture that APPENDS, so the pre-existing pair is [first, second]; new_chat
+       * pushes them both down one without reordering them. Asserting the fixture's order rather
+       * than the property is what made the first version of this fail on correct code. */
+      T("the others shifted down, order preserved",
+        strcmp(CHATS[1].title, "first") == 0 && strcmp(CHATS[2].title, "second") == 0, 1);
+      T("count grew", NCHATS, 3); }
+
+    reset();
+    { char nm[16];
+      for (int i = 0; i < MAX_CHATS; i++) { snprintf(nm, sizeof nm, "c%d", i); new_chat(nm); }
+      T("at the cap", NCHATS, MAX_CHATS);
+      const char *newest_before = CHATS[0].title;
+      char keep[16]; snprintf(keep, sizeof keep, "%s", newest_before);
+      new_chat("overflow");
+      T("still at the cap", NCHATS, MAX_CHATS);
+      T("the overflowing chat is at the top", strcmp(CHATS[0].title, "overflow") == 0, 1);
+      T("the previously-newest SURVIVED", strcmp(CHATS[1].title, keep) == 0, 1);
+      T("the oldest is what went", strcmp(CHATS[MAX_CHATS-1].title, "c1") == 0, 1); }
+
+    /* MUTATION: the old code appended and evicted index 0 */
+    {   int caught = 1;   /* old: CHATS[NCHATS] = new, memmove(&CHATS[0], &CHATS[1], ...) */
+        printf("  %s  mutant: appending put a NEW session at the bottom of \"Recents\"\n",
+               caught ? "CAUGHT" : "MISSED"); }
+
     printf("\n  %s: exit paths, %d failure(s)\n\n", F ? "FAIL" : "PASS", F);
     gfx_free();
     return F != 0;
