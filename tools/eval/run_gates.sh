@@ -3,6 +3,10 @@
 # the same scrutiny as a finding. Three records had their units invalidated by an LHS repair and
 # stayed invisible for turns because nothing re-ran the gates afterwards.
 #
+# Run `make check` rather than this script directly: it BUILDS the host binaries first. Invoked on
+# its own against a fresh clone, every ./build/test_* below reports "FAIL (not built)" -- correct,
+# and not what you were trying to find out.
+#
 # EXIT STATUS IS THE RESULT. 0 = all gates ran and passed. Any non-zero = stop.
 # Exit 2 from a gate means CANNOT CHECK, which is not the same as clean and is also a failure here.
 set -u
