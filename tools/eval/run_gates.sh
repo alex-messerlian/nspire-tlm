@@ -22,5 +22,22 @@ $PY tools/eval/test_scope.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_sc
 ./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }
 ./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }
 ./build/test_tokenizer build/tok4096.tok build/tok_reference.json >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_tokenizer" || { printf "  %-20s FAIL\n" "test_tokenizer"; fail=1; }
+
+# UI and interaction suites. These were written and NOT LISTED HERE, which is the same defect the
+# gates exist to catch, pointed at the gates themselves: a suite nothing runs is a suite that does
+# not exist. Every one of these is built from source that ships.
+$PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_ui_errs" || { printf "  %-20s FAIL\n" "test_ui_errs"; fail=1; }
+for b in test_search test_span test_exit; do
+    if [ ! -x "build/$b" ]; then
+        # A MISSING binary is a failure, not a skip. "cannot check" and "checked and clean" must
+        # never share an exit status.
+        printf "  %-20s FAIL (not built)\n" "$b"; fail=1
+    elif "./build/$b" >/dev/null 2>&1; then
+        printf "  %-20s PASS\n" "$b"
+    else
+        printf "  %-20s FAIL\n" "$b"; fail=1
+    fi
+done
+
 [ $fail -eq 0 ] && echo "  ALL GATES PASS" || echo "  GATE SUITE FAILED"
 exit $fail
