@@ -116,6 +116,11 @@ static const char *span_next(const char *s, sp_kind *k, char *out, int cap) {
 }
 
 /* "eval<arg> (150.0)/(12.0)" -> fn "eval", arg "(150.0)/(12.0)" */
+/* Unused by the device build since the chips were hidden, and KEPT rather than deleted: this is the
+ * tool-call parser, and linking the evaluator in needs it back. It is not dead in the sense that
+ * matters -- tools/eval/test_span.c exercises all four of its cases, including the multi-argument
+ * separator. Deleting it would take working, tested code out with a UI decision. */
+__attribute__((unused))
 static void split_call(const char *in, char *fn, int fcap, char *arg, int acap) {
     const char *a = strstr(in, "<arg>");
     /* no <arg>: the whole span is the function name. Explicit precision -- a malformed span can
@@ -139,6 +144,9 @@ static void split_call(const char *in, char *fn, int fcap, char *arg, int acap) 
 }
 
 /* ---- drawing --------------------------------------------------------------------------------- */
+/* Likewise unused since the call and result chips were hidden. Kept because it is the only
+ * implementation of that visual and the decision to hide them is a preference, not a defect. */
+__attribute__((unused))
 static int chip(int x, int y, const char *label, const char *val, uint16_t bg, uint16_t ln,
                 uint16_t fg, int draw) {
     int lw = label ? gfx_text_w(label, F_UIB) : 0;
