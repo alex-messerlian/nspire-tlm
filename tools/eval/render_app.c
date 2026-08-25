@@ -25,14 +25,24 @@ int main(int argc, char **argv) {
     gfx_init();
     app_init();
     seed("A car goes 150 m in 12 s", "A car goes 150 m in 12 s. Find the speed.",
-         "<a>The speed is <r>12.5</r> m/s, straight from v = d/t.<end>");
+         "<tool>eval 150/12</tool><res>12.5</res><a>The speed is 12.5 m/s, straight from v = d/t.<end>");
     seed("3 A through a 4 ohm resistor", "3 A flows through 4 ohm. Find the voltage.",
-         "<a>The voltage is <r>12</r> V by Ohm law.<end>");
+         "<tool>eval 3*4</tool><res>12</res><a>The voltage is 12 V by Ohm law.<end>");
     seed("A 2 kg mass raised 5 m", "A 2 kg mass is raised 5 m. Find the potential energy.",
-         "<a>The gravitational potential energy is <r>98</r> J from U = mgh.<end>");
+         "<tool>eval 2*9.8*5</tool><res>98</res><a>The gravitational potential energy is 98 J from U = mgh.<end>");
     seed("Cart on a level track", "A 4 kg cart moves at 3 m/s. Find the kinetic energy.",
-         "<a>The kinetic energy is <r>18</r> J from K = mv^2/2.<end>");
+         "<tool>eval 4*9/2</tool><res>18</res><a>The kinetic energy is 18 J from K = mv^2/2.<end>");
 
+    if (!strcmp(screen, "full")) {          /* twelve sessions: exercises the scrollbar */
+        const char *n[] = { "Terminal velocity of a sphere", "Charge on a capacitor",
+                            "Doppler shift of a siren", "Half life of carbon 14",
+                            "Escape velocity from Mars", "Refraction through a prism",
+                            "Torque on a bolt", "Ideal gas at 300 K" };
+        for (unsigned i = 0; i < sizeof n / sizeof n[0]; i++)
+            seed(n[i], "worked question", "<a>worked answer<end>");
+        CUR = 1; CHAT_SCROLL = 3; MX = 300; MY = 220;
+        app_draw(); goto out;
+    }
     if (!strcmp(screen, "search")) {
         SEARCH_ON = 1; snprintf(SQ, sizeof SQ, "%s", query); SQ_N = (int)strlen(SQ);
         run_search();
@@ -43,7 +53,7 @@ int main(int argc, char **argv) {
         MX = 46; MY = 50; HOVER = 1;        /* hovering the Search row, to show its state */
     }
     app_draw();
-
+out:;
     FILE *f = fopen(out, "wb");
     if (!f) { perror("ppm"); return 1; }
     fprintf(f, "P6\n%d %d\n255\n", GFX_W, GFX_H);

@@ -19,6 +19,10 @@ static int  BUSY;
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
 static int NCHAT_ROWS;
+static int CHAT_SCROLL;              /* index of the first chat row drawn */
+static int CHAT_AT[MAX_CHATS];       /* screen row -> chat index */
+static int CHAT_FIT;                 /* rows that fit, recomputed each frame */
+static gfx_rect R_LIST;              /* the scrollable list area, for hit-testing the wheel */
 
 static void clamp_scroll(int content_h, int view_h);
 
@@ -58,6 +62,17 @@ static void delete_chat(int i) {
  * text is being appended token by token while it streams and a tree would be rebuilt every frame. */
 typedef enum { SP_TOOL, SP_RES, SP_TEXT } sp_kind;
 
+/* Is this '<' the start of markup, or just a less-than in prose? "<name>" / "</name>" with a short
+ * alphanumeric name is markup; "5 < 7" is not. Without this test an inequality in an answer ate the
+ * rest of the sentence, which for a PHYSICS model is not a hypothetical input. */
+static int istag(const char *e) {
+    const char *p = e + 1;
+    if (*p == '/') p++;
+    const char *nm = p;
+    while ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9')) p++;
+    return p > nm && *p == '>' && (p - nm) <= 10;
+}
+
 static const char *span_next(const char *s, sp_kind *k, char *out, int cap) {
     if (!*s) return 0;
     if (!strncmp(s, "<tool>", 6)) {
@@ -77,13 +92,26 @@ static const char *span_next(const char *s, sp_kind *k, char *out, int cap) {
         return *e ? e + 6 : e;
     }
     const char *e = s;
-    while (*e && *e != '<') e++;
+    for (;;) {                                   /* a bare '<' does not end the run; a tag does */
+        while (*e && *e != '<') e++;
+        if (!*e || istag(e)) break;
+        e++;
+    }
     int n = (int)(e - s); if (n >= cap) n = cap - 1;
     memcpy(out, s, (size_t)n); out[n] = 0;
     *k = SP_TEXT;
     if (!*e) return e;
     if (!strncmp(e, "<a>", 3)) return e + 3;
     if (!strncmp(e, "<end>", 5)) return e + 5;
+    if (!strncmp(e, "<tool>", 6) || !strncmp(e, "<res>", 5)) return e;   /* handled on re-entry */
+    /* An UNRECOGNISED tag is skipped WHOLE, not one character at a time. Advancing past just the
+     * '<' left the tag name and its body as literal text, so a stray "<r>12</r>" rendered on screen
+     * as "r>12 ... /r>". The model emits malformed markup often enough that this is the common
+     * case -- degrade to dropping the tag, never to showing its guts. */
+    {   const char *gt = e;
+        while (*gt && *gt != '>') gt++;
+        if (*gt == '>') return gt + 1;
+    }
     return e + 1;
 }
 
@@ -289,6 +317,39 @@ static void pencil(int x, int y, uint16_t c) {
     gfx_fill(x + 8, y + 1, 2, 2, c);                                       /* eraser */
 }
 
+/* Draw `s` with the parts matching any term in the BOLD face. The device had no equivalent of the
+ * web's <b> wrapping, so a result gave no indication of WHY it matched. Two weights is all the font
+ * has, so the title stays bold throughout and only the snippet carries the emphasis. */
+static int draw_marked(int x, int y, const char *s, char terms[MAX_TERMS][TERM_MAX], int nt,
+                       uint16_t fg, uint16_t bg, int maxw) {
+    char low[128];
+    unsigned char mark[128];
+    int n = 0;
+    for (; s[n] && n < (int)sizeof low - 1; n++) {
+        char c = s[n];
+        low[n] = (c >= 'A' && c <= 'Z') ? (char)(c - 'A' + 'a') : c;
+    }
+    low[n] = 0;
+    memset(mark, 0, sizeof mark);
+    for (int i = 0; i < nt; i++) {
+        int tl = (int)strlen(terms[i]);
+        if (!tl) continue;
+        for (const char *p = strstr(low, terms[i]); p; p = strstr(p + 1, terms[i])) {
+            int at = (int)(p - low);
+            for (int k = at; k < at + tl && k < n; k++) mark[k] = 1;
+        }
+    }
+    int x0 = x, ew = gfx_text_w("...", F_UI);
+    for (int i = 0; i < n; i++) {
+        char one[2]; one[0] = s[i]; one[1] = 0;
+        gfx_font f = mark[i] ? F_UIB : F_UI;
+        int w = gfx_text_w(one, f);
+        if (x - x0 + w + (s[i + 1] ? ew : 0) > maxw) { gfx_text(x, y, "...", F_UI, fg, bg); break; }
+        x += gfx_text(x, y, one, f, fg, bg);
+    }
+    return x - x0;
+}
+
 static void draw_search(void) {
     gfx_dim(HEX(0x000000), 28);            /* same scrim weight as the web popup */
 
@@ -302,7 +363,7 @@ static void draw_search(void) {
     gfx_hline(SX + 10, SY + 27, SW - 20, C_LINE);
     magnifier(SX + 11, SY + 8, C_INK3);
     if (SQ_N) gfx_text(SX + 28, SY + 7, SQ, F_UI, C_INK, C_BG);
-    else      gfx_text(SX + 28, SY + 7, "Search chats", F_UI, C_INK3, C_BG);
+    else      gfx_text(SX + 28, SY + 7, "Search chats...", F_UI, C_INK3, C_BG);
     if (SQ_N) gfx_vline(SX + 29 + gfx_text_w(SQ, F_UI), SY + 8, 12, C_INK);
 
     char terms[MAX_TERMS][TERM_MAX];
@@ -323,7 +384,7 @@ static void draw_search(void) {
         if (nt) {
             char sn[110];
             snippet_of(c, terms, nt, sn, sizeof sn);
-            gfx_text_ellipsis(SX + 10, y + 13, sn, F_UI, C_INK2, bg, SW - 20);
+            draw_marked(SX + 10, y + 13, sn, terms, nt, C_INK2, bg, SW - 20);
         }
     }
 }
@@ -333,11 +394,18 @@ static void draw_sidebar(void) {
     gfx_vline(SIDE_W, 0, GFX_H, C_LINE);
 
     /* header: toggle on the right, matching the main bar's height so both sit on one line */
-    R_TOGGLE = (gfx_rect){ SIDE_W - 22, 4, 18, 16 };
-    uint16_t tg = (HOVER && inside(R_TOGGLE, MX, MY)) ? C_SEL : C_SIDE;
-    gfx_rrect(R_TOGGLE.x - 2, R_TOGGLE.y - 2, R_TOGGLE.w + 4, R_TOGGLE.h + 4, 4, tg);
-    gfx_rrect_outline(R_TOGGLE.x + 2, R_TOGGLE.y + 2, 14, 12, 2, C_INK2);
-    gfx_vline(R_TOGGLE.x + 7, R_TOGGLE.y + 2, 12, C_INK2);
+    /* [search][toggle], right-aligned and the same size, as on the web header */
+    R_TOGGLE = (gfx_rect){ SIDE_W - 21, 3, 18, 18 };
+    R_SEARCH = (gfx_rect){ SIDE_W - 41, 3, 18, 18 };
+    {   int sh = HOVER && inside(R_SEARCH, MX, MY);
+        gfx_rrect(R_SEARCH.x, R_SEARCH.y, 18, 18, 4, sh ? C_SEL : C_SIDE);
+        magnifier(R_SEARCH.x + 4, R_SEARCH.y + 4, C_INK2);
+    }
+    {   int th = HOVER && inside(R_TOGGLE, MX, MY);
+        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 18, 18, 4, th ? C_SEL : C_SIDE);
+        gfx_rrect_outline(R_TOGGLE.x + 3, R_TOGGLE.y + 4, 13, 11, 2, C_INK2);
+        gfx_vline(R_TOGGLE.x + 8, R_TOGGLE.y + 4, 11, C_INK2);
+    }
 
     R_NEW = (gfx_rect){ 4, TOP_H + 2, SIDE_W - 8, 18 };
     {   int hot = HOVER && inside(R_NEW, MX, MY);
@@ -347,36 +415,54 @@ static void draw_sidebar(void) {
         gfx_text(R_NEW.x + 20, R_NEW.y + 2, "New chat", F_UIB, C_INK, nb);
     }
 
-    R_SEARCH = (gfx_rect){ 4, TOP_H + 22, SIDE_W - 8, 18 };
-    {   int hot = HOVER && inside(R_SEARCH, MX, MY);
-        uint16_t sb = hot ? C_SEL : C_SIDE;
-        if (hot) gfx_rrect(R_SEARCH.x, R_SEARCH.y, R_SEARCH.w, R_SEARCH.h, 5, sb);
-        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 3, C_INK2);
-        gfx_text(R_SEARCH.x + 20, R_SEARCH.y + 2, "Search", F_UIB, C_INK, sb);
-    }
+    gfx_text(10, TOP_H + 26, "Chats", F_UI, C_INK3, C_SIDE);
 
-    gfx_text(10, TOP_H + 46, "Chats", F_UI, C_INK3, C_SIDE);
+    /* The list SCROLLS. It used to break at the first row that did not fit, which silently hid up
+     * to six of a twelve-session cap -- unreachable, with nothing on screen admitting it. Hiding
+     * data is worse than truncating it, because truncation is visible. */
+    {
+        int top = TOP_H + 42, bot = GFX_H - DOCK_H - 6;
+        CHAT_FIT = (bot - top) / 18;
+        if (CHAT_FIT < 1) CHAT_FIT = 1;
+        R_LIST = (gfx_rect){ 0, top - 4, SIDE_W, bot - top + 8 };
 
-    NCHAT_ROWS = NCHATS;
-    for (int i = 0; i < NCHATS; i++) {
-        int y = TOP_H + 62 + i * 18;
-        if (y > GFX_H - DOCK_H - 20) { NCHAT_ROWS = i; break; }
-        R_CHAT[i]  = (gfx_rect){ 4, y - 2, SIDE_W - 8, 17 };
-        R_TRASH[i] = (gfx_rect){ SIDE_W - 20, y - 1, 14, 14 };
-        int hot = HOVER && inside(R_CHAT[i], MX, MY);
-        uint16_t bg = (i == CUR || hot) ? C_SEL : C_SIDE;
-        if (i == CUR || hot) gfx_rrect(R_CHAT[i].x, R_CHAT[i].y, R_CHAT[i].w, R_CHAT[i].h, 5, bg);
-        gfx_text_ellipsis(10, y, CHATS[i].title, F_UI, C_INK, bg, SIDE_W - (hot ? 32 : 18));
-        if (hot) {                        /* trash appears only on hover, as on the web */
-            int tx = R_TRASH[i].x, ty = R_TRASH[i].y;
-            uint16_t tb = inside(R_TRASH[i], MX, MY) ? HEX(0xE6E6E6) : bg;
-            gfx_rrect(tx, ty, 14, 14, 3, tb);
-            gfx_hline(tx + 3, ty + 4, 9, C_INK2);      /* lid */
-            gfx_hline(tx + 6, ty + 2, 3, C_INK2);      /* handle */
-            gfx_vline(tx + 4, ty + 5, 7, C_INK2);      /* body sides */
-            gfx_vline(tx + 10, ty + 5, 7, C_INK2);
-            gfx_hline(tx + 4, ty + 11, 7, C_INK2);     /* base */
-            gfx_vline(tx + 7, ty + 6, 5, C_INK2);      /* tine */
+        int maxs = NCHATS - CHAT_FIT; if (maxs < 0) maxs = 0;
+        if (CHAT_SCROLL > maxs) CHAT_SCROLL = maxs;
+        if (CHAT_SCROLL < 0) CHAT_SCROLL = 0;
+
+        int over = NCHATS > CHAT_FIT;
+        int rowmax = over ? SIDE_W - 14 : SIDE_W - 8;   /* leave room for the bar when it shows */
+
+        NCHAT_ROWS = 0;
+        for (int r = 0; r < CHAT_FIT && CHAT_SCROLL + r < NCHATS; r++) {
+            int i = CHAT_SCROLL + r, y = top + r * 18;
+            CHAT_AT[r] = i;
+            R_CHAT[r]  = (gfx_rect){ 4, y - 2, rowmax, 17 };
+            R_TRASH[r] = (gfx_rect){ rowmax - 12, y - 1, 14, 14 };
+            int hot = HOVER && inside(R_CHAT[r], MX, MY);
+            uint16_t bg = (i == CUR || hot) ? C_SEL : C_SIDE;
+            if (i == CUR || hot) gfx_rrect(R_CHAT[r].x, R_CHAT[r].y, R_CHAT[r].w, R_CHAT[r].h, 5, bg);
+            gfx_text_ellipsis(10, y, CHATS[i].title, F_UI, C_INK, bg, rowmax - (hot ? 26 : 10));
+            if (hot) {                    /* trash appears only on hover, as on the web */
+                int tx = R_TRASH[r].x, ty = R_TRASH[r].y;
+                uint16_t tb = inside(R_TRASH[r], MX, MY) ? HEX(0xE6E6E6) : bg;
+                gfx_rrect(tx, ty, 14, 14, 3, tb);
+                gfx_hline(tx + 3, ty + 4, 9, C_INK2);      /* lid */
+                gfx_hline(tx + 6, ty + 2, 3, C_INK2);      /* handle */
+                gfx_vline(tx + 4, ty + 5, 7, C_INK2);      /* body sides */
+                gfx_vline(tx + 10, ty + 5, 7, C_INK2);
+                gfx_hline(tx + 4, ty + 11, 7, C_INK2);     /* base */
+                gfx_vline(tx + 7, ty + 6, 5, C_INK2);      /* tine */
+            }
+            NCHAT_ROWS = r + 1;
+        }
+        /* A scrollbar, so "there is more" is visible rather than inferred. */
+        if (over) {
+            int track_h = CHAT_FIT * 18, tx = SIDE_W - 7;
+            int knob = track_h * CHAT_FIT / NCHATS; if (knob < 12) knob = 12;
+            int ky = top - 2 + (track_h - knob) * CHAT_SCROLL / maxs;
+            gfx_rrect(tx, top - 2, 3, track_h, 1, HEX(0xEDEDED));
+            gfx_rrect(tx, ky, 3, knob, 1, C_INK3);
         }
     }
 
@@ -474,7 +560,15 @@ void app_draw(void) {
 /* ---- input ------------------------------------------------------------------------------------ */
 void app_event(const in_event *e) {
     if (e->kind == IN_MOVE)  { MX = e->x; MY = e->y; HOVER = e->hover; return; }
-    if (e->kind == IN_SCROLL){ SCROLL += e->dy; if (SCROLL < 0) SCROLL = 0; return; }
+    if (e->kind == IN_SCROLL) {
+        /* over the sidebar the wheel moves the SESSION LIST; over the pane it moves the transcript */
+        if (SIDEBAR && !SEARCH_ON && inside(R_LIST, MX, MY)) {
+            CHAT_SCROLL += (e->dy > 0) ? 1 : -1;
+            if (CHAT_SCROLL < 0) CHAT_SCROLL = 0;
+            return;
+        }
+        SCROLL += e->dy; if (SCROLL < 0) SCROLL = 0; return;
+    }
 
     if (e->kind == IN_CLICK) {
         MX = e->x; MY = e->y;
@@ -486,14 +580,14 @@ void app_event(const in_event *e) {
             return;
         }
         if (inside(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
-        if (SIDEBAR && inside(R_SEARCH, MX, MY)) {
+        if (inside(R_SEARCH, MX, MY)) {
             SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); return;
         }
         if (SIDEBAR) {
             if (inside(R_NEW, MX, MY)) { CUR = -1; SCROLL = 0; COMPOSE_N = 0; COMPOSE[0] = 0; return; }
             for (int i = 0; i < NCHAT_ROWS; i++) {
-                if (inside(R_TRASH[i], MX, MY)) { delete_chat(i); return; }
-                if (inside(R_CHAT[i], MX, MY))  { CUR = i; SCROLL = 0; return; }
+                if (inside(R_TRASH[i], MX, MY)) { delete_chat(CHAT_AT[i]); return; }
+                if (inside(R_CHAT[i], MX, MY))  { CUR = CHAT_AT[i]; SCROLL = 0; return; }
             }
         }
         if (inside(R_SEND, MX, MY) && COMPOSE_N && !BUSY) {

@@ -38,21 +38,53 @@ static void pointer_init(void) {
     if (ti && ti->width && ti->height) { PAD_W = ti->width; PAD_H = ti->height; }
 }
 
-/* Returns 1 if an event was produced. Absolute mapping when the finger is down or in proximity;
- * the cursor holds its last position otherwise, which is what a mouse does. */
+/* Returns 1 if an event was produced.
+ *
+ * Tap versus drag. app.c has handled IN_SCROLL since it was written and NOTHING EVER SENT ONE --
+ * the poll only ever produced IN_MOVE and IN_CLICK, so the transcript scrolled by arrow key alone
+ * and the session list not at all. A handler with no producer reads as a feature and is not one;
+ * same shape as the provenance check that was written, unit-tested, and never called.
+ *
+ * A finger down that then moves emits IN_SCROLL deltas; a finger down that lifts having barely
+ * moved emits one IN_CLICK. Direction is natural: dragging up pushes content up. */
+#define TAP_SLOP 5                    /* pixels of travel still counted as a tap */
+
+static int DOWN, LAST_Y, TRAVEL;
+
 static int pointer_poll(in_event *e) {
     touchpad_report_t r;
     if (touchpad_scan(&r) != 0) return 0;
-    if (!r.contact && !r.proximity) return 0;
+
+    if (r.contact) {
+        CX = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
+        CY = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));   /* pad y is bottom-up */
+        if (CX < 0) CX = 0;
+        if (CX >= GFX_W) CX = GFX_W - 1;
+        if (CY < 0) CY = 0;
+        if (CY >= GFX_H) CY = GFX_H - 1;
+        e->x = CX; e->y = CY; e->hover = 0;
+        if (!DOWN) { DOWN = 1; LAST_Y = CY; TRAVEL = 0; e->kind = IN_MOVE; return 1; }
+        int d = CY - LAST_Y;
+        TRAVEL += d < 0 ? -d : d;
+        if (d > 1 || d < -1) { LAST_Y = CY; e->kind = IN_SCROLL; e->dy = -d; return 1; }
+        e->kind = IN_MOVE; return 1;
+    }
+
+    if (DOWN) {                                  /* release: a short press is a click */
+        DOWN = 0;
+        e->x = CX; e->y = CY; e->hover = 0;
+        if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; return 1; }
+        return 0;                                /* it was a drag; the scrolls already went out */
+    }
+
+    if (!r.proximity) return 0;
     CX = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
-    CY = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));   /* pad y is bottom-up */
+    CY = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));
     if (CX < 0) CX = 0;
     if (CX >= GFX_W) CX = GFX_W - 1;
     if (CY < 0) CY = 0;
     if (CY >= GFX_H) CY = GFX_H - 1;
-    e->x = CX; e->y = CY;
-    e->hover = r.proximity && !r.pressed;
-    e->kind = r.pressed ? IN_CLICK : IN_MOVE;
+    e->x = CX; e->y = CY; e->hover = 1; e->kind = IN_MOVE;
     return 1;
 }
 
