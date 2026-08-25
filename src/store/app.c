@@ -192,6 +192,71 @@ static int chip(int x, int y, const char *label, const char *val, uint16_t bg, u
  * not the working, and a calculator screen is 320px wide. The spans are still PARSED (span_next
  * consumes them) and still stored verbatim in app_turn.a, so the provenance data is intact for the
  * write-up; it is only not drawn. */
+/* ---- notation ----------------------------------------------------------------------------------
+ * The corpus writes formulas in a parser-first ASCII: Delta_p=m*Delta_v, omega=sqrt((k)/(m)),
+ * theta, lambda, _0, ^2. That is correct for the evaluator and wrong for a reader, and the font
+ * has carried the real glyphs the whole time -- all three faces have the Greek lowercase set, both
+ * digit runs of sub- and superscripts, and √ ∫ ∂ ≈ ≤ ≥.
+ *
+ * EVERY TARGET IS CHECKED TO EXIST. gfx_text draws nothing at all for a missing glyph -- never a
+ * box -- so mapping to a code point the font lacks does not look wrong, it makes the character
+ * silently disappear. tools/eval/test_notation.c asserts every replacement below is present in all
+ * three faces, which is the only reason this is safe to do at all.
+ *
+ * Names are matched on WORD BOUNDARIES, so "pi" in "spin" and "eta" inside "theta" are left alone.
+ * Longest first, for the same reason. */
+typedef struct { const char *from; const char *to; } sym;
+static const sym SYMS[] = {
+    /* Greek, longest first so a shorter name cannot claim a prefix */
+    {"epsilon","\xce\xb5"}, {"lambda","\xce\xbb"}, {"omega","\xcf\x89"}, {"sigma","\xcf\x83"},
+    {"theta","\xce\xb8"},   {"alpha","\xce\xb1"},  {"gamma","\xce\xb3"}, {"delta","\xce\xb4"},
+    {"Delta","\xce\x94"},   {"Omega","\xce\xa9"},  {"Sigma","\xce\xa3"},
+    {"beta","\xce\xb2"},    {"phi","\xcf\x86"},    {"psi","\xcf\x88"},
+    {"chi","\xcf\x87"},     {"tau","\xcf\x84"},    {"rho","\xcf\x81"},   {"eta","\xce\xb7"},
+    {"mu","\xce\xbc"},      {"nu","\xce\xbd"},     {"xi","\xce\xbe"},    {"pi","\xcf\x80"},
+    /* operators and relations */
+    {"sqrt","\xe2\x88\x9a"}, {"<=","\xe2\x89\xa4"}, {">=","\xe2\x89\xa5"},
+    {"!=","\xe2\x89\x88"},
+};
+static const char *SUB[10] = {"\xe2\x82\x80","\xe2\x82\x81","\xe2\x82\x82","\xe2\x82\x83",
+                              "\xe2\x82\x84","\xe2\x82\x85","\xe2\x82\x86","\xe2\x82\x87",
+                              "\xe2\x82\x88","\xe2\x82\x89"};
+static const char *SUP[10] = {"\xe2\x81\xb0","\xc2\xb9","\xc2\xb2","\xc2\xb3",
+                              "\xe2\x81\xb4","\xe2\x81\xb5","\xe2\x81\xb6","\xe2\x81\xb7",
+                              "\xe2\x81\xb8","\xe2\x81\xb9"};
+
+static int wordch2(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+}
+/* Rewrite `in` for DISPLAY. Never changes what is stored or what the evaluator sees. */
+void to_display(const char *in, char *out, int cap) {
+    int o = 0;
+    for (int i = 0; in[i] && o < cap - 4; ) {
+        /* _0.._9 and ^0..^9 become real sub/superscripts; a letter after _ is left alone, because
+         * the font has no subscript letters and dropping the underscore would fuse "f_beat". */
+        if ((in[i] == '_' || in[i] == '^') && in[i+1] >= '0' && in[i+1] <= '9') {
+            const char *g = (in[i] == '_' ? SUB : SUP)[in[i+1] - '0'];
+            for (int k = 0; g[k] && o < cap - 1; k++) out[o++] = g[k];
+            i += 2; continue;
+        }
+        int hit = 0;
+        for (unsigned s = 0; s < sizeof SYMS / sizeof SYMS[0]; s++) {
+            int L = (int)strlen(SYMS[s].from);
+            if (strncmp(in + i, SYMS[s].from, (size_t)L) != 0) continue;
+            /* word boundary, so "pi" in "spin" and "eta" in "theta" are not touched. Operators are
+             * not alphabetic and need no boundary. */
+            if (wordch2(SYMS[s].from[0])) {
+                if (i > 0 && wordch2(in[i-1])) continue;
+                if (wordch2(in[i+L])) continue;
+            }
+            for (int k = 0; SYMS[s].to[k] && o < cap - 1; k++) out[o++] = SYMS[s].to[k];
+            i += L; hit = 1; break;
+        }
+        if (!hit) out[o++] = in[i++];
+    }
+    out[o] = 0;
+}
+
 static int draw_answer(int x, int y, int w, const char *raw, int draw) {
     int lh = gfx_font_h(F_UI) + 2, cy = y;
     const char *p = raw;
@@ -200,7 +265,9 @@ static int draw_answer(int x, int y, int w, const char *raw, int draw) {
         if (k == SP_TEXT) {
             const char *s = buf; while (*s == ' ') s++;
             if (*s) {
-                int n = gfx_text_wrap(x, cy, s, F_UI, C_INK, C_BG, w, lh, draw);
+                static char disp[640];
+                to_display(s, disp, sizeof disp);
+                int n = gfx_text_wrap(x, cy, disp, F_UI, C_INK, C_BG, w, lh, draw);
                 cy += n * lh;
             }
         }
@@ -518,6 +585,14 @@ static void draw_sidebar(void) {
     gfx_text(8, GFX_H - DOCK_H + 18, "2.68 tok/s", F_UI, C_INK3, C_SIDE);
 }
 
+/* Text width available inside a question bubble, for a given pane width.
+ *
+ * ONE definition, because there were two: the measure pass used pw-26 and the draw pass pw-32, so
+ * the bubble was sized for fewer lines than were actually drawn and a long question spilled out
+ * through the bottom of its own bubble. The bubble sits at px0+16 with 8px of padding each side,
+ * which is where 32 comes from -- the 26 was simply wrong. */
+static int qbubble_textw(int pane_w) { return pane_w - 32; }
+
 static void draw_main(void) {
     int x0 = SIDEBAR ? SIDE_W + 1 : 0;
     int w  = GFX_W - x0;
@@ -555,7 +630,7 @@ static void draw_main(void) {
         int lh0 = gfx_font_h(F_UI) + 2, total = 6;
         for (int i = 0; i < c->nturns; i++) {
             app_turn *t = &c->turn[i];
-            total += gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, pw - 26, lh0, 0) * lh0 + 8 + 8;
+            total += gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh0, 0) * lh0 + 8 + 8;
             total += t->a[0] ? draw_answer(0, 0, pw, t->a, 0) + 10 : 20;
         }
         clamp_scroll(total, bot - top);
@@ -564,10 +639,10 @@ static void draw_main(void) {
             app_turn *t = &c->turn[i];
             /* question, right-aligned in a bubble */
             int lh = gfx_font_h(F_UI) + 2;
-            int lines = gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, pw - 26, lh, 0);
+            int lines = gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh, 0);
             int bh = lines * lh + 8;
             gfx_rrect(px0 + 16, y, pw - 16, bh, 7, C_BUBBLE);
-            gfx_text_wrap(px0 + 24, y + 4, t->q, F_UI, C_INK, C_BUBBLE, pw - 32, lh, 1);
+            gfx_text_wrap(px0 + 24, y + 4, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh, 1);
             y += bh + 8;
             if (t->a[0]) y += draw_answer(px0, y, pw, t->a, 1) + 10;
             else { gfx_fill(px0, y + 4, 5, 9, C_INK); y += 20; }   /* streaming caret */

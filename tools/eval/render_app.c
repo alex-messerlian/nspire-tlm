@@ -43,6 +43,13 @@ int main(int argc, char **argv) {
         CUR = 1; CHAT_SCROLL = 3; MX = 300; MY = 220;
         app_draw(); goto out;
     }
+    if (!strcmp(screen, "notation")) {     /* the corpus's ASCII, as a reader sees it */
+        seed("Notation", "Show me the symbols.",
+             "<a>Delta_p = m*Delta_v, and omega = sqrt((k)/(m)). "
+             "With lambda_0, theta_1, E=m*c^2, rho, mu and 2*pi*f.<end>");
+        CUR = NCHATS - 1; MX = 300; MY = 220;
+        app_draw(); goto out;
+    }
     if (!strcmp(screen, "busy")) {          /* mid-generation: the Stop control and its hint */
         CUR = 0; BUSY = 1;
         snprintf(CHATS[0].turn[0].a, sizeof CHATS[0].turn[0].a,
@@ -66,7 +73,7 @@ int main(int argc, char **argv) {
         run_search();
         MX = 300; MY = 220;                 /* cursor parked off the sheet */
     } else if (!strcmp(screen, "chat")) {
-        CUR = 0; MX = 300; MY = 220;
+        CUR = 2; MX = 300; MY = 220;
     } else {
         MX = 46; MY = 50; HOVER = 1;        /* hovering the Search row, to show its state */
     }
