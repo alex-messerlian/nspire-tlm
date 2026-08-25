@@ -46,6 +46,29 @@ static void clock_start(void) {
     }
 }
 static uint32_t clock_raw(void) { return TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_VALUE); }
+
+/* ---- wall clock ---------------------------------------------------------------------------------
+ * The RTC is a 32-bit seconds counter at 0x90090000: vendor/Ndless/ndless-sdk/libsyscalls/
+ * stdlib.cpp:514 implements gettimeofday() as a straight read of it into tv_sec, and nspire-io uses
+ * the same address for its cursor blink.
+ *
+ * What the SDK does NOT establish is whether the counter runs on THIS unit, or what its zero means
+ * -- assigning it to tv_sec assumes the Unix epoch, which is an assumption in someone else's code
+ * rather than a measurement on ours. bench/bench_rtc.c is the probe for exactly that and HAS NOT
+ * RUN. So this reports -1 unless the value decodes to a plausible year, and AUTO stays light.
+ *
+ * Returning -1 rather than a plausible-looking hour is the whole point: a theme derived from an
+ * unverified epoch would be a number nobody measured, driving something a person can see. */
+#define RTC_ADDR 0x90090000u
+#define RTC_MIN  1735689600u   /* 2025-01-01: before this the clock was never set */
+#define RTC_MAX  2524608000u   /* 2050-01-01: after this it is not a Unix epoch    */
+
+int app_clock_hour(void) {
+    uint32_t s = TLM_MMIO32(RTC_ADDR);
+    if (s == 0 || s == 0xFFFFFFFFu) return -1;        /* stopped or floating */
+    if (s < RTC_MIN || s > RTC_MAX)  return -1;        /* not the epoch the SDK assumes */
+    return (int)((s % 86400u) / 3600u);                /* UTC: no timezone exists on this device */
+}
 /* The counter runs DOWN; unsigned wraparound handles one wrap. Returns milliseconds. */
 static unsigned clock_ms_since(uint32_t start) {
     uint32_t ticks = start - clock_raw();

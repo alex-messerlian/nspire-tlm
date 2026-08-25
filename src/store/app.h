@@ -5,21 +5,67 @@
 #include "gfx.h"
 
 /* palette, kept in step with tools/webui/index.html */
-#define C_BG      HEX(0xFFFFFF)
-#define C_SIDE    HEX(0xF9F9F9)
-#define C_LINE    HEX(0xE5E5E5)
-#define C_INK     HEX(0x0D0D0D)
-#define C_INK2    HEX(0x5D5D5D)
-#define C_INK3    HEX(0x8F8F8F)
-#define C_BUBBLE  HEX(0xF4F4F4)
-#define C_SEL     HEX(0xECECEC)
-#define C_TOOL    HEX(0xF5F6F8)
-#define C_TOOLLN  HEX(0xE3E5EA)
-#define C_RES     HEX(0xEDF7F0)
-#define C_RESLN   HEX(0xCFE8D8)
-#define C_RESFG   HEX(0x186A3B)
-#define C_ERR     HEX(0xFDF2F2)
-#define C_ERRFG   HEX(0xA8342C)
+/* ---- palette ------------------------------------------------------------------------------------
+ * These were #defines, i.e. compile-time constants, which is fine for one theme and impossible for
+ * two. They are now indices into a runtime table, so every existing call site is unchanged and the
+ * whole UI re-colours by swapping one array.
+ *
+ * The six colours that were written inline in app.c -- the modal scrim, the trash hover, the
+ * scrollbar, the exit hover, the composer outline, the disabled send -- are named here too. On the
+ * web the same class of hardcoded colour was every place dark mode broke; naming them is the fix
+ * before the bug rather than after it. */
+enum {
+    P_BG, P_SIDE, P_LINE, P_INK, P_INK2, P_INK3, P_BUBBLE, P_SEL,
+    P_TOOL, P_TOOLLN, P_RES, P_RESLN, P_RESFG, P_ERR, P_ERRFG,
+    P_SCRIM, P_TRASH_HOT, P_BAR, P_EXIT_HOT, P_FIELD_LN, P_SEND_OFF,
+    P_N
+};
+extern uint16_t TLM_PAL[P_N];
+
+#define C_BG        TLM_PAL[P_BG]
+#define C_SIDE      TLM_PAL[P_SIDE]
+#define C_LINE      TLM_PAL[P_LINE]
+#define C_INK       TLM_PAL[P_INK]
+#define C_INK2      TLM_PAL[P_INK2]
+#define C_INK3      TLM_PAL[P_INK3]
+#define C_BUBBLE    TLM_PAL[P_BUBBLE]
+#define C_SEL       TLM_PAL[P_SEL]
+#define C_TOOL      TLM_PAL[P_TOOL]
+#define C_TOOLLN    TLM_PAL[P_TOOLLN]
+#define C_RES       TLM_PAL[P_RES]
+#define C_RESLN     TLM_PAL[P_RESLN]
+#define C_RESFG     TLM_PAL[P_RESFG]
+#define C_ERR       TLM_PAL[P_ERR]
+#define C_ERRFG     TLM_PAL[P_ERRFG]
+#define C_SCRIM     TLM_PAL[P_SCRIM]
+#define C_TRASH_HOT TLM_PAL[P_TRASH_HOT]
+#define C_BAR       TLM_PAL[P_BAR]
+#define C_EXIT_HOT  TLM_PAL[P_EXIT_HOT]
+#define C_FIELD_LN  TLM_PAL[P_FIELD_LN]
+#define C_SEND_OFF  TLM_PAL[P_SEND_OFF]
+
+/* Three states, cycled by the header button, matching the web exactly:
+ *   TH_AUTO   follow the device -- on the calculator that means the CLOCK, since the Nspire OS has
+ *             no appearance setting to follow
+ *   TH_LIGHT  always day
+ *   TH_DARK   always night */
+enum { TH_AUTO = 0, TH_LIGHT, TH_DARK };
+void app_set_theme(int mode);
+int  app_theme(void);
+/* What AUTO currently resolves to. `hour` is 0-23, or negative when the clock could not be read --
+ * in which case this returns light, because guessing dark on an unknown clock is worse than a
+ * wrong-but-legible default. */
+int  app_auto_is_dark(int hour);
+
+/* Local hour 0-23, or NEGATIVE when there is no usable clock.
+ *
+ * Supplied by the platform, because there is no portable answer: the calculator reads the RTC at
+ * 0x90090000 and the host harness has no clock at all. Returning -1 rather than a plausible-looking
+ * default is the point -- app_auto_is_dark() then chooses light, instead of a theme derived from a
+ * number nobody measured. bench/bench_rtc.c is the probe that will establish whether that register
+ * is running on this unit and on what epoch; until it has run, the device implementation reports
+ * -1 and AUTO is light. */
+int  app_clock_hour(void);
 
 /* 320x240 is a fifth the width of the desktop layout, so proportions are re-derived rather than
  * scaled: an 18%-wide sidebar would be 58px and unreadable, a scaled-down 260px would eat a

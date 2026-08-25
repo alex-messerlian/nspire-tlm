@@ -12,6 +12,52 @@ static int MX = 160, MY = 120;     /* cursor */
 static int HOVER;                  /* pointer in proximity: hover states are live */
 static int QUIT;
 static int SIDEBAR = 1;
+uint16_t TLM_PAL[P_N];
+static int THEME_MODE = TH_AUTO;
+
+/* Light is the calculator's own register: the Nspire OS is light-only, so this is what a person
+ * expects to see when they open a program on it. */
+static const uint16_t PAL_LIGHT[P_N] = {
+    [P_BG] = HEX(0xFFFFFF), [P_SIDE] = HEX(0xF9F9F9), [P_LINE] = HEX(0xE5E5E5),
+    [P_INK] = HEX(0x0D0D0D), [P_INK2] = HEX(0x5D5D5D), [P_INK3] = HEX(0x8F8F8F),
+    [P_BUBBLE] = HEX(0xF4F4F4), [P_SEL] = HEX(0xECECEC),
+    [P_TOOL] = HEX(0xF5F6F8), [P_TOOLLN] = HEX(0xE3E5EA),
+    [P_RES] = HEX(0xEDF7F0), [P_RESLN] = HEX(0xCFE8D8), [P_RESFG] = HEX(0x186A3B),
+    [P_ERR] = HEX(0xFDF2F2), [P_ERRFG] = HEX(0xA8342C),
+    [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0xE6E6E6), [P_BAR] = HEX(0xEDEDED),
+    [P_EXIT_HOT] = HEX(0xF3D9D7), [P_FIELD_LN] = HEX(0xD9D9D9), [P_SEND_OFF] = HEX(0xD5D5D5),
+};
+/* Dark is not inverted light. Surfaces LIFT as they come forward, as on the web -- and this panel
+ * is 16-bit, so a near-black ground has only a few distinguishable steps above it before the
+ * quantisation shows. The steps below are chosen far enough apart to survive RGB565. */
+static const uint16_t PAL_DARK[P_N] = {
+    [P_BG] = HEX(0x0D0D0D), [P_SIDE] = HEX(0x0D0D0D), [P_LINE] = HEX(0x2A2A2A),
+    [P_INK] = HEX(0xECECEC), [P_INK2] = HEX(0xAFAFAF), [P_INK3] = HEX(0x8A8A8A),
+    [P_BUBBLE] = HEX(0x303030), [P_SEL] = HEX(0x242424),
+    [P_TOOL] = HEX(0x22262E), [P_TOOLLN] = HEX(0x333A45),
+    [P_RES] = HEX(0x16281D), [P_RESLN] = HEX(0x27492F), [P_RESFG] = HEX(0x79D497),
+    [P_ERR] = HEX(0x2C1B1B), [P_ERRFG] = HEX(0xF0857C),
+    [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0x3A3A3A), [P_BAR] = HEX(0x333333),
+    [P_EXIT_HOT] = HEX(0x4A2A28), [P_FIELD_LN] = HEX(0x3A3A3A), [P_SEND_OFF] = HEX(0x3D3D3D),
+};
+
+/* The clock decides only when the mode is AUTO. A negative hour means the clock could not be read;
+ * light is returned then, because a wrong-but-legible default beats guessing dark on no evidence.
+ * Day is 06:00-18:00, per the owner's spec. */
+int app_auto_is_dark(int hour) {
+    if (hour < 0 || hour > 23) return 0;
+    return !(hour >= 6 && hour < 18);
+}
+int app_theme(void) { return THEME_MODE; }
+
+void app_set_theme(int mode) {
+    THEME_MODE = mode;
+    int dark = (mode == TH_DARK);
+    if (mode == TH_AUTO) dark = app_auto_is_dark(app_clock_hour());
+    const uint16_t *src = dark ? PAL_DARK : PAL_LIGHT;
+    for (int i = 0; i < P_N; i++) TLM_PAL[i] = src[i];
+}
+
 static const char *PERSIST;          /* NULL = do not persist (host harness) */
 
 /* Called after EVERY change that could lose a conversation. Deliberately not called per token:
@@ -37,7 +83,7 @@ static char STATUS[48], STATUS_MONO[40];
 /* hit regions, recomputed every frame so hover testing and click handling can never disagree
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
-static gfx_rect R_EXIT;              /* always visible: leaving must not depend on knowing a key */
+static gfx_rect R_EXIT, R_THEME;              /* always visible: leaving must not depend on knowing a key */
 static int ABORT;                    /* set by ESC or Stop; polled by the generation loop */
 static int NCHAT_ROWS;
 static int CHAT_SCROLL;              /* index of the first chat row drawn */
@@ -52,6 +98,7 @@ static int inside(gfx_rect r, int x, int y) {
 }
 
 void app_init(void) {
+    app_set_theme(THEME_MODE);   /* fill the palette before anything draws */
     NCHATS = 0; CUR = -1; SCROLL = 0; COMPOSE[0] = 0; COMPOSE_N = 0;
 }
 int app_should_quit(void) { return QUIT; }
@@ -476,7 +523,7 @@ static int draw_marked(int x, int y, const char *s, char terms[MAX_TERMS][TERM_M
 }
 
 static void draw_search(void) {
-    gfx_dim(HEX(0x000000), 28);            /* same scrim weight as the web popup */
+    gfx_dim(C_SCRIM, 28);                  /* same scrim weight as the web popup */
 
     const int SW = 260, SX = (GFX_W - SW) / 2, SY = 26;
     /* The sheet SCROLLS. It used to cap at five hits and stop, so a sixth match was ranked, counted
@@ -536,6 +583,35 @@ static void draw_sidebar(void) {
     /* [search][toggle], right-aligned and the same size, as on the web header */
     R_TOGGLE = (gfx_rect){ SIDE_W - 21, 3, 18, 18 };
     R_SEARCH = (gfx_rect){ SIDE_W - 41, 3, 18, 18 };
+    R_THEME  = (gfx_rect){ SIDE_W - 61, 3, 18, 18 };
+    {   int th = HOVER && inside(R_THEME, MX, MY);
+        gfx_rrect(R_THEME.x, R_THEME.y, 18, 18, 4, th ? C_SEL : C_SIDE);
+        int cx = R_THEME.x + 9, cy = R_THEME.y + 9;
+        if (THEME_MODE == TH_LIGHT) {            /* sun: a disc with eight rays */
+            for (int dy = -3; dy <= 3; dy++)
+                for (int dx = -3; dx <= 3; dx++)
+                    if (dx*dx + dy*dy <= 9) gfx_fill(cx + dx, cy + dy, 1, 1, C_INK2);
+            for (int k = 0; k < 4; k++) {
+                gfx_fill(cx - 6 + 12*(k&1), cy, 2, 1, C_INK2);       /* left / right */
+                gfx_fill(cx, cy - 6 + 12*(k&1), 1, 2, C_INK2);       /* up / down    */
+            }
+            gfx_fill(cx - 5, cy - 5, 2, 2, C_INK2); gfx_fill(cx + 4, cy + 4, 2, 2, C_INK2);
+            gfx_fill(cx + 4, cy - 5, 2, 2, C_INK2); gfx_fill(cx - 5, cy + 4, 2, 2, C_INK2);
+        } else if (THEME_MODE == TH_DARK) {      /* moon: a disc with a bite out of it */
+            for (int dy = -5; dy <= 5; dy++)
+                for (int dx = -5; dx <= 5; dx++) {
+                    int d = dx*dx + dy*dy;
+                    int bite = (dx-4)*(dx-4) + (dy-3)*(dy-3);
+                    if (d <= 25 && bite > 25) gfx_fill(cx + dx, cy + dy, 1, 1, C_INK2);
+                }
+        } else {                                  /* calculator: follow the device */
+            gfx_rrect_outline(cx - 5, cy - 6, 11, 13, 2, C_INK2);
+            gfx_fill(cx - 3, cy - 4, 7, 3, C_INK2);
+            for (int r2 = 0; r2 < 2; r2++)
+                for (int c2 = 0; c2 < 3; c2++)
+                    gfx_fill(cx - 3 + c2*3, cy + 1 + r2*3, 1, 1, C_INK2);
+        }
+    }
     {   int sh = HOVER && inside(R_SEARCH, MX, MY);
         gfx_rrect(R_SEARCH.x, R_SEARCH.y, 18, 18, 4, sh ? C_SEL : C_SIDE);
         magnifier(R_SEARCH.x + 4, R_SEARCH.y + 4, C_INK2);
@@ -585,7 +661,7 @@ static void draw_sidebar(void) {
             gfx_text_ellipsis(10, y, CHATS[i].title, F_UI, C_INK, bg, rowmax - (hot ? 26 : 10));
             if (hot) {                    /* trash appears only on hover, as on the web */
                 int tx = R_TRASH[r].x, ty = R_TRASH[r].y;
-                uint16_t tb = inside(R_TRASH[r], MX, MY) ? HEX(0xE6E6E6) : bg;
+                uint16_t tb = inside(R_TRASH[r], MX, MY) ? C_TRASH_HOT : bg;
                 gfx_rrect(tx, ty, 14, 14, 3, tb);
                 gfx_hline(tx + 3, ty + 4, 9, C_INK2);      /* lid */
                 gfx_hline(tx + 6, ty + 2, 3, C_INK2);      /* handle */
@@ -601,7 +677,7 @@ static void draw_sidebar(void) {
             int track_h = CHAT_FIT * 18, tx = SIDE_W - 7;
             int knob = track_h * CHAT_FIT / NCHATS; if (knob < 12) knob = 12;
             int ky = top - 2 + (track_h - knob) * CHAT_SCROLL / maxs;
-            gfx_rrect(tx, top - 2, 3, track_h, 1, HEX(0xEDEDED));
+            gfx_rrect(tx, top - 2, 3, track_h, 1, C_BAR);
             gfx_rrect(tx, ky, 3, knob, 1, C_INK3);
         }
     }
@@ -633,7 +709,7 @@ static void draw_main(void) {
      * source is not an affordance. */
     R_EXIT = (gfx_rect){ GFX_W - 22, 3, 18, 18 };
     {   int hot = HOVER && inside(R_EXIT, MX, MY);
-        gfx_rrect(R_EXIT.x, R_EXIT.y, 18, 18, 4, hot ? HEX(0xF3D9D7) : C_BG);
+        gfx_rrect(R_EXIT.x, R_EXIT.y, 18, 18, 4, hot ? C_EXIT_HOT : C_BG);
         uint16_t xc = hot ? C_ERRFG : C_INK2;
         for (int i = 0; i < 9; i++) {          /* an X, both diagonals, 2px */
             gfx_fill(R_EXIT.x + 5 + i, R_EXIT.y + 5 + i, 2, 1, xc);
@@ -691,7 +767,7 @@ static void draw_main(void) {
     int cy = GFX_H - DOCK_H + 3;
     R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, 20 };
     gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_BG);
-    gfx_rrect_outline(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, HEX(0xD9D9D9));
+    gfx_rrect_outline(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD_LN);
     if (COMPOSE_N) {
         gfx_text_ellipsis(R_FIELD.x + 9, cy + 3, COMPOSE, F_UI, C_INK, C_BG, R_FIELD.w - 34);
         int cw = gfx_text_w(COMPOSE, F_UI);
@@ -706,7 +782,7 @@ static void draw_main(void) {
         gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, C_INK);
         gfx_fill(R_SEND.x + 5, R_SEND.y + 5, 6, 6, C_BG);
     } else {
-        uint16_t sb = COMPOSE_N ? C_INK : HEX(0xD5D5D5);
+        uint16_t sb = COMPOSE_N ? C_INK : C_SEND_OFF;
         gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, sb);
         for (int i = 0; i < 5; i++) gfx_hline(R_SEND.x + 8 - i, R_SEND.y + 5 + i, 1, C_BG);
         gfx_vline(R_SEND.x + 8, R_SEND.y + 5, 7, C_BG);
@@ -763,6 +839,10 @@ void app_event(const in_event *e) {
             return;
         }
         if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
+        if (SIDEBAR && inside(R_THEME, MX, MY)) {   /* auto -> light -> dark -> auto */
+            app_set_theme((THEME_MODE + 1) % 3);
+            return;
+        }
         if (BUSY && inside(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
         if (inside(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
         if (inside(R_SEARCH, MX, MY)) {

@@ -51,6 +51,16 @@ int main(int argc, char **argv) {
         CUR = NCHATS - 1; MX = 300; MY = 220;
         app_draw(); goto out;
     }
+    if (!strcmp(screen, "dark") || !strcmp(screen, "darksearch")) {
+        app_set_theme(TH_DARK);
+        CUR = 0;
+        CHATS[0].turn[0].done = 1;
+        snprintf(CHATS[0].turn[0].sum, sizeof CHATS[0].turn[0].sum, "22.4s  eval(150/12) -> 12.5");
+        if (!strcmp(screen, "darksearch")) {
+            SEARCH_ON = 1; snprintf(SQ, sizeof SQ, "energy"); SQ_N = 6; run_search();
+        }
+        MX = 300; MY = 220; app_draw(); goto out;
+    }
     if (!strcmp(screen, "status")) {      /* mid-turn: the live line */
         CUR = 0; BUSY = 1;
         snprintf(CHATS[0].turn[0].a, sizeof CHATS[0].turn[0].a, "<a>The speed is 12.5 m/s,");
