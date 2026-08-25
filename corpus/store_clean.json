@@ -511,7 +511,10 @@
   "scope": "m58303",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "8e6fab7b"
+  "rid": "8e6fab7b",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "C_p=C_V+R",
@@ -553,7 +556,10 @@
   },
   "scope": "m58338",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "7600847d"
+  "rid": "7600847d",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "C_V=((d)/(2))*R",
@@ -850,7 +856,10 @@
   "scope": "m58286",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "90852813"
+  "rid": "90852813",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "W_o=F_o*d_o",
@@ -1132,7 +1141,10 @@
   },
   "scope": "m58301",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "2265b236"
+  "rid": "2265b236",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "W_net=K_B-K_A",
@@ -1234,7 +1246,10 @@
   },
   "scope": "m58301",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "cd6f4f69"
+  "rid": "cd6f4f69",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "f=((c)/(lambda))",
@@ -1684,7 +1699,10 @@
   "scope": "canonical",
   "source": "hand",
   "verified": "unverifiable-no-source",
-  "rid": "6205e51a"
+  "rid": "6205e51a",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "p=m*v",
@@ -1777,7 +1795,10 @@
   "scope": "canonical",
   "source": "hand",
   "verified": "unverifiable-no-source",
-  "rid": "fcdd583a"
+  "rid": "fcdd583a",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "F=q*v*B",
@@ -1982,7 +2003,10 @@
   },
   "scope": "m58301",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "12cd9116"
+  "rid": "12cd9116",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "T=((1)/(f))",
@@ -2019,7 +2043,10 @@
   },
   "scope": "m58287",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "11a8fb85"
+  "rid": "11a8fb85",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "B=((mu_0*I)/(2*pi*R))",
@@ -2131,7 +2158,10 @@
   },
   "scope": "m58293",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "2a4a8866"
+  "rid": "2a4a8866",
+  "cval": {
+   "g": "9.81"
+  }
  },
  {
   "f": "T=2*pi*sqrt(((m)/(k)))",
