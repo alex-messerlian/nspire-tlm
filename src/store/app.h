@@ -73,6 +73,11 @@ int  app_should_quit(void);
 void app_request(const char *question, const char *rid);
 void app_stream_token(const char *piece);   /* called as tokens arrive */
 void app_stream_end(void);
+/* Interruption. A generation loop is the only thing here that runs long enough that the UI stops
+ * answering -- 60 tokens at the measured 2.683 tok/s is 22 seconds -- so it must poll. */
+int  app_take_abort(void);      /* 1 if ESC or Stop was pressed; clears on read */
+int  app_busy(void);
+int  app_hit_stop(int x, int y);
 /* Prior turns of the CURRENT session, oldest first, for context. Returns how many were written.
  * Sessions are independent: this never reaches across chats, and deleting a chat destroys its
  * history with it. */

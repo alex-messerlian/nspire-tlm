@@ -18,6 +18,8 @@ static int  BUSY;
 /* hit regions, recomputed every frame so hover testing and click handling can never disagree
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
+static gfx_rect R_EXIT;              /* always visible: leaving must not depend on knowing a key */
+static int ABORT;                    /* set by ESC or Stop; polled by the generation loop */
 static int NCHAT_ROWS;
 static int CHAT_SCROLL;              /* index of the first chat row drawn */
 static int CHAT_AT[MAX_CHATS];       /* screen row -> chat index */
@@ -504,7 +506,20 @@ static void draw_main(void) {
 
     /* top bar: ChatTLM when empty, the chat's title inside a chat */
     const char *title = (CUR >= 0) ? CHATS[CUR].title : "ChatTLM";
-    gfx_text_ellipsis(x0 + PAD, 4, title, F_BIG, C_INK, C_BG, w - 2 * PAD - 34);
+    gfx_text_ellipsis(x0 + PAD, 4, title, F_BIG, C_INK, C_BG, w - 2 * PAD - 30);
+
+    /* EXIT, top right, always drawn. ESC has always quit, but nothing on screen said so, and a
+     * judge handed the calculator does not know the key. An affordance that exists only in the
+     * source is not an affordance. */
+    R_EXIT = (gfx_rect){ GFX_W - 22, 3, 18, 18 };
+    {   int hot = HOVER && inside(R_EXIT, MX, MY);
+        gfx_rrect(R_EXIT.x, R_EXIT.y, 18, 18, 4, hot ? HEX(0xF3D9D7) : C_BG);
+        uint16_t xc = hot ? C_ERRFG : C_INK2;
+        for (int i = 0; i < 9; i++) {          /* an X, both diagonals, 2px */
+            gfx_fill(R_EXIT.x + 5 + i, R_EXIT.y + 5 + i, 2, 1, xc);
+            gfx_fill(R_EXIT.x + 5 + i, R_EXIT.y + 13 - i, 2, 1, xc);
+        }
+    }
     gfx_hline(x0, TOP_H, w, C_LINE);
 
     /* transcript */
@@ -553,14 +568,25 @@ static void draw_main(void) {
     } else {
         gfx_text(R_FIELD.x + 9, cy + 3, "Ask a physics question", F_UI, C_INK3, C_BG);
     }
+    /* While generating, the send arrow becomes a STOP square -- the same control, so there is
+     * always exactly one button there and it always does the thing the state calls for. */
     R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 20, cy + 2, 16, 16 };
-    uint16_t sb = COMPOSE_N ? C_INK : HEX(0xD5D5D5);
-    gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, sb);
-    for (int i = 0; i < 5; i++) gfx_hline(R_SEND.x + 8 - i, R_SEND.y + 5 + i, 1, C_BG);
-    gfx_vline(R_SEND.x + 8, R_SEND.y + 5, 7, C_BG);
+    if (BUSY) {
+        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, C_INK);
+        gfx_fill(R_SEND.x + 5, R_SEND.y + 5, 6, 6, C_BG);
+    } else {
+        uint16_t sb = COMPOSE_N ? C_INK : HEX(0xD5D5D5);
+        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, sb);
+        for (int i = 0; i < 5; i++) gfx_hline(R_SEND.x + 8 - i, R_SEND.y + 5 + i, 1, C_BG);
+        gfx_vline(R_SEND.x + 8, R_SEND.y + 5, 7, C_BG);
+    }
 
-    gfx_text(x0 + (w - gfx_text_w("ChatTLM can make mistakes.", F_UI)) / 2, GFX_H - 14,
-             "ChatTLM can make mistakes.", F_UI, C_INK3, C_BG);
+    /* The footer carries the one key worth knowing, and says what it does HERE -- ESC means "back"
+     * inside a chat and "quit" at home, so a single fixed label would be wrong half the time. */
+    const char *foot = BUSY ? "ESC or Stop to interrupt"
+                            : (CUR >= 0 ? "ESC for home  -  X to exit"
+                                        : "ESC or X to exit");
+    gfx_text(x0 + (w - gfx_text_w(foot, F_UI)) / 2, GFX_H - 14, foot, F_UI, C_INK3, C_BG);
 }
 
 static void draw_cursor(void) {
@@ -605,6 +631,8 @@ void app_event(const in_event *e) {
             SEARCH_ON = 0;                     /* click outside a row closes, as on the web */
             return;
         }
+        if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
+        if (BUSY && inside(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
         if (inside(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
         if (inside(R_SEARCH, MX, MY)) {
             SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); return;
@@ -635,7 +663,12 @@ void app_event(const in_event *e) {
             }
             return;
         }
-        if (k == K_ESC)  { if (CUR >= 0) CUR = -1; else QUIT = 1; return; }
+        if (k == K_ESC)  {
+            if (BUSY)         { ABORT = 1; return; }   /* interrupt first, never navigate away */
+            else if (COMPOSE_N) { COMPOSE_N = 0; COMPOSE[0] = 0; return; }  /* then clear the box */
+            else if (CUR >= 0)  { CUR = -1; return; }                       /* then go home */
+            QUIT = 1; return;                                               /* then leave */
+        }
         if (k == K_TAB)  { SIDEBAR = !SIDEBAR; return; }
         if (k == K_BACK) { if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0; return; }
         if (k == K_ENTER){ if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; } return; }
@@ -765,6 +798,12 @@ int app_context(char *out, int cap, int budget) {
     out[n] = 0;
     return n;
 }
+
+/* Polled by the generation loop, which is the only place that runs long enough to need it.
+ * Cleared on read: an abort must not survive into the next question. */
+int app_take_abort(void) { int a = ABORT; ABORT = 0; return a; }
+int app_busy(void) { return BUSY; }
+int app_hit_stop(int x, int y) { return BUSY && inside(R_SEND, x, y); }
 
 void app_stream_end(void) { if (pending) pending->done = 1; pending = 0; BUSY = 0; SCROLL = 1 << 20; }
 

@@ -43,6 +43,13 @@ int main(int argc, char **argv) {
         CUR = 1; CHAT_SCROLL = 3; MX = 300; MY = 220;
         app_draw(); goto out;
     }
+    if (!strcmp(screen, "busy")) {          /* mid-generation: the Stop control and its hint */
+        CUR = 0; BUSY = 1;
+        snprintf(CHATS[0].turn[0].a, sizeof CHATS[0].turn[0].a,
+                 "<a>The speed is 12.5 m/s, straight from");
+        MX = 300; MY = 220;
+        app_draw(); goto out;
+    }
     if (!strcmp(screen, "manyhits")) {      /* more matches than the sheet holds */
         const char *n[] = { "Kinetic energy of a cart", "Potential energy on a ramp",
                             "Energy stored in a spring", "Thermal energy of a gas",
