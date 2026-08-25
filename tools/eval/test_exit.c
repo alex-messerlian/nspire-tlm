@@ -122,6 +122,27 @@ int main(void) {
         printf("  %s  mutant: no bump leaves the answered session at index %d\n",
                caught ? "CAUGHT" : "MISSED", cur); }
 
+    printf("\n  -- the empty state is tappable --\n");
+    reset(); CUR = -1; app_draw();
+    T("suggestion has a hit rect", R_SUGGEST[0].w > 0, 1);
+    click(R_SUGGEST[1].x + 20, R_SUGGEST[1].y + 8);
+    T("tapping fills the composer", COMPOSE_N > 0, 1);
+    T("with that suggestion's text", strcmp(COMPOSE, SUGGEST[1]) == 0, 1);
+    T("it does NOT send", app_busy(), 0);
+    T("and does not open a session", CUR, -1);
+
+    reset(); CUR = -1; app_draw();
+    click(R_SUGGEST[2].x + 20, R_SUGGEST[2].y + 8);
+    T("third suggestion works too", strcmp(COMPOSE, SUGGEST[2]) == 0, 1);
+
+    /* inside a session those rects are stale -- a click there must not resurrect them */
+    reset(); seed("a"); CUR = -1; app_draw();
+    gfx_rect stale = R_SUGGEST[0];
+    CUR = 0; app_draw();
+    COMPOSE_N = 0; COMPOSE[0] = 0;
+    click(stale.x + 20, stale.y + 8);
+    T("stale rect ignored inside a session", COMPOSE_N, 0);
+
     printf("\n  %s: exit paths, %d failure(s)\n\n", F ? "FAIL" : "PASS", F);
     gfx_free();
     return F != 0;

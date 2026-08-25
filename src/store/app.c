@@ -58,6 +58,14 @@ void app_set_theme(int mode) {
     for (int i = 0; i < P_N; i++) TLM_PAL[i] = src[i];
 }
 
+/* Deliberately phrased as a person would ask, not as the store phrases a relation -- these are
+ * examples of USE, and they have to still make sense once the relation flow is gone. */
+static const char *SUGGEST[3] = {
+    "A car goes 150 m in 12 s. Find the speed.",
+    "A 2 kg mass is raised 5 m. Find the potential energy.",
+    "3 A flows through 4 ohm. Find the voltage.",
+};
+
 static const char *PERSIST;          /* NULL = do not persist (host harness) */
 
 /* Called after EVERY change that could lose a conversation. Deliberately not called per token:
@@ -83,7 +91,7 @@ static char STATUS[48], STATUS_MONO[40];
 /* hit regions, recomputed every frame so hover testing and click handling can never disagree
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
-static gfx_rect R_EXIT, R_THEME;              /* always visible: leaving must not depend on knowing a key */
+static gfx_rect R_EXIT, R_THEME, R_SUGGEST[3];              /* always visible: leaving must not depend on knowing a key */
 static int ABORT;                    /* set by ESC or Stop; polled by the generation loop */
 static int NCHAT_ROWS;
 static int CHAT_SCROLL;              /* index of the first chat row drawn */
@@ -724,9 +732,26 @@ static void draw_main(void) {
     gfx_clip(x0, top, w, bot - top);
 
     if (CUR < 0) {
-        gfx_text(px0, top + 26, "What can I work out?", F_BIG, C_INK, C_BG);
-        gfx_text(px0, top + 50, "Pick a relation, give values,", F_UI, C_INK3, C_BG);
-        gfx_text(px0, top + 64, "get a worked answer.", F_UI, C_INK3, C_BG);
+        /* Three examples, TAPPABLE. They were static prose with no hit rect and no handler, so the
+         * only thing a new user could do on this screen was guess at the keypad.
+         *
+         * Tapping one puts its text in the composer and nothing else -- it does not send, and it
+         * does not pick anything. That is deliberate: a suggestion the person can still edit is
+         * useful under any architecture, and this app is moving to direct typing where there is
+         * nothing to pick. */
+        gfx_text(px0, top + 22, "What can I work out?", F_BIG, C_INK, C_BG);
+        gfx_text(px0, top + 44, "Ask in your own words.", F_UI, C_INK3, C_BG);
+        for (int i = 0; i < 3; i++) {
+            int y = top + 66 + i * 20;
+            R_SUGGEST[i] = (gfx_rect){ px0 - 4, y - 3, pw + 8, 18 };
+            int hot = HOVER && inside(R_SUGGEST[i], MX, MY);
+            uint16_t bg = hot ? C_SEL : C_BG;
+            if (hot) gfx_rrect(R_SUGGEST[i].x, R_SUGGEST[i].y, R_SUGGEST[i].w, R_SUGGEST[i].h, 5, bg);
+            /* an arrow, so the row reads as something you can act on rather than as a caption */
+            for (int k = 0; k < 4; k++) gfx_fill(px0 + 2 + k, y + 8 - k, 1, 1, C_INK3);
+            gfx_fill(px0 + 5, y + 4, 1, 5, C_INK3);
+            gfx_text_ellipsis(px0 + 14, y, SUGGEST[i], F_UI, hot ? C_INK : C_INK2, bg, pw - 20);
+        }
     } else {
         app_chat *c = &CHATS[CUR];
         int lh0 = gfx_font_h(F_UI) + 2, total = 6;
@@ -839,6 +864,14 @@ void app_event(const in_event *e) {
             return;
         }
         if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
+        if (CUR < 0 && !SEARCH_ON) {
+            for (int i = 0; i < 3; i++)
+                if (inside(R_SUGGEST[i], MX, MY)) {
+                    snprintf(COMPOSE, sizeof COMPOSE, "%s", SUGGEST[i]);
+                    COMPOSE_N = (int)strlen(COMPOSE);
+                    return;                      /* fills the box; the person still presses send */
+                }
+        }
         if (SIDEBAR && inside(R_THEME, MX, MY)) {   /* auto -> light -> dark -> auto */
             app_set_theme((THEME_MODE + 1) % 3);
             return;
