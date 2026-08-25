@@ -16,6 +16,7 @@
 #include "assemble.h"
 #include "tokenizer.h"
 #include "../../tools/eval/eval.h"
+#include "toolrun.h"
 
 FILE *g_nspire_log = 0;
 extern void  rq_build(const char *path);
@@ -119,34 +120,8 @@ static int keypad_poll(void) {
 /* ---- generation ------------------------------------------------------------------------------- */
 static int argmax(const float *v, int n) { int b = 0; for (int i = 1; i < n; i++) if (v[i] > v[b]) b = i; return b; }
 
-/* Execute one tool call ON THE CALCULATOR.
- *
- * This is the whole thesis of the project: the model does not compute, it emits a call, and the
- * runtime executes it. Until now this returned "!give" and the answer's number came from the model
- * -- so the device was ASSERTING the architecture rather than demonstrating it.
- *
- * tool_call_text() is the same entry point the host cli uses (tools/eval/main.c:16), over the same
- * CORE sources, which the evaluator's own Makefile already cross-compiles for ARMv5TE. Host and
- * device therefore run identical arithmetic; TOOL_SPEC 5.1 requires the formatting to be
- * byte-identical and tools/eval/device_main.c is the suite that checks it.
- *
- * A failure returns the evaluator's own refusal code. It never invents a value and never falls
- * back to whatever the model was going to say. */
-static const char *run_call(const char *call) {
-    static char out[MAX_RESULT];
-    out[0] = 0;
-    if (tool_call_text(call, out, sizeof out) != TB_OK || !out[0])
-        snprintf(out, sizeof out, "%s", out[0] ? out : "!give");
-    return out;
-}
-
-/* Last occurrence of `needle`. The model can emit more than one call in a document, and the span to
- * execute is the one that just closed, not the first one in the buffer. */
-static const char *rfind(const char *hay, const char *needle) {
-    const char *last = 0, *p = hay;
-    for (;;) { p = strstr(p, needle); if (!p) break; last = p; p++; }
-    return last;
-}
+/* Tool execution lives in toolrun.c so the shipping code can be verified on the host against
+ * evalcli, instead of only by a device round-trip. See src/store/toolrun.h. */
 
 /* ---- data location -----------------------------------------------------------------------------
  * The SLM->TLM rename moved every hardcoded path from /documents/slm/ to /documents/tlm/ while the
@@ -246,8 +221,18 @@ void app_request(const char *question, const char *rid) {
     int n = ns_tok_encode(&TK, prompt, ids, NS_MAX_TOKENS);
     if (n <= 0) { app_stream_token("<a> encode failed<end>"); app_stream_end(); return; }
 
+    /* Token ids the runtime steers on. Looked up by TEXT, so the device and the host steer on the
+     * same tokens rather than on numbers hardcoded twice. */
+    const int ID_RES   = ns_tok_special_id(&TK, "<res>");
+    const int ID_TOOLC = ns_tok_special_id(&TK, "</tool>");
+    const int ID_END   = ns_tok_special_id(&TK, "<end>");
+
     int tok = ids[0], pos = 0;
     while (pos < n - 1) { rq_forward(tok, pos); pos++; tok = ids[pos]; }
+
+    static int emitted[300];                 /* what the model has produced, for span extraction */
+    int nemit = 0;
+
     /* POLL. This loop used to run to completion with nothing checking for input: 60 tokens at the
      * measured 2.683 tok/s is 22.4 seconds during which the calculator answered no key and no tap.
      * In front of a judge that is not "slow", it is indistinguishable from a crash -- and it is the
@@ -255,15 +240,51 @@ void app_request(const char *question, const char *rid) {
      *
      * Polling between tokens, not inside rq_forward, so the cost is one keypad scan per ~370 ms of
      * compute rather than anything measurable against the forward pass. */
-    int stopped = 0;
-    for (int s = 0; s < 60 && pos < 250; s++) {
+    int stopped = 0, ran_tool = 0;
+    for (int s = 0; s < 90 && pos < 250; s++) {
         float *lg = rq_forward(tok, pos); pos++;
+
+        /* The model may not SUPPLY its own result. <res> is the runtime's to emit, and suppressing
+         * the logit is what makes that structural rather than a convention the model may break.
+         * The host has done this since it was written (server.py: lg[0, RES] = -1e30); the device
+         * did not, which is half of why its result chip held a number nobody had checked. */
+        if (ID_RES >= 0) lg[ID_RES] = -1e30f;
+
         tok = argmax(lg, V);
+        if (nemit < (int)(sizeof emitted / sizeof emitted[0])) emitted[nemit++] = tok;
+
         char piece[64];
         ns_tok_decode(&TK, &tok, 1, piece, sizeof piece);
         app_stream_token(piece);
         app_draw();                          /* stream: one repaint per token */
-        if (tok == 10) break;
+        if (tok == ID_END || tok == 10) break;
+
+        /* ---- a call just closed: EXECUTE IT ------------------------------------------------
+         * This is the whole architecture. The model emitted a call; the runtime runs it and feeds
+         * the real answer back in, so everything the model writes afterwards is composed around a
+         * number it did not choose. */
+        if (tok == ID_TOOLC) {
+            static char doc[1024], span[320], inj[MAX_RESULT + 16];
+            ns_tok_decode(&TK, emitted, nemit, doc, sizeof doc);
+            if (tlm_extract_call(doc, span, sizeof span))
+                tlm_result_span(span, inj, sizeof inj);
+            else
+                /* Malformed span. Report the evaluator's own no-call code rather than skipping, so
+                 * a broken call is visible instead of looking like a clean answer. */
+                snprintf(inj, sizeof inj, "<res>!give</res>");
+            ran_tool = 1;
+
+            int iids[64];
+            int ni = ns_tok_encode(&TK, inj, iids, 64);
+            for (int k = 0; k < ni && pos < 250; k++) {
+                rq_forward(tok, pos); pos++;         /* consume the token just produced */
+                tok = iids[k];
+                if (nemit < (int)(sizeof emitted / sizeof emitted[0])) emitted[nemit++] = tok;
+                ns_tok_decode(&TK, &tok, 1, piece, sizeof piece);
+                app_stream_token(piece);
+            }
+            app_draw();
+        }
 
         if (isKeyPressed(KEY_NSPIRE_ESC)) { stopped = 1; }
         else {
@@ -277,8 +298,7 @@ void app_request(const char *question, const char *rid) {
         if (app_take_abort()) stopped = 1;
         if (stopped) break;
     }
-    /* Say it was stopped. A truncated answer that looks complete is a worse outcome than a slow
-     * one, because the reader cannot tell the model was cut off mid-sentence. */
+    (void)ran_tool;
     if (stopped) { app_stream_token(" [stopped]"); while (isKeyPressed(KEY_NSPIRE_ESC)) { } }
     /* compact summary from the finished turn: relation + values + result */
     {
