@@ -57,6 +57,24 @@ int main(void) {
         if (!caught) F++;
         printf("  %s  over-eager skip \"%s\" would fail the oracle\n", caught ? "CAUGHT" : "MISSED", bad); }
 
+    /* <arg> is a separator; the spec's own `solve` example passes two arguments. */
+    printf("\n  -- tool call arguments --\n");
+    {   struct { const char *in, *fn, *arg; } C[] = {
+            { "eval<arg>150/12",              "eval",  "150/12" },
+            { "solve<arg>2x^2+3x-5=0<arg>x",  "solve", "2x^2+3x-5=0, x" },
+            { "conv<arg>5<arg>km<arg>m",      "conv",  "5, km, m" },
+            { "give",                         "give",  "" },
+        };
+        for (unsigned i = 0; i < sizeof C / sizeof C[0]; i++) {
+            char fn[24], arg[96];
+            split_call(C[i].in, fn, sizeof fn, arg, sizeof arg);
+            int ok = !strcmp(fn, C[i].fn) && !strcmp(arg, C[i].arg);
+            if (!ok) F++;
+            printf("  %s  %-30s -> fn=\"%s\" arg=\"%s\"%s\n", ok ? "PASS" : "FAIL",
+                   C[i].in, fn, arg, ok ? "" : "   LEAKED <arg>");
+        }
+    }
+
     printf("\n  %s: span parser, %d failure(s)\n\n", F ? "FAIL" : "PASS", F);
     gfx_free();
     return F != 0;

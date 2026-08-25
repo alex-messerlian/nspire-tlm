@@ -148,11 +148,40 @@ static const char *dpath(const char *leaf) {
     snprintf(buf, sizeof buf, "%s%s", DATA_DIR, leaf);
     return buf;
 }
-/* Returns 1 when a directory holding the store was found. */
-static int resolve_data_dir(ns_store2 *st) {
+/* Returns 1 when a directory holding ALL THREE data files was found.
+ *
+ * The first version of this probed the STORE ONLY and its comment claimed that probing a file
+ * rather than a directory meant "a half-populated directory does not win". That was false: a
+ * directory holding only the store won outright, and the model path built from the same prefix
+ * then reached llama2.c's read_checkpoint, which calls exit() on a missing file -- the process
+ * would vanish mid-demo with no message. A comment asserting a guarantee the code does not make is
+ * worse than no comment, because it stops the next reader from checking.
+ *
+ * fopen is used to test presence so a rejected candidate costs no allocation; ns_load runs once,
+ * on the winner. */
+static int has(const char *leaf) {
+    FILE *f = fopen(dpath(leaf), "rb");
+    if (!f) return 0;
+    fclose(f);
+    return 1;
+}
+static int resolve_data_dir(ns_store2 *st, char *why, int wcap) {
+    int n = 0;
+    why[0] = 0;
     for (unsigned i = 0; i < sizeof DATA_DIRS / sizeof DATA_DIRS[0]; i++) {
         snprintf(DATA_DIR, sizeof DATA_DIR, "%s", DATA_DIRS[i]);
+        const char *missing = 0;
+        if      (!has("store.tns.tns"))     missing = "store";
+        else if (!has("tok4096.tok.tns"))   missing = "tok";
+        else if (!has("model4096.bin.tns")) missing = "model";
+        if (missing) {
+            n += snprintf(why + n, (size_t)(wcap - n > 0 ? wcap - n : 0),
+                          "%s no %s\n", DATA_DIRS[i], missing);
+            continue;
+        }
         if (ns_load(st, dpath("store.tns.tns")) == NS_OK) return 1;
+        n += snprintf(why + n, (size_t)(wcap - n > 0 ? wcap - n : 0),
+                      "%s store unreadable\n", DATA_DIRS[i]);
     }
     DATA_DIR[0] = 0;
     return 0;
@@ -224,10 +253,33 @@ void app_request(const char *question, const char *rid) {
     app_draw();
 }
 
+/* Put a failure on the SCREEN. Both boot failures used to return 1 before gfx_init(), so a wrong
+ * data directory was a black screen -- indistinguishable from a hang, which is precisely the
+ * failure shape the standing rule in the project log exists to prevent. It cost five device cycles once
+ * already; it is not going to cost a sixth. */
+static void die(const char *what, const char *detail) {
+    gfx_clear(C_BG);
+    gfx_text(12, 16, "ChatTLM cannot start", F_BIG, C_ERRFG, C_BG);
+    gfx_text(12, 44, what, F_UIB, C_INK, C_BG);
+    gfx_text_wrap(12, 62, detail, F_UI, C_INK2, C_BG, GFX_W - 24, 14, 1);
+    gfx_text(12, GFX_H - 20, "Press ESC to exit.", F_UI, C_INK3, C_BG);
+    gfx_present();
+    while (!isKeyPressed(KEY_NSPIRE_ESC)) { }
+    gfx_free();
+}
+
 int main(void) {
-    if (!resolve_data_dir(&ST)) return 1;
-    if (ns_tok_load(&TK, dpath("tok4096.tok.tns")) != NST_OK) return 1;
-    gfx_init();
+    gfx_init();                                  /* BEFORE any load, so a failure can be shown */
+    char why[256];
+    if (!resolve_data_dir(&ST, why, sizeof why)) {
+        die("No directory holds all three data files.", why);
+        return 1;
+    }
+    if (ns_tok_load(&TK, dpath("tok4096.tok.tns")) != NST_OK) {
+        die("Tokenizer failed to load.", dpath("tok4096.tok.tns"));
+        ns_free(&ST);
+        return 1;
+    }
     pointer_init();
     app_init();
     app_draw();

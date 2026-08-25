@@ -20,12 +20,15 @@ Correctness of an ANSWER requires all four, and they are not redundant:
 
 Does NOT verify: that the tool chosen was the right tool, that the formula applied was the right
 formula, or that the prose is true. It checks numeric provenance and shape."""
+import pathlib as _pathlib
 import re, subprocess
 
 REF  = re.compile(r"\bcannot\b|\bcan't\b|\bnot given\b|\bnot enough\b|\bmissing\b|\bdoes not apply\b", re.I)
 WF   = re.compile(r"<a>.*<end>", re.S)
 NUM  = re.compile(r"-?\d+\.?\d*(?:[eE][-+]?\d+)?")
-PROV = "tools/eval/provcli"
+# Absolute, resolved against THIS file. A relative path made the grader depend on the caller's
+# working directory, so provenance silently failed for any launcher not started from the repo root.
+PROV = str(_pathlib.Path(__file__).resolve().parent / "provcli")
 
 def well_formed(generation):
     o = generation

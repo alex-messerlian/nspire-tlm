@@ -62,11 +62,14 @@ $NSP info
 echo "--- directories ---"
 $NSP mkdir /bench/.mk  >/dev/null 2>&1 || true
 $NSP mkdir /models/.mk >/dev/null 2>&1 || true
+$NSP mkdir /tlm/.mk    >/dev/null 2>&1 || true
 $NSP rmdir /bench/.mk  >/dev/null 2>&1 || true
 $NSP rmdir /models/.mk >/dev/null 2>&1 || true
+$NSP rmdir /tlm/.mk    >/dev/null 2>&1 || true
 $NSP ls /bench  >/dev/null 2>&1 || { echo "  FATAL: /bench does not exist"; exit 1; }
 $NSP ls /models >/dev/null 2>&1 || { echo "  FATAL: /models does not exist"; exit 1; }
-echo "  /bench and /models present"
+$NSP ls /tlm    >/dev/null 2>&1 || { echo "  FATAL: /tlm does not exist"; exit 1; }
+echo "  /bench, /models and /tlm present"
 
 echo "--- programs ---"
 send tools/eval/eval_device.tns  /eval_device.tns
@@ -75,6 +78,16 @@ send bench/bench_platform.tns    /bench_platform.tns
 send bench/bench_mem.tns         /bench_mem.tns
 send bench/bench_mac.tns         /bench_mac.tns
 send bench/bench_flash.tns       /bench_flash.tns
+
+# ChatTLM: the demo. Nothing staged this set before -- push-all.sh created /bench and /models and
+# never touched build/transfer/, so a fresh device had no /tlm at all and the app exited at boot.
+# All three data files must land, and all three must land in the SAME directory: device_app.c
+# accepts a prefix only when store, tokenizer AND model all open under it.
+echo "--- ChatTLM (8.2 MB: ~40 s to push, ~40 s to verify) ---"
+send build/chattlm.tns             /chattlm.tns
+send build/transfer/store.tns.tns  /tlm/store.tns.tns
+send build/transfer/tok4096.tok.tns /tlm/tok4096.tok.tns
+send build/transfer/model4096.bin.tns /tlm/model4096.bin.tns
 
 echo "--- model (17 MB: ~60 s to push, ~60 s to verify) ---"
 send models/stories15M_q80.bin   /models/stories15M_q80.bin.tns

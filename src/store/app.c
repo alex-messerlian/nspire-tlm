@@ -128,6 +128,14 @@ static void split_call(const char *in, char *fn, int fcap, char *arg, int acap) 
     /* explicit precision: the argument is drawn in a chip and a runaway span must be cut here,
      * visibly, rather than silently filling the buffer */
     snprintf(arg, (size_t)acap, "%.*s", acap - 1, p);
+    /* <arg> is a SEPARATOR, not a wrapper -- the spec is <tool>NAME<arg>A1<arg>A2</tool>. Taking the
+     * tail whole leaked a literal "<arg>" into the chip on every multi-argument call, and `solve` in
+     * the spec's own example takes two. Render the separators as commas. */
+    for (char *q = strstr(arg, "<arg>"); q; q = strstr(q, "<arg>")) {
+        q[0] = ','; q[1] = ' ';
+        memmove(q + 2, q + 5, strlen(q + 5) + 1);
+        q += 2;
+    }
 }
 
 /* ---- drawing --------------------------------------------------------------------------------- */
@@ -193,6 +201,8 @@ static int  SEARCH_ON;
 static char SQ[40];
 static int  SQ_N;
 static int  SHIT[MAX_CHATS], NSHIT, SSEL;
+static int  SSCROLL;                 /* first hit row drawn in the sheet */
+#define SHEET_ROWS 5                 /* what fits in a 320x240 sheet without covering the composer */
 static gfx_rect R_SEARCH, R_SROW[MAX_CHATS];
 
 #define MAX_TERMS 5
@@ -267,6 +277,7 @@ static void run_search(void) {
         score[at] = s; SHIT[at] = i; NSHIT++;
     }
     if (SSEL >= NSHIT) SSEL = 0;
+    SSCROLL = 0;
 }
 /* Window around the earliest match in the earliest message that has one. */
 static void snippet_of(const app_chat *c, char terms[MAX_TERMS][TERM_MAX], int nt,
@@ -354,8 +365,15 @@ static void draw_search(void) {
     gfx_dim(HEX(0x000000), 28);            /* same scrim weight as the web popup */
 
     const int SW = 260, SX = (GFX_W - SW) / 2, SY = 26;
-    int rows = NSHIT > 5 ? 5 : NSHIT;
-    int SH = 30 + (rows ? rows * 30 + 6 : 26);
+    /* The sheet SCROLLS. It used to cap at five hits and stop, so a sixth match was ranked, counted
+     * and unreachable -- the same hide-rather-than-truncate defect the session list had. */
+    if (SSEL < SSCROLL) SSCROLL = SSEL;
+    if (SSEL >= SSCROLL + SHEET_ROWS) SSCROLL = SSEL - SHEET_ROWS + 1;
+    if (SSCROLL > NSHIT - SHEET_ROWS) SSCROLL = NSHIT - SHEET_ROWS;
+    if (SSCROLL < 0) SSCROLL = 0;
+    int rows = NSHIT - SSCROLL;
+    if (rows > SHEET_ROWS) rows = SHEET_ROWS;
+    int SH = 30 + (rows ? rows * 30 + 6 : 26) + (NSHIT > SHEET_ROWS ? 14 : 0);
     gfx_rrect(SX - 1, SY - 1, SW + 2, SH + 2, 9, C_LINE);
     gfx_rrect(SX, SY, SW, SH, 8, C_BG);
 
@@ -376,16 +394,23 @@ static void draw_search(void) {
     for (int i = 0; i < rows; i++) {
         int y = SY + 34 + i * 30;
         R_SROW[i] = (gfx_rect){ SX + 4, y - 2, SW - 8, 28 };
-        int hot = (i == SSEL) || (HOVER && inside(R_SROW[i], MX, MY));
+        int hit = SSCROLL + i;
+        int hot = (hit == SSEL) || (HOVER && inside(R_SROW[i], MX, MY));
         uint16_t bg = hot ? C_SEL : C_BG;
         if (hot) gfx_rrect(R_SROW[i].x, R_SROW[i].y, R_SROW[i].w, R_SROW[i].h, 5, bg);
-        const app_chat *c = &CHATS[SHIT[i]];
+        const app_chat *c = &CHATS[SHIT[hit]];
         gfx_text_ellipsis(SX + 10, y, c->title, F_UIB, C_INK, bg, SW - 20);
         if (nt) {
             char sn[110];
             snippet_of(c, terms, nt, sn, sizeof sn);
             draw_marked(SX + 10, y + 13, sn, terms, nt, C_INK2, bg, SW - 20);
         }
+    }
+    /* Say how many are off the sheet, rather than letting them be silently absent. */
+    if (NSHIT > SHEET_ROWS) {
+        char more[40];
+        snprintf(more, sizeof more, "%d of %d  -  arrows for more", SSCROLL + rows, NSHIT);
+        gfx_text(SX + 10, SY + 34 + rows * 30 - 1, more, F_UI, C_INK3, C_BG);
     }
 }
 
@@ -573,9 +598,9 @@ void app_event(const in_event *e) {
     if (e->kind == IN_CLICK) {
         MX = e->x; MY = e->y;
         if (SEARCH_ON) {                       /* the sheet is modal: it eats clicks under it */
-            int rows = NSHIT > 5 ? 5 : NSHIT;
+            int rows = NSHIT - SSCROLL; if (rows > SHEET_ROWS) rows = SHEET_ROWS;
             for (int i = 0; i < rows; i++)
-                if (inside(R_SROW[i], MX, MY)) { CUR = SHIT[i]; SCROLL = 0; SEARCH_ON = 0; return; }
+                if (inside(R_SROW[i], MX, MY)) { CUR = SHIT[SSCROLL + i]; SCROLL = 0; SEARCH_ON = 0; return; }
             SEARCH_ON = 0;                     /* click outside a row closes, as on the web */
             return;
         }
@@ -600,7 +625,7 @@ void app_event(const in_event *e) {
         int k = e->key;
         if (SEARCH_ON) {                       /* typing goes to the query, not the composer */
             if (k == K_ESC)   { SEARCH_ON = 0; return; }
-            if (k == K_DOWN)  { if (SSEL + 1 < (NSHIT > 5 ? 5 : NSHIT)) SSEL++; return; }
+            if (k == K_DOWN)  { if (SSEL + 1 < NSHIT) SSEL++; return; }   /* the sheet follows */
             if (k == K_UP)    { if (SSEL > 0) SSEL--; return; }
             if (k == K_ENTER) { if (NSHIT) { CUR = SHIT[SSEL]; SCROLL = 0; } SEARCH_ON = 0; return; }
             if (k == K_BACK)  { if (SQ_N) { SQ[--SQ_N] = 0; SSEL = 0; run_search(); } return; }

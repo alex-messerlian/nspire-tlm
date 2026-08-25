@@ -43,6 +43,17 @@ int main(int argc, char **argv) {
         CUR = 1; CHAT_SCROLL = 3; MX = 300; MY = 220;
         app_draw(); goto out;
     }
+    if (!strcmp(screen, "manyhits")) {      /* more matches than the sheet holds */
+        const char *n[] = { "Kinetic energy of a cart", "Potential energy on a ramp",
+                            "Energy stored in a spring", "Thermal energy of a gas",
+                            "Energy of a photon", "Rotational energy of a disc" };
+        for (unsigned i = 0; i < sizeof n / sizeof n[0]; i++)
+            seed(n[i], "find the energy", "<a>the energy is 12 J<end>");
+        SEARCH_ON = 1; snprintf(SQ, sizeof SQ, "energy"); SQ_N = 6;
+        run_search(); SSEL = 5;             /* selection past the visible window */
+        MX = 300; MY = 220;
+        app_draw(); goto out;
+    }
     if (!strcmp(screen, "search")) {
         SEARCH_ON = 1; snprintf(SQ, sizeof SQ, "%s", query); SQ_N = (int)strlen(SQ);
         run_search();
