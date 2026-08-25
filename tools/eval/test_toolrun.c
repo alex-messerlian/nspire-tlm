@@ -65,6 +65,26 @@ int main(void) {
 
     /* MUTATION: a runtime that fell back to the model's own text instead of the evaluator's code
      * is exactly the defect this replaces -- prove the oracle would catch it. */
+    printf("\n  -- the status label a reader sees --\n");
+    {   struct { const char *span, *want; } L[] = {
+          { "<tool>eval<arg>150/12</tool>",             "eval(150/12)" },
+          { "<tool>solve<arg>2x^2+3x-5=0<arg>x</tool>", "solve(2x^2+3x-5=0, x)" },
+          { "<tool>conv<arg>5<arg>km<arg>m</tool>",     "conv(5, km, m)" },
+          { "<tool>give</tool>",                        "give" },
+          { "not a call",                               "eval" },
+        };
+        char lbl[64];
+        for (unsigned i = 0; i < sizeof L / sizeof L[0]; i++) {
+            tlm_call_label(L[i].span, lbl, sizeof lbl);
+            T(L[i].span, lbl, L[i].want);
+        }
+        /* a span far longer than the buffer must truncate, not overrun */
+        char tiny[12];
+        tlm_call_label("<tool>eval<arg>1234567890123456789012345</tool>", tiny, sizeof tiny);
+        int ok = strlen(tiny) < sizeof tiny;
+        if (!ok) F++;
+        printf("  %s  a long call truncates into a small buffer (\"%s\")\n", ok ? "PASS" : "FAIL", tiny); }
+
     printf("\n  -- mutation pass --\n");
     {   const char *faked = "<res>12.5</res>";      /* what a fabricating runtime would emit for 1/0 */
         tlm_result_span("<tool>eval<arg>1/0</tool>", out, sizeof out);

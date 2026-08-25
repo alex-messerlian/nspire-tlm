@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../src/store/app.c"
+#include "../../src/store/toolrun.h"
 
 static void seed(const char *title, const char *q, const char *a) {
     app_chat *c = &CHATS[NCHATS++];
@@ -49,6 +50,20 @@ int main(int argc, char **argv) {
              "With lambda_0, theta_1, E=m*c^2, rho, mu and 2*pi*f.<end>");
         CUR = NCHATS - 1; MX = 300; MY = 220;
         app_draw(); goto out;
+    }
+    if (!strcmp(screen, "status")) {      /* mid-turn: the live line */
+        CUR = 0; BUSY = 1;
+        snprintf(CHATS[0].turn[0].a, sizeof CHATS[0].turn[0].a, "<a>The speed is 12.5 m/s,");
+        CHATS[0].turn[0].done = 0;
+        { char lbl[64]; tlm_call_label("<tool>eval<arg>150/12</tool>", lbl, sizeof lbl); app_status("Running", lbl); }
+        MX = 300; MY = 220; app_draw(); goto out;
+    }
+    if (!strcmp(screen, "statusdone")) {  /* after: the line that stays */
+        CUR = 0; BUSY = 0;
+        CHATS[0].turn[0].done = 1;
+        snprintf(CHATS[0].turn[0].sum, sizeof CHATS[0].turn[0].sum,
+                 "22.4s  eval(150/12) -> 12.5");
+        MX = 300; MY = 220; app_draw(); goto out;
     }
     if (!strcmp(screen, "busy")) {          /* mid-generation: the Stop control and its hint */
         CUR = 0; BUSY = 1;

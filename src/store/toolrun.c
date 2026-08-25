@@ -34,3 +34,28 @@ int tlm_result_span(const char *span, char *out, int cap) {
     snprintf(out, (size_t)cap, "<res>%s</res>", res);
     return ok;
 }
+
+void tlm_call_label(const char *span, char *out, int cap) {
+    out[0] = 0;
+    if (!span || cap < 4) return;
+    const char *p = strstr(span, "<tool>");
+    if (!p) { snprintf(out, (size_t)cap, "eval"); return; }
+    p += 6;
+    const char *a = strstr(p, "<arg>");
+    const char *e = strstr(p, "</tool>");
+    if (!e) { snprintf(out, (size_t)cap, "eval"); return; }
+    int o = 0;
+    for (const char *q = p; q < (a && a < e ? a : e) && o < cap - 3; q++)
+        if (*q != ' ') out[o++] = *q;
+    if (!a || a >= e) { out[o] = 0; return; }
+    out[o++] = '(';
+    for (const char *q = a; q < e && o < cap - 2; ) {
+        if (!strncmp(q, "<arg>", 5)) {
+            if (o > 0 && out[o-1] != '(') { out[o++] = ','; if (o < cap-2) out[o++] = ' '; }
+            q += 5; continue;
+        }
+        out[o++] = *q++;
+    }
+    if (o < cap - 1) out[o++] = ')';
+    out[o] = 0;
+}

@@ -17,4 +17,10 @@ int tlm_extract_call(const char *doc, char *out, int cap);
  * evaluator's own refusal code, never an invented value and never a fallback to what the model was
  * about to say. Returns 1 if the evaluator returned a value, 0 if it refused. */
 int tlm_result_span(const char *span, char *out, int cap);
+
+/* "<tool>eval<arg>150/12</tool>" -> "eval(150/12)", for the status line. DISPLAY ONLY -- <arg> is a
+ * separator, so a multi-argument call joins with commas, matching what the web shows. Bounded:
+ * feeding the raw span to a 64-byte status buffer produced a truncation warning and would have
+ * shown "<tool>eval<arg>150/12<..." to the reader. */
+void tlm_call_label(const char *span, char *out, int cap);
 #endif

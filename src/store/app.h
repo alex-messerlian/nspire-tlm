@@ -80,17 +80,26 @@ void app_stream_end(void);
  * answering -- 60 tokens at the measured 2.683 tok/s is 22 seconds -- so it must poll. */
 int  app_take_abort(void);      /* 1 if ESC or Stop was pressed; clears on read */
 int  app_busy(void);
+
+/* ---- live status --------------------------------------------------------------------------------
+ * What the runtime is doing right now, shown in grey above the answer. This matters MORE here than
+ * on the web: a turn is 134 ms there and roughly 22 s on the calculator, so the difference between
+ * "working" and "frozen" is the whole of the user's experience.
+ *
+ * Every label must correspond to real work. A line claiming a tool ran when none did is the same
+ * defect as a result chip holding a number the model invented -- so app_status is called from the
+ * generation loop at points where something actually happened, never on a timer.
+ *
+ * `mono` is the detail drawn in the lighter face: a record name, a call, a result. NULL for none. */
+void app_status(const char *label, const char *mono);
+/* Record what the finished turn actually did, for the line that stays. ms is MEASURED elapsed time;
+ * pass tool_call = NULL when no tool ran, and it will not claim one. */
+void app_status_done(unsigned ms, const char *tool_call, const char *tool_result, int tool_ok);
 int  app_hit_stop(int x, int y);
-/* Prior turns of the CURRENT session, oldest first, for context. Returns how many were written.
- * Sessions are independent: this never reaches across chats, and deleting a chat destroys its
- * history with it. */
-int  app_history(const char **q, const char **a, int max);
 /* Build the context string for the next turn, newest-first until `budget_chars` is spent.
  * Recent turns go in verbatim; older ones fall back to their compact form; anything that still
  * does not fit is dropped silently. Returns characters written. */
 int  app_context(char *out, int cap, int budget_chars);
-/* Record the compact summary for the turn currently being generated. */
-void app_set_summary(const char *s);
 /* Build the compact summary from the finished turn. Call BEFORE app_stream_end(). */
 void app_finish_turn(const char *formula, const char *values);
 #endif

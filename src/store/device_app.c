@@ -18,6 +18,40 @@
 #include "../../tools/eval/eval.h"
 #include "toolrun.h"
 
+/* ---- elapsed time -------------------------------------------------------------------------------
+ * The status line reports how long a turn took, and this project does not put unmeasured numbers on
+ * screen. Timing comes from the 32.768 kHz SP804, which bench_platform established as the
+ * crystal-derived cross-check -- NOT from a token count multiplied by the published 2.683 tok/s,
+ * which would be an estimate wearing a measurement's clothes.
+ *
+ * Constants deliberately mirror bench/common.h rather than including it: that header pulls in an
+ * on-screen console and its own file logging, which this program already owns differently. If the
+ * SP804 layout ever changes, both must change -- noted here because a silent divergence between
+ * two copies of a hardware constant is exactly the sort of thing that is found late. */
+#define TLM_TIMER_32K   0x900D0000u
+#define TLM_SP804_VALUE 0x04u
+#define TLM_SP804_LOAD  0x00u
+#define TLM_SP804_CTRL  0x08u
+#define TLM_MMIO32(a)   (*(volatile uint32_t *)(uintptr_t)(a))
+#define TLM_32K_HZ      32768u
+
+static void clock_start(void) {
+    /* Only configure it if nobody else is running it: an already-enabled free-running timer is
+     * almost certainly the OS's, and stopping it would be rude and probably fatal. */
+    uint32_t c = TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL);
+    if (!((c & (1u << 7)) && (c & (1u << 1)))) {
+        TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL) = 0;
+        TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_LOAD) = 0xFFFFFFFFu;
+        TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL) = (1u << 7) | (1u << 1);
+    }
+}
+static uint32_t clock_raw(void) { return TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_VALUE); }
+/* The counter runs DOWN; unsigned wraparound handles one wrap. Returns milliseconds. */
+static unsigned clock_ms_since(uint32_t start) {
+    uint32_t ticks = start - clock_raw();
+    return (unsigned)((unsigned long long)ticks * 1000ull / TLM_32K_HZ);
+}
+
 FILE *g_nspire_log = 0;
 extern void  rq_build(const char *path);
 extern float *rq_forward(int token, int pos);
@@ -214,6 +248,11 @@ void app_request(const char *question, const char *rid) {
     if (ns_assemble(prompt, sizeof prompt, &ST.rec[idx], question, &in) < 0) {
         app_stream_token("<a> could not assemble a prompt<end>"); app_stream_end(); return;
     }
+    clock_start();
+    uint32_t t_start = clock_raw();
+    app_status("Reading", ST.rec[idx].name);
+    app_draw();
+
     if (!MODEL_READY) { rq_build(dpath("model4096.bin.tns")); MODEL_READY = 1; }
     int V = rq_vocab();
 
@@ -240,7 +279,13 @@ void app_request(const char *question, const char *rid) {
      *
      * Polling between tokens, not inside rq_forward, so the cost is one keypad scan per ~370 ms of
      * compute rather than anything measurable against the forward pass. */
-    int stopped = 0, ran_tool = 0;
+    int stopped = 0;
+    static char tool_call[64], tool_res[48];
+    int tool_ok = 0; tool_call[0] = 0; tool_res[0] = 0;
+    app_status("Thinking", 0);
+    app_draw();
+
+    int wrote = 0;
     for (int s = 0; s < 90 && pos < 250; s++) {
         float *lg = rq_forward(tok, pos); pos++;
 
@@ -256,6 +301,7 @@ void app_request(const char *question, const char *rid) {
         char piece[64];
         ns_tok_decode(&TK, &tok, 1, piece, sizeof piece);
         app_stream_token(piece);
+        if (!wrote && strstr(piece, "<a>")) { wrote = 1; app_status("Writing the answer", 0); }
         app_draw();                          /* stream: one repaint per token */
         if (tok == ID_END || tok == 10) break;
 
@@ -266,13 +312,27 @@ void app_request(const char *question, const char *rid) {
         if (tok == ID_TOOLC) {
             static char doc[1024], span[320], inj[MAX_RESULT + 16];
             ns_tok_decode(&TK, emitted, nemit, doc, sizeof doc);
-            if (tlm_extract_call(doc, span, sizeof span))
-                tlm_result_span(span, inj, sizeof inj);
-            else
+            if (tlm_extract_call(doc, span, sizeof span)) {
+                /* Say what is being run BEFORE running it: on a 396 MHz core the evaluator is fast
+                 * but not instant, and a frozen screen with no explanation is the failure mode this
+                 * whole line exists to prevent. */
+                tlm_call_label(span, tool_call, sizeof tool_call);
+                app_status("Running", tool_call);
+                app_draw();
+                tool_ok = tlm_result_span(span, inj, sizeof inj);
+                {   const char *o = strstr(inj, "<res>");
+                    const char *c = o ? strstr(o, "</res>") : 0;
+                    if (o && c) {
+                        int L = (int)(c - o) - 5;
+                        if (L >= (int)sizeof tool_res) L = (int)sizeof tool_res - 1;
+                        if (L > 0) { memcpy(tool_res, o + 5, (size_t)L); tool_res[L] = 0; }
+                    } }
+                app_status(tool_ok ? "Got" : "Tool refused", tool_res);
+                app_draw();
+            } else
                 /* Malformed span. Report the evaluator's own no-call code rather than skipping, so
                  * a broken call is visible instead of looking like a clean answer. */
                 snprintf(inj, sizeof inj, "<res>!give</res>");
-            ran_tool = 1;
 
             int iids[64];
             int ni = ns_tok_encode(&TK, inj, iids, 64);
@@ -298,7 +358,8 @@ void app_request(const char *question, const char *rid) {
         if (app_take_abort()) stopped = 1;
         if (stopped) break;
     }
-    (void)ran_tool;
+    /* The line that stays. Elapsed time is measured; the tool is reported only if one ran. */
+    app_status_done(clock_ms_since(t_start), tool_call[0] ? tool_call : 0, tool_res, tool_ok);
     if (stopped) { app_stream_token(" [stopped]"); while (isKeyPressed(KEY_NSPIRE_ESC)) { } }
     /* compact summary from the finished turn: relation + values + result */
     {

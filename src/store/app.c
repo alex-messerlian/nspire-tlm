@@ -31,6 +31,9 @@ static char COMPOSE[160];          /* what is being typed */
 static int  COMPOSE_N;
 static int  BUSY;
 
+/* live status, drawn above the streaming answer */
+static char STATUS[48], STATUS_MONO[40];
+
 /* hit regions, recomputed every frame so hover testing and click handling can never disagree
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
@@ -255,6 +258,29 @@ void to_display(const char *in, char *out, int cap) {
         if (!hit) out[o++] = in[i++];
     }
     out[o] = 0;
+}
+
+/* One status line: a dot, a label, and an optional detail in the lighter ink. Grey and a step down
+ * from the answer, so a reader never has to work out which line is the model talking.
+ *
+ * Returns the height used. Drawing and measuring go through the same call with `draw` 0 or 1, which
+ * is how the question bubble's measure/draw split went wrong -- one function, two modes, no chance
+ * for the two to disagree. */
+static int draw_status(int x, int y, int w, const char *label, const char *mono, int live, int draw) {
+    int lh = gfx_font_h(F_UI);
+    if (!label || !label[0]) return 0;
+    if (draw) {
+        /* the dot: filled while working, hollow once finished */
+        if (live) gfx_rrect(x, y + lh / 2 - 2, 5, 5, 2, C_INK3);
+        else      gfx_rrect_outline(x, y + lh / 2 - 2, 5, 5, 2, C_INK3);
+        int tx = x + 10;
+        tx += gfx_text(tx, y, label, F_UI, C_INK3, C_BG);
+        if (mono && mono[0]) {
+            tx += gfx_text(tx, y, " ", F_UI, C_INK3, C_BG);
+            gfx_text_ellipsis(tx, y, mono, F_UI, C_INK2, C_BG, x + w - tx);
+        }
+    }
+    return lh + 4;
 }
 
 static int draw_answer(int x, int y, int w, const char *raw, int draw) {
@@ -631,6 +657,10 @@ static void draw_main(void) {
         for (int i = 0; i < c->nturns; i++) {
             app_turn *t = &c->turn[i];
             total += gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh0, 0) * lh0 + 8 + 8;
+            if (BUSY && i == c->nturns - 1 && STATUS[0])
+                total += draw_status(0, 0, pw, STATUS, STATUS_MONO, 1, 0);
+            else if (t->done && t->sum[0])
+                total += draw_status(0, 0, pw, t->sum, 0, 0, 0);
             total += t->a[0] ? draw_answer(0, 0, pw, t->a, 0) + 10 : 20;
         }
         clamp_scroll(total, bot - top);
@@ -644,6 +674,13 @@ static void draw_main(void) {
             gfx_rrect(px0 + 16, y, pw - 16, bh, 7, C_BUBBLE);
             gfx_text_wrap(px0 + 24, y + 4, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh, 1);
             y += bh + 8;
+            /* The status line sits between the question and the answer: live while this turn is
+             * generating, and the permanent one-line summary once it is done. */
+            if (BUSY && i == c->nturns - 1 && STATUS[0])
+                y += draw_status(px0, y, pw, STATUS, STATUS_MONO, 1, 1);
+            else if (t->done && t->sum[0])
+                y += draw_status(px0, y, pw, t->sum, 0, 0, 1);
+
             if (t->a[0]) y += draw_answer(px0, y, pw, t->a, 1) + 10;
             else { gfx_fill(px0, y + 4, 5, 9, C_INK); y += 20; }   /* streaming caret */
         }
@@ -806,22 +843,9 @@ void app_stream_token(const char *piece) {
     int n = (int)strlen(pending->a), m = (int)strlen(piece);
     if (n + m < (int)sizeof pending->a - 1) { memcpy(pending->a + n, piece, (size_t)m); pending->a[n + m] = 0; }
 }
-int app_history(const char **q, const char **a, int max) {
-    if (CUR < 0) return 0;
-    app_chat *c = &CHATS[CUR];
-    int n = 0;
-    /* exclude the turn currently being generated -- it has no answer yet */
-    int upto = c->nturns - (pending ? 1 : 0);
-    for (int i = 0; i < upto && n < max; i++) {
-        if (!c->turn[i].q[0]) continue;
-        q[n] = c->turn[i].q; a[n] = c->turn[i].a; n++;
-    }
-    return n;
-}
 
-void app_set_summary(const char *s) {
-    if (pending && s) snprintf(pending->sum, sizeof pending->sum, "%s", s);
-}
+
+
 
 /* Derive the compact summary from the finished turn: relation, the values that went in, and the
  * result the evaluator returned. Called at stream end, when <res> is present if it ever will be.
@@ -909,6 +933,24 @@ int app_context(char *out, int cap, int budget) {
  * Cleared on read: an abort must not survive into the next question. */
 int app_take_abort(void) { int a = ABORT; ABORT = 0; return a; }
 int app_busy(void) { return BUSY; }
+
+void app_status(const char *label, const char *mono) {
+    snprintf(STATUS, sizeof STATUS, "%s", label ? label : "");
+    snprintf(STATUS_MONO, sizeof STATUS_MONO, "%s", mono ? mono : "");
+}
+void app_status_done(unsigned ms, const char *tool_call, const char *tool_result, int tool_ok) {
+    if (!pending) return;
+    /* The line that STAYS. It reports elapsed time always, and a tool only when one ran -- a
+     * summary that claims "used eval" on a turn with no call would be a fabricated provenance
+     * claim, which is the exact thing the hidden result chip was doing before. */
+    if (tool_call && tool_call[0])
+        snprintf(pending->sum, sizeof pending->sum, "%u.%us  %s %s %s",
+                 ms / 1000, (ms % 1000) / 100, tool_call, tool_ok ? "->" : "refused",
+                 tool_result ? tool_result : "");
+    else
+        snprintf(pending->sum, sizeof pending->sum, "%u.%us", ms / 1000, (ms % 1000) / 100);
+    STATUS[0] = 0; STATUS_MONO[0] = 0;
+}
 int app_hit_stop(int x, int y) { return BUSY && inside(R_SEND, x, y); }
 
 void app_stream_end(void) {
