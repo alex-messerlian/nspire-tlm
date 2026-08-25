@@ -2,11 +2,11 @@
  *
  * SHIPS THE TRAINING-TIME SCORER VERBATIM. A shipped scorer that bands differently from the one the
  * corpus was generated against teaches one rule and applies another, and both components would test
- * clean in isolation. Term overlap over record names is what fit-v1 was computed with, so it is what
+ * clean in isolation. Term overlap over record names is what the corpus was generated with, so it is what
  * runs here.
  *
  * The assembler emits three things the model is TRAINED to read and cannot function without:
- *   fit:high|low   band from the top-1 / top-2 margin      (threshold 0.35, fit-v1)
+ *   fit:high|low   band from the top-1 / top-2 comparative rule    (fit-v2, refusal.py)
  *   missing:X|none required variable absent from the question
  *   inlined constants  record-supplied values moved into the givens
  */

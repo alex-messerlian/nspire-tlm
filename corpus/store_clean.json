@@ -1,0 +1,2193 @@
+[
+ {
+  "f": "F=-k*x",
+  "name": "Hooke's law",
+  "units": {
+   "F": "N",
+   "k": "N/m",
+   "x": "m"
+  },
+  "scope": "m54154",
+  "req": "restoring force, signed: negative means opposite to the displacement",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "487677f5"
+ },
+ {
+  "f": "W=Q_h-Q_c",
+  "name": "net work of a heat engine per cycle",
+  "units": {
+   "W": "J",
+   "Q_c": "J",
+   "Q_h": "J"
+  },
+  "scope": "m58408",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "531ab622"
+ },
+ {
+  "f": "Delta_p=m*Delta_v",
+  "name": "momentum change from a velocity change",
+  "units": {
+   "Delta_p": "kg*m/s",
+   "Delta_v": "m/s",
+   "m": "kg"
+  },
+  "scope": "m42579",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "355ecd21"
+ },
+ {
+  "f": "E_f=h*f",
+  "name": "Energy of a photon",
+  "units": {
+   "E_f": "J",
+   "f": "Hz",
+   "h": "J*s"
+  },
+  "scope": "m58766",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "f347be72",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "I_0=((V_0)/(Z))",
+  "name": "AC version of Ohm's law",
+  "units": {
+   "I_0": "A",
+   "V_0": "V",
+   "Z": "ohm"
+  },
+  "scope": "m58494",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "0d2314f0"
+ },
+ {
+  "f": "P=(((V)^(2))/(R))",
+  "name": "electrical power from voltage and resistance",
+  "units": {
+   "P": "W",
+   "R": "ohm",
+   "V": "V"
+  },
+  "scope": "m54446",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e31335c4"
+ },
+ {
+  "f": "P=((1)/(f))",
+  "name": "Optical power",
+  "units": {
+   "P": "1/m",
+   "f": "m"
+  },
+  "scope": "m58534",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "04bd5ae7"
+ },
+ {
+  "f": "Delta_t=((h)/(E))",
+  "name": "Approximate time for exchange of a virtual particle between two other particles",
+  "units": {
+   "Delta_t": "s",
+   "E": "J",
+   "h": "J*s"
+  },
+  "scope": "m58776",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e596c35a",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "Delta_U=Q-W",
+  "name": "first law of thermodynamics",
+  "units": {
+   "Delta_U": "J",
+   "Q": "J",
+   "W": "J"
+  },
+  "scope": "m54305",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "9b66aa28"
+ },
+ {
+  "f": "E=m*(c)^(2)",
+  "name": "energy-mass conversion",
+  "units": {
+   "E": "J",
+   "c": "m/s",
+   "m": "kg"
+  },
+  "scope": "m54574",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "67252c3c",
+  "cval": {
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "Delta_x=x_f-x_i",
+  "name": "Displacement",
+  "units": {
+   "Delta_x": "m",
+   "x_f": "m",
+   "x_i": "m"
+  },
+  "scope": "m58287",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "4e83a423"
+ },
+ {
+  "f": "f=(Delta_E_LK)/h",
+  "name": "photon frequency from an energy-level difference",
+  "units": {
+   "f": "Hz",
+   "Delta_E_LK": "J",
+   "h": "J*s"
+  },
+  "scope": "m58590",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "900a3ca0",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "L=((v_w)/(4*f_1))",
+  "name": "length of a closed tube from its fundamental",
+  "units": {
+   "L": "m",
+   "f_1": "Hz",
+   "v_w": "m/s"
+  },
+  "scope": "m42296",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "7ae06e9b"
+ },
+ {
+  "f": "Eff_C=1-((T_c)/(T_h))",
+  "name": "Carnot efficiency",
+  "units": {
+   "Eff_C": "1",
+   "T_c": "s",
+   "T_h": "s"
+  },
+  "scope": "m42235",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "861cee95"
+ },
+ {
+  "f": "p=((F)/(A))",
+  "name": "Pressure",
+  "units": {
+   "p": "Pa",
+   "A": "m^2",
+   "F": "N"
+  },
+  "scope": "m58359",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "4db2af61"
+ },
+ {
+  "f": "a_CM=R*alpha",
+  "name": "Acceleration of center of mass of rolling object",
+  "units": {
+   "a_CM": "m/s^2",
+   "R": "m",
+   "alpha": "1/s^2"
+  },
+  "scope": "m58338",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "79b5145a"
+ },
+ {
+  "f": "epsilon=B*l*v",
+  "name": "Motionally induced emf",
+  "units": {
+   "epsilon": "V",
+   "B": "T",
+   "l": "m",
+   "v": "m/s"
+  },
+  "scope": "m58482",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b213e3a5"
+ },
+ {
+  "f": "E_n=-E_0*((1)/((n)^(2)))",
+  "name": "electron energy in the nth Bohr orbit",
+  "units": {
+   "E_n": "J",
+   "E_0": "J",
+   "n": "1"
+  },
+  "scope": "m58766",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "38fd7e71"
+ },
+ {
+  "f": "omega=sqrt(((k)/(m)))",
+  "name": "Angular frequency of a mass-spring system in SHM",
+  "units": {
+   "omega": "1/s",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "66cbf9bc"
+ },
+ {
+  "f": "tau=R*C",
+  "name": "Time constant",
+  "units": {
+   "tau": "s",
+   "C": "F",
+   "R": "ohm"
+  },
+  "scope": "m58458",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "6938afd5"
+ },
+ {
+  "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+  "name": "Frequency of a mass-spring system in SHM",
+  "units": {
+   "f": "Hz",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "22347cbf"
+ },
+ {
+  "f": "C=((Q)/(V))",
+  "name": "Capacitance",
+  "units": {
+   "C": "F",
+   "Q": "C",
+   "V": "V"
+  },
+  "scope": "m58452",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "96e237b0"
+ },
+ {
+  "f": "g=((4*(pi)^(2)*L)/((T)^(2)))",
+  "name": "gravitational acceleration from a pendulum period",
+  "units": {
+   "g": "m/s^2",
+   "L": "m",
+   "T": "s"
+  },
+  "scope": "m42243",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "6ad3352f"
+ },
+ {
+  "f": "V_rms=((V_0)/(sqrt(2)))",
+  "name": "rms voltage",
+  "units": {
+   "V_rms": "V",
+   "V_0": "V"
+  },
+  "scope": "m58494",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "76438db8"
+ },
+ {
+  "f": "Delta_T_F=T_F2-T_F1",
+  "name": "change in Fahrenheit temperature",
+  "units": {
+   "Delta_T_F": "s",
+   "T_F1": "s",
+   "T_F2": "s"
+  },
+  "scope": "m58385",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "ace7e584"
+ },
+ {
+  "f": "P_ave=I_rms*V_rms",
+  "name": "average AC power from rms current and voltage",
+  "units": {
+   "P_ave": "W",
+   "I_rms": "A",
+   "V_rms": "V"
+  },
+  "scope": "m42348",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "abd3ddd8"
+ },
+ {
+  "f": "n=((c)/(v))",
+  "name": "Index of refraction",
+  "units": {
+   "n": "1",
+   "c": "m/s",
+   "v": "m/s"
+  },
+  "scope": "m58525",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "5c19df12",
+  "cval": {
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "f_1=((v)/(4*L))",
+  "name": "fundamental frequency of a closed tube",
+  "units": {
+   "f_1": "Hz",
+   "L": "m",
+   "v": "m/s"
+  },
+  "scope": "m54335",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "cd499e23"
+ },
+ {
+  "f": "M=((theta_image)/(theta_object))",
+  "name": "Angular magnification M of a simple magnifier",
+  "units": {
+   "M": "1",
+   "theta_image": "1",
+   "theta_object": "1"
+  },
+  "scope": "m58534",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "c246907d"
+ },
+ {
+  "f": "P=(I)^(2)*R",
+  "name": "power dissipated in a resistor",
+  "units": {
+   "P": "W",
+   "I": "A",
+   "R": "ohm"
+  },
+  "scope": "m54446",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "5c4d75a1"
+ },
+ {
+  "f": "f_beat=|f_2-f_1|",
+  "name": "beat frequency from two waves that differ in frequency",
+  "units": {
+   "f_beat": "Hz",
+   "f_1": "Hz",
+   "f_2": "Hz"
+  },
+  "scope": "m58382",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "502d83d6"
+ },
+ {
+  "f": "m=rho*V",
+  "name": "mass from density and volume",
+  "units": {
+   "m": "kg",
+   "V": "m^3",
+   "rho": "kg/m^3"
+  },
+  "scope": "m42187",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "d005aec3"
+ },
+ {
+  "f": "p_abs=p_g+p_atm",
+  "name": "Absolute pressure",
+  "units": {
+   "p_abs": "Pa",
+   "p_atm": "Pa",
+   "p_g": "Pa"
+  },
+  "scope": "m58359",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "dce41bce"
+ },
+ {
+  "f": "lambda=((h*c)/(E))",
+  "name": "photon wavelength from energy",
+  "units": {
+   "lambda": "m",
+   "E": "J",
+   "c": "m/s",
+   "h": "J*s"
+  },
+  "scope": "m68732",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "0de180f2",
+  "cval": {
+   "h": "6.626e-34",
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "m=F_net/a",
+  "name": "mass from net force and acceleration",
+  "units": {
+   "m": "kg",
+   "F_net": "N",
+   "a": "m/s^2"
+  },
+  "scope": "m58297",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "11f2a56d"
+ },
+ {
+  "f": "U_E=((1)/(2))*C*(V)^(2)",
+  "name": "energy stored in a capacitor",
+  "units": {
+   "U_E": "J",
+   "C": "F",
+   "V": "V"
+  },
+  "scope": "m63179",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "2f41a91e"
+ },
+ {
+  "f": "F_net=m*a",
+  "name": "Newton's second law, scalar form",
+  "units": {
+   "F_net": "N",
+   "a": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m58301",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "578b92bf"
+ },
+ {
+  "f": "v_t=r*omega",
+  "name": "Tangential speed",
+  "units": {
+   "v_t": "m/s",
+   "omega": "1/s",
+   "r": "m"
+  },
+  "scope": "m58333",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "cdd5d3d7"
+ },
+ {
+  "f": "x=v_0x*t",
+  "name": "horizontal displacement in projectile motion",
+  "units": {
+   "x": "m",
+   "t": "s",
+   "v_0x": "m/s"
+  },
+  "scope": "m42042",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "2c78f2d0"
+ },
+ {
+  "f": "a=((m_2)/(m_1+m_2))*g",
+  "name": "acceleration of two blocks connected over a pulley",
+  "units": {
+   "a": "m/s^2",
+   "g": "m/s^2",
+   "m_1": "kg",
+   "m_2": "kg"
+  },
+  "scope": "m58303",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "8e6fab7b"
+ },
+ {
+  "f": "C_p=C_V+R",
+  "name": "Molar heat capacity at constant pressure",
+  "units": {
+   "C_p": "J/(mol*K)",
+   "C_V": "J/(mol*K)",
+   "R": "J/(mol*K)"
+  },
+  "scope": "m58401",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "50002c06",
+  "cval": {
+   "R": "8.314"
+  }
+ },
+ {
+  "f": "s=r*theta",
+  "name": "arc length",
+  "units": {
+   "s": "m",
+   "r": "m",
+   "theta": "1"
+  },
+  "scope": "m51283",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "c74413fa"
+ },
+ {
+  "f": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))",
+  "name": "Acceleration of an object rolling without slipping",
+  "units": {
+   "a_CM": "m/s^2",
+   "I_CM": "kg*m^2",
+   "g": "m/s^2",
+   "m": "kg",
+   "r": "m",
+   "theta": "1"
+  },
+  "scope": "m58338",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "7600847d"
+ },
+ {
+  "f": "C_V=((d)/(2))*R",
+  "name": "Molar heat capacity at constant volume for an ideal gas with d degrees of freedom",
+  "units": {
+   "C_V": "J/(mol*K)",
+   "R": "J/(mol*K)",
+   "d": "1"
+  },
+  "scope": "m58394",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "33bd23ae",
+  "cval": {
+   "R": "8.314"
+  }
+ },
+ {
+  "f": "I_2=I_1*((((r_1)/(r_2))))^(2)",
+  "name": "Decrease in intensity as a spherical wave expands",
+  "units": {
+   "I_2": "W/m^2",
+   "I_1": "W/m^2",
+   "r_1": "m",
+   "r_2": "m"
+  },
+  "scope": "m58382",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "a1c77827"
+ },
+ {
+  "f": "F=q*v*B*sin(theta)",
+  "name": "Magnitude of magnetic force",
+  "units": {
+   "F": "N",
+   "B": "T",
+   "q": "C",
+   "theta": "1",
+   "v": "m/s"
+  },
+  "scope": "m58745",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "55634e62"
+ },
+ {
+  "f": "v_CM=R*omega",
+  "name": "Velocity of center of mass of rolling object",
+  "units": {
+   "v_CM": "m/s",
+   "R": "m",
+   "omega": "1/s"
+  },
+  "scope": "m58338",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "273ecd9a"
+ },
+ {
+  "f": "E=(Delta_m)(c)^(2)",
+  "name": "Binding energy",
+  "units": {
+   "E": "J",
+   "Delta_m": "kg",
+   "c": "m/s"
+  },
+  "scope": "m58614",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "605c05f1",
+  "cval": {
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "Delta_theta=((Delta_s)/(r))",
+  "name": "Angle of rotation",
+  "units": {
+   "Delta_theta": "1",
+   "Delta_s": "m",
+   "r": "m"
+  },
+  "scope": "m54176",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "367eb9fd"
+ },
+ {
+  "f": "U=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "name": "Potential-energy function of a harmonic oscillator",
+  "units": {
+   "U": "J",
+   "m": "kg",
+   "omega": "1/s",
+   "x": "m"
+  },
+  "scope": "m58582",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "63d812bf"
+ },
+ {
+  "f": "I=((P)/(4*pi*(r)^(2)))",
+  "name": "Intensity for a spherical wave",
+  "units": {
+   "I": "W/m^2",
+   "P": "W",
+   "r": "m"
+  },
+  "scope": "m58373",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e885ea28"
+ },
+ {
+  "f": "I=((((Delta_p_max))^(2))/(2*rho*v))",
+  "name": "Intensity of sound",
+  "units": {
+   "I": "W/m^2",
+   "Delta_p_max": "Pa",
+   "rho": "kg/m^3",
+   "v": "m/s"
+  },
+  "scope": "m58382",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "72e1bd2e"
+ },
+ {
+  "f": "I_rms=((I_0)/(sqrt(2)))",
+  "name": "rms current",
+  "units": {
+   "I_rms": "A",
+   "I_0": "A"
+  },
+  "scope": "m58494",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "3c1d3c0c"
+ },
+ {
+  "f": "a_t=r*alpha",
+  "name": "Tangential acceleration",
+  "units": {
+   "a_t": "m/s^2",
+   "alpha": "1/s^2",
+   "r": "m"
+  },
+  "scope": "m58333",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "575a619b"
+ },
+ {
+  "f": "p=((h)/(lambda))",
+  "name": "momentum of a photon (deBroglie relation)",
+  "units": {
+   "p": "kg*m/s",
+   "h": "J*s",
+   "lambda": "m"
+  },
+  "scope": "m54552",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "623dd433",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "v=v_0+a*t",
+  "name": "Velocity",
+  "units": {
+   "v": "m/s",
+   "a": "m/s^2",
+   "t": "s",
+   "v_0": "m/s"
+  },
+  "scope": "m54094",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "210d62a9"
+ },
+ {
+  "f": "omega=v/r",
+  "name": "angular velocity from tangential speed",
+  "units": {
+   "omega": "1/s",
+   "r": "m",
+   "v": "m/s"
+  },
+  "scope": "m42183",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "2e627e65"
+ },
+ {
+  "f": "a=((Delta_v)/(Delta_t))",
+  "name": "Acceleration",
+  "units": {
+   "a": "m/s^2",
+   "Delta_t": "s",
+   "Delta_v": "m/s"
+  },
+  "scope": "m54094",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "7a3549b6"
+ },
+ {
+  "f": "theta_2=asin(((n_1*sin(theta_1))/(n_2)))",
+  "name": "Law of refraction (Snell's law)",
+  "units": {
+   "theta_2": "1",
+   "n_1": "1",
+   "n_2": "1",
+   "theta_1": "1"
+  },
+  "scope": "m58525",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "c148d89a"
+ },
+ {
+  "f": "k=((F)/(x))",
+  "name": "spring constant from force and extension",
+  "units": {
+   "k": "N/m",
+   "F": "N",
+   "x": "m"
+  },
+  "scope": "m54154",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "f4a620c2"
+ },
+ {
+  "f": "K=(n)^(2)*E_1",
+  "name": "energy of the nth level of a particle in a box",
+  "units": {
+   "K": "J",
+   "E_1": "J",
+   "n": "1"
+  },
+  "scope": "m58580",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "f2c3acfd"
+ },
+ {
+  "f": "L=I*omega",
+  "name": "Angular momentum of a rotating rigid body",
+  "units": {
+   "L": "kg*m^2/s",
+   "I": "kg*m^2",
+   "omega": "1/s"
+  },
+  "scope": "m58338",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "d0a3fcea"
+ },
+ {
+  "f": "P=F*v",
+  "name": "power from force and velocity",
+  "units": {
+   "P": "W",
+   "F": "N",
+   "v": "m/s"
+  },
+  "scope": "m58734",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e9fca28e"
+ },
+ {
+  "f": "Q=((omega_0)/(Delta_omega))",
+  "name": "Quality factor of a circuit",
+  "units": {
+   "Q": "1",
+   "Delta_omega": "1/s",
+   "omega_0": "1/s"
+  },
+  "scope": "m58494",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "29ee028f"
+ },
+ {
+  "f": "I=((P)/(A))",
+  "name": "Intensity",
+  "units": {
+   "I": "W/m^2",
+   "A": "m^2",
+   "P": "W"
+  },
+  "scope": "m58373",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "ddf10169"
+ },
+ {
+  "f": "v=v_0-g*t",
+  "name": "velocity in free fall, upward positive",
+  "units": {
+   "v": "m/s",
+   "g": "m/s^2",
+   "t": "s",
+   "v_0": "m/s"
+  },
+  "scope": "m58286",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "90852813"
+ },
+ {
+  "f": "W_o=F_o*d_o",
+  "name": "output work",
+  "units": {
+   "W_o": "J",
+   "F_o": "N",
+   "d_o": "m"
+  },
+  "scope": "m54274",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "db63654a"
+ },
+ {
+  "f": "m=m_R+m_g",
+  "name": "total mass from rocket and propellant",
+  "units": {
+   "m": "kg",
+   "m_R": "kg",
+   "m_g": "kg"
+  },
+  "scope": "m58324",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "72803d8e"
+ },
+ {
+  "f": "theta=((s)/(r))",
+  "name": "Angular position",
+  "units": {
+   "theta": "1",
+   "r": "m",
+   "s": "m"
+  },
+  "scope": "m58333",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "4aca8d85"
+ },
+ {
+  "f": "f=((d_i*d_o)/(d_o+d_i))",
+  "name": "lens/mirror equation (solved version)",
+  "units": {
+   "f": "m",
+   "d_i": "m",
+   "d_o": "m"
+  },
+  "scope": "m54357",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b2042904"
+ },
+ {
+  "f": "f=((R)/(2))",
+  "name": "Focal length for a spherical mirror",
+  "units": {
+   "f": "m",
+   "R": "m"
+  },
+  "scope": "m58534",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "cb81ba93"
+ },
+ {
+  "f": "F=((m*Delta_v)/(Delta_t))",
+  "name": "force from rate of momentum change",
+  "units": {
+   "F": "N",
+   "Delta_t": "s",
+   "Delta_v": "m/s",
+   "m": "kg"
+  },
+  "scope": "m42159",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "448943fb"
+ },
+ {
+  "f": "n=((K/E_1))^(1/2)",
+  "name": "quantum number from energy, particle in a box",
+  "units": {
+   "n": "1",
+   "E_1": "J",
+   "K": "J"
+  },
+  "scope": "m58580",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "dadbe3fc"
+ },
+ {
+  "f": "v=((lambda)/(T))",
+  "name": "wave speed from wavelength and period",
+  "units": {
+   "v": "m/s",
+   "T": "s",
+   "lambda": "m"
+  },
+  "scope": "m58368",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e23687aa"
+ },
+ {
+  "f": "lambda=((h)/(m*v))",
+  "name": "de Broglie wavelength from mass and speed",
+  "units": {
+   "lambda": "m",
+   "h": "J*s",
+   "m": "kg",
+   "v": "m/s"
+  },
+  "scope": "m68733",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "a4b71601",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "Delta_S=((Q)/(T))",
+  "name": "Entropy of a system undergoing a reversible process at a constant temperature",
+  "units": {
+   "Delta_S": "J/K",
+   "Q": "J",
+   "T": "K"
+  },
+  "scope": "m58408",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e8d2ab71"
+ },
+ {
+  "f": "d_CM=R*theta",
+  "name": "Displacement of center of mass of rolling object",
+  "units": {
+   "d_CM": "m",
+   "R": "m",
+   "theta": "1"
+  },
+  "scope": "m58338",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "0b3564c4"
+ },
+ {
+  "f": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))",
+  "name": "Relativistic Doppler effect for frequency",
+  "units": {
+   "f_obs": "Hz",
+   "c": "m/s",
+   "f_s": "Hz",
+   "v": "m/s"
+  },
+  "scope": "m58572",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "5c4e160d",
+  "cval": {
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "P=tau*omega",
+  "name": "Rotational power",
+  "units": {
+   "P": "W",
+   "omega": "1/s",
+   "tau": "N*m"
+  },
+  "scope": "m58333",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "05008a12"
+ },
+ {
+  "f": "v=a*t",
+  "name": "velocity from constant acceleration starting at rest",
+  "units": {
+   "v": "m/s",
+   "a": "m/s^2",
+   "t": "s"
+  },
+  "scope": "m58345",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "cb854c8b"
+ },
+ {
+  "f": "h_i=(((n_2)/(n_1)))*h_o",
+  "name": "image height from object height and refractive indices",
+  "units": {
+   "h_i": "m",
+   "h_o": "m",
+   "n_1": "1",
+   "n_2": "1"
+  },
+  "scope": "m58534",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "10224ce2",
+  "req": "flat refracting surface; h_i and h_o are heights, not depths"
+ },
+ {
+  "f": "f=((1)/(T))",
+  "name": "Relationship between frequency and period",
+  "units": {
+   "f": "Hz",
+   "T": "s"
+  },
+  "scope": "m58366",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "a1020bfb"
+ },
+ {
+  "f": "Delta_l=d*sin(theta)",
+  "name": "Path length difference for waves from two slits to a common point on a screen",
+  "units": {
+   "Delta_l": "m",
+   "d": "m",
+   "theta": "1"
+  },
+  "scope": "m58541",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "5c19d41a"
+ },
+ {
+  "f": "x=x_0+v_x*t",
+  "name": "horizontal position under constant velocity",
+  "units": {
+   "x": "m",
+   "t": "s",
+   "v_x": "m/s",
+   "x_0": "m"
+  },
+  "scope": "m42042",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "1c8ff6b2"
+ },
+ {
+  "f": "omega_f=omega_0+alpha*t",
+  "name": "Angular velocity from constant angular acceleration",
+  "units": {
+   "omega_f": "1/s",
+   "alpha": "1/s^2",
+   "omega_0": "1/s",
+   "t": "s"
+  },
+  "scope": "m58333",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "91cbfe4e"
+ },
+ {
+  "f": "theta_r=theta_i",
+  "name": "Law of reflection",
+  "units": {
+   "theta_r": "1",
+   "theta_i": "1"
+  },
+  "scope": "m58525",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "d1723d1c"
+ },
+ {
+  "f": "lambda_n=((lambda)/(n))",
+  "name": "change of wavelength with index of refraction",
+  "units": {
+   "lambda_n": "m",
+   "lambda": "m",
+   "n": "1"
+  },
+  "scope": "m54369",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "44f4b86d"
+ },
+ {
+  "f": "N=m*g*cos(theta)",
+  "name": "normal force on an object on an inclined plane",
+  "units": {
+   "N": "N",
+   "g": "m/s^2",
+   "m": "kg",
+   "theta": "1"
+  },
+  "scope": "m58301",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "2265b236"
+ },
+ {
+  "f": "W_net=K_B-K_A",
+  "name": "Work-energy theorem",
+  "units": {
+   "W_net": "J",
+   "K_A": "J",
+   "K_B": "J"
+  },
+  "scope": "m58310",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "4bf407e0"
+ },
+ {
+  "f": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+  "name": "Drag force",
+  "units": {
+   "F_D": "N",
+   "A": "m^2",
+   "C": "1",
+   "rho": "kg/m^3",
+   "v": "m/s"
+  },
+  "scope": "m58306",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b4001f82"
+ },
+ {
+  "f": "T=((2*pi*m)/(q*B))",
+  "name": "Period of a particle's motion in a magnetic field",
+  "units": {
+   "T": "s",
+   "B": "T",
+   "m": "kg",
+   "q": "C"
+  },
+  "scope": "m58745",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b19adaa8"
+ },
+ {
+  "f": "Delta_T_F=((9)/(5))*(T_C2-T_C1)",
+  "name": "Fahrenheit change from a Celsius change",
+  "units": {
+   "Delta_T_F": "s",
+   "T_C1": "s",
+   "T_C2": "s"
+  },
+  "scope": "m58385",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "528fdd0b"
+ },
+ {
+  "f": "A=((1)/(2))*theta*(r)^(2)",
+  "name": "area of a sector",
+  "units": {
+   "A": "m^2",
+   "r": "m",
+   "theta": "1"
+  },
+  "scope": "m51283",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "accfa62f"
+ },
+ {
+  "f": "W_out=W_in-W_f",
+  "name": "output work after friction losses",
+  "units": {
+   "W_out": "J",
+   "W_f": "J",
+   "W_in": "J"
+  },
+  "scope": "m42193",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "125f0673"
+ },
+ {
+  "f": "R=V/I",
+  "name": "resistance from voltage and current",
+  "units": {
+   "R": "ohm",
+   "I": "A",
+   "V": "V"
+  },
+  "scope": "m58732",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "8d2cb915"
+ },
+ {
+  "f": "N=m*g",
+  "name": "normal force on an object on a horizontal surface",
+  "units": {
+   "N": "N",
+   "g": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m58301",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "cd6f4f69"
+ },
+ {
+  "f": "f=((c)/(lambda))",
+  "name": "frequency from wavelength",
+  "units": {
+   "f": "Hz",
+   "c": "m/s",
+   "lambda": "m"
+  },
+  "scope": "m54559",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "6cd2846e",
+  "cval": {
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "Delta_S_tot=Delta_S_h+Delta_S_c",
+  "name": "total entropy change of system and surroundings",
+  "units": {
+   "Delta_S_tot": "J/K",
+   "Delta_S_c": "J/K",
+   "Delta_S_h": "J/K"
+  },
+  "scope": "m42237",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e63ae0f6"
+ },
+ {
+  "f": "alpha=((Delta_omega)/(Delta_t))",
+  "name": "Angular acceleration",
+  "units": {
+   "alpha": "1/s^2",
+   "Delta_omega": "1/s",
+   "Delta_t": "s"
+  },
+  "scope": "m54180",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "34515feb"
+ },
+ {
+  "f": "alpha=((a_t)/(r))",
+  "name": "angular acceleration from tangential acceleration",
+  "units": {
+   "alpha": "1/s^2",
+   "a_t": "m/s^2",
+   "r": "m"
+  },
+  "scope": "m42177",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "a5633cc7"
+ },
+ {
+  "f": "F_net=((Delta_p)/(Delta_t))",
+  "name": "net force from rate of momentum change",
+  "units": {
+   "F_net": "N",
+   "Delta_p": "kg*m/s",
+   "Delta_t": "s"
+  },
+  "scope": "m42156",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "12c2b0d9"
+ },
+ {
+  "f": "V=((U_E)/(q))",
+  "name": "definition of electric potential",
+  "units": {
+   "V": "V",
+   "U_E": "J",
+   "q": "C"
+  },
+  "scope": "m54426",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "90821924"
+ },
+ {
+  "f": "v_toty=v_wy+v_p",
+  "name": "resultant velocity from component velocities",
+  "units": {
+   "v_toty": "m/s",
+   "v_p": "m/s",
+   "v_wy": "m/s"
+  },
+  "scope": "m42045",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "9079d136"
+ },
+ {
+  "f": "a=((F)/(m))",
+  "name": "acceleration from force and mass",
+  "units": {
+   "a": "m/s^2",
+   "F": "N",
+   "m": "kg"
+  },
+  "scope": "m42132",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b654f4e0"
+ },
+ {
+  "f": "U_form=E_transfer+U_coul+U_ex",
+  "name": "Energy change associated with ionic bonding",
+  "units": {
+   "U_form": "J",
+   "E_transfer": "J",
+   "U_coul": "J",
+   "U_ex": "J"
+  },
+  "scope": "m58602",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "5b69e739"
+ },
+ {
+  "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)",
+  "name": "Displacement with constant acceleration",
+  "units": {
+   "d": "m",
+   "a": "m/s^2",
+   "d_0": "m",
+   "t": "s",
+   "v_0": "m/s"
+  },
+  "scope": "m54116",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b10d34bd"
+ },
+ {
+  "f": "I_rms=V_rms/Z",
+  "name": "rms current from impedance",
+  "units": {
+   "I_rms": "A",
+   "V_rms": "V",
+   "Z": "ohm"
+  },
+  "scope": "m42431",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "76077a73"
+ },
+ {
+  "f": "Delta_p=F_net*Delta_t",
+  "name": "impulse-momentum theorem",
+  "units": {
+   "Delta_p": "kg*m/s",
+   "Delta_t": "s",
+   "F_net": "N"
+  },
+  "scope": "m54215",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "1672f61e"
+ },
+ {
+  "f": "R_eqv=((1)/(1/R_1+1/R_2))",
+  "name": "equivalent resistance of two resistors in parallel",
+  "units": {
+   "R_eqv": "ohm",
+   "R_1": "ohm",
+   "R_2": "ohm"
+  },
+  "scope": "m54442",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "01184cdc"
+ },
+ {
+  "f": "lambda=((h)/(p))",
+  "name": "The de Broglie wavelength",
+  "units": {
+   "lambda": "m",
+   "h": "J*s",
+   "p": "kg*m/s"
+  },
+  "scope": "m58766",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "7567f564",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "E=K+U",
+  "name": "total mechanical energy",
+  "units": {
+   "E": "J",
+   "K": "J",
+   "U": "J"
+  },
+  "scope": "m58314",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "da1e3585"
+ },
+ {
+  "f": "F_c=m*a_c",
+  "name": "Centripetal force",
+  "units": {
+   "F_c": "N",
+   "a_c": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m54181",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "fb70c38d"
+ },
+ {
+  "f": "T_F=((E_F)/(k_B))",
+  "name": "Fermi temperature",
+  "units": {
+   "T_F": "K",
+   "E_F": "J",
+   "k_B": "J/K"
+  },
+  "scope": "m58602",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "1b79087c",
+  "cval": {
+   "k_B": "1.381e-23"
+  }
+ },
+ {
+  "f": "I_1=I_2+I_3",
+  "name": "Kirchhoff junction rule",
+  "units": {
+   "I_1": "A",
+   "I_2": "A",
+   "I_3": "A"
+  },
+  "scope": "m42359",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "7f892172"
+ },
+ {
+  "f": "W_i=F_i*d_i",
+  "name": "input work",
+  "units": {
+   "W_i": "J",
+   "F_i": "N",
+   "d_i": "m"
+  },
+  "scope": "m54274",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "adc72d99"
+ },
+ {
+  "f": "Q=Delta_E_int-W",
+  "name": "heat from internal energy change and work",
+  "units": {
+   "Q": "J",
+   "Delta_E_int": "J",
+   "W": "J"
+  },
+  "scope": "m58407",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "66414fd7"
+ },
+ {
+  "f": "E=P*t",
+  "name": "energy from power and time",
+  "units": {
+   "E": "J",
+   "P": "W",
+   "t": "s"
+  },
+  "scope": "m58734",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "1827d133"
+ },
+ {
+  "f": "omega=((theta)/(t))",
+  "name": "angular speed",
+  "units": {
+   "omega": "1/s",
+   "t": "s",
+   "theta": "1"
+  },
+  "scope": "m51283",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "71c9d308"
+ },
+ {
+  "f": "x=l-l_0",
+  "name": "extension from length change",
+  "units": {
+   "x": "m",
+   "l": "m",
+   "l_0": "m"
+  },
+  "scope": "m58719",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "010f5b78"
+ },
+ {
+  "f": "I_S=((N_P)/(N_S))*I_P",
+  "name": "Transformer equation with current",
+  "units": {
+   "I_S": "A",
+   "I_P": "A",
+   "N_P": "1",
+   "N_S": "1"
+  },
+  "scope": "m58494",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "9380ed12"
+ },
+ {
+  "f": "Delta_y=x*lambda/d",
+  "name": "fringe spacing in double-slit interference",
+  "units": {
+   "Delta_y": "m",
+   "d": "m",
+   "lambda": "m",
+   "x": "m"
+  },
+  "scope": "m58538",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "6ce19794"
+ },
+ {
+  "f": "E=((h*c)/(lambda))",
+  "name": "photon energy from wavelength",
+  "units": {
+   "E": "J",
+   "c": "m/s",
+   "h": "J*s",
+   "lambda": "m"
+  },
+  "scope": "m42596",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "4ce7f072",
+  "cval": {
+   "h": "6.626e-34",
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "rho=((m)/(V))",
+  "name": "density from mass and volume",
+  "units": {
+   "rho": "kg/m^3",
+   "V": "m^3",
+   "m": "kg"
+  },
+  "scope": "m58359",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "8c3fb7eb"
+ },
+ {
+  "f": "V=I*R",
+  "name": "Common expression of Ohm's law",
+  "units": {
+   "V": "V",
+   "I": "A",
+   "R": "ohm"
+  },
+  "scope": "m58735",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "8f12b5dc"
+ },
+ {
+  "f": "E=h*f",
+  "name": "photon energy from frequency",
+  "units": {
+   "E": "J",
+   "f": "Hz",
+   "h": "J*s"
+  },
+  "scope": "m58766",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "101ca2fd",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "P=((W)/(t))",
+  "name": "power",
+  "units": {
+   "P": "W",
+   "W": "J",
+   "t": "s"
+  },
+  "scope": "m54271",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "9813f994"
+ },
+ {
+  "f": "v=d/t",
+  "name": "average speed",
+  "units": {
+   "d": "m",
+   "t": "s",
+   "v": "m/s"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "df802213"
+ },
+ {
+  "f": "F=m*a",
+  "name": "Newton's second law",
+  "units": {
+   "m": "kg",
+   "F": "N",
+   "a": "m/s^2"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "5d4d128a"
+ },
+ {
+  "f": "K=0.5*m*(v)^(2)",
+  "name": "kinetic energy",
+  "units": {
+   "K": "J",
+   "m": "kg",
+   "v": "m/s"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "2d3f8551"
+ },
+ {
+  "f": "U=m*g*h",
+  "name": "gravitational potential energy",
+  "units": {
+   "g": "m/s^2",
+   "m": "kg",
+   "U": "J",
+   "h": "m"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "6205e51a"
+ },
+ {
+  "f": "p=m*v",
+  "name": "momentum",
+  "units": {
+   "p": "kg*m/s",
+   "m": "kg",
+   "v": "m/s"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "fe7aab2b"
+ },
+ {
+  "f": "W=F*d",
+  "name": "work done by a constant force",
+  "units": {
+   "W": "J",
+   "d": "m",
+   "F": "N"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "ec2b938d"
+ },
+ {
+  "f": "a=(v)^(2)/r",
+  "name": "centripetal acceleration",
+  "units": {
+   "r": "m",
+   "a": "m/s^2",
+   "v": "m/s"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "71239b8d"
+ },
+ {
+  "f": "P=V*I",
+  "name": "electrical power",
+  "units": {
+   "V": "V",
+   "P": "W",
+   "I": "A"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "634246e4"
+ },
+ {
+  "f": "tau=r*F",
+  "name": "torque",
+  "units": {
+   "r": "m",
+   "tau": "N*m",
+   "F": "N"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "552b6c8e"
+ },
+ {
+  "f": "v_d=E/B",
+  "name": "drift velocity in crossed electric and magnetic fields",
+  "units": {
+   "E": "V/m",
+   "B": "T",
+   "v_d": "m/s"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "1e141220"
+ },
+ {
+  "f": "p=p_0+rho*g*h",
+  "name": "pressure at depth in a fluid",
+  "units": {
+   "p": "Pa",
+   "rho": "kg/m^3",
+   "p_0": "Pa",
+   "g": "m/s^2",
+   "h": "m"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "fcdd583a"
+ },
+ {
+  "f": "F=q*v*B",
+  "name": "magnetic force on a moving charge",
+  "units": {
+   "v": "m/s",
+   "q": "C",
+   "B": "T",
+   "F": "N"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "5f2c9c2b"
+ },
+ {
+  "f": "V=((k_e*q)/(r))",
+  "name": "electric potential of a point charge",
+  "units": {
+   "V": "V",
+   "q": "C",
+   "k_e": "V*m/C",
+   "r": "m"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "f0c8cb87"
+ },
+ {
+  "f": "E=((sigma)/(epsilon_0))",
+  "name": "electric field at a charged conducting surface",
+  "units": {
+   "E": "V/m",
+   "epsilon_0": "C^2/(N*m^2)",
+   "sigma": "C/m^2"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "d1109352",
+  "cval": {
+   "epsilon_0": "8.854e-12"
+  }
+ },
+ {
+  "f": "F=G*m1*m2/(r)^(2)",
+  "name": "Newton's law of universal gravitation",
+  "units": {
+   "F": "N",
+   "G": "N*m^2/kg^2",
+   "m1": "kg",
+   "m2": "kg",
+   "r": "m"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "eb57ecf5",
+  "cval": {
+   "G": "6.674e-11"
+  }
+ },
+ {
+  "f": "Q=m*c*dT",
+  "name": "heat transferred with no phase change",
+  "units": {
+   "Q": "J",
+   "m": "kg",
+   "c": "J/(kg*K)",
+   "dT": "K"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "b67a93e8"
+ },
+ {
+  "f": "a=(vf-vi)/t",
+  "name": "uniform acceleration",
+  "units": {
+   "a": "m/s^2",
+   "vf": "m/s",
+   "vi": "m/s",
+   "t": "s"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "verified": "unverifiable-no-source",
+  "rid": "e3c3da51"
+ },
+ {
+  "f": "d=vi*t+0.5*a*(t)^(2)",
+  "name": "displacement under uniform acceleration",
+  "units": {
+   "d": "m",
+   "vi": "m/s",
+   "a": "m/s^2",
+   "t": "s"
+  },
+  "scope": "canonical",
+  "source": "hand",
+  "note": "solvable for d, vi, a; t requires the numeric route (symbolic quadratic is E3, descoped)",
+  "verified": "unverifiable-no-source",
+  "rid": "1d68eb92"
+ },
+ {
+  "f": "C=epsilon_0*((A)/(d))",
+  "name": "Capacitance of a parallel-plate capacitor",
+  "units": {
+   "C": "F",
+   "A": "m^2",
+   "d": "m",
+   "epsilon_0": "C^2/(N*m^2)"
+  },
+  "scope": "m58452",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "81efd9cb",
+  "cval": {
+   "epsilon_0": "8.854e-12"
+  }
+ },
+ {
+  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
+  "name": "Distance",
+  "units": {
+   "d": "m",
+   "x_1": "m",
+   "x_2": "m",
+   "y_1": "m",
+   "y_2": "m"
+  },
+  "scope": "m51256",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "ecb41e76"
+ },
+ {
+  "f": "v=((omega)/(k))",
+  "name": "Wave speed",
+  "units": {
+   "v": "m/s",
+   "k": "1/m",
+   "omega": "1/s"
+  },
+  "scope": "m58373",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e907adc0"
+ },
+ {
+  "f": "Delta_E=h*Delta_f",
+  "name": "energy difference from a frequency difference",
+  "units": {
+   "Delta_E": "J",
+   "Delta_f": "Hz",
+   "h": "J*s"
+  },
+  "scope": "m58578",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "af962d41",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "v_d=((I)/(n*q*A))",
+  "name": "Drift velocity",
+  "units": {
+   "v_d": "m/s",
+   "A": "m^2",
+   "I": "A",
+   "n": "1/m^3",
+   "q": "C"
+  },
+  "scope": "m58735",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "56f0223d"
+ },
+ {
+  "f": "lambda=((c)/(f))",
+  "name": "wavelength from frequency",
+  "units": {
+   "lambda": "m",
+   "c": "m/s",
+   "f": "Hz"
+  },
+  "scope": "m59792",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "0e63208a",
+  "cval": {
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "w=m*g",
+  "name": "Definition of weight, scalar form",
+  "units": {
+   "w": "N",
+   "g": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m58301",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "12cd9116"
+ },
+ {
+  "f": "T=((1)/(f))",
+  "name": "period",
+  "units": {
+   "T": "s",
+   "f": "Hz"
+  },
+  "scope": "m54321",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "f2f00c8c"
+ },
+ {
+  "f": "omega=((Delta_theta)/(Delta_t))",
+  "name": "angular speed from angular displacement",
+  "units": {
+   "omega": "1/s",
+   "Delta_t": "s",
+   "Delta_theta": "1"
+  },
+  "scope": "m54176",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b891bbb8"
+ },
+ {
+  "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
+  "name": "Height of free fall",
+  "units": {
+   "y": "m",
+   "g": "m/s^2",
+   "t": "s",
+   "v_0": "m/s",
+   "y_0": "m"
+  },
+  "scope": "m58287",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "11a8fb85"
+ },
+ {
+  "f": "B=((mu_0*I)/(2*pi*R))",
+  "name": "magnetic field due to a long straight wire",
+  "units": {
+   "B": "T",
+   "I": "A",
+   "R": "m",
+   "mu_0": "T*m/A"
+  },
+  "scope": "m58467",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "1a8db093",
+  "cval": {
+   "mu_0": "1.257e-6"
+  }
+ },
+ {
+  "f": "E_b=h*f_O",
+  "name": "binding energy of an electron",
+  "units": {
+   "E_b": "J",
+   "h": "J*s",
+   "f_O": "Hz"
+  },
+  "scope": "m54559",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "06d6c249",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "v=f*lambda",
+  "name": "Velocity of a wave",
+  "units": {
+   "v": "m/s",
+   "f": "Hz",
+   "lambda": "m"
+  },
+  "scope": "m58382",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "0b4c082c"
+ },
+ {
+  "f": "y=y_0+((1)/(2))(v_0y+v_y)t",
+  "name": "vertical position from average vertical velocity",
+  "units": {
+   "y": "m",
+   "t": "s",
+   "v_0y": "m/s",
+   "v_y": "m/s",
+   "y_0": "m"
+  },
+  "scope": "m42042",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "776a4aba"
+ },
+ {
+  "f": "E=n*h*f",
+  "name": "quantum energy",
+  "units": {
+   "E": "J",
+   "f": "Hz",
+   "h": "J*s",
+   "n": "1"
+  },
+  "scope": "m54566",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "08ec66d9",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ },
+ {
+  "f": "R_eqv=R_1+R_2",
+  "name": "equivalent resistance of two resistors in series",
+  "units": {
+   "R_eqv": "ohm",
+   "R_1": "ohm",
+   "R_2": "ohm"
+  },
+  "scope": "m54442",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "77e7a335"
+ },
+ {
+  "f": "a_c=(((v)^(2))/(r))",
+  "name": "Centripetal acceleration",
+  "units": {
+   "a_c": "m/s^2",
+   "r": "m",
+   "v": "m/s"
+  },
+  "scope": "m54181",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "095d6f2e"
+ },
+ {
+  "f": "T_tof=((2(v_0*sin(theta_0)))/(g))",
+  "name": "Time of flight",
+  "units": {
+   "T_tof": "s",
+   "g": "m/s^2",
+   "theta_0": "1",
+   "v_0": "m/s"
+  },
+  "scope": "m58293",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "2a4a8866"
+ },
+ {
+  "f": "T=2*pi*sqrt(((m)/(k)))",
+  "name": "Period of a mass-spring system in SHM",
+  "units": {
+   "T": "s",
+   "k": "N/m",
+   "m": "kg"
+  },
+  "scope": "m58366",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "97988a02"
+ },
+ {
+  "f": "m=Delta_E/(c)^(2)",
+  "name": "mass from energy equivalence",
+  "units": {
+   "m": "kg",
+   "Delta_E": "J",
+   "c": "m/s"
+  },
+  "scope": "m42669",
+  "source": "worked-example",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "e04377e1",
+  "cval": {
+   "c": "2.998e8"
+  }
+ },
+ {
+  "f": "r=((m*v)/(q*B))",
+  "name": "Radius of a particle's path in a magnetic field",
+  "units": {
+   "r": "m",
+   "B": "T",
+   "m": "kg",
+   "q": "C",
+   "v": "m/s"
+  },
+  "scope": "m58745",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "ca43e731"
+ },
+ {
+  "f": "Delta_E=h*f",
+  "name": "Energy quantum of radiation",
+  "units": {
+   "Delta_E": "J",
+   "f": "Hz",
+   "h": "J*s"
+  },
+  "scope": "m58766",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "6d1dc0b1",
+  "cval": {
+   "h": "6.626e-34"
+  }
+ }
+]

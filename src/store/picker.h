@@ -1,0 +1,19 @@
+#ifndef NS_PICKER_H
+#define NS_PICKER_H
+#include "loader.h"
+#define NS_MAX_FAMILIES 24
+#define NS_FAMILY_ROWS  15          /* list rows visible at 320x240 with chrome */
+
+typedef struct { const char *name; int count; } ns_family;
+
+/* Families are derived from the UNIT of the solved-for variable through a fixed unit->family map.
+ * A map over ~30 units, NOT a hand-labelled taxonomy over 166 records: a new record assigns its
+ * own family, so the taxonomy cannot drift from the store. All 166 records map; no Other bucket. */
+int  ns_family_of(const ns_store2 *st, int rec_index);      /* -1 if unmapped */
+int  ns_families(const ns_store2 *st, ns_family *out, int max);
+int  ns_records_in_family(const ns_store2 *st, int fam, int *out, int max);
+/* Case-insensitive substring filter over record NAMES. scope<0 filters all records. */
+int  ns_filter(const ns_store2 *st, int scope_fam, const char *q, int *out, int max);
+const char *ns_family_name(int fam);
+int  ns_family_count(void);
+#endif

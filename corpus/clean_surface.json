@@ -1,0 +1,1419 @@
+{
+ "meta": {
+  "protocol": "docs/CLEAN_SURFACE_PROTOCOL.md",
+  "stem_source": "OpenStax via corpus/stems_all.json",
+  "stem_preceded_record": true,
+  "labeller_blind_to_store": false,
+  "none_was_available": true,
+  "draw_seed": 20260824,
+  "labels_by": "physics relation, not term overlap",
+  "relabelled_after_store_clean": 1,
+  "orphans_repaired_2026_08_24": {
+   "relabelled": 8,
+   "demoted_to_none": 1
+  }
+ },
+ "items": [
+  {
+   "i": 0,
+   "stem": "What is the total angle, in radians, through which a point on the flywheel rotates in 40 s?",
+   "formula": "omega=((theta)/(t))",
+   "record_name": "angular speed",
+   "source": "openstax"
+  },
+  {
+   "i": 1,
+   "stem": "5 kJ of heat were added to 485 g of liquid water, how much would its temperature increase?",
+   "formula": "Q=m*c*dT",
+   "record_name": "heat transferred with no phase change",
+   "source": "openstax"
+  },
+  {
+   "i": 2,
+   "stem": "500 kg-m 2 , what is the rotational kinetic energy of the forearm?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 3,
+   "stem": "Compute &#x222C; S F \u00b7 N d S , where F ( x , y , z ) = x y z i + x y z j + x y z k and N is an outward normal vector S , where S is the surface of the five faces of the unit cube 0 \u2264 x \u2264 1 , 0 \u2264 y \u2264 1 , 0 \u2264 z \u2264 1 missing z = 0 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 4,
+   "stem": "70 m 2 ) (b) What is the drag force at 70 km/h and 100 km/h for a Hummer H2?",
+   "formula": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+   "record_name": "Drag force",
+   "source": "openstax"
+  },
+  {
+   "i": 5,
+   "stem": "What is the velocity of an electron that goes through a 10 V potential after initially being at rest?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 6,
+   "stem": "Find the flux through a circle of radius 3 cm between the plates when the normal to the circle makes an angle of 5 \u00b0 with a line perpendicular to the plates.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 7,
+   "stem": "If the object experiences a friction force of 10 N and accelerates at 18 m/s 2 , what is the magnitude of the force exerted by the person?",
+   "formula": "F_net=m*a",
+   "record_name": "Newton\u2019s second law, scalar form",
+   "source": "openstax"
+  },
+  {
+   "i": 8,
+   "stem": "Determine que los \u00e1ngulos de depresi\u00f3n de dos hitos, separados por 4,3 km, son de 32\u00b0 y 56\u00b0, como se muestra en la .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 9,
+   "stem": "0 m and 20 m below his launch point, what is his initial speed?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 10,
+   "stem": "Find the charge on the capacitor in an RLC series circuit where L = 40 H, R = 30 \u03a9 , C = 1 / 200 F, and E ( t ) = 200 V.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 11,
+   "stem": "What is the total translational kinetic energy of the air molecules in a room of volume 23 m 3 if the pressure is 9.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 12,
+   "stem": "0 cm of fiberglass to the attic, by what percentage would the heating cost of the house drop?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 13,
+   "stem": "0 W of microwaves (other than those sent by its antenna) uniformly in all directions, how far away must you be to be exposed to an intensity considered to be safe?",
+   "formula": "I=((P)/(4*pi*(r)^(2)))",
+   "record_name": "Intensity for a spherical wave",
+   "source": "openstax"
+  },
+  {
+   "i": 14,
+   "stem": "If n = 500 turns per meter, I 0 = 20 A, and A = 20 cm 2 , what is the emf induced in the loop when d A / d t = 100 ?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 15,
+   "stem": "2 s and runs at constant speed throughout the race, what is her centripetal acceleration as she runs the curved portion of the track?",
+   "formula": "a_c=(((v)^(2))/(r))",
+   "record_name": "Centripetal acceleration",
+   "source": "openstax"
+  },
+  {
+   "i": 16,
+   "stem": "(b) How fast must air move over the upper surface at a cruising speed of 245 m/s and at an altitude where air density is one-fourth that at sea level?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 17,
+   "stem": "How much heat transfer occurs from a system, if its internal energy decreased by 150 J while it was doing 30.",
+   "formula": "Delta_U=Q-W",
+   "record_name": "first law of thermodynamics",
+   "source": "openstax"
+  },
+  {
+   "i": 18,
+   "stem": "If the wheel has a mass of 5 kg, what is its velocity at the bottom of the basin?",
+   "formula": "E=K+U",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 19,
+   "stem": "7 g of carbon dioxide is produced, what mass of ethanol is produced?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 20,
+   "stem": "If the engine absorbs 100 J per cycle at the hot reservoir, what is its work output per cycle?",
+   "formula": "W=Q_h-Q_c",
+   "record_name": "Result of energy conservation",
+   "source": "openstax"
+  },
+  {
+   "i": 21,
+   "stem": "Find the greatest common factor: 25 m 4 , 35 m 3 , 20 m 2 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 22,
+   "stem": "If a tsunami travels at the speed of 600 km/h and approaches a shore at a rate of one wave crest every 15 min (4 waves/h), what would be the distance between those wave crests at sea?",
+   "formula": "v=f*lambda",
+   "record_name": "Velocity of a wave",
+   "source": "openstax"
+  },
+  {
+   "i": 23,
+   "stem": "(b) If 400 J per cycle are removed from the triple-point reservoir while 200 J per cycle are deposited in the heat reservoir, what is the temperature of the heat reservoir?",
+   "formula": "Delta_S=((Q)/(T))",
+   "record_name": "Entropy of a system undergoing a reversible process at a constant temperature",
+   "source": "openstax"
+  },
+  {
+   "i": 24,
+   "stem": "0 Hz, what are its first three overtones?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 25,
+   "stem": "0 A/s, what is the emf induced per unit length?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 26,
+   "stem": "(a) What are the magnitudes of drag forces at 70 km/h and 100 km/h for a Toyota Camry?",
+   "formula": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+   "record_name": "Drag force",
+   "source": "openstax"
+  },
+  {
+   "i": 27,
+   "stem": "20 s, what is the average emf induced in it?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 28,
+   "stem": "50 g, what is the net vertical force on the balloon if it is let go?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 29,
+   "stem": "(b) How much work is required to stretch it an additional 6 cm?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 30,
+   "stem": "(d) If E = 16 J , what are the speeds of the particle at the positions listed in part (a)?",
+   "formula": "E=K+U",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 31,
+   "stem": "(c) What is the average power at 120 Hz?",
+   "formula": "P_ave=I_rms*V_rms",
+   "record_name": "Power Losses Are Less for High-Voltage Transmission",
+   "source": "openstax"
+  },
+  {
+   "i": 32,
+   "stem": "Find the apparent size of a 25-m tree at a distance of 10 km that you would perceive when looking through the telescope.",
+   "formula": "M=((theta_image)/(theta_object))",
+   "record_name": "Angular magnification M of a simple magnifier",
+   "source": "openstax"
+  },
+  {
+   "i": 33,
+   "stem": "25 kg straight upward with an initial speed of 20 m / s When the ball returns to the boy, its speed is 17 m / s How much much work does air resistance do on the ball during its flight?",
+   "formula": "W_net=K_B-K_A",
+   "record_name": "Work-energy theorem",
+   "source": "openstax"
+  },
+  {
+   "i": 34,
+   "stem": "(c) How much energy is stored in it when stretched by the 100 N force?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 35,
+   "stem": "How far is the moon from the planet when it is 260,000 km from f 2 ?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 36,
+   "stem": "(a) If 400 J per cycle are removed from the heat reservoir while 200 J per cycle are deposited in the triple-point reservoir, what is the temperature of the heat reservoir?",
+   "formula": "Delta_S=((Q)/(T))",
+   "record_name": "Entropy of a system undergoing a reversible process at a constant temperature",
+   "source": "openstax"
+  },
+  {
+   "i": 37,
+   "stem": "(b) What is the fraction of 40 K in natural potassium, given that the person has 140 g in his body?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 38,
+   "stem": "Calculate the force on the rod due to the Earth\u2019s magnetic field, if you throw it with a horizontal velocity of 10 m/s due west in a place where the Earth\u2019s field is due north parallel to the ground.",
+   "formula": "F=q*v*B",
+   "record_name": "F=q*v*B",
+   "source": "openstax"
+  },
+  {
+   "i": 39,
+   "stem": "(a) What is the instantaneous angular velocity of the rod at t = 5 s ?",
+   "formula": "omega_f=omega_0+alpha*t",
+   "record_name": "Angular velocity from constant angular acceleration",
+   "source": "openstax"
+  },
+  {
+   "i": 40,
+   "stem": "15 \u00d7 10 \u221214 J is required to trip the signal, what is the minimum number of photons that must strike the receptor?",
+   "formula": "E=((h*c)/(lambda))",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 41,
+   "stem": "Find the quotient: ( m 2 + 9 m + 20 ) \u00f7 ( m + 4 ) .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 42,
+   "stem": "Gravity above Earth\u2019s Surface What is the value of g 400 km above Earth\u2019s surface, where the International Space Station is in orbit?",
+   "formula": "F=G*m1*m2/(r)^(2)",
+   "record_name": "Newton's law of universal gravitation",
+   "source": "openstax"
+  },
+  {
+   "i": 43,
+   "stem": "How much will the temperature of a cup (180 g) of coffee at 95 \u00b0C be reduced when a 45 g silver spoon (specific heat 0.",
+   "formula": "Q=m*c*dT",
+   "record_name": "heat transferred with no phase change",
+   "source": "openstax"
+  },
+  {
+   "i": 44,
+   "stem": "What is the area in c m 2 when the side length is 2cm ?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 45,
+   "stem": "--> If it takes 10 mJ to move a charge q from x i = 25 cm to x f = \u2212 25 cm in an electric field of ( \u009620 N/C ) x ^ , what is the charge q ?",
+   "formula": "W=F*d",
+   "record_name": "work done by a constant force",
+   "source": "openstax"
+  },
+  {
+   "i": 46,
+   "stem": "(b) To what location should the point at 20 cm be moved to increase this potential difference by a factor of two?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 47,
+   "stem": "(b) What is the position of the boat at t = 10s?",
+   "formula": "x=x_0+v_x*t",
+   "record_name": "A Fireworks Projectile Explodes High and Away",
+   "source": "openstax"
+  },
+  {
+   "i": 48,
+   "stem": "Finding the Perimeter of an Octagon Find the perimeter of a regular octagon with a side length of 14 cm ( ).",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 49,
+   "stem": "What is the maximum angular magnification obtained by an older person with a near point of 45 cm?",
+   "formula": "M=((theta_image)/(theta_object))",
+   "record_name": "Angular magnification M of a simple magnifier",
+   "source": "openstax"
+  },
+  {
+   "i": 50,
+   "stem": "0 kg, what is the tension in the connecting string?",
+   "formula": "F=m*a",
+   "record_name": "Newton's second law",
+   "source": "openstax"
+  },
+  {
+   "i": 51,
+   "stem": "(a) How far away is the planet Venus if the echo time is 1000 s?",
+   "formula": "v=d/t",
+   "record_name": "average speed",
+   "source": "openstax"
+  },
+  {
+   "i": 52,
+   "stem": "If Trooper runs 20 m west before taking a rest, what is his displacement vector?",
+   "formula": "Delta_x=x_f-x_i",
+   "record_name": "Displacement",
+   "source": "openstax"
+  },
+  {
+   "i": 53,
+   "stem": "(a) If it requires 200 J of work per cycle, how much heat per cycle does it remove the cold reservoir?",
+   "formula": "W=Q_h-Q_c",
+   "record_name": "Result of energy conservation",
+   "source": "openstax"
+  },
+  {
+   "i": 54,
+   "stem": "If such a string operates on 120 V and has 39 remaining identical bulbs, what is then the operating voltage of each?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 55,
+   "stem": "To what maximum height from the uncompressed spring can a child jump on the stick using only the energy in the spring, if the child and stick have a total mass of 40 kg?",
+   "formula": "U=m*g*h",
+   "record_name": "gravitational potential energy",
+   "source": "openstax"
+  },
+  {
+   "i": 56,
+   "stem": "--> What is the magnitude of a vector whose x -component is 4 cm and whose y -component is 3 cm?",
+   "formula": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
+   "record_name": "Distance",
+   "source": "openstax"
+  },
+  {
+   "i": 57,
+   "stem": "Using the graph, what is the runner\u2019s velocity from 4 to 10 s?",
+   "formula": "v=d/t",
+   "record_name": "average speed",
+   "source": "openstax"
+  },
+  {
+   "i": 58,
+   "stem": "Approximately what is the force due to the Bernoulli effect on a roof having an area of 220 m 2 ?",
+   "formula": "p=((F)/(A))",
+   "record_name": "Pressure",
+   "source": "openstax"
+  },
+  {
+   "i": 59,
+   "stem": "(b) What angle is subtended by a 25,000 km-diameter sunspot?",
+   "formula": "theta=((s)/(r))",
+   "record_name": "Angular position",
+   "source": "openstax"
+  },
+  {
+   "i": 60,
+   "stem": "If the ball lands 20 m above the spot where it was hit, how much work is done on it by air resistance?",
+   "formula": "W_net=K_B-K_A",
+   "record_name": "Work-energy theorem",
+   "source": "openstax"
+  },
+  {
+   "i": 61,
+   "stem": "If the bounciest one were dropped from a height of 300 cm, what equation would model its bounce height h ?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 62,
+   "stem": "What is v rms for argon atoms near the filament, assuming their temperature is 2500 K?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 63,
+   "stem": "(a) What is the power delivered to the wheels when the car travels at 30 m/s?",
+   "formula": "P=F*v",
+   "record_name": "Calculating Power in Electric Devices",
+   "source": "openstax"
+  },
+  {
+   "i": 64,
+   "stem": "5 \u00d7 10 \u2212 2 m/s 2 in the direction shown, what is the drag force of the water on the barge resisting the motion?",
+   "formula": "F=m*a",
+   "record_name": "Newton's second law",
+   "source": "openstax"
+  },
+  {
+   "i": 65,
+   "stem": "(b) If the temperature of a blackbody is 800 K, at what wavelength does it radiate the most energy?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 66,
+   "stem": "Find h \u2032 ( 1 ) if h ( x ) = x f ( x ) + 4 g ( x ) .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 67,
+   "stem": "Find the coefficient of kinetic friction for the skier if friction is known to be 25 N .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 68,
+   "stem": "Calculate the necessary heat of vaporization of 1 g of water: Q = mL v = 1 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 69,
+   "stem": "If we have 100 g carbon- 14 today, how much is left in 50 years?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 70,
+   "stem": "Calculate the acceleration produced when the professor exerts a backward force of 150 N on the floor.",
+   "formula": "a=((F)/(m))",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 71,
+   "stem": "(c) If the voltage source has V rms = 408 V , what is I rms at each frequency?",
+   "formula": "I_rms=V_rms/Z",
+   "record_name": "Calculating Impedance and Current",
+   "source": "openstax"
+  },
+  {
+   "i": 72,
+   "stem": "3 cm from the center, what is the total distance traveled by the dust in 3 minutes?",
+   "formula": "s=r*theta",
+   "record_name": "arc length",
+   "source": "openstax"
+  },
+  {
+   "i": 73,
+   "stem": "(a) How much does the cable stretch if a 100 N force is exerted to pull the satellite in?",
+   "formula": "F=-k*x",
+   "record_name": "Hooke's law",
+   "source": "openstax"
+  },
+  {
+   "i": 74,
+   "stem": "Assuming that 120 V is applied across the lightbulb, what is the current through the lightbulb?",
+   "formula": "V=I*R",
+   "record_name": "Common expression of Ohm\u2019s law",
+   "source": "openstax"
+  },
+  {
+   "i": 75,
+   "stem": "Calculate how much this tension stretches the steel wire if it was originally 15 m long and 0.",
+   "formula": "F=-k*x",
+   "record_name": "Hooke's law",
+   "source": "openstax"
+  },
+  {
+   "i": 76,
+   "stem": "(c) What is the magnitude and direction of the total linear acceleration of the tip of the blade that lies along the positive x -axis at t = 0 s?",
+   "formula": "a_t=r*alpha",
+   "record_name": "Tangential acceleration",
+   "source": "openstax"
+  },
+  {
+   "i": 77,
+   "stem": "If the gases of the preceding problem are initially at 300 K, what are their internal energies after they absorb the heat?",
+   "formula": "Delta_U=Q-W",
+   "record_name": "first law of thermodynamics",
+   "source": "openstax"
+  },
+  {
+   "i": 78,
+   "stem": "4 kg and its radius is 30 cm, and the distance from the center of mass to the pivot is 40 cm, what is the rotation rate in rev/s of the disk?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 79,
+   "stem": "90 \u00d7 10 5 Pa (b) What is unreasonable about this (a) result?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 80,
+   "stem": "(b) What voltage was applied if 500 J of energy was dissipated?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 81,
+   "stem": "(b) Based on that percent uncertainty, what mass in pound-mass has an uncertainty of 1 kg when converted to kilograms?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 82,
+   "stem": "000 m), (a) how far is it from the corner of the screen?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 83,
+   "stem": "50 cm of water, what is the effective surface tension of the balloon?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 84,
+   "stem": "(c) If they returned home by the same path 7 h 30 min after they left, what were their average speed and velocity for the entire trip?",
+   "formula": "v=d/t",
+   "record_name": "average speed",
+   "source": "openstax"
+  },
+  {
+   "i": 85,
+   "stem": "0 cm , and the current in the solenoid is changing at a rate of 200 A/s, what is the emf induced in the surrounding coil?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 86,
+   "stem": "What is the back emf of a 120 V motor that draws 8.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 87,
+   "stem": "At what speed is the musician approaching if the speed of sound is 338 m/s?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 88,
+   "stem": "60 \u00d7 10 \u201315 J, what is the wavelength of the photon after the collision with the electron?",
+   "formula": "E=((h*c)/(lambda))",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 89,
+   "stem": "8 min Check Your Learning What is the half-life (min) for the thermal decomposition of ammonia on tungsten (see )?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 90,
+   "stem": "How far from the starter cable of a car, carrying 150 A, must you be to experience a field less than the Earth\u2019s ( 5 .",
+   "formula": "B=((mu_0*I)/(2*pi*R))",
+   "record_name": "Magnetic field due to along straight wire",
+   "source": "openstax"
+  },
+  {
+   "i": 91,
+   "stem": "0 \u00d7 10 5 Pa and 300 K, respectively, what are the final pressure and temperature of the gas?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 92,
+   "stem": "0255 m/s 2 , what is the force on the wagon?",
+   "formula": "F=m*a",
+   "record_name": "Newton's second law",
+   "source": "openstax"
+  },
+  {
+   "i": 93,
+   "stem": "(a) If each wire carries a current of 50 A in the same direction, what is the magnetic force per meter exerted on each wire?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 94,
+   "stem": "05 m from the tip of the shoe, what is the shoe tip\u2019s angular velocity?",
+   "formula": "v_t=r*omega",
+   "record_name": "Tangential speed",
+   "source": "openstax"
+  },
+  {
+   "i": 95,
+   "stem": "Calculate the work done on the particle by this force, as it moves in a straight line from the point (3 m, 4 m) to the point (6 m, 8 m).",
+   "formula": "W=F*d",
+   "record_name": "work done by a constant force",
+   "source": "openstax"
+  },
+  {
+   "i": 96,
+   "stem": "What if the velocity in the string were v = 686 m/s ?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 97,
+   "stem": "If the area of the plates is 500 cm 2 , what is the plate separation?",
+   "formula": "C=epsilon_0*((A)/(d))",
+   "record_name": "Capacitance of a parallel-plate capacitor",
+   "source": "openstax"
+  },
+  {
+   "i": 98,
+   "stem": "0 m/s 2 to the right, what is the magnitude F of the applied force?",
+   "formula": "F=m*a",
+   "record_name": "Newton's second law",
+   "source": "openstax"
+  },
+  {
+   "i": 99,
+   "stem": "If six of these lines cross a 40 cm path drawn between two points of interest, what is the (magnitude of the average) electric field along this path?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 100,
+   "stem": "When a negative charge is placed at x = 10 cm, what happens to the electric field lines between the charges?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 101,
+   "stem": "Find the average force on the feet if the person bends his legs throughout the impact so that his center of mass drops by 50 cm vertically and 5 cm horizontally during the impact.",
+   "formula": "W=F*d",
+   "record_name": "work done by a constant force",
+   "source": "openstax"
+  },
+  {
+   "i": 102,
+   "stem": "If 128 g of material is in the shape of a brick 2 cm wide, 4 cm high, and 8 cm long, what is the density of the material?",
+   "formula": "rho=((m)/(V))",
+   "record_name": "Density of a sample at constant density",
+   "source": "openstax"
+  },
+  {
+   "i": 103,
+   "stem": "00 \u00d7 10 5 kg (100 tons), what total yield nuclear explosion in tons of TNT is needed?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 104,
+   "stem": "Find the instantaneous acceleration at t = 1, 2, 3, and 5 s.",
+   "formula": "a=((Delta_v)/(Delta_t))",
+   "record_name": "Acceleration",
+   "source": "openstax"
+  },
+  {
+   "i": 105,
+   "stem": "600 m from the central maximum, what is the spacing of grooves on the CD?",
+   "formula": "Delta_l=d*sin(theta)",
+   "record_name": "Path length difference for waves from two slits to a common point on a screen",
+   "source": "openstax"
+  },
+  {
+   "i": 106,
+   "stem": "50 \u00d7 10 13 m 2 (a large fraction of North America), how much power does it radiate?",
+   "formula": "I=((P)/(A))",
+   "record_name": "Intensity",
+   "source": "openstax"
+  },
+  {
+   "i": 107,
+   "stem": "Find the number of children in each group, g , by solving the equation 4 g = 24 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 108,
+   "stem": "50 km/s , how far away is the epicenter of the earthquake?",
+   "formula": "v=d/t",
+   "record_name": "average speed",
+   "source": "openstax"
+  },
+  {
+   "i": 109,
+   "stem": "410 A, what is the magnitude of the magnetic field inside and near the middle of the solenoid?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 110,
+   "stem": "0 m, how much has the kinetic energy of the two-wagon system changed?",
+   "formula": "W_net=K_B-K_A",
+   "record_name": "Work-energy theorem",
+   "source": "openstax"
+  },
+  {
+   "i": 111,
+   "stem": "Finding the Sum of Scalar Multiples Find the sum 3 A + 2 B .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 112,
+   "stem": "If the sound waves travel through air at a speed of v = 343 m/s, what is the wavelength of the sound waves?",
+   "formula": "v=f*lambda",
+   "record_name": "Velocity of a wave",
+   "source": "openstax"
+  },
+  {
+   "i": 113,
+   "stem": "4 \u00d7 10 6 m at its equator, what is the linear velocity at Earth\u2019s surface?",
+   "formula": "v_t=r*omega",
+   "record_name": "Tangential speed",
+   "source": "openstax"
+  },
+  {
+   "i": 114,
+   "stem": "0 cm from the lens, what is the apparent image distance?",
+   "formula": "f=((d_i*d_o)/(d_o+d_i))",
+   "record_name": "lens/mirror equation (solved version)",
+   "source": "openstax"
+  },
+  {
+   "i": 115,
+   "stem": "600 cm thick and heat conduction occurs through a 14 cm radius and at a rate of 2256 W, what is the temperature difference across it?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 116,
+   "stem": "How much more light can be gathered by a telescope that is 8 m in diameter than by your fully dark-adapted eye at 7 mm?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 117,
+   "stem": "3 cm from the center, what is the total distance traveled by the dust in 3 minutes?",
+   "formula": "s=r*theta",
+   "record_name": "arc length",
+   "source": "openstax"
+  },
+  {
+   "i": 118,
+   "stem": "86 N, what is the coefficient of friction?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 119,
+   "stem": "Calculate the energy of a \u03b3 -ray photon that has a wavelength of 1 \u00d7 10 \u2212 16 m , small enough to detect details about one-tenth the size of a nucleon.",
+   "formula": "E=((h*c)/(lambda))",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 120,
+   "stem": "0 V, what is the time rate of change of the current in the wire?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 121,
+   "stem": "What is the kinetic energy after 2 m of travel?",
+   "formula": "W_net=K_B-K_A",
+   "record_name": "Work-energy theorem",
+   "source": "openstax"
+  },
+  {
+   "i": 122,
+   "stem": "0 \u00d7 10 5 N/C , what is the correct equation for the magnetic field wave at the antenna?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 123,
+   "stem": "00 s characteristic time constant, what is the minimum resistance of system?",
+   "formula": "tau=R*C",
+   "record_name": "Time constant",
+   "source": "openstax"
+  },
+  {
+   "i": 124,
+   "stem": "What are the spacecraft\u2019s accelerations at t = 0, 15, 30, and 35 s?",
+   "formula": "a=((Delta_v)/(Delta_t))",
+   "record_name": "Acceleration",
+   "source": "openstax"
+  },
+  {
+   "i": 125,
+   "stem": "Find the rate at which the area of the triangle changes when the height is 22 cm and the base is 10 cm.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 126,
+   "stem": "Find the rate at which the volume increases when the radius is 20 m.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 127,
+   "stem": "CH 4 ( g ) + 4Cl 2 ( g ) \u27f6 CCl 4 ( g ) + 4HCl ( g ) What is the equilibrium constant for the reaction at 850 K?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 128,
+   "stem": "Find the distance from the center of an artery with a velocity of 15 cm/sec, 10 cm/sec, and 5 cm/sec.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 129,
+   "stem": "What is the entropy change of 10 g of steam at 100 \u00b0C when it condenses to water at the same temperature?",
+   "formula": "Delta_S=((Q)/(T))",
+   "record_name": "Entropy of a system undergoing a reversible process at a constant temperature",
+   "source": "openstax"
+  },
+  {
+   "i": 130,
+   "stem": "5 m/s before the second child jumps on, what is its speed after she jumps on?",
+   "formula": "p=m*v",
+   "record_name": "momentum",
+   "source": "openstax"
+  },
+  {
+   "i": 131,
+   "stem": "What power is supplied to the starter motor of a large truck that draws 250 A of current from a 24.",
+   "formula": "P=V*I",
+   "record_name": "electrical power",
+   "source": "openstax"
+  },
+  {
+   "i": 132,
+   "stem": "Find the equation of motion if the mass is released from a position 5 m below its equilibrium position with an upward velocity of 10 m/sec.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 133,
+   "stem": "Determine the flow rate and the volume that passes through the artery in a period of 30 s.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax",
+   "note": "record deleted (Leibniz notation); store no longer serves this stem"
+  },
+  {
+   "i": 134,
+   "stem": "(b) What is the opponent\u2019s final velocity, if his mass is 105 kg and he is motionless in midair when struck near his center of mass?",
+   "formula": "p=m*v",
+   "record_name": "momentum",
+   "source": "openstax"
+  },
+  {
+   "i": 135,
+   "stem": "00 m above the ground, what is the total mechanical energy relative to the ground?",
+   "formula": "E=K+U",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 136,
+   "stem": "Find the mass of Jupiter based on the fact that Io, its innermost moon, has an average orbital radius of 421,700 km and a period of 1.",
+   "formula": "F=G*m1*m2/(r)^(2)",
+   "record_name": "Newton's law of universal gravitation",
+   "source": "openstax"
+  },
+  {
+   "i": 137,
+   "stem": "Find the height of an adult-size table by solving the equation 3 5 h = 18 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 138,
+   "stem": "Find the recoil velocity of a 70 kg ice hockey goalie who catches a 0.",
+   "formula": "p=m*v",
+   "record_name": "momentum",
+   "source": "openstax"
+  },
+  {
+   "i": 139,
+   "stem": "Find the quotient: 30 m 5 n 11 48 m 10 n 14 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 140,
+   "stem": "What work is required to stretch the spring from x = 0 to x = 2 m?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 141,
+   "stem": "If the two balls have equal masses of 300 g, what is the velocity of the ball 2 after the impact?",
+   "formula": "p=m*v",
+   "record_name": "momentum",
+   "source": "openstax"
+  },
+  {
+   "i": 142,
+   "stem": "(b) If the voltage source has V rms = 120 V , what is I rms at each frequency?",
+   "formula": "I_rms=V_rms/Z",
+   "record_name": "Calculating Impedance and Current",
+   "source": "openstax"
+  },
+  {
+   "i": 143,
+   "stem": "Calculating B -Field Strength in an Electromagnetic Wave What is the maximum strength of the B -field in an electromagnetic wave that has a maximum E -field strength of 1000 V/m ?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 144,
+   "stem": "What is the takeoff acceleration of a 10,000-kg ABM that expels 196 kg of gas per second at an exhaust velocity of 2 .",
+   "formula": "a=((F)/(m))",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 145,
+   "stem": "004 mol sugar Check Your Learning What volume (mL) of the sweetened tea described in contains the same amount of sugar (mol) as 10 mL of the soft drink in this example?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 146,
+   "stem": "What is the magnetic field inside the solenoid if its core is (a) a vacuum and (b) filled with liquid oxygen at 90 K?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 147,
+   "stem": "If 1 kg of carbon-11 sample exists at the beginning of an hour, (b) how much material will remain at the end of the hour and (c) what will be the decay activity at that time?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 148,
+   "stem": "Calculate the acceleration produced when the professor exerts a backward force of 150 N on the floor.",
+   "formula": "a=((F)/(m))",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 149,
+   "stem": "Find the maximum error in the volume of the cone if the machinist creates a cone of height 6 cm and radius 2 cm.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 150,
+   "stem": "Find the miles per gallons, m , of the hybrid car, by solving the equation 1 2 m = 18 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 151,
+   "stem": "(a) What is the mass of the infant and basket if a scale reading of 55 N is observed?",
+   "formula": "w=m*g",
+   "record_name": "Definition of weight, scalar form",
+   "source": "openstax"
+  },
+  {
+   "i": 152,
+   "stem": "What is the magnification of a magnifying lens with a focal length of 10 cm if it is held 3.",
+   "formula": "M=((theta_image)/(theta_object))",
+   "record_name": "Angular magnification M of a simple magnifier",
+   "source": "openstax"
+  },
+  {
+   "i": 153,
+   "stem": "Find the loss of power in the transmission lines if it is transmitted at (a) 200 kV (rms) and (b) 120 V (rms).",
+   "formula": "P=(I)^(2)*R",
+   "record_name": "for a given current I flowing through a resistance R, the electric power dissipated",
+   "source": "openstax"
+  },
+  {
+   "i": 154,
+   "stem": "(b) If we consider friction in this problem, with a friction force of 120 N, what is the acceleration of the safe?",
+   "formula": "F_net=m*a",
+   "record_name": "Newton\u2019s second law, scalar form",
+   "source": "openstax"
+  },
+  {
+   "i": 155,
+   "stem": "If a piano tuner hears two beats per second, and the tuning fork has a frequency of 256 Hz, what are the possible frequencies of the piano?",
+   "formula": "f_beat=|f_2-f_1|",
+   "record_name": "beat frequency from two waves that differ in frequency",
+   "source": "openstax"
+  },
+  {
+   "i": 156,
+   "stem": "00 kg , what is the magnitude of the acceleration of the block?",
+   "formula": "a=((F)/(m))",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 157,
+   "stem": "Find the work done when you push a box along the floor 2 m, when you apply a constant force of F = 100 N .",
+   "formula": "W=F*d",
+   "record_name": "work done by a constant force",
+   "source": "openstax"
+  },
+  {
+   "i": 158,
+   "stem": "(b) To what location should the point at 20 cm be moved to increase this potential difference by a factor of two?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 159,
+   "stem": "Find the probability of rolling a standard 6-sided die 60 times and getting exactly eight 6s using technology.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 160,
+   "stem": "What is the intensity of an electromagnetic wave with a peak electric field strength of 125 V/m?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 161,
+   "stem": "0 \u00d7 10 \u22125 T that is directed vertically downward, what is the resultant magnitude of the magnetic field 20 cm above the wire?",
+   "formula": "B=((mu_0*I)/(2*pi*R))",
+   "record_name": "Magnetic field due to along straight wire",
+   "source": "openstax"
+  },
+  {
+   "i": 162,
+   "stem": "00 km straight into an oncoming wind, what is the velocity of the wind?",
+   "formula": "v_toty=v_wy+v_p",
+   "record_name": "Calculating Velocity: Wind Velocity Causes an Airplane to Drift",
+   "source": "openstax"
+  },
+  {
+   "i": 163,
+   "stem": "How much charge must be added to the plates to increase the potential difference between them by 100 V?",
+   "formula": "C=((Q)/(V))",
+   "record_name": "Capacitance",
+   "source": "openstax"
+  },
+  {
+   "i": 164,
+   "stem": "What is the work done moving a particle from x = 0 to x = 1 m if the force acting on it is F = 3 x 2 N?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 165,
+   "stem": "How far in the future will this occur if the displacement to be made is 590 km northwest, assuming the motion remains constant?",
+   "formula": "v=d/t",
+   "record_name": "average speed",
+   "source": "openstax"
+  },
+  {
+   "i": 166,
+   "stem": "--> How much work is required from an outside agent to move an electron from x i = 0 to x f = 20 cm in an electric field ( 50 N/C ) x ^ ?",
+   "formula": "W=F*d",
+   "record_name": "work done by a constant force",
+   "source": "openstax"
+  },
+  {
+   "i": 167,
+   "stem": "What is the instantaneous rate of change of the radius when r = 6 cm ?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 168,
+   "stem": "What is the rotation rate of the propeller in 40 s?",
+   "formula": "omega=((theta)/(t))",
+   "record_name": "angular speed",
+   "source": "openstax"
+  },
+  {
+   "i": 169,
+   "stem": "00 A, what are the maximum output currents (each used alone)?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 170,
+   "stem": "(b) If it actually takes 900 s, what is the power?",
+   "formula": "P=((W)/(t))",
+   "record_name": "power",
+   "source": "openstax"
+  },
+  {
+   "i": 171,
+   "stem": "Calculate the force exerted by each of the 10 braces if a strong wind exerts a horizontal force of 650 N on each square meter of the wall.",
+   "formula": "p=((F)/(A))",
+   "record_name": "Pressure",
+   "source": "openstax"
+  },
+  {
+   "i": 172,
+   "stem": "300 m from the elbow joint, what is the angular velocity of the forearm?",
+   "formula": "v_t=r*omega",
+   "record_name": "Tangential speed",
+   "source": "openstax"
+  },
+  {
+   "i": 173,
+   "stem": "Find the rms speed: v rms = 3 R T M = 413 m s .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 174,
+   "stem": "If she is 300 m from the finish line when she starts to accelerate, how much time did she save?",
+   "formula": "d=vi*t+0.5*a*(t)^(2)",
+   "record_name": "displacement under uniform acceleration",
+   "source": "openstax"
+  },
+  {
+   "i": 175,
+   "stem": "If I 1 = 10 A and I 2 = 20 A , what is the magnetic field at point P?",
+   "formula": "B=((mu_0*I)/(2*pi*R))",
+   "record_name": "Magnetic field due to along straight wire",
+   "source": "openstax"
+  },
+  {
+   "i": 176,
+   "stem": "If a storm has a diameter of 400 km and rotates once in 24 h, what is the wind speed?",
+   "formula": "v_t=r*omega",
+   "record_name": "Tangential speed",
+   "source": "openstax"
+  },
+  {
+   "i": 177,
+   "stem": "If your body has a density of 995 kg /m 3 , what fraction of you will be submerged when floating gently in: (a) freshwater?",
+   "formula": "rho=((m)/(V))",
+   "record_name": "Density of a sample at constant density",
+   "source": "openstax"
+  },
+  {
+   "i": 178,
+   "stem": "2 A, what is the magnetic field within the solenoid?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 179,
+   "stem": "--> What is the velocity of a wave whose wavelength is 2 m and whose frequency is 5 Hz?",
+   "formula": "v=f*lambda",
+   "record_name": "Velocity of a wave",
+   "source": "openstax"
+  },
+  {
+   "i": 180,
+   "stem": "What additional information do we need to answer the question \u201cWhich ion has the electron configuration 1 s 2 2 s 2 2 p 6 3 s 2 3 p 6 \u201d?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 181,
+   "stem": "00 kg spacewalk to an awaiting spaceship, what is the new rotation rate when all the people are off the station?",
+   "formula": "L=I*omega",
+   "record_name": "Angular momentum of a rotating rigid body",
+   "source": "openstax"
+  },
+  {
+   "i": 182,
+   "stem": "If it took 3 ms for the bullet to change the speed from 400 m/s to the final speed after impact, what is the average force between the block and the bullet during this time?",
+   "formula": "F_net=((Delta_p)/(Delta_t))",
+   "record_name": "net force from rate of momentum change",
+   "source": "openstax"
+  },
+  {
+   "i": 183,
+   "stem": "If the boat velocity is 5 km/h due north in still water and the water has a current of 2 km/h due west (see the following figure), what is the velocity of the boat relative to shore?",
+   "formula": "v_toty=v_wy+v_p",
+   "record_name": "Calculating Velocity: Wind Velocity Causes an Airplane to Drift",
+   "source": "openstax"
+  },
+  {
+   "i": 184,
+   "stem": "If the crate of mass 50 kg moving at speed 8 m/s comes to rest in 10 seconds, what is the rate at which the frictional force on the crate takes energy away from the crate?",
+   "formula": "P=F*v",
+   "record_name": "Calculating Power in Electric Devices",
+   "source": "openstax"
+  },
+  {
+   "i": 185,
+   "stem": "10 s, what is the emf induced between the ends of the solenoid?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 186,
+   "stem": "How much charge must leak off its plates before the voltage across them is reduced by 100 V?",
+   "formula": "C=((Q)/(V))",
+   "record_name": "Capacitance",
+   "source": "openstax"
+  },
+  {
+   "i": 187,
+   "stem": "0 m above its starting point, how much thermal energy was generated by friction?",
+   "formula": "E=K+U",
+   "record_name": "(from worked example)",
+   "source": "openstax"
+  },
+  {
+   "i": 188,
+   "stem": "Find the amount of work performed by a 50-kg woman ascending a helical staircase with radius 2 m and height 100 m.",
+   "formula": "U=m*g*h",
+   "record_name": "gravitational potential energy",
+   "source": "openstax"
+  },
+  {
+   "i": 189,
+   "stem": "What is the rate at which the angle between you and the bus is changing when you are 20 m south of the intersection and the bus is 10 m west of the intersection?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 190,
+   "stem": "If the rod has a diameter of 1 cm and the IMA of the machine is 6, what is the radius of the handle?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 191,
+   "stem": "00 m: (a) What minimum charge must be used?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 192,
+   "stem": "Find the rate at which the water is leaking out of the cylinder if the rate at which the height is decreasing is 10 cm/min when the height is 1 m.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 193,
+   "stem": "Calculate the frequency and period of these oscillations for such a car if the car\u2019s mass (including its load) is 900 kg and the force constant ( k ) of the suspension system is 6 .",
+   "formula": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+   "record_name": "Frequency of a mass-spring system in SHM",
+   "source": "openstax"
+  },
+  {
+   "i": 194,
+   "stem": "2500 mol nicotine, what is the molecular formula?",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 195,
+   "stem": "Calculate the test statistic: t c = ( X \u00af 1 - X \u00af 2 ) - 0 s 1 2 n 2 + s 2 2 n 2 = ( 74 .",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  },
+  {
+   "i": 196,
+   "stem": "70 m 2 ) (b) What is the magnitude of drag force at 70 km/h and 100 km/h for a Hummer H2?",
+   "formula": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+   "record_name": "Drag force",
+   "source": "openstax"
+  },
+  {
+   "i": 197,
+   "stem": "(b) If the engine does 300 J of work per cycle, how much heat is removed from the high-temperature reservoir per cycle?",
+   "formula": "W=Q_h-Q_c",
+   "record_name": "Result of energy conservation",
+   "source": "openstax"
+  },
+  {
+   "i": 198,
+   "stem": "0255 m/s 2 , what is the force on the wagon?",
+   "formula": "F=m*a",
+   "record_name": "Newton's second law",
+   "source": "openstax"
+  },
+  {
+   "i": 199,
+   "stem": "Find the volume of the diluted solution, V 2 by rearranging the dilution equation to isolate V 2 : C 1 V 1 = C 2 V 2 V 2 = C 1 V 1 C 2 Since the diluted concentration (0.",
+   "formula": null,
+   "record_name": null,
+   "source": "openstax"
+  }
+ ]
+}
