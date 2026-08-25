@@ -90,12 +90,16 @@ static const char *span_next(const char *s, sp_kind *k, char *out, int cap) {
 /* "eval<arg> (150.0)/(12.0)" -> fn "eval", arg "(150.0)/(12.0)" */
 static void split_call(const char *in, char *fn, int fcap, char *arg, int acap) {
     const char *a = strstr(in, "<arg>");
-    if (!a) { snprintf(fn, (size_t)fcap, "%s", in); arg[0] = 0; return; }
+    /* no <arg>: the whole span is the function name. Explicit precision -- a malformed span can
+     * be the entire remaining generation, and fn is 24 bytes. */
+    if (!a) { snprintf(fn, (size_t)fcap, "%.*s", fcap - 1, in); arg[0] = 0; return; }
     int n = (int)(a - in); if (n >= fcap) n = fcap - 1;
     while (n && in[n - 1] == ' ') n--;
     memcpy(fn, in, (size_t)n); fn[n] = 0;
     const char *p = a + 5; while (*p == ' ') p++;
-    snprintf(arg, (size_t)acap, "%s", p);
+    /* explicit precision: the argument is drawn in a chip and a runaway span must be cut here,
+     * visibly, rather than silently filling the buffer */
+    snprintf(arg, (size_t)acap, "%.*s", acap - 1, p);
 }
 
 /* ---- drawing --------------------------------------------------------------------------------- */
@@ -132,7 +136,7 @@ static int draw_answer(int x, int y, int w, const char *raw, int draw) {
             const char *v = buf; while (*v == ' ') v++;
             int err = (*v == '!');
             char lbl[64];
-            snprintf(lbl, sizeof lbl, "%s%s", err ? "" : "= ", v);
+            snprintf(lbl, sizeof lbl, "%s%.58s", err ? "" : "= ", v);
             int cw = chip(chip_x, cy, 0, lbl, err ? C_ERR : C_RES, err ? C_ERR : C_RESLN,
                           err ? C_ERRFG : C_RESFG, draw);
             chip_x += cw + 4; row_open = 1;
@@ -335,6 +339,105 @@ void app_stream_token(const char *piece) {
     int n = (int)strlen(pending->a), m = (int)strlen(piece);
     if (n + m < (int)sizeof pending->a - 1) { memcpy(pending->a + n, piece, (size_t)m); pending->a[n + m] = 0; }
 }
+int app_history(const char **q, const char **a, int max) {
+    if (CUR < 0) return 0;
+    app_chat *c = &CHATS[CUR];
+    int n = 0;
+    /* exclude the turn currently being generated -- it has no answer yet */
+    int upto = c->nturns - (pending ? 1 : 0);
+    for (int i = 0; i < upto && n < max; i++) {
+        if (!c->turn[i].q[0]) continue;
+        q[n] = c->turn[i].q; a[n] = c->turn[i].a; n++;
+    }
+    return n;
+}
+
+void app_set_summary(const char *s) {
+    if (pending && s) snprintf(pending->sum, sizeof pending->sum, "%s", s);
+}
+
+/* Derive the compact summary from the finished turn: relation, the values that went in, and the
+ * result the evaluator returned. Called at stream end, when <res> is present if it ever will be.
+ * A turn with no result still summarises to its relation -- better than falling back to 90
+ * characters of prose. */
+static void summarise(app_turn *t, const char *formula, const char *values) {
+    char res[24]; res[0] = 0;
+    if (!formula) formula = "";
+    const char *r = strstr(t->a, "<res>");
+    if (r) {
+        r += 5; while (*r == ' ') r++;
+        int i = 0;
+        while (*r && *r != '<' && i < (int)sizeof res - 1) res[i++] = *r++;
+        while (i && res[i-1] == ' ') i--;
+        res[i] = 0;
+    }
+    if (res[0] && values && *values) {
+        char v[32]; snprintf(v, sizeof v, "%.28s", values);
+        int n = (int)strlen(v);
+        while (n && v[n-1] == ' ') v[--n] = 0;      /* callers pass a trailing separator */
+        snprintf(t->sum, sizeof t->sum, "%.24s %s -> %.12s", formula, v, res);
+    }
+    else if (res[0])
+        snprintf(t->sum, sizeof t->sum, "%.40s -> %.12s", formula ? formula : "", res);
+    else
+        snprintf(t->sum, sizeof t->sum, "%.60s", formula);
+}
+
+void app_finish_turn(const char *formula, const char *values) {
+    if (pending) summarise(pending, formula ? formula : "", values ? values : "");
+}
+
+/* THREE TIERS, degrading rather than truncating:
+ *   1. the most recent VERBATIM_TURNS turns keep their full question -- a follow-up almost always
+ *      refers to these, and compacting them loses the phrasing it refers to;
+ *   2. older turns collapse to their compact summary, ~1.6x cheaper (measured: 25.2 -> 15.5
+ *      tokens per turn, so ~11 turns fit where ~6.6 did);
+ *   3. whatever still does not fit is dropped, oldest first, SILENTLY. Asking again refreshes it.
+ *
+ * Newest-first assembly, then reversed: the budget must be spent on what the user just referred
+ * to, not on the start of the session. */
+#define VERBATIM_TURNS 2
+
+int app_context(char *out, int cap, int budget) {
+    out[0] = 0;
+    if (CUR < 0) return 0;
+    app_chat *c = &CHATS[CUR];
+    int upto = c->nturns - (pending ? 1 : 0);
+    if (upto <= 0) return 0;
+
+    char parts[MAX_TURNS][200];
+    int np = 0, used = 0;
+    for (int i = upto - 1; i >= 0 && np < MAX_TURNS; i--) {
+        app_turn *t = &c->turn[i];
+        int recent = (i >= upto - VERBATIM_TURNS);
+        char one[200];
+        if (recent && t->q[0])       snprintf(one, sizeof one, "Earlier: %.90s ", t->q);
+        else if (t->sum[0])          snprintf(one, sizeof one, "%.70s ", t->sum);
+        else if (t->q[0])            snprintf(one, sizeof one, "Earlier: %.60s ", t->q);
+        else continue;
+        int l = (int)strlen(one);
+        if (used + l > budget) {
+            /* a verbatim turn that does not fit gets one chance in compact form before it is
+             * dropped -- otherwise the newest turn could be lost while older ones survive */
+            if (recent && t->sum[0]) {
+                snprintf(one, sizeof one, "%.70s ", t->sum);
+                l = (int)strlen(one);
+                if (used + l > budget) break;
+            } else break;
+        }
+        snprintf(parts[np++], sizeof parts[0], "%s", one);
+        used += l;
+    }
+    int n = 0;
+    for (int i = np - 1; i >= 0 && n < cap - 1; i--) {      /* reverse: oldest surviving first */
+        int l = (int)strlen(parts[i]);
+        if (n + l >= cap - 1) break;
+        memcpy(out + n, parts[i], (size_t)l); n += l;
+    }
+    out[n] = 0;
+    return n;
+}
+
 void app_stream_end(void) { if (pending) pending->done = 1; pending = 0; BUSY = 0; SCROLL = 1 << 20; }
 
 /* Clamp the scroll to the measured content height. Called from draw, because the height is only

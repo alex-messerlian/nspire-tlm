@@ -46,8 +46,10 @@ static int pointer_poll(in_event *e) {
     if (!r.contact && !r.proximity) return 0;
     CX = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
     CY = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));   /* pad y is bottom-up */
-    if (CX < 0) CX = 0; if (CX >= GFX_W) CX = GFX_W - 1;
-    if (CY < 0) CY = 0; if (CY >= GFX_H) CY = GFX_H - 1;
+    if (CX < 0) CX = 0;
+    if (CX >= GFX_W) CX = GFX_W - 1;
+    if (CY < 0) CY = 0;
+    if (CY >= GFX_H) CY = GFX_H - 1;
     e->x = CX; e->y = CY;
     e->hover = r.proximity && !r.pressed;
     e->kind = r.pressed ? IN_CLICK : IN_MOVE;
@@ -84,6 +86,9 @@ static int keypad_poll(void) {
 /* ---- generation ------------------------------------------------------------------------------- */
 static int argmax(const float *v, int n) { int b = 0; for (int i = 1; i < n; i++) if (v[i] > v[b]) b = i; return b; }
 
+/* Kept, not deleted: the evaluator lands here when it is linked into the device build, and a
+ * deleted stub would hide that the tool path is still unimplemented. */
+__attribute__((unused))
 static const char *run_call(const char *call) {
     static char out[64];
     /* the evaluator is a host tool; on device the call is executed by the same C the host uses.
@@ -104,6 +109,26 @@ void app_request(const char *question, const char *rid) {
     int idx = 0;
     static char prompt[NS_PROMPT_MAX];
     ns_input in; in.nvals = 0;
+
+    /* SESSION CONTEXT, compacted. The model is single-turn -- every training document is one
+     * <q>..</q><r>..<a>..<end> and it has never seen a conversation -- so prior turns go in as
+     * plain text inside the question rather than as extra document structure.
+     *
+     * Budget in CHARACTERS rather than tokens: counting tokens costs a full BPE pass per keystroke
+     * on a 396 MHz core. 4.15 chars/token measured on this corpus, and the budget below is derived
+     * from the 167-token context allowance that survives the record and question.
+     */
+    static char withctx[NS_PROMPT_MAX];
+    char ctx[512];
+    int rec_tok = 38, q_tok = (int)strlen(question) / 4;
+    int budget_tok = 256 - rec_tok - q_tok - 24;
+    if (budget_tok < 0) budget_tok = 0;
+    int budget_chars = budget_tok * 4;
+    if (budget_chars > (int)sizeof ctx - 1) budget_chars = (int)sizeof ctx - 1;
+    app_context(ctx, sizeof ctx, budget_chars);
+    snprintf(withctx, sizeof withctx, "%s%s", ctx, question);
+    question = withctx;
+
     if (ns_assemble(prompt, sizeof prompt, &ST.rec[idx], question, &in) < 0) {
         app_stream_token("<a> could not assemble a prompt<end>"); app_stream_end(); return;
     }
@@ -124,6 +149,16 @@ void app_request(const char *question, const char *rid) {
         app_stream_token(piece);
         app_draw();                          /* stream: one repaint per token */
         if (tok == 10) break;
+    }
+    /* compact summary from the finished turn: relation + values + result */
+    {
+        char vals[64]; vals[0] = 0;
+        for (int i = 0; i < in.nvals; i++) {
+            char one[24];
+            snprintf(one, sizeof one, "%s=%s ", in.var[i], in.val[i]);
+            if (strlen(vals) + strlen(one) < sizeof vals) strcat(vals, one);
+        }
+        app_finish_turn(ST.rec[idx].formula, vals);
     }
     app_stream_end();
     app_draw();

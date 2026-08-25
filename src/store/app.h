@@ -48,6 +48,10 @@ typedef struct {
 typedef struct {
     char  q[160];      /* the question as typed */
     char  a[512];      /* the model's raw output, span markup included */
+    /* Compact form, captured AT GENERATION TIME while the record and values are still in hand:
+     * "v=d/t d=150 t=12 -> 12.5". Reconstructing this later by re-parsing `a` would depend on the
+     * model having produced well-formed markup, which is exactly what fails 50% of the time. */
+    char  sum[72];
     int   done;
 } app_turn;
 
@@ -69,4 +73,16 @@ int  app_should_quit(void);
 void app_request(const char *question, const char *rid);
 void app_stream_token(const char *piece);   /* called as tokens arrive */
 void app_stream_end(void);
+/* Prior turns of the CURRENT session, oldest first, for context. Returns how many were written.
+ * Sessions are independent: this never reaches across chats, and deleting a chat destroys its
+ * history with it. */
+int  app_history(const char **q, const char **a, int max);
+/* Build the context string for the next turn, newest-first until `budget_chars` is spent.
+ * Recent turns go in verbatim; older ones fall back to their compact form; anything that still
+ * does not fit is dropped silently. Returns characters written. */
+int  app_context(char *out, int cap, int budget_chars);
+/* Record the compact summary for the turn currently being generated. */
+void app_set_summary(const char *s);
+/* Build the compact summary from the finished turn. Call BEFORE app_stream_end(). */
+void app_finish_turn(const char *formula, const char *values);
 #endif
