@@ -27,7 +27,7 @@ $PY tools/eval/test_scope.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_sc
 # gates exist to catch, pointed at the gates themselves: a suite nothing runs is a suite that does
 # not exist. Every one of these is built from source that ships.
 $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_ui_errs" || { printf "  %-20s FAIL\n" "test_ui_errs"; fail=1; }
-for b in test_search test_span test_exit test_toolrun; do
+for b in test_search test_span test_exit test_toolrun test_chatstore; do
     if [ ! -x "build/$b" ]; then
         # A MISSING binary is a failure, not a skip. "cannot check" and "checked and clean" must
         # never share an exit status.

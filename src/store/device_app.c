@@ -343,6 +343,9 @@ int main(void) {
     }
     pointer_init();
     app_init();
+    /* Sessions survive the run. RAM-only was tolerable while exiting was obscure; it stopped being
+     * so the moment there was a button for it. */
+    app_set_persist(dpath("chats.tns.tns"));
     app_draw();
 
     while (!app_should_quit()) {

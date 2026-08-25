@@ -71,6 +71,9 @@ void app_draw(void);
 int  app_should_quit(void);
 /* the app asks the host/device for generation; implemented separately on each side */
 void app_request(const char *question, const char *rid);
+/* Where sessions are kept between runs. Set once at startup; app.c writes after every change that
+ * can lose data. Passing NULL (the host harness) disables persistence entirely. */
+void app_set_persist(const char *path);
 void app_stream_token(const char *piece);   /* called as tokens arrive */
 void app_stream_end(void);
 /* Interruption. A generation loop is the only thing here that runs long enough that the UI stops

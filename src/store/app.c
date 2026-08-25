@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "app.h"
+#include "chatstore.h"
 
 /* ---- state ---------------------------------------------------------------------------------- */
 static app_chat CHATS[MAX_CHATS];
@@ -11,6 +12,21 @@ static int MX = 160, MY = 120;     /* cursor */
 static int HOVER;                  /* pointer in proximity: hover states are live */
 static int QUIT;
 static int SIDEBAR = 1;
+static const char *PERSIST;          /* NULL = do not persist (host harness) */
+
+/* Called after EVERY change that could lose a conversation. Deliberately not called per token:
+ * writing 141 KB at 2.68 tok/s would dominate generation, and a turn in progress is not worth
+ * saving anyway -- it is the finished ones that matter. */
+static void persist(void) {
+    if (PERSIST) chat_save(PERSIST, CHATS, NCHATS, CUR);
+}
+void app_set_persist(const char *path) {
+    PERSIST = path;
+    if (!path) return;
+    int cur = -1;
+    int n = chat_load(path, CHATS, MAX_CHATS, &cur);
+    if (n > 0) { NCHATS = n; CUR = cur; }
+}
 static char COMPOSE[160];          /* what is being typed */
 static int  COMPOSE_N;
 static int  BUSY;
@@ -51,11 +67,13 @@ static app_chat *new_chat(const char *title) {
     return c;
 }
 static void delete_chat(int i) {
+    /* saved at the end of this function */
     if (i < 0 || i >= NCHATS) return;
     memset(&CHATS[i], 0, sizeof(app_chat));      /* wiped, not just unlinked */
     memmove(&CHATS[i], &CHATS[i + 1], sizeof(app_chat) * (NCHATS - i - 1));
     NCHATS--;
     if (CUR == i) CUR = -1; else if (CUR > i) CUR--;
+    persist();                       /* a deletion must not come back on the next run */
 }
 
 /* ---- span markup ------------------------------------------------------------------------------
@@ -818,7 +836,11 @@ int app_take_abort(void) { int a = ABORT; ABORT = 0; return a; }
 int app_busy(void) { return BUSY; }
 int app_hit_stop(int x, int y) { return BUSY && inside(R_SEND, x, y); }
 
-void app_stream_end(void) { if (pending) pending->done = 1; pending = 0; BUSY = 0; SCROLL = 1 << 20; }
+void app_stream_end(void) {
+    if (pending) pending->done = 1;
+    pending = 0; BUSY = 0; SCROLL = 1 << 20;
+    persist();                       /* a finished turn is the thing worth not losing */
+}
 
 /* Clamp the scroll to the measured content height. Called from draw, because the height is only
  * known once the answer text has been laid out -- it changes on every streamed token. */
