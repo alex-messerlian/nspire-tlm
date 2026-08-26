@@ -144,6 +144,12 @@ int main(void) {
     }
 
     /* ---- Step 2: one attempt at the calling convention, then stop. ---------------------------- */
+    /* RUN EVERY ATTEMPT THAT SURVIVES, in this one launch.
+     *
+     * The counter is advanced BEFORE each call, so a reset resumes at the next hypothesis. But an
+     * attempt that RETURNS need not cost a relaunch -- the loop simply continues. Worst case is
+     * therefore one relaunch per resetting attempt; best case is a single launch that walks all
+     * nine. The operator does nothing but relaunch after an actual reset. */
     int idx = load_next();
     if (idx >= NATTEMPTS) {
         say("");
@@ -153,6 +159,7 @@ int main(void) {
         wait_key_pressed();
         return 0;
     }
+  for (; idx < NATTEMPTS; idx++) {
     /* Advance the counter BEFORE the call. If this attempt resets the device, the next launch
      * moves on instead of reproducing the reset forever. */
     save_next(idx + 1);
@@ -166,7 +173,11 @@ int main(void) {
     ascii2utf16(expr, "1+1", 3);
     say("expr marshalled: utf16_strlen=%u", (unsigned)utf16_strlen(expr));
 
-    static char b1[64], b2[64], b4[64], b5[64];
+    /* 512 not 64. These are handed to an OS routine whose output size is unknown; if it writes a
+     * larger structure than the buffer, the overrun lands in this program's own static memory --
+     * still a crash rather than anything durable, but a bigger buffer makes the crash less likely
+     * without costing anything. */
+    static char b1[512], b2[512], b4[512], b5[512];
     static int  i4, i5;
     static void *pp2;
     memset(b1, 0, sizeof b1); memset(b2, 0, sizeof b2);
@@ -213,8 +224,10 @@ int main(void) {
         say("rc!=0, not attempting the string conversion");
     }
 
+    say("attempt %d survived.", idx + 1);
+  }
     say("");
-    say("attempt %d complete. Relaunch to try attempt %d.", idx + 1, idx + 2);
+    say("ALL %d ATTEMPTS COMPLETE in this launch -- none of the remaining ones reset.", NATTEMPTS);
     if (LOG) fclose(LOG);
     printf("\nlog: %s\nPress any key.\n", LOG_PATH);
     wait_key_pressed();
