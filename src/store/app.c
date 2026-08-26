@@ -779,21 +779,22 @@ static void panel_icon(int x, int y, uint16_t c) {
  *
  * Same 16x16 envelope as the other glyphs, centred on (11.5, 11.5) like theirs. */
 static void info_icon(int x, int y, uint16_t c) {
-    /* 2px wide at x+11 and spanning y+4..y+19, so its ink centres on (11.5, 11.5) exactly like the
-     * pencil, lens and panel. A 3px stem cannot: an odd width centres on a whole pixel, and the
-     * 24px plate's centre falls between two. Measured, not judged by eye -- the gear that preceded
-     * this was a pixel large and half a pixel down and right without looking obviously wrong. */
-    /* 1px wide and 12 tall, down from 2x16.
+    /* 1px wide, spanning y+4..y+19 -- the SAME 16-row envelope as the pencil, lens and panel.
      *
-     * Its neighbours are 1px OUTLINES, whose ink is spread thinly around a 16px shape. A solid bar
-     * of the same height concentrates far more ink into a narrow column, so matching them on
-     * envelope made it the heaviest mark on the row -- the same mistake the plus made at 2px. It
-     * matches on WEIGHT now and sits shorter, which is what a punctuation mark should do beside
-     * three pictograms.
+     * Two separate properties, and the earlier versions each got one of them wrong. WEIGHT is set
+     * by stroke width: its neighbours are 1px outlines, so a 2px bar was the heaviest mark on the
+     * row while being the smallest glyph. HEIGHT is set by the envelope, and shrinking it to 12 to
+     * fix the weight made it a short mark in a row of tall ones -- solving the first problem with
+     * the wrong dial. 1px thin and full height gets both.
      *
-     * Span y+6..y+17 keeps its centre on 11.5 like the others; an odd height would not. */
-    gfx_fill(x + 11, y + 6,  1, 9, c);       /* the stem */
-    gfx_fill(x + 11, y + 16, 1, 2, c);       /* the dot   */
+     * 11 stem, 3 gap, 2 dot. The gap is wider than the dot because a period reads as separated
+     * from the stem, not merely below it; at a 1px gap the two fuse into one bar.
+     *
+     * Centre lands on (11.0, 11.5). The vertical matches the others exactly; the horizontal is
+     * half a pixel left because an odd width cannot straddle a half-pixel, and 2px to square it is
+     * what made this too heavy twice. */
+    gfx_fill(x + 11, y + 4,  1, 11, c);      /* stem */
+    gfx_fill(x + 11, y + 18, 1, 2,  c);      /* dot  */
 }
 
 /* NEW CHAT IS A PLUS, not a pencil.
