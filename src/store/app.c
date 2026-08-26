@@ -783,8 +783,17 @@ static void info_icon(int x, int y, uint16_t c) {
      * pencil, lens and panel. A 3px stem cannot: an odd width centres on a whole pixel, and the
      * 24px plate's centre falls between two. Measured, not judged by eye -- the gear that preceded
      * this was a pixel large and half a pixel down and right without looking obviously wrong. */
-    gfx_fill(x + 11, y + 4,  2, 11, c);      /* the stem */
-    gfx_fill(x + 11, y + 17, 2, 3,  c);      /* the dot   */
+    /* 1px wide and 12 tall, down from 2x16.
+     *
+     * Its neighbours are 1px OUTLINES, whose ink is spread thinly around a 16px shape. A solid bar
+     * of the same height concentrates far more ink into a narrow column, so matching them on
+     * envelope made it the heaviest mark on the row -- the same mistake the plus made at 2px. It
+     * matches on WEIGHT now and sits shorter, which is what a punctuation mark should do beside
+     * three pictograms.
+     *
+     * Span y+6..y+17 keeps its centre on 11.5 like the others; an odd height would not. */
+    gfx_fill(x + 11, y + 6,  1, 9, c);       /* the stem */
+    gfx_fill(x + 11, y + 16, 1, 2, c);       /* the dot   */
 }
 
 /* NEW CHAT IS A PLUS, not a pencil.
