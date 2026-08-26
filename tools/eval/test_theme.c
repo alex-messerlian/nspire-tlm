@@ -42,6 +42,35 @@ int main(void) {
     /* The composer fill is a token now, and it must actually differ from the page in BOTH themes --
      * that is the whole reason it is not C_BG. In dark the field is #303030 on a #0d0d0d page; in
      * light it is #ffffff on a #f9f9f9 sidebar and a #ffffff page, so light leans on its border. */
+    /* -- surfaces must stay distinct ON THE PANEL, not merely in the source --
+     *
+     * The framebuffer is RGB565 and gfx.h's RGB() truncates, so a range of source values collapses
+     * onto one displayed value: #303030 through #333333 all drive #313031. A tint-reduction pass
+     * moved P_SHEET from #2E2E2E to #303030, which left it distinct in the table and IDENTICAL to
+     * P_BUBBLE and P_FIELD on the glass. Every existing contrast assertion still passed, because
+     * they all compare against the page. Compare the surfaces to each other, post-quantisation. */
+    printf("\n  -- surfaces are distinct after RGB565 --\n");
+    {   struct { const char *a, *b; uint16_t x, y; } pairs[] = {
+            { "dark sheet",  "dark bubble", PAL_DARK[P_SHEET],  PAL_DARK[P_BUBBLE] },
+            { "dark sheet",  "dark field",  PAL_DARK[P_SHEET],  PAL_DARK[P_FIELD]  },
+            { "dark bubble", "dark page",   PAL_DARK[P_BUBBLE], PAL_DARK[P_BG]     },
+            { "dark sel",    "dark side",   PAL_DARK[P_SEL],    PAL_DARK[P_SIDE]   },
+            { "light sheet", "light bubble",PAL_LIGHT[P_SHEET], PAL_LIGHT[P_BUBBLE]},
+            { "light sel",   "light side",  PAL_LIGHT[P_SEL],   PAL_LIGHT[P_SIDE]  },
+        };
+        for (int i = 0; i < (int)(sizeof pairs / sizeof pairs[0]); i++) {
+            char msg[96];
+            snprintf(msg, sizeof msg, "%s != %s on the panel", pairs[i].a, pairs[i].b);
+            T(msg, pairs[i].x != pairs[i].y, 1);
+        }
+        /* MUTATION: the value the tint pass chose, which collapsed onto the bubble. */
+        uint16_t collapsed = HEX(0x303030);
+        int caught = (collapsed == PAL_DARK[P_BUBBLE]);
+        if (!caught) F++;
+        printf("  %s  mutant: sheet at #303030 lands on the bubble's panel value\n",
+               caught ? "CAUGHT" : "MISSED");
+    }
+
     printf("\n  -- the composer fill is its own surface --\n");
     {   T("dark: field lifts off the page", PAL_DARK[P_FIELD] != PAL_DARK[P_BG], 1);
         T("dark: placeholder readable on it", ratio(PAL_DARK[P_INK3], PAL_DARK[P_FIELD]) >= 3.0, 1);

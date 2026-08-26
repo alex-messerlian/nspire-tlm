@@ -46,7 +46,7 @@ void gfx_clip_reset(void);
 
 /* ---- text ---------------------------------------------------------------------------------- */
 /* F_SM is the session list's face. See tools/mkfont.py for why a fourth size exists. */
-typedef enum { F_UI = 0, F_UIB = 1, F_BIG = 2, F_SM = 3 } gfx_font;
+typedef enum { F_UI = 0, F_UIB = 1, F_BIG = 2, F_SM = 3, F_XS = 4 } gfx_font;
 
 int  gfx_text(int x, int y, const char *utf8, gfx_font f, uint16_t fg, uint16_t bg);
 int  gfx_text_w(const char *utf8, gfx_font f);     /* advance width, no drawing */

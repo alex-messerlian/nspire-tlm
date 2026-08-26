@@ -18,29 +18,29 @@ static int THEME_MODE = TH_AUTO;
 /* Light is the calculator's own register: the Nspire OS is light-only, so this is what a person
  * expects to see when they open a program on it. */
 static const uint16_t PAL_LIGHT[P_N] = {
-    [P_BG] = HEX(0xFFFFFF), [P_SIDE] = HEX(0xF9F9F9), [P_LINE] = HEX(0xE5E5E5),
-    [P_INK] = HEX(0x0D0D0D), [P_INK2] = HEX(0x5D5D5D), [P_INK3] = HEX(0x8F8F8F),
+    [P_BG] = HEX(0xFFFFFF), [P_SIDE] = HEX(0xFFFFFF), [P_LINE] = HEX(0xE5E5E5),
+    [P_INK] = HEX(0x0B0B0B), [P_INK2] = HEX(0x5B5B5B), [P_INK3] = HEX(0x8F8F8F),
     [P_BUBBLE] = HEX(0xF4F4F4), [P_SEL] = HEX(0xECECEC),
     [P_TOOL] = HEX(0xF5F6F8), [P_TOOLLN] = HEX(0xE3E5EA),
     [P_RES] = HEX(0xEDF7F0), [P_RESLN] = HEX(0xCFE8D8), [P_RESFG] = HEX(0x186A3B),
     [P_ERR] = HEX(0xFDF2F2), [P_ERRFG] = HEX(0xA8342C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0xE6E6E6), [P_BAR] = HEX(0xEDEDED),
-    [P_EXIT_HOT] = HEX(0xF3D9D7), [P_FIELD] = HEX(0xFFFFFF), [P_FIELD_LN] = HEX(0xD9D9D9), [P_SEND_OFF] = HEX(0xD5D5D5),
+    [P_EXIT_HOT] = HEX(0xF3D9D7), [P_FIELD] = HEX(0xFFFFFF), [P_FIELD_LN] = HEX(0xD7D7D7), [P_SEND_OFF] = HEX(0xD5D5D5),
     [P_SHEET] = HEX(0xFFFFFF),   /* white on a dimmed page */
 };
 /* Dark is not inverted light. Surfaces LIFT as they come forward, as on the web -- and this panel
  * is 16-bit, so a near-black ground has only a few distinguishable steps above it before the
  * quantisation shows. The steps below are chosen far enough apart to survive RGB565. */
 static const uint16_t PAL_DARK[P_N] = {
-    [P_BG] = HEX(0x0D0D0D), [P_SIDE] = HEX(0x0D0D0D), [P_LINE] = HEX(0x2A2A2A),
+    [P_BG] = HEX(0x0B0B0B), [P_SIDE] = HEX(0x0B0B0B), [P_LINE] = HEX(0x2A2A2A),
     [P_INK] = HEX(0xECECEC), [P_INK2] = HEX(0xAFAFAF), [P_INK3] = HEX(0x8A8A8A),
-    [P_BUBBLE] = HEX(0x303030), [P_SEL] = HEX(0x242424),
+    [P_BUBBLE] = HEX(0x303030), [P_SEL] = HEX(0x232323),
     [P_TOOL] = HEX(0x22262E), [P_TOOLLN] = HEX(0x333A45),
     [P_RES] = HEX(0x16281D), [P_RESLN] = HEX(0x27492F), [P_RESFG] = HEX(0x79D497),
     [P_ERR] = HEX(0x2C1B1B), [P_ERRFG] = HEX(0xF0857C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0x3A3A3A), [P_BAR] = HEX(0x333333),
-    [P_EXIT_HOT] = HEX(0x4A2A28), [P_FIELD] = HEX(0x303030), [P_FIELD_LN] = HEX(0x303030), [P_SEND_OFF] = HEX(0x3D3D3D),
-    [P_SHEET] = HEX(0x2E2E2E),   /* lifted OFF the page, since the scrim cannot sink it */
+    [P_EXIT_HOT] = HEX(0x4A2A28), [P_FIELD] = HEX(0x303030), [P_FIELD_LN] = HEX(0x303030), [P_SEND_OFF] = HEX(0x3B3B3B),
+    [P_SHEET] = HEX(0x383838),   /* lifted OFF the page, since the scrim cannot sink it */
 };
 
 /* The clock decides only when the mode is AUTO. A negative hour means the clock could not be read;
@@ -138,7 +138,7 @@ static int compose_lines(int w) {
 }
 static int compose_field_h(int w) { return compose_lines(w) * COMPOSE_LH + 9; }
 /* The dock is the field plus 3px above, then 2px and the 13px disclaimer below. */
-static int compose_dock_h(int w) { return compose_field_h(w) + 3 + 2 + 13 + 2; }
+static int compose_dock_h(int w) { return compose_field_h(w) + 3 + 3 + 11 + 2; }
 static int EMPTY_COMPOSER;   /* set per-frame: the composer was drawn centred, so do not dock it */              /* always visible: leaving must not depend on knowing a key */
 static int ABORT;                    /* set by ESC or Stop; polled by the generation loop */
 static int NCHAT_ROWS;
@@ -679,17 +679,19 @@ static void draw_sidebar(void) {
     R_SEARCH = (gfx_rect){ 30, 3, 20, 20 };
     R_TOGGLE = (gfx_rect){ 55, 3, 20, 20 };
 
+    /* Hover darkens the plate AND the glyph. The plate alone is a very small cue at 20px on a
+     * panel with this contrast; the ink moving from C_INK2 to C_INK is what actually reads. */
     {   int hot = HOVER && inside(R_NEW, MX, MY);
         gfx_rrect(R_NEW.x, R_NEW.y, 20, 20, 5, hot ? C_SEL : C_SIDE);
-        pencil(R_NEW.x + 4, R_NEW.y + 3, C_INK2);
+        pencil(R_NEW.x + 4, R_NEW.y + 3, hot ? C_INK : C_INK2);
     }
     {   int sh = HOVER && inside(R_SEARCH, MX, MY);
         gfx_rrect(R_SEARCH.x, R_SEARCH.y, 20, 20, 5, sh ? C_SEL : C_SIDE);
-        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 4, 4, C_INK2);
+        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 4, 4, sh ? C_INK : C_INK2);
     }
     {   int th = HOVER && inside(R_TOGGLE, MX, MY);
         gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 20, 20, 5, th ? C_SEL : C_SIDE);
-        panel_icon(R_TOGGLE.x, R_TOGGLE.y, C_INK2);
+        panel_icon(R_TOGGLE.x, R_TOGGLE.y, th ? C_INK : C_INK2);
     }
 
     /* A heading over nothing is furniture. */
@@ -813,7 +815,11 @@ static void draw_main(void) {
      * being stated three times on one screen -- top bar, "Ask ChatTLM" in the field, and
      * "ChatTLM can make mistakes" under it -- while the heading already identifies the app. */
     if (CUR >= 0)
-        gfx_text_ellipsis(tx, 4, CHATS[CUR].title, F_BIG, C_INK, C_BG, GFX_W - 30 - tx);
+        /* F_UIB, not F_BIG. The title is bold 13 now: an 18px box on a 26px bar left the icons
+         * boxed in beside it, and the string is the chat's own opening words, which the transcript
+         * repeats immediately underneath. Bold keeps it the heading of the pane without it being
+         * the largest thing on screen. Box 15 in a 26px band centres at y=5. */
+        gfx_text_ellipsis(tx, 5, CHATS[CUR].title, F_UIB, C_INK, C_BG, GFX_W - 30 - tx);
 
     /* EXIT, top right, always drawn. ESC has always quit, but nothing on screen said so, and a
      * judge handed the calculator does not know the key. An affordance that exists only in the
@@ -905,9 +911,11 @@ static void draw_main(void) {
         draw_composer(x0, w, cy);
         /* The web's `.note`, and only under the DOCKED field -- `#empty` has no counterpart, which
          * is why the new-chat screen shows the bar alone. */
+        /* F_XS. It is a disclaimer under a text box -- the least important line on the screen --
+         * and at F_SM it was the same size as the session titles, which are navigation. */
         const char *note = "ChatTLM can make mistakes.";
-        gfx_text(x0 + (w - gfx_text_w(note, F_SM)) / 2, cy + compose_field_h(w) + 2,
-                 note, F_SM, C_INK3, C_BG);
+        gfx_text(x0 + (w - gfx_text_w(note, F_XS)) / 2, cy + compose_field_h(w) + 3,
+                 note, F_XS, C_INK3, C_BG);
     }
 
 }

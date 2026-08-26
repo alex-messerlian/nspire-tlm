@@ -98,6 +98,7 @@ static fontref fref(gfx_font f) {
     case F_UIB: { fontref r = { FONT_UIB_IDX, FONT_UIB_N, FONT_UIB_DATA, FONT_UIB_H, FONT_UIB_ASC }; return r; }
     case F_BIG: { fontref r = { FONT_BIG_IDX, FONT_BIG_N, FONT_BIG_DATA, FONT_BIG_H, FONT_BIG_ASC }; return r; }
     case F_SM:  { fontref r = { FONT_SM_IDX,  FONT_SM_N,  FONT_SM_DATA,  FONT_SM_H,  FONT_SM_ASC  }; return r; }
+    case F_XS:  { fontref r = { FONT_XS_IDX,  FONT_XS_N,  FONT_XS_DATA,  FONT_XS_H,  FONT_XS_ASC  }; return r; }
     default:    { fontref r = { FONT_UI_IDX,  FONT_UI_N,  FONT_UI_DATA,  FONT_UI_H,  FONT_UI_ASC  }; return r; }
     }
 }

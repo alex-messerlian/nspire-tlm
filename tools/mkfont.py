@@ -112,7 +112,7 @@ if __name__ == "__main__":
     # the rows needed an 18px pitch; at 11px it gets more of the title AND a 15px pitch, so the whole
     # MAX_CHATS cap fits without scrolling. It is the only place a fourth face earns its ~20 KB.
     for path, size, name in ((FONT, 13, "FONT_UI"), (BOLD, 13, "FONT_UIB"), (FONT, 15, "FONT_BIG"),
-                             (FONT, 11, "FONT_SM")):
+                             (FONT, 11, "FONT_SM"), (FONT, 9, "FONT_XS")):
         h, blob, n = render(path, size, name, tmp)
         parts.append(tmp.read_text())
         total += blob
