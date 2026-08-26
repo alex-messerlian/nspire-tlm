@@ -53,13 +53,35 @@ static const uint16_t PAL_DARK[P_N] = {
  *
  * It cannot be derived, so it is asked for. In memory only: persisting it means a settings file,
  * and the theme is a one-tap fix if this is wrong. */
-static int TZ_OFFSET;
+/* NAMED US ZONES, not a bare UTC number. "UTC-10" asks the reader to know their own offset;
+ * "HST" is the thing they already call it.
+ *
+ * Standard and daylight are separate entries rather than a date calculation, because the device
+ * cannot be trusted to know the date -- bench_rtc has never run, so even the epoch of that seconds
+ * counter is unverified -- and a DST rule computed from an unverified clock is a guess wearing a
+ * uniform. Picking PDT in July is one press and is honestly what the reader knows.
+ *
+ * Ordered west to east, so the minus key moves west and the plus key moves east. */
+static const struct { const char *name; int off; } TZ[] = {
+    { "HST",  -10 },      /* Hawaii, no daylight time */
+    { "AKST",  -9 }, { "AKDT", -8 },
+    { "PST",   -8 }, { "PDT",  -7 },
+    { "MST",   -7 }, { "MDT",  -6 },
+    { "CST",   -6 }, { "CDT",  -5 },
+    { "EST",   -5 }, { "EDT",  -4 },
+};
+#define TZ_N ((int)(sizeof TZ / sizeof TZ[0]))
+static int TZ_IDX = 3;                       /* PST: the middle of the populated range */
 
-int app_tz(void) { return TZ_OFFSET; }
-void app_set_tz(int h) {
-    if (h < -12) h = -12;
-    if (h > 14)  h = 14;                     /* the real range of civil offsets */
-    TZ_OFFSET = h;
+int app_tz(void)            { return TZ[TZ_IDX].off; }
+const char *app_tz_name(void) { return TZ[TZ_IDX].name; }
+int app_tz_index(void)      { return TZ_IDX; }
+
+void app_set_tz_index(int i) {
+    if (i < 0) i = 0;
+    if (i >= TZ_N) i = TZ_N - 1;             /* clamp, not wrap: stepping off the end of a list
+                                              * should stop, not silently jump to the far side */
+    TZ_IDX = i;
     app_set_theme(app_theme());              /* re-resolve AUTO against the new local time */
 }
 
@@ -74,7 +96,7 @@ void app_set_theme(int mode) {
     int dark = (mode == TH_DARK);
     if (mode == TH_AUTO) {
         int h = app_clock_hour();
-        if (h >= 0) { h = (h + TZ_OFFSET) % 24; if (h < 0) h += 24; }
+        if (h >= 0) { h = (h + app_tz()) % 24; if (h < 0) h += 24; }
         dark = app_auto_is_dark(h);
     }
     const uint16_t *src = dark ? PAL_DARK : PAL_LIGHT;
@@ -1237,9 +1259,7 @@ static void draw_settings(void) {
     /* The offset, shown only when System is the choice, because it changes nothing otherwise and
      * a control that does nothing is worse than no control. */
     if (app_theme() == TH_AUTO) {
-        char tz[32];
         int h = app_clock_hour();
-        snprintf(tz, sizeof tz, "UTC%+d", app_tz());
         gfx_text(X + 10, y, "Time zone", F_SM, C_INK3, C_SHEET);
         int bx = X + 10 + gfx_text_w("Time zone ", F_SM);
         R_SET_TZM = (gfx_rect){ bx, y - 1, 15, 15 };
@@ -1249,7 +1269,7 @@ static void draw_settings(void) {
         gfx_fill(R_SET_TZM.x + 4, R_SET_TZM.y + 7, 7, 1, C_INK2);
         gfx_fill(R_SET_TZP.x + 4, R_SET_TZP.y + 7, 7, 1, C_INK2);
         gfx_fill(R_SET_TZP.x + 7, R_SET_TZP.y + 4, 1, 7, C_INK2);
-        gfx_text(bx + 40, y, tz, F_SM, C_INK2, C_SHEET);
+        gfx_text(bx + 40, y, app_tz_name(), F_SM, C_INK2, C_SHEET);
         /* what it resolves to, so the setting can be checked rather than guessed at */
         if (h >= 0) {
             char now[32];
@@ -1464,8 +1484,8 @@ void app_event(const in_event *e) {
         MX = e->x; MY = e->y;
         if (SETTINGS_ON) {
             /* Modal: it consumes clicks under it, and a click outside closes it. */
-            if (inside(R_SET_TZM, MX, MY)) { app_set_tz(app_tz() - 1); return; }
-            if (inside(R_SET_TZP, MX, MY)) { app_set_tz(app_tz() + 1); return; }
+            if (inside(R_SET_TZM, MX, MY)) { app_set_tz_index(app_tz_index() - 1); return; }
+            if (inside(R_SET_TZP, MX, MY)) { app_set_tz_index(app_tz_index() + 1); return; }
             if (inside(R_SET_THEME, MX, MY)) {
                 /* which of the three chips: measured the same way they are drawn */
                 static const char *NAME[3] = { "System", "Light", "Dark" };

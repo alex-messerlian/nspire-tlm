@@ -71,8 +71,10 @@ int  app_theme(void);
 int  app_auto_is_dark(int hour);
 /* Hours from UTC. The device has no timezone and its RTC is a bare seconds counter, so AUTO cannot
  * tell local day from night without being told this. */
-int  app_tz(void);
-void app_set_tz(int hours);
+int  app_tz(void);              /* hours from UTC for the selected zone */
+const char *app_tz_name(void);  /* "HST", "PST", ... as the reader would say it */
+int  app_tz_index(void);
+void app_set_tz_index(int i);
 
 /* Local hour 0-23, or NEGATIVE when there is no usable clock.
  *

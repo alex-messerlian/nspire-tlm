@@ -62,26 +62,38 @@ int main(void) {
         T("18:00 is the first night hour", app_auto_is_dark(18), 1);
         T("an unreadable clock is not night", app_auto_is_dark(-1), 0);
 
-        /* the offset itself */
-        app_set_tz(0);
-        T("offset starts where it is put", app_tz(), 0);
-        app_set_tz(-10);
-        T("it takes a negative offset",    app_tz(), -10);
-        app_set_tz(-99);
-        T("and clamps below -12",          app_tz(), -12);
-        app_set_tz(99);
-        T("and above +14",                 app_tz(), 14);
+        /* THE ZONE LIST. Named US zones rather than a bare UTC number: "UTC-10" asks the reader
+         * to know their own offset, "HST" is what they already call it. Standard and daylight are
+         * separate entries rather than a date calculation, because bench_rtc has never run and a
+         * DST rule computed from an unverified clock is a guess wearing a uniform. */
+        app_set_tz_index(0);
+        T("the list starts in Hawaii",     app_tz(), -10);
+        T("and says so",                   strcmp(app_tz_name(), "HST"), 0);
+        app_set_tz_index(app_tz_index() + 3);
+        T("stepping east reaches PST",     strcmp(app_tz_name(), "PST"), 0);
+        T("which is UTC-8",                app_tz(), -8);
+        app_set_tz_index(-5);
+        T("it clamps at the west end",     app_tz_index(), 0);
+        app_set_tz_index(999);
+        T("and at the east end",           strcmp(app_tz_name(), "EDT"), 0);
+        T("EDT is UTC-4",                  app_tz(), -4);
+        /* clamping rather than wrapping: stepping off the end of a list should stop, not jump to
+         * the far side, which would look like the control glitching */
+        {   int at_end = app_tz_index();
+            app_set_tz_index(at_end + 1);
+            T("stepping past the end stays put", app_tz_index(), at_end); }
 
-        /* the shift itself: 20:00 UTC at -10 is 10:00 local, which is day */
-        {   int h = (20 + (-10)) % 24; if (h < 0) h += 24;
-            T("20:00 UTC at -10 is 10:00 local", h, 10);
-            T("and 10:00 local is day",          app_auto_is_dark(h), 0);
-            /* MUTATION: the shipped behaviour, which read the same instant as night */
-            int caught = (app_auto_is_dark(20) != app_auto_is_dark(h));
-            if (!caught) F++;
-            printf("  %s  mutant: AUTO on raw UTC calls 10am local night\n",
-                   caught ? "CAUGHT" : "MISSED"); }
-        app_set_tz(0);
+        /* every entry is a real US offset, and the list runs west to east */
+        {   int ordered = 1, prev = -99;
+            for (int i = 0; i < 11; i++) {
+                app_set_tz_index(i);
+                if (app_tz() < prev) ordered = 0;
+                prev = app_tz();
+                if (app_tz() < -10 || app_tz() > -4) ordered = 0;
+            }
+            T("west to east, all within US offsets", ordered, 1); }
+
+        app_set_tz_index(3);
     }
 
     printf("\n  -- surfaces are distinct after RGB565 --\n");
