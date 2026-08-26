@@ -48,9 +48,20 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include "nspire_screen.h"   /* printf -> on-screen console */
 
-#define LOG_PATH   "/documents/tlm/caslog.txt.tns"
-#define STATE_PATH "/documents/tlm/casnext.txt.tns"
+/* Both files are resolved at runtime rather than hardcoded, because this program now runs on a
+ * SECOND calculator that has none of this project's directories on it.
+ *
+ * The state file matters more than the log. If it cannot be written, the attempt counter never
+ * advances, every relaunch after a reset retries the SAME hypothesis, and the operator sees an
+ * infinite reset loop that is indistinguishable from "attempt 0 always resets". The counter is the
+ * whole mechanism that makes a nine-hypothesis sweep bounded, so a silent failure to persist it
+ * turns a 20-second procedure into an unbounded one. It is written AND READ BACK before any
+ * dangerous call is made, and the probe refuses to proceed if that round trip fails. */
+static const char *DIRS[] = { "/documents/tlm/", "/documents/bench/", "/documents/ndless/",
+                              "/documents/" };
+static char LOG_PATH[64], STATE_PATH[64];
 
 static FILE *LOG;
 
@@ -64,6 +75,27 @@ static void say(const char *fmt, ...) {
     if (LOG) { fprintf(LOG, "%s\n", buf); fflush(LOG); }   /* flush: a crash must not lose this */
 }
 
+/* Find a directory that can hold BOTH files. Verified by an actual write-read-back, not by an
+ * fopen that may succeed on a read-only or full filesystem. */
+static int resolve_paths(void) {
+    for (unsigned i = 0; i < sizeof DIRS / sizeof DIRS[0]; i++) {
+        snprintf(STATE_PATH, sizeof STATE_PATH, "%scasnext.txt.tns", DIRS[i]);
+        FILE *f = fopen(STATE_PATH, "w");
+        if (!f) continue;
+        int wrote = fprintf(f, "0\n") > 0;
+        fclose(f);
+        if (!wrote) continue;
+        f = fopen(STATE_PATH, "r");
+        if (!f) continue;
+        int back = -1, ok = (fscanf(f, "%d", &back) == 1 && back == 0);
+        fclose(f);
+        if (!ok) continue;
+        snprintf(LOG_PATH, sizeof LOG_PATH, "%scaslog.txt.tns", DIRS[i]);
+        return 1;
+    }
+    return 0;
+}
+
 /* Which attempt to make on this run. Persisted, so a reset resumes at the next one. */
 static int load_next(void) {
     FILE *f = fopen(STATE_PATH, "r");
@@ -73,12 +105,20 @@ static int load_next(void) {
     fclose(f);
     return (n < 0 || n > 999) ? 0 : n;
 }
-static void save_next(int n) {
+/* Returns 1 only if the value is on disk and reads back. The caller must not make a dangerous call
+ * unless this succeeded, or a reset would resume at the wrong attempt -- forever. */
+static int save_next(int n) {
     FILE *f = fopen(STATE_PATH, "w");
-    if (!f) return;
+    if (!f) return 0;
     fprintf(f, "%d\n", n);
     fflush(f);
     fclose(f);
+    f = fopen(STATE_PATH, "r");
+    if (!f) return 0;
+    int back = -1;
+    int ok = (fscanf(f, "%d", &back) == 1 && back == n);
+    fclose(f);
+    return ok;
 }
 
 /* ---- the attempt table -------------------------------------------------------------------------
@@ -107,8 +147,18 @@ static const attempt ATTEMPTS[] = {
 #define NATTEMPTS ((int)(sizeof ATTEMPTS / sizeof ATTEMPTS[0]))
 
 int main(void) {
+    if (!resolve_paths()) {
+        /* No writable directory. The sweep cannot be made bounded without one, so refuse rather
+         * than run a procedure that can never terminate. */
+        screen_init();
+        printf("bench_cas: no writable directory found.\n");
+        printf("Tried /documents/{tlm,bench,ndless}/ and /documents/.\n");
+        printf("Create one (e.g. copy any file into /documents/tlm/) and re-run.\n");
+        printf("\nPress any key.\n");
+        wait_key_pressed();
+        return 1;
+    }
     LOG = fopen(LOG_PATH, "a");
-    if (!LOG) LOG = fopen("/documents/bench/caslog.txt.tns", "a");
 
     say("=== bench_cas ===");
     say("os: hwtype=%u subtype=%u", (unsigned)nl_hwtype(), (unsigned)nl_hwsubtype());
@@ -160,9 +210,13 @@ int main(void) {
         return 0;
     }
   for (; idx < NATTEMPTS; idx++) {
-    /* Advance the counter BEFORE the call. If this attempt resets the device, the next launch
-     * moves on instead of reproducing the reset forever. */
-    save_next(idx + 1);
+    /* Advance the counter BEFORE the call, and CONFIRM it landed. If it did not, a reset would
+     * resume at this same attempt and the sweep would never terminate. */
+    if (!save_next(idx + 1)) {
+        say("STOP: could not persist the attempt counter to %s.", STATE_PATH);
+        say("      Without it a reset would repeat this attempt forever. Refusing to continue.");
+        break;
+    }
 
     const attempt *a = &ATTEMPTS[idx];
     say("");
