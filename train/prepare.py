@@ -8,10 +8,23 @@ TAG,WS,MATH = re.compile(r"<[^>]+>"),re.compile(r"\s+"),re.compile(r"<m:math.*?<
 def clean(p): return WS.sub(" ", TAG.sub(" ", MATH.sub(" [MATH] ", p.read_text(errors="ignore")))).strip()
 
 syn = [json.loads(l)["text"] for l in open("corpus/synth_sample.jsonl")]
-PHYS = ["osbooks-college-physics","osbooks-university-physics-bundle","osbooks-physics"]
-oer = [clean(f) for r in PHYS for f in (pathlib.Path("corpus/raw")/r).rglob("*.cnxml")]
+# ALL TWELVE BOOKS, not the three physics ones.
+#
+# corpus/raw holds 12 OpenStax books, all downloaded. This read three of them -- 2,825,221 tokens --
+# while astronomy, chemistry, calculus, algebra, statistics, precalculus, prealgebra and
+# contemporary mathematics sat unused: 7,806,218 further tokens already on disk. Measured totals:
+#
+#   3 physics books    2,825,221 tokens   ->  11.3M usable at the <=4-epoch ceiling
+#   all 12 books      10,631,439 tokens   ->  42.5M usable
+#
+# That was the constraint reported as binding the corpus size, and it was a reading of the loader
+# rather than of the disk. It also matches the charter's plan of continued training per domain --
+# algebra, calculus, physics, statistics are all here.
+OER_BOOKS = sorted(d.name for d in pathlib.Path("corpus/raw").iterdir()
+                   if d.is_dir() and any(d.rglob("*.cnxml")))
+oer = [clean(f) for r in OER_BOOKS for f in (pathlib.Path("corpus/raw")/r).rglob("*.cnxml")]
 rng = random.Random(20260820); rng.shuffle(syn); rng.shuffle(oer)
-print(f"synthetic {len(syn):,} docs   OER {len(oer):,} modules")
+print(f"synthetic {len(syn):,} docs   OER {len(oer):,} modules from {len(OER_BOOKS)} books")
 
 tk = Tokenizer(models.BPE(unk_token="<unk>"))
 tk.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=True)

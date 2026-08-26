@@ -1,8 +1,14 @@
 """THE generation loop. One implementation, imported — never rewritten.
 
-WHY THIS FILE EXISTS. Twenty files in this repo contained their own copy of "generate until <end>,
-and when the model emits </tool>, execute the call and feed <res>...</res> back in". Every copy is a
-chance to omit the injection, and omitting it does not fail loudly — the model emits `</tool>`,
+THE FINDING, WHICH IS NOT "SOMEONE FORGOT TWICE". There was no importable generation path in this
+repo. Twenty files each contained their own copy of "generate until <end>, and when the model emits
+</tool>, execute the call and feed <res>...</res> back in" -- because every harness that needed one
+had to write one. Bug 5 was not a lapse that recurred; it was a defect that EVERY harness could
+reproduce independently, and two of twenty happening to do so is the expected outcome of that
+structure rather than bad luck.
+
+That is why the fix is a module and an executable guard rather than a note. Omitting the injection
+does not fail loudly — the model emits `</tool>`,
 receives nothing to continue from, and loops:
 
     <tool> eval<arg> (6.626e-34)*(1.0)</tool></tool></tool></tool></tool>...

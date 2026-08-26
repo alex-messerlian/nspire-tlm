@@ -411,6 +411,37 @@ void matmul(float* xout, QuantizedTensor *x, QuantizedTensor *w, int n, int d) {
     }
 }
 
+#ifdef TLM_PROFILE
+/* ---- per-stage profiling -------------------------------------------------------------------
+ * Compiled out entirely unless TLM_PROFILE is defined, so the shipping binary is byte-identical.
+ *
+ * The point of this is F0. The parameter/context/throughput table rests on a fixed per-token
+ * overhead of ~180 ms that was never observed -- it is the residual of a two-anchor fit with two
+ * free parameters, i.e. whatever was left over after a MAC rate was also fitted. It is 47% of the
+ * only good decode measurement, and the central design parameter (how many parameters the model
+ * gets) is currently chosen on it.
+ *
+ * Reads the 32.768 kHz SP804, which bench_platform established as the crystal-derived cross-check.
+ * Timer setup is the caller's job -- bench/common.h's, not a raw read, because reading the SP804
+ * without configuring LOAD/CONTROL once produced a 2^32 underflow in this project.
+ */
+#include <stdint.h>
+#define PROF_TIMER 0x900D0000u
+#define PROF_VALUE 0x04u
+#define PROF_RD()  (*(volatile uint32_t *)(uintptr_t)(PROF_TIMER + PROF_VALUE))
+enum { PF_EMBED, PF_RMSNORM, PF_QUANT, PF_QKV, PF_ROPE, PF_KVWRITE,
+       PF_ATTN, PF_SOFTMAX, PF_FFN, PF_CLS, PF_N };
+uint32_t tlm_prof[PF_N];
+int      tlm_prof_layers = -1;        /* -1 = all; otherwise run only this many layers */
+static uint32_t _pf_t0;
+/* The counter runs DOWN; unsigned subtraction handles one wrap. */
+#define PF_BEG()      do { _pf_t0 = PROF_RD(); } while (0)
+#define PF_END(slot)  do { tlm_prof[slot] += (_pf_t0 - PROF_RD()); } while (0)
+#else
+#define PF_BEG()      do { } while (0)
+#define PF_END(slot)  do { } while (0)
+#endif
+
 float* forward(Transformer* transformer, int token, int pos) {
 
     // a few convenience variables
@@ -424,6 +455,7 @@ float* forward(Transformer* transformer, int token, int pos) {
     int hidden_dim =  p->hidden_dim;
     int head_size = dim / p->n_heads;
 
+    PF_BEG();
     // copy the token embedding into x
 #ifdef _TINSPIRE
     /* Same arithmetic dequantize() would have done for this row, done on demand. */
@@ -433,20 +465,36 @@ float* forward(Transformer* transformer, int token, int pos) {
     }
 #else
     memcpy(x, w->token_embedding_table + token*dim, dim * sizeof(float));
+    PF_END(PF_EMBED);
 #endif
 
     // forward all the layers
+#ifdef TLM_PROFILE
+    /* Run only the first N layers when asked. The output is meaningless -- that is fine, this is a
+     * TIMING probe. Varying L on one checkpoint is what turns F0 from a fitted residual into a
+     * measured intercept: time per token against L is a straight line whose intercept is everything
+     * that is not per-layer (embedding, final norm, classifier, loop overhead). No second
+     * checkpoint, no training run, and it separates the two terms directly instead of inferring one
+     * from the other. */
+    int _n_layers = (tlm_prof_layers >= 0 && tlm_prof_layers <= p->n_layers)
+                    ? tlm_prof_layers : p->n_layers;
+    for(int l = 0; l < _n_layers; l++) {
+#else
     for(int l = 0; l < p->n_layers; l++) {
+#endif
 
         // attention rmsnorm
-        rmsnorm(s->xb, x, w->rms_att_weight + l*dim, dim);
+        PF_BEG(); rmsnorm(s->xb, x, w->rms_att_weight + l*dim, dim); PF_END(PF_RMSNORM);
 
         // qkv matmuls for this position
-        quantize(&s->xq, s->xb, dim);
+        PF_BEG(); quantize(&s->xq, s->xb, dim); PF_END(PF_QUANT);
+        PF_BEG();
         matmul(s->q, &s->xq, w->wq + l, dim, dim);
         matmul(s->k, &s->xq, w->wk + l, dim, kv_dim);
         matmul(s->v, &s->xq, w->wv + l, dim, kv_dim);
+        PF_END(PF_QKV);
 
+        PF_BEG();
         // RoPE relative positional encoding: complex-valued rotate q and k in each head
         for (int i = 0; i < dim; i+=2) {
             int head_dim = i % head_size;
@@ -464,6 +512,8 @@ float* forward(Transformer* transformer, int token, int pos) {
             }
         }
 
+        PF_END(PF_ROPE);
+        PF_BEG();
         // save key,value at this time step (pos) to our kv cache
         int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
         float* key_cache_row = s->key_cache + loff + pos * kv_dim;
@@ -491,6 +541,8 @@ float* forward(Transformer* transformer, int token, int pos) {
         memcpy(value_cache_row, s->v, kv_dim * sizeof(*value_cache_row));
 #endif
 
+        PF_END(PF_KVWRITE);
+        PF_BEG();
         // multihead attention. iterate over all heads
         int h;
         #pragma omp parallel for private(h)
@@ -534,7 +586,7 @@ float* forward(Transformer* transformer, int token, int pos) {
             }
 
             // softmax the scores to get attention weights, from 0..pos inclusively
-            softmax(att, pos + 1);
+            PF_END(PF_ATTN); PF_BEG(); softmax(att, pos + 1); PF_END(PF_SOFTMAX); PF_BEG();
 
             // weighted sum of the values, store back into xb
             float* xb = s->xb + h * head_size;
@@ -600,11 +652,13 @@ float* forward(Transformer* transformer, int token, int pos) {
     }
 
     // final rmsnorm
-    rmsnorm(x, x, w->rms_final_weight, dim);
+    PF_BEG(); rmsnorm(x, x, w->rms_final_weight, dim); PF_END(PF_RMSNORM);
 
     // classifier into logits
-    quantize(&s->xq, x, dim);
+    PF_BEG(); quantize(&s->xq, x, dim); PF_END(PF_QUANT);
+    PF_BEG();
     matmul(s->logits, &s->xq, w->wcls, dim, p->vocab_size);
+    PF_END(PF_CLS);
     return s->logits;
 }
 
