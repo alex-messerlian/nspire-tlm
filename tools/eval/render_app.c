@@ -99,6 +99,15 @@ int main(int argc, char **argv) {
         MX = 300; MY = 220;                 /* cursor parked off the sheet */
     } else if (!strcmp(screen, "chat")) {
         CUR = 2; MX = 300; MY = 220;
+    } else if (!strcmp(screen, "typing") || !strcmp(screen, "typinglong")) {
+        CUR = 2; MX = 300; MY = 220;
+        const char *s = !strcmp(screen, "typinglong")
+            ? "What is the distance from What is the distance from What is the distance from "
+              "What is the distance from What is the distance from"
+            : "What is the distance from What is the distance from What is";
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", s);
+        COMPOSE_N = (int)strlen(COMPOSE);
+        app_set_theme(TH_DARK);
     } else if (!strcmp(screen, "empty")) {
         NCHATS = 0; CUR = -1; MX = 300; MY = 220;   /* the first-run screen, nothing seeded */
     } else if (!strcmp(screen, "emptydark")) {

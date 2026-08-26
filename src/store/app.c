@@ -108,6 +108,37 @@ static int marq_off(int t, int overflow) {
     return off > overflow ? overflow : off;
 }
 static void draw_composer(int x0, int w, int cy);
+
+/* THE COMPOSER GROWS UPWARD, like the web one and like every chat box people already use.
+ *
+ * It used to be a fixed 24px slot, so a question longer than one line spilled out of the pill and
+ * over whatever was beneath it. Now the field takes as many lines as the text needs, the dock
+ * grows with it, and the transcript's bottom rises to match -- the field's BOTTOM edge never moves.
+ *
+ * Capped at four lines. Past that the text scrolls inside the field and the oldest lines stop
+ * being shown, which is the answer to "should there be a character limit": there is no limit on
+ * what you can type, only on how much of it is on screen at once. A hard cap would silently
+ * refuse keystrokes, and a composer that ignores the keypad is worse than one that scrolls. */
+#define COMPOSE_MAX_LINES 4
+#define COMPOSE_LH        15     /* F_UI's box */
+
+/* Text width inside the field, for a pane of width `w`. ONE definition, because a measure/draw
+ * mismatch here is exactly the bubble-width defect that took a 60-case sweep to find. */
+static int compose_textw(int w) { return w - 2 * PAD - 9 - 24; }
+
+/* Lines the composer wants, before the cap, for a pane of width `w`. */
+static int compose_lines_total(int w) {
+    if (!COMPOSE_N) return 1;
+    int n = gfx_text_wrap(0, 0, COMPOSE, F_UI, C_INK, C_FIELD, compose_textw(w), COMPOSE_LH, 0);
+    return n < 1 ? 1 : n;
+}
+static int compose_lines(int w) {
+    int n = compose_lines_total(w);
+    return n > COMPOSE_MAX_LINES ? COMPOSE_MAX_LINES : n;
+}
+static int compose_field_h(int w) { return compose_lines(w) * COMPOSE_LH + 9; }
+/* The dock is the field plus 3px above, then 2px and the 13px disclaimer below. */
+static int compose_dock_h(int w) { return compose_field_h(w) + 3 + 2 + 13 + 2; }
 static int EMPTY_COMPOSER;   /* set per-frame: the composer was drawn centred, so do not dock it */              /* always visible: leaving must not depend on knowing a key */
 static int ABORT;                    /* set by ESC or Stop; polled by the generation loop */
 static int NCHAT_ROWS;
@@ -802,7 +833,12 @@ static void draw_main(void) {
 
     /* transcript */
     int px0 = x0 + PAD, pw = w - 2 * PAD;
-    int top = TOP_H, bot = GFX_H - DOCK_H;
+    /* The dock is whatever the composer currently needs, not a constant. DOCK_H is its one-line
+     * value and stays the floor; as the field grows the transcript's bottom rises to meet it, so
+     * the field's BOTTOM edge never moves and the text it holds grows upward. */
+    int dock = compose_dock_h(w);
+    if (dock < DOCK_H) dock = DOCK_H;
+    int top = TOP_H, bot = GFX_H - dock;
     gfx_clip(x0, top, w, bot - top);
 
     EMPTY_COMPOSER = 0;
@@ -818,7 +854,7 @@ static void draw_main(void) {
          * exactly what they could not do here. */
         int gap = 14;
         int hh = gfx_font_h(F_BIG);
-        int blk = hh + gap + 20;                             /* heading + gap + field */
+        int blk = hh + gap + compose_field_h(w);             /* heading + gap + field */
         int cy0 = top + (bot - top - blk) / 2;
         if (cy0 < top + 6) cy0 = top + 6;
 
@@ -865,12 +901,13 @@ static void draw_main(void) {
     gfx_clip_reset();
 
     if (!EMPTY_COMPOSER) {
-        int cy = GFX_H - DOCK_H + 3;
+        int cy = GFX_H - dock + 3;
         draw_composer(x0, w, cy);
         /* The web's `.note`, and only under the DOCKED field -- `#empty` has no counterpart, which
          * is why the new-chat screen shows the bar alone. */
         const char *note = "ChatTLM can make mistakes.";
-        gfx_text(x0 + (w - gfx_text_w(note, F_SM)) / 2, cy + 26, note, F_SM, C_INK3, C_BG);
+        gfx_text(x0 + (w - gfx_text_w(note, F_SM)) / 2, cy + compose_field_h(w) + 2,
+                 note, F_SM, C_INK3, C_BG);
     }
 
 }
@@ -890,21 +927,35 @@ static void draw_cursor(void) {
  * reparents the same field between `#centerComposer` and `#bottomComposer`; this is that, and it is
  * the reason the function takes a coordinate instead of reading DOCK_H itself. */
 static void draw_composer(int x0, int w, int cy) {
-    R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, 24 };
-    gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 12, C_FIELD);
+    int fh = compose_field_h(w);
+    R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, fh };
+    /* The radius stays a half-height pill at one line and stops growing after that, so a tall
+     * field is a rounded rectangle rather than a lozenge. */
+    gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, fh > 24 ? 12 : fh / 2, C_FIELD);
     gfx_rrect_outline(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD_LN);
     if (COMPOSE_N) {
-        gfx_text_ellipsis(R_FIELD.x + 9, cy + 5, COMPOSE, F_UI, C_INK, C_FIELD, R_FIELD.w - 34);
-        int cw = gfx_text_w(COMPOSE, F_UI);
-        if (cw < R_FIELD.w - 40) gfx_vline(R_FIELD.x + 9 + cw + 1, cy + 6, 12, C_INK);
+        /* Wrapped, and scrolled to the END: with more than COMPOSE_MAX_LINES the earlier lines
+         * move off the top so what you are typing stays visible. Clipped to the field, because a
+         * scrolled first line would otherwise be drawn above it. */
+        int tw = compose_textw(w);
+        int total = compose_lines_total(w), shown = compose_lines(w);
+        int skip = total - shown, last_w = 0;
+        /* Clipped to the TEXT band, not to the field. Clipping to the field left the bottom 5px
+         * of the line above the first visible one showing -- a row of glyph-tops with no line
+         * under them, which reads as a rendering fault rather than as scrolled text. */
+        gfx_clip(R_FIELD.x, cy + 5, R_FIELD.w, shown * COMPOSE_LH);
+        gfx_text_wrap_ex(R_FIELD.x + 9, cy + 5 - skip * COMPOSE_LH, COMPOSE, F_UI, C_INK, C_FIELD,
+                         tw, COMPOSE_LH, 1, &last_w);
+        gfx_clip_reset();
+        /* the caret follows the text, on the last visible line */
+        int cxx = R_FIELD.x + 9 + last_w + 1, cyy = cy + 6 + (shown - 1) * COMPOSE_LH;
+        if (last_w < tw - 2) gfx_vline(cxx, cyy, 12, C_INK);
     } else {
         gfx_text(R_FIELD.x + 9, cy + 5, "Ask ChatTLM", F_UI, C_INK3, C_FIELD);
     }
-    /* While generating, the send arrow becomes a STOP square -- the same control, so there is
-     * always exactly one button there and it always does the thing the state calls for. */
     /* 14, not 16. In a 20px field a 16px disc leaves 2px of margin and reads as a plug filling
      * the end of the pill rather than as a button sitting inside it. */
-    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 19, cy + 5, 14, 14 };
+    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 19, cy + fh - 19, 14, 14 };
     if (BUSY) {
         gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 7, C_INK);
         gfx_fill(R_SEND.x + 4, R_SEND.y + 4, 6, 6, C_BG);

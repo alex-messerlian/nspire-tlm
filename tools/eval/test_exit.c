@@ -180,6 +180,56 @@ int main(void) {
     T("and sits on the same row",       R_EXIT.y == R_NEW.y, 1);
     T("exit clears the screen edge",    R_EXIT.x + R_EXIT.w <= GFX_W - 3, 1);
 
+    /* -- the composer grows upward and then stops --
+     *
+     * It was a fixed 24px slot, so a question longer than one line spilled out of the pill. The
+     * field takes the lines it needs, the dock grows with it, and the BOTTOM edge stays put --
+     * that last part is the whole point and is what a height-only assertion would miss. */
+    printf("\n  -- the composer grows with its text --\n");
+    reset(); CUR = -1;
+    {   int w = GFX_W - (SIDE_W + 1);
+        int h1 = compose_field_h(w);
+        T("empty is one line", compose_lines(w), 1);
+        T("and DOCK_H tall",   compose_dock_h(w) <= DOCK_H, 1);
+
+        /* grow it a line at a time and watch the bottom edge */
+        int bottoms[6], heights[6];
+        for (int n = 1; n <= 5; n++) {
+            COMPOSE_N = 0; COMPOSE[0] = 0;
+            for (int k = 0; k < n * 40 && COMPOSE_N < (int)sizeof COMPOSE - 2; k++) {
+                COMPOSE[COMPOSE_N++] = (k % 6 == 5) ? ' ' : 'm';
+            }
+            COMPOSE[COMPOSE_N] = 0;
+            app_draw();
+            heights[n] = R_FIELD.h;
+            bottoms[n] = R_FIELD.y + R_FIELD.h;
+        }
+        T("it got taller than one line", heights[3] > h1, 1);
+        T("the BOTTOM edge never moved",
+          bottoms[1] == bottoms[2] && bottoms[2] == bottoms[3] &&
+          bottoms[3] == bottoms[4] && bottoms[4] == bottoms[5], 1);
+        T("capped at COMPOSE_MAX_LINES", heights[5] <= COMPOSE_MAX_LINES * COMPOSE_LH + 9, 1);
+        T("the cap actually binds",      heights[5] == heights[4], 1);
+        T("the field stays on screen",   bottoms[5] <= GFX_H, 1);
+        T("send stays inside the field",
+          R_SEND.y >= R_FIELD.y && R_SEND.y + R_SEND.h <= R_FIELD.y + R_FIELD.h, 1);
+
+        /* MUTATION: a fixed-height field is what spilled text out of the pill. */
+        int caught = (heights[3] != h1);
+        if (!caught) F++;
+        printf("  %s  mutant: fixed-height field (3 lines still %d px)\n",
+               caught ? "CAUGHT" : "MISSED", heights[3]);
+
+        /* the transcript must yield the space, or the grown field covers the last answer */
+        COMPOSE_N = 0; COMPOSE[0] = 0; app_draw();
+        int dock1 = compose_dock_h(w);
+        for (int k = 0; k < 200 && COMPOSE_N < (int)sizeof COMPOSE - 2; k++)
+            COMPOSE[COMPOSE_N++] = (k % 6 == 5) ? ' ' : 'm';
+        COMPOSE[COMPOSE_N] = 0; app_draw();
+        T("the dock grew with the field", compose_dock_h(w) > dock1, 1);
+        COMPOSE_N = 0; COMPOSE[0] = 0;
+    }
+
     /* -- hover marquee on session titles --
      *
      * Titles ellipsise at ~64px, which for a question is a few words and often not enough to tell

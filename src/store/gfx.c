@@ -186,6 +186,10 @@ int gfx_text_ellipsis(int x, int y, const char *s, gfx_font f, uint16_t fg, uint
 
 int gfx_text_wrap(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t bg,
                   int maxw, int line_h, int draw) {
+    return gfx_text_wrap_ex(x, y, s, f, fg, bg, maxw, line_h, draw, 0);
+}
+int gfx_text_wrap_ex(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t bg,
+                     int maxw, int line_h, int draw, int *out_last_w) {
     fontref F = fref(f);
     int lines = 0;
     while (*s) {
@@ -202,6 +206,11 @@ int gfx_text_wrap(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t
         }
         const char *end = *p ? (lastsp ? lastsp : p) : p;
         if (end == s) end = p;                /* a single word longer than the line: hard-break */
+        if (out_last_w) {                     /* width of THIS line; the last one to run wins */
+            int lw = 0; const char *q = s; unsigned c2;
+            while (q < end) { q = u8(q, &c2); const ns_glyph *g = find(F, c2); if (g) lw += g->w; }
+            *out_last_w = lw;
+        }
         if (draw) {
             int xx = x; const char *q = s;
             while (q < end) {

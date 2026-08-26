@@ -54,6 +54,11 @@ int  gfx_font_h(gfx_font f);
 /* Draw at most `maxw` pixels, appending an ellipsis if it does not fit. Returns width drawn. */
 int  gfx_text_ellipsis(int x, int y, const char *utf8, gfx_font f, uint16_t fg, uint16_t bg, int maxw);
 /* Word-wrap: returns the number of lines that WOULD be drawn; draws them when draw is true. */
+/* As gfx_text_wrap, but also reports the pixel width of the LAST line through `out_last_w`.
+ * The composer needs it to put a caret after wrapped text: recomputing the break points at the
+ * call site would be a second copy of the wrapping rule, and the two would drift. */
+int  gfx_text_wrap_ex(int x, int y, const char *utf8, gfx_font f, uint16_t fg, uint16_t bg,
+                      int maxw, int line_h, int draw, int *out_last_w);
 int  gfx_text_wrap(int x, int y, const char *utf8, gfx_font f, uint16_t fg, uint16_t bg,
                    int maxw, int line_h, int draw);
 #endif
