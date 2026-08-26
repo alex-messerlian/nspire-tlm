@@ -60,8 +60,8 @@ Date of measurement run: `UNMEASURED`
 
 | # | Property | Why it matters | MEASURED | Bench |
 |---|---|---|---|---|
-| B1 | Largest single successful `malloc` under Ndless | Hard ceiling on resident weights. A model that does not fit here does not run. | `UNMEASURED` | `bench_mem` |
-| B2 | Total heap allocatable in chunks | Fragmentation may make B2 >> B1. If so, weights must be allocated per-layer, not as one block. | `UNMEASURED` | `bench_mem` |
+| B1 | Largest single successful `malloc` under Ndless | Hard ceiling on resident weights. A model that does not fit here does not run. | `**22,609,920 B = 21.56 MiB** (pessimistic of 3 battery runs; 22,872,064 / 22,937,600)` | `bench_mem` |
+| B2 | Total heap allocatable in chunks | Fragmentation may make B2 >> B1. If so, weights must be allocated per-layer, not as one block. | `**28,442,624 B = 27.12 MiB** (64 KB chunks, 3 battery runs)` | `bench_mem` |
 | B3 | Peak RSS of a bare "hello world" Ndless app | Baseline overhead to subtract from every later measurement | `UNMEASURED` | `bench_mem` |
 | B4 | Sequential read bandwidth, LPDDR | Memory-bound ceiling | **70.5 MB/s** (corrected; log says 97) | `bench_mem` |
 | B5 | `memcpy` bandwidth | Sanity check on B4 | **50.9 MB/s** (corrected; log says 70) | `bench_mem` |
