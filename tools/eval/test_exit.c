@@ -26,6 +26,9 @@ static void reset(void) {
     app_init();
     ABORT = 0; QUIT = 0; BUSY = 0; SEARCH_ON = 0;
     SIDEBAR = 1; HOVER = 0; MX = MY = 0; SCROLL = 0; CHAT_SCROLL = 0;
+    /* The animation clock too. A timestamp left by an earlier case made NOW_MS - MARQ_T0 underflow
+     * and the marquee read as fully travelled before it had moved at all. */
+    MARQ_AT = -1; MARQ_T0 = 0; app_set_now(0);
     app_draw();
 }
 static void seed(const char *title) {
@@ -278,27 +281,58 @@ int main(void) {
      * the answer they are reading. */
     printf("\n  -- the placeholder names a subject, on the right screen --\n");
     {   T("more than one subject", ASK_N > 1, 1);
-        int cycle = ASK_HOLD + ASK_SLIDE;
-        T("a word rests, then moves", ASK_HOLD > ASK_SLIDE, 1);
-        /* Sized by ASK_N, not by a literal. It was seen[16] from when the bank held six subjects,
-         * and growing the bank to 39 made this write off the end of the stack -- caught by the
-         * stack protector as SIGABRT, which is the only reason it did not pass while corrupting
-         * whatever sat next to it. A fixture that hardcodes the size of the thing under test
-         * breaks the moment that thing is the thing being changed. */
+        T("a word rests longer than it slides", ASK_HOLD_MS > ASK_SLIDE_MS, 1);
+        /* A CLOCK, so the cadence is identical whether or not a finger is on the pad. Tied to
+         * draws, the rotation ran at whatever rate the input loop happened to spin, which on
+         * hardware was far too fast under a finger and frozen without one. */
+        unsigned cycle = ASK_HOLD_MS + ASK_SLIDE_MS;
+        /* Deliberately unhurried. The first cadence was 2.86 s and on hardware it read as
+         * flickering; a subject you have not finished reading before it leaves is decoration, not
+         * information. */
+        T("a word is on screen for four seconds or more", ASK_HOLD_MS >= 4000, 1);
+        T("and the whole cycle stays under six", cycle <= 6000, 1);
+        T("the slide is long enough to be motion", ASK_SLIDE_MS >= 300, 1);
+
+        /* SHUFFLED, not in table order, and never the same word twice running. */
+        {   int repeats = 0, distinct = 0, hit[ASK_N];
+            for (int i = 0; i < ASK_N; i++) hit[i] = 0;
+            int prev = -1;
+            for (unsigned n = 0; n < 400u; n++) {
+                int i = ask_index(n);
+                if (i < 0 || i >= ASK_N) { repeats = -1; break; }
+                if (i == prev) repeats++;
+                hit[i] = 1; prev = i;
+            }
+            for (int i = 0; i < ASK_N; i++) distinct += hit[i];
+            T("never the same subject twice running", repeats, 0);
+            T("every subject comes up", distinct, ASK_N);
+            /* and it is NOT simply walking the table */
+            int sequential = 1;
+            for (unsigned n = 0; n < 8u; n++)
+                if (ask_index(n) != (int)(n % (unsigned)ASK_N)) { sequential = 0; break; }
+            T("the order is shuffled, not the table order", sequential, 0);
+            /* the same instant always shows the same word, or a redraw would advance it */
+            T("it is a pure function of the clock", ask_index(123u), ask_index(123u));
+        }
         int bad = 0, seen[ASK_N];
         for (int i = 0; i < ASK_N; i++) seen[i] = 0;
-        for (int tt = 0; tt < cycle * ASK_N * 2; tt++) {
-            int i = (tt / cycle) % ASK_N;
+        for (unsigned ms = 0; ms < cycle * (unsigned)ASK_N * 2u; ms += 50) {
+            int i = (int)((ms / cycle) % (unsigned)ASK_N);
             if (i < 0 || i >= ASK_N) bad++; else seen[i] = 1;
         }
         T("index never leaves the table", bad, 0);
         int all = 1; for (int i = 0; i < ASK_N; i++) if (!seen[i]) all = 0;
         T("every subject is reached", all, 1);
-        int worst = ((cycle - 1 - ASK_HOLD) * COMPOSE_LH) / ASK_SLIDE;
-        T("travel never exceeds one line", worst <= COMPOSE_LH, 1);
 
-        /* EVERY subject must fit the field. The bank is meant to grow, and a word wider than the
-         * budget would be silently clipped mid-slide with nothing on screen saying so. */
+        /* app_set_now reports whether a redraw is OWED, and at rest it must mostly say no. That is
+         * what stops the app repainting a 320x240 framebuffer in software for nothing, which is
+         * what the CPU was actually doing. */
+        reset(); CUR = -1; COMPOSE_N = 0; app_draw();
+        int asked = 0, frames = 0;
+        for (unsigned ms = 0; ms < cycle; ms += 20) { frames++; if (app_set_now(ms)) asked++; }
+        T("resting, most frames are skipped", asked * 3 < frames, 1);
+        printf("        %d of %d frames wanted a redraw across one cycle\n", asked, frames);
+
         {   int w = GFX_W - (SIDE_W + 1);
             int budget = compose_textw(w) - gfx_text_w("Ask me about ", F_UI);
             int widest = 0; const char *worst_word = "";
@@ -308,17 +342,13 @@ int main(void) {
             }
             T("every subject fits the field", widest <= budget, 1);
             printf("        widest is \"%s\" at %d px against %d px of budget\n",
-                   worst_word, widest, budget);
-        }
+                   worst_word, widest, budget); }
 
-        /* Which text is drawn is decided by CUR, so read the pixels: the two strings differ in
-         * width, and the rotating one is the only one that changes between draws. */
         reset(); CUR = -1; COMPOSE_N = 0; app_draw();
         int empty_w = gfx_text_w("Ask me about ", F_UI) + gfx_text_w(ASK_ABOUT[0], F_UI);
         reset(); seed("A car goes 150 m in 12 s."); CUR = 0; COMPOSE_N = 0; app_draw();
         int chat_w = gfx_text_w("Type a message...", F_UI);
         T("the two screens use different copy", empty_w != chat_w, 1);
-        /* MUTATION: one placeholder everywhere is what this replaces. */
         if (empty_w == chat_w) F++;
         printf("  %s  mutant: the same placeholder on both screens\n",
                empty_w != chat_w ? "CAUGHT" : "MISSED");
@@ -331,29 +361,48 @@ int main(void) {
      * the cursor leaves. The clamp is the part worth asserting: without it the title keeps going
      * and scrolls off its own left edge, leaving a blank row that reads as a rendering fault. */
     printf("\n  -- session titles marquee on hover --\n");
-    {   T("still at rest during the hold",  marq_off(MARQ_HOLD, 40), 0);
-        T("has not moved one draw before",  marq_off(MARQ_HOLD - 1, 40), 0);
-        T("moves after the hold",           marq_off(MARQ_HOLD + 2 * MARQ_DIV, 40) > 0, 1);
-        T("advances one px per MARQ_DIV",   marq_off(MARQ_HOLD + 10 * MARQ_DIV, 40), 10);
-        T("STOPS at the end",               marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40), 40);
-        T("never exceeds the overflow",     marq_off(999999, 40), 40);
-        T("a title that fits never moves",  marq_off(999999, 0), 0);
-        T("negative overflow is not motion", marq_off(999999, -12), 0);
-
-        /* MUTATION: drop the clamp and a long title runs off its own left edge. */
-        int unclamped = (MARQ_HOLD + 400 * MARQ_DIV - MARQ_HOLD) / MARQ_DIV;
-        int caught = (marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40) != unclamped);
-        if (!caught) F++;
-        printf("  %s  mutant: no clamp -> travel %d px against a 40 px overflow\n",
-               caught ? "CAUGHT" : "MISSED", unclamped);
+    {   /* MILLISECONDS now. It was a draw count, and draws happen only on input, so the travel
+         * raced under a moving finger and stopped dead the moment it lifted. */
+        T("still at rest during the hold",  marq_off(MARQ_HOLD_MS, 40), 0);
+        T("has not moved just before",      marq_off(MARQ_HOLD_MS - 1, 40), 0);
+        T("moves after the hold",           marq_off(MARQ_HOLD_MS + 500, 40) > 0, 1);
+        T("STOPS at the end",               marq_off(MARQ_HOLD_MS + 60000, 40), 40);
+        T("never exceeds the overflow",     marq_off(0xFFFFFFu, 40), 40);
+        T("a title that fits never moves",  marq_off(0xFFFFFFu, 0), 0);
+        T("negative overflow is not motion",marq_off(0xFFFFFFu, -12), 0);
+        {   int unclamped = (int)(((0xFFFFFFu - MARQ_HOLD_MS) * MARQ_PX_S) / 1000u);
+            int caught = (marq_off(0xFFFFFFu, 40) != unclamped);
+            if (!caught) F++;
+            printf("  %s  mutant: no clamp -> %d px against a 40 px overflow\n",
+                   caught ? "CAUGHT" : "MISSED", unclamped); }
     }
 
     /* the hover STATE: it must reset when the cursor leaves, or the next hover resumes mid-scroll */
     reset(); seed("Speed from distance and time on a long straight road"); CUR = -1;
     MX = 40; MY = 50; HOVER = 1; app_draw();
     T("hovering a row arms the marquee", MARQ_AT >= 0, 1);
-    {   int t0 = MARQ_T; app_draw();
-        T("each draw advances it", MARQ_T > t0, 1); }
+    /* It advances with the CLOCK, not with draws.
+     *
+     * Order matters here and the first version of this test got it wrong: MARQ_T0 is stamped from
+     * NOW_MS inside app_draw when the cursor ARRIVES on a row, so setting the clock after the
+     * arming draw moves the origin and the elapsed time reads as zero. Arm first, then advance the
+     * clock without drawing. */
+    {   app_set_now(1000); app_draw();                 /* arms: MARQ_T0 = 1000 */
+        int at_rest = marq_off(marq_elapsed(), 400);
+        app_set_now(1000 + MARQ_HOLD_MS + 1000);       /* one second past the hold */
+        int moved = marq_off(marq_elapsed(), 400);
+        T("time advances it", moved > at_rest, 1);
+        /* RELATIVE, because the row armed at whatever NOW_MS the first draw of this block saw and
+         * pinning an absolute expectation to it just encodes that accident. A second of clock is a
+         * second of travel wherever the origin happens to be. */
+        int p0 = moved;
+        app_set_now(1000 + MARQ_HOLD_MS + 2000);
+        T("advances MARQ_PX_S per second", marq_off(marq_elapsed(), 400) - p0, MARQ_PX_S);
+        /* and DRAWING does not: this is the hardware bug in one assertion. Read the value AFTER
+         * the last clock change, or it compares against a stale sample. */
+        int before_draws = marq_off(marq_elapsed(), 400);
+        app_draw(); app_draw(); app_draw();
+        T("redrawing advances it not at all", marq_off(marq_elapsed(), 400), before_draws); }
     MX = 300; MY = 220; app_draw();
     T("leaving the list disarms it", MARQ_AT, -1);
 
@@ -406,32 +455,6 @@ int main(void) {
      * two sessions apart. On hover the full title scrolls left, STOPS at its end, and resets when
      * the cursor leaves. The clamp is the part worth asserting: without it the title keeps going
      * and scrolls off its own left edge, leaving a blank row that reads as a rendering fault. */
-    printf("\n  -- session titles marquee on hover --\n");
-    {   T("still at rest during the hold",  marq_off(MARQ_HOLD, 40), 0);
-        T("has not moved one draw before",  marq_off(MARQ_HOLD - 1, 40), 0);
-        T("moves after the hold",           marq_off(MARQ_HOLD + 2 * MARQ_DIV, 40) > 0, 1);
-        T("advances one px per MARQ_DIV",   marq_off(MARQ_HOLD + 10 * MARQ_DIV, 40), 10);
-        T("STOPS at the end",               marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40), 40);
-        T("never exceeds the overflow",     marq_off(999999, 40), 40);
-        T("a title that fits never moves",  marq_off(999999, 0), 0);
-        T("negative overflow is not motion", marq_off(999999, -12), 0);
-
-        /* MUTATION: drop the clamp and a long title runs off its own left edge. */
-        int unclamped = (MARQ_HOLD + 400 * MARQ_DIV - MARQ_HOLD) / MARQ_DIV;
-        int caught = (marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40) != unclamped);
-        if (!caught) F++;
-        printf("  %s  mutant: no clamp -> travel %d px against a 40 px overflow\n",
-               caught ? "CAUGHT" : "MISSED", unclamped);
-    }
-
-    /* the hover STATE: it must reset when the cursor leaves, or the next hover resumes mid-scroll */
-    reset(); seed("Speed from distance and time on a long straight road"); CUR = -1;
-    MX = 40; MY = 50; HOVER = 1; app_draw();
-    T("hovering a row arms the marquee", MARQ_AT >= 0, 1);
-    {   int t0 = MARQ_T; app_draw();
-        T("each draw advances it", MARQ_T > t0, 1); }
-    MX = 300; MY = 220; app_draw();
-    T("leaving the list disarms it", MARQ_AT, -1);
 
     printf("\n  -- the empty state centres the composer --\n");
     reset(); CUR = -1; app_draw();

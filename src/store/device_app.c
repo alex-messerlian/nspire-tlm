@@ -99,38 +99,29 @@ static void pointer_init(void) {
 
 /* Returns 1 if an event was produced.
  *
- * RELATIVE motion, not absolute. The pad reports where the finger IS, and mapping that straight to
- * a screen position makes the cursor teleport to wherever you happen to touch down, then snap back
- * the moment you lift and re-touch -- which is what it did. A pad this small cannot be an absolute
- * digitiser anyway: it is ~1/4 the aspect of the panel, so absolute mapping also means you can only
- * reach a screen position by touching the corresponding fraction of a 2 cm pad.
+ * ABSOLUTE, and that is a reversal. Relative was tried because touching down teleported the cursor
+ * and lifting snapped it back, which is genuinely how a trackpad should not behave. But this pad is
+ * about 2 cm wide with no room to re-stroke, so relative motion made the 20px icons at the top of
+ * the sidebar effectively unreachable: you could not get there in one pass and lifting to try again
+ * did not help. Absolute has a real flaw and is still the better one, because every target is
+ * directly reachable by touching the matching part of the pad.
  *
- * So it behaves like a trackpad. Contact establishes a reference point and does NOT move the
- * cursor; subsequent motion moves it by the delta. Lifting clears the reference, so the next touch
- * resumes from where the cursor already is instead of jumping.
- *
- * Tap versus drag is unchanged and still needed: app.c has handled IN_SCROLL since it was written
- * and nothing ever emitted one.
+ * Two things make it behave. The cursor only follows a REAL contact, not mere proximity, so a hand
+ * resting near the pad does not drag it around. And an event is emitted only when the cursor
+ * actually CHANGED: every sample used to produce one, and each event forced a full 320x240
+ * software repaint, which is what pegged the CPU and made the whole app feel like it was
+ * struggling.
  */
-#define TAP_SLOP  5             /* pixels of cursor travel still counted as a tap */
-#define PAD_GAIN  3             /* cursor pixels per pad unit, x256 -- tuned for a 320px panel */
+#define TAP_SLOP  6             /* pixels of travel still counted as a tap */
 
-static int DOWN, HAVE_REF, REF_X, REF_Y, TRAVEL;
-/* Sub-pixel remainder. The pad is higher-resolution than the panel, so `delta * GFX_W / PAD_W`
- * truncates every small movement to ZERO -- slow, precise motion would move the cursor not at all
- * while fast motion worked, which reads as a dead pad rather than as a scaling bug. Carrying the
- * remainder in 1/256ths makes fine motion accumulate instead of being discarded. */
-static int ACC_X, ACC_Y;
+static int DOWN, TRAVEL, SEEN;
 
 static int pointer_poll(in_event *e) {
     touchpad_report_t r;
     if (touchpad_scan(&r) != 0) return 0;
 
-    int active = r.contact || r.proximity;
-    if (!active) {
-        /* Lift. Drop the reference so the next touch does not jump, and turn a short press into a
-         * click. */
-        HAVE_REF = 0;
+    if (!r.contact && !r.proximity) {          /* hand away: settle, and finish a tap */
+        SEEN = 0;
         if (DOWN) {
             DOWN = 0;
             e->x = CX; e->y = CY; e->hover = 0;
@@ -139,40 +130,28 @@ static int pointer_poll(in_event *e) {
         return 0;
     }
 
-    if (!HAVE_REF) {                      /* first sample of a touch: anchor, do not move */
-        HAVE_REF = 1; REF_X = r.x; REF_Y = r.y; TRAVEL = 0; ACC_X = ACC_Y = 0;
-        if (r.contact) DOWN = 1;
-        e->x = CX; e->y = CY; e->hover = r.proximity && !r.contact; e->kind = IN_MOVE;
-        return 1;
+    if (!r.contact) {                          /* hovering only: report it, do not move */
+        if (DOWN) { DOWN = 0; e->x = CX; e->y = CY; e->hover = 1;
+                    if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; return 1; } }
+        return 0;
     }
 
-    /* Pad coordinates are scaled to the panel so a full swipe crosses roughly the full screen,
-     * then multiplied by a gain. Pad y is bottom-up; the screen is top-down. */
-    ACC_X += (r.x - REF_X) * GFX_W * 128 * PAD_GAIN / (PAD_W ? PAD_W : 1);
-    ACC_Y += (REF_Y - r.y) * GFX_H * 128 * PAD_GAIN / (PAD_H ? PAD_H : 1);
-    REF_X = r.x; REF_Y = r.y;
-    int dx = ACC_X / 256, dy = ACC_Y / 256;
-    ACC_X -= dx * 256; ACC_Y -= dy * 256;      /* keep the remainder, do not discard it */
+    int nx = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
+    int ny = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));
+    if (nx < 0) nx = 0;
+    if (nx >= GFX_W) nx = GFX_W - 1;
+    if (ny < 0) ny = 0;
+    if (ny >= GFX_H) ny = GFX_H - 1;
 
-    if (r.contact) {
-        DOWN = 1;
+    if (!SEEN) { SEEN = 1; DOWN = 1; TRAVEL = 0; }
+    else {
+        int dx = nx - CX, dy = ny - CY;
         TRAVEL += (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-        /* A press that is moving vertically scrolls; the cursor stays put. */
-        if (dy > 1 || dy < -1) {
-            e->x = CX; e->y = CY; e->hover = 0;
-            e->kind = IN_SCROLL; e->dy = -dy;
-            return 1;
-        }
     }
 
-    CX += dx; CY += dy;
-    if (CX < 0) CX = 0;
-    if (CX >= GFX_W) CX = GFX_W - 1;
-    if (CY < 0) CY = 0;
-    if (CY >= GFX_H) CY = GFX_H - 1;
-    e->x = CX; e->y = CY;
-    e->hover = r.proximity && !r.contact;
-    e->kind = IN_MOVE;
+    if (nx == CX && ny == CY) return 0;        /* nothing moved: do not spend a repaint */
+    CX = nx; CY = ny;
+    e->x = CX; e->y = CY; e->hover = 1; e->kind = IN_MOVE;
     return 1;
 }
 
@@ -475,11 +454,33 @@ int main(void) {
     app_set_persist(dpath("chats.tns.tns"));
     app_draw();
 
+    /* THE LOOP DECIDES WHEN TO PAINT, and that is the whole fix for both the lag and the animation.
+     *
+     * Before, app_draw() ran on every input event and at no other time. Every touchpad sample
+     * produced an event, so a finger on the pad meant a full 320x240 software repaint as fast as
+     * this loop could spin -- which is what made the app feel like it was struggling -- and with no
+     * finger there were no frames at all, so the placeholder simply stopped moving.
+     *
+     * Now: input is applied whenever it arrives, the clock is read every pass, and a frame is
+     * painted only when something actually changed. app_set_now() answers that question, so a
+     * resting screen paints nothing and the rotation still runs on its own schedule.
+     */
+    uint32_t t0 = clock_raw();
+    unsigned last_paint = 0;
     while (!app_should_quit()) {
         in_event e; memset(&e, 0, sizeof e);
-        if (pointer_poll(&e)) { app_event(&e); app_draw(); }
+        int dirty = 0;
+
+        if (pointer_poll(&e)) { app_event(&e); dirty = 1; }
         int k = keypad_poll();
-        if (k) { e.kind = IN_KEY; e.key = k; app_event(&e); app_draw(); }
+        if (k) { e.kind = IN_KEY; e.key = k; app_event(&e); dirty = 1; }
+
+        unsigned now = clock_ms_since(t0);
+        if (app_set_now(now)) dirty = 1;
+
+        /* At most ~30 frames a second. Beyond that the panel cannot show the difference and the
+         * core has better things to do; below it the slide stops looking like motion. */
+        if (dirty && now - last_paint >= 33) { app_draw(); last_paint = now; }
     }
     if (MODEL_READY) rq_free();
     ns_tok_free(&TK); ns_free(&ST);

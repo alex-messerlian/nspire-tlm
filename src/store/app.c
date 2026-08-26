@@ -95,16 +95,27 @@ static gfx_rect R_EXIT;
  * two sessions apart. On hover the full title scrolls left, stops at its end and stays there;
  * moving away resets it. MARQ_AT is the chat index under the cursor and MARQ_T counts draws since
  * it arrived, so the animation is driven by the redraw loop and needs no clock. */
-static int MARQ_AT = -1, MARQ_T;
-#define MARQ_HOLD 12      /* draws to wait before moving, so a pass-through does not twitch */
-#define MARQ_DIV  2       /* draws per pixel of travel */
+/* The app's millisecond clock, fed by app_set_now(). Declared ahead of BOTH animations because
+ * each reads it, and the marquee's helper sits above the placeholder's table. */
+static unsigned NOW_MS;
+
+static int MARQ_AT = -1;
+static unsigned MARQ_T0;              /* NOW_MS when the cursor arrived on this row */
+#define MARQ_HOLD_MS 420      /* wait before moving, so a pass-through does not twitch */
+#define MARQ_PX_S    38       /* pixels per second of travel */
 
 /* Travel after `t` draws, for a title overflowing its band by `overflow` px. Its own function so
  * the clamp can be tested directly: without it the title scrolls off its own left edge and the row
  * ends up blank, which looks like a rendering fault rather than a missing bound. */
-static int marq_off(int t, int overflow) {
-    if (overflow <= 0 || t <= MARQ_HOLD) return 0;
-    int off = (t - MARQ_HOLD) / MARQ_DIV;
+/* Elapsed since the cursor arrived, clamped at zero. NOW_MS - MARQ_T0 is UNSIGNED: if the clock
+ * ever runs backwards -- a wrap of the 32 kHz counter, or a test setting the clock behind a stamp
+ * left by an earlier case -- the difference becomes billions and the title snaps to full travel.
+ * Seen exactly once, in a test, which is the cheap place to see it. */
+static unsigned marq_elapsed(void) { return NOW_MS >= MARQ_T0 ? NOW_MS - MARQ_T0 : 0u; }
+
+static int marq_off(unsigned elapsed_ms, int overflow) {
+    if (overflow <= 0 || elapsed_ms <= MARQ_HOLD_MS) return 0;
+    int off = (int)(((elapsed_ms - MARQ_HOLD_MS) * MARQ_PX_S) / 1000u);
     return off > overflow ? overflow : off;
 }
 static void draw_composer(int x0, int w, int cy);
@@ -139,6 +150,17 @@ static void draw_composer(int x0, int w, int cy);
  *
  * Every entry is checked to FIT: the prefix is 83 px and the field's text budget is 190 px, so a
  * subject has 107 px. All 39 clear it, "standard deviation" being the longest. */
+/* Which subject is showing during cycle `n`. SHUFFLED rather than in table order: reading the same
+ * 39 words in the same sequence every time makes it a list being recited, and the point is that the
+ * app answers a wide range of things, not that it has a particular order.
+ *
+ * It is a hash of the cycle number, not a running RNG, so it stays a pure function of the clock:
+ * the same instant always shows the same word, which is what makes it testable and what stops a
+ * redraw from advancing it. Consecutive repeats are stepped past, because the same word appearing
+ * twice in a row looks like the animation broke. */
+static int ask_at(unsigned n);
+static int ask_index(unsigned n);
+
 static const char *ASK_ABOUT[] = {
     "motion", "velocity", "acceleration", "forces",
     "friction", "momentum", "energy", "work",
@@ -152,9 +174,29 @@ static const char *ASK_ABOUT[] = {
     "distributions", "standard deviation", "regression",
 };
 #define ASK_N     ((int)(sizeof ASK_ABOUT / sizeof ASK_ABOUT[0]))
-#define ASK_HOLD  46      /* draws a word rests before it leaves */
-#define ASK_SLIDE 9       /* draws the crossfade takes */
-static int ASK_T;
+
+static int ask_at(unsigned n) {
+    unsigned h = (n + 1u) * 2654435761u;      /* Knuth's multiplicative hash */
+    h ^= h >> 13; h *= 1274126177u; h ^= h >> 16;
+    return (int)(h % (unsigned)ASK_N);
+}
+static int ask_index(unsigned n) {
+    int i = ask_at(n);
+    if (n && i == ask_at(n - 1u)) i = (i + 1) % ASK_N;   /* never the same word twice running */
+    return i;
+}
+/* MILLISECONDS, not draws.
+ *
+ * These were frame counts, and app_draw() runs only when there is input -- so the rotation raced
+ * while a finger was on the pad, because every touchpad sample forced a redraw, and froze the
+ * instant the finger came off. A frame count is only a clock when something guarantees the frame
+ * rate, and nothing here did.
+ *
+ * app_set_now() is fed the device's 32 kHz timer. On the host it is fed a counter, so the tests
+ * stay deterministic. */
+#define ASK_HOLD_MS  4200     /* a word rests this long */
+#define ASK_SLIDE_MS  420     /* and takes this long to cross */
+
 
 #define COMPOSE_MAX_LINES 4
 #define COMPOSE_LH        15     /* F_UI's box */
@@ -575,9 +617,9 @@ static void magnifier(int x, int y, int R, uint16_t c) {
     for (int j = -R; j <= R; j++)
         for (int i = -R; i <= R; i++) {
             int d = i * i + j * j;
-            if (d <= R * R && d > (R - 2) * (R - 2)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
+            if (d <= R * R && d > (R - 3) * (R - 3)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
         }
-    for (int k = 0; k < R; k++) gfx_fill(x + 2*R - 1 + k, y + 2*R - 1 + k, 2, 1, c);  /* handle */
+    for (int k = 0; k < R; k++) gfx_fill(x + 2*R - 1 + k, y + 2*R - 1 + k, 2, 2, c);  /* handle */
 }
 
 /* compose glyph for New chat: the web row has one and the device row did not, so the two rows sat
@@ -592,8 +634,13 @@ static void magnifier(int x, int y, int R, uint16_t c) {
  * second hand-inlined copy is how they diverge. Both are sized to the same 20x20 plate and the
  * same 1px weight as the magnifier and the pencil, so every control in the app is one class. */
 static void panel_icon(int x, int y, uint16_t c) {   /* 13x12 inside a 20x20 plate */
+    /* TWO nested outlines, not one. A 1px stroke at this size is a hairline on this panel and the
+     * icons read as unfinished beside the OS's own, which are heavier. Doubling the edge costs
+     * nothing and is the difference between a drawn icon and a sketched one. */
     gfx_rrect_outline(x + 4, y + 4, 13, 12, 2, c);
-    gfx_vline(x + 9, y + 4, 12, c);
+    gfx_rrect_outline(x + 5, y + 5, 11, 10, 1, c);
+    gfx_vline(x + 9,  y + 4, 12, c);
+    gfx_vline(x + 10, y + 4, 12, c);
 }
 static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 optical box */
     for (int i = 0; i < 9; i++) {
@@ -603,13 +650,16 @@ static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 o
 }
 
 static void pencil(int x, int y, uint16_t c) {
-    gfx_hline(x,      y + 3,  6, c);       /* top edge, stopping short of the corner */
-    gfx_vline(x,      y + 3, 10, c);       /* left edge */
-    gfx_hline(x,      y + 12, 11, c);      /* bottom edge */
-    gfx_vline(x + 10, y + 7,  6, c);       /* right edge, resuming below the gap */
-    for (int k = 0; k < 6; k++)            /* the pencil, through the open corner */
-        gfx_fill(x + 5 + k, y + 6 - k, 2, 1, c);
-    gfx_fill(x + 4, y + 7, 2, 2, c);       /* its tip */
+    /* Every edge 2px, for the same reason as panel_icon. */
+    for (int d = 0; d < 2; d++) {
+        gfx_hline(x,          y + 3 + d,  6, c);      /* top, stopping short of the corner */
+        gfx_vline(x + d,      y + 3,     10, c);      /* left */
+        gfx_hline(x,          y + 11 + d, 11, c);     /* bottom */
+        gfx_vline(x + 10 - d, y + 7,      5, c);      /* right, resuming below the gap */
+    }
+    for (int k = 0; k < 6; k++)                       /* the pencil, through the open corner */
+        gfx_fill(x + 5 + k, y + 6 - k, 2, 2, c);
+    gfx_fill(x + 4, y + 7, 3, 3, c);                  /* its tip */
 }
 
 /* Draw `s` with the parts matching any term in the BOLD face. The device had no equivalent of the
@@ -761,7 +811,6 @@ static void draw_sidebar(void) {
         /* One tick per draw. Reset when nothing is hovered so the next hover starts from the
          * left rather than resuming mid-scroll. */
         int any_hot = 0;
-        MARQ_T++;
 
         NCHAT_ROWS = 0;
         for (int r = 0; r < CHAT_FIT && CHAT_SCROLL + r < NCHATS; r++) {
@@ -776,8 +825,8 @@ static void draw_sidebar(void) {
             {   int avail = rowmax - (hot ? 26 : 10);   /* the trash takes room only while hovered */
                 int tw = gfx_text_w(CHATS[i].title, F_SM);
                 if (hot && tw > avail) {
-                    if (MARQ_AT != i) { MARQ_AT = i; MARQ_T = 0; }
-                    int off = marq_off(MARQ_T, tw - avail);
+                    if (MARQ_AT != i) { MARQ_AT = i; MARQ_T0 = NOW_MS; }
+                    int off = marq_off(marq_elapsed(), tw - avail);
                     /* Clipped to the title band, so the scrolled tail cannot run under the trash
                      * or out of the sidebar. */
                     gfx_clip(9, y, avail, gfx_font_h(F_SM));
@@ -957,15 +1006,45 @@ static void draw_main(void) {
 
 }
 
+/* The pointer.
+ *
+ * It was a right triangle -- rows widening from 1px to 6px with a vertical left edge -- which is
+ * half an arrowhead and reads as a broken shape rather than a cursor. This is the ordinary arrow
+ * everyone already knows: a slanted head, a notch, and a tail, drawn as INK on a BG-filled body so
+ * it stays legible over the white pane, the grey sidebar and a dark bubble alike.
+ *
+ * '#' is the outline, '.' the fill, ' ' transparent. Written out rather than computed because the
+ * shape is the point, and 16 rows of literal are easier to check by eye than the arithmetic that
+ * would generate them.
+ */
+static const char *CURSOR[] = {
+    "#",
+    "##",
+    "#.#",
+    "#..#",
+    "#...#",
+    "#....#",
+    "#.....#",
+    "#......#",
+    "#.......#",
+    "#........#",
+    "#....#####",
+    "#..#.#",
+    "#.# #.#",
+    "##  #.#",
+    "#    #.#",
+    "     ###",
+};
+
 static void draw_cursor(void) {
-    /* a plain arrow, drawn last so it is never occluded. Outlined in white so it stays visible
-     * over both the white pane and the grey sidebar. */
-    for (int i = 0; i < 10; i++) {
-        int wdt = 1 + i * 6 / 10;
-        gfx_hline(MX, MY + i, wdt + 1, C_BG);
-        gfx_hline(MX, MY + i, wdt, C_INK);
+    int rows = (int)(sizeof CURSOR / sizeof CURSOR[0]);
+    for (int y = 0; y < rows; y++) {
+        const char *row = CURSOR[y];
+        for (int x = 0; row[x]; x++) {
+            if (row[x] == ' ') continue;
+            gfx_fill(MX + x, MY + y, 1, 1, row[x] == '#' ? C_INK : C_BG);
+        }
     }
-    gfx_hline(MX, MY + 10, 4, C_BG);
 }
 
 /* The composer is drawn at a caller-chosen y because it MOVES. On the web build `placeComposer()`
@@ -1007,18 +1086,20 @@ static void draw_composer(int x0, int w, int cy) {
         gfx_text(px, py, pre, F_UI, C_INK3, C_FIELD);
 
         int wx = px + gfx_text_w(pre, F_UI);
-        int cycle = ASK_HOLD + ASK_SLIDE;
-        int i = (ASK_T / cycle) % ASK_N, phase = ASK_T % cycle;
+        unsigned cycle = ASK_HOLD_MS + ASK_SLIDE_MS;
+        unsigned n = NOW_MS / cycle;
+        int i = ask_index(n);
+        unsigned phase = NOW_MS % cycle;
 
         /* Clipped to exactly one line, so the word arriving from below and the one leaving above
          * are both cut at the field's text band instead of drawing over the caret row. */
         gfx_clip(wx, py, R_FIELD.w - (wx - R_FIELD.x) - 22, lh);
-        if (phase < ASK_HOLD) {
+        if (phase < ASK_HOLD_MS) {
             gfx_text(wx, py, ASK_ABOUT[i], F_UI, C_INK3, C_FIELD);
         } else {
-            int d = ((phase - ASK_HOLD) * lh) / ASK_SLIDE;   /* 0 -> lh over the slide */
+            int d = (int)(((phase - ASK_HOLD_MS) * (unsigned)lh) / ASK_SLIDE_MS);
             gfx_text(wx, py - d,      ASK_ABOUT[i],             F_UI, C_INK3, C_FIELD);
-            gfx_text(wx, py + lh - d, ASK_ABOUT[(i + 1) % ASK_N], F_UI, C_INK3, C_FIELD);
+            gfx_text(wx, py + lh - d, ASK_ABOUT[ask_index(n + 1u)], F_UI, C_INK3, C_FIELD);
         }
         gfx_clip_reset();
     }
@@ -1037,8 +1118,34 @@ static void draw_composer(int x0, int w, int cy) {
 
 }
 
+/* Set the clock and say whether anything animated has actually changed since last time. The point
+ * is to let the caller NOT redraw: this app renders a 320x240 framebuffer in software on a 288 MHz
+ * core, so a redraw that changes nothing is pure heat. */
+int app_set_now(unsigned ms) {
+    unsigned prev = NOW_MS;
+    NOW_MS = ms;
+    if (BUSY) return 1;                       /* a running turn owns the screen */
+
+    int moved = 0;
+    if (CUR < 0 && !COMPOSE_N && !SEARCH_ON) {
+        /* the rotating placeholder: only while it is the thing on screen */
+        unsigned cycle = ASK_HOLD_MS + ASK_SLIDE_MS;
+        unsigned a = prev % cycle, b = ms % cycle;
+        int a_slide = a >= ASK_HOLD_MS, b_slide = b >= ASK_HOLD_MS;
+        if (prev / cycle != ms / cycle) moved = 1;        /* the word changed */
+        else if (b_slide) moved = 1;                      /* mid-slide, every frame counts */
+        else if (a_slide != b_slide) moved = 1;           /* it just started or finished */
+    }
+    if (MARQ_AT >= 0) {
+        unsigned ea = prev >= MARQ_T0 ? prev - MARQ_T0 : 0u;
+        unsigned eb = ms   >= MARQ_T0 ? ms   - MARQ_T0 : 0u;
+        if (eb > MARQ_HOLD_MS &&
+            marq_off(ea, 1 << 20) != marq_off(eb, 1 << 20)) moved = 1;
+    }
+    return moved;
+}
+
 void app_draw(void) {
-    ASK_T++;                 /* the placeholder rotates on the draw loop */
     gfx_clear(C_BG);
     if (SIDEBAR) draw_sidebar();
     draw_main();

@@ -59,6 +59,11 @@ extern uint16_t TLM_PAL[P_N];
  *   TH_DARK   always night */
 enum { TH_AUTO = 0, TH_LIGHT, TH_DARK };
 void app_set_theme(int mode);
+/* Feed the app a millisecond clock. Animation is timed from THIS, not from how often app_draw
+ * happens to run -- draws are driven by input, so a frame count raced under a finger and froze
+ * without one. Returns 1 when something on screen has moved since the last call and a redraw is
+ * therefore owed; the caller uses that to decide whether to spend a frame. */
+int  app_set_now(unsigned ms);
 int  app_theme(void);
 /* What AUTO currently resolves to. `hour` is 0-23, or negative when the clock could not be read --
  * in which case this returns light, because guessing dark on an unknown clock is worse than a
