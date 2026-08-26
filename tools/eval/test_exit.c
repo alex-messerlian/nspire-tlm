@@ -280,7 +280,13 @@ int main(void) {
     {   T("more than one subject", ASK_N > 1, 1);
         int cycle = ASK_HOLD + ASK_SLIDE;
         T("a word rests, then moves", ASK_HOLD > ASK_SLIDE, 1);
-        int bad = 0, seen[16] = {0};
+        /* Sized by ASK_N, not by a literal. It was seen[16] from when the bank held six subjects,
+         * and growing the bank to 39 made this write off the end of the stack -- caught by the
+         * stack protector as SIGABRT, which is the only reason it did not pass while corrupting
+         * whatever sat next to it. A fixture that hardcodes the size of the thing under test
+         * breaks the moment that thing is the thing being changed. */
+        int bad = 0, seen[ASK_N];
+        for (int i = 0; i < ASK_N; i++) seen[i] = 0;
         for (int tt = 0; tt < cycle * ASK_N * 2; tt++) {
             int i = (tt / cycle) % ASK_N;
             if (i < 0 || i >= ASK_N) bad++; else seen[i] = 1;
@@ -290,6 +296,20 @@ int main(void) {
         T("every subject is reached", all, 1);
         int worst = ((cycle - 1 - ASK_HOLD) * COMPOSE_LH) / ASK_SLIDE;
         T("travel never exceeds one line", worst <= COMPOSE_LH, 1);
+
+        /* EVERY subject must fit the field. The bank is meant to grow, and a word wider than the
+         * budget would be silently clipped mid-slide with nothing on screen saying so. */
+        {   int w = GFX_W - (SIDE_W + 1);
+            int budget = compose_textw(w) - gfx_text_w("Ask me about ", F_UI);
+            int widest = 0; const char *worst_word = "";
+            for (int i = 0; i < ASK_N; i++) {
+                int wd = gfx_text_w(ASK_ABOUT[i], F_UI);
+                if (wd > widest) { widest = wd; worst_word = ASK_ABOUT[i]; }
+            }
+            T("every subject fits the field", widest <= budget, 1);
+            printf("        widest is \"%s\" at %d px against %d px of budget\n",
+                   worst_word, widest, budget);
+        }
 
         /* Which text is drawn is decided by CUR, so read the pixels: the two strings differ in
          * width, and the rotating one is the only one that changes between draws. */

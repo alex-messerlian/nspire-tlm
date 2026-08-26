@@ -132,8 +132,24 @@ static void draw_composer(int x0, int w, int cy);
  *
  * Driven by the draw loop like the title marquee, so it needs no clock and stops when the app
  * stops drawing. */
+/* WIDE ON PURPOSE, and not limited to what the store answers today. The brief scopes this to
+ * algebra, calculus, physics and statistics; the corpus and the checkpoint catch up to that, and a
+ * placeholder that only ever offered the six subjects the current 166 records happen to cover
+ * would be designing the product down to a temporary dataset.
+ *
+ * Every entry is checked to FIT: the prefix is 83 px and the field's text budget is 190 px, so a
+ * subject has 107 px. All 39 clear it, "standard deviation" being the longest. */
 static const char *ASK_ABOUT[] = {
-    "speed", "energy", "forces", "circuits", "momentum", "acceleration",
+    "motion", "velocity", "acceleration", "forces",
+    "friction", "momentum", "energy", "work",
+    "power", "gravity", "circular motion", "waves",
+    "sound", "light", "optics", "heat",
+    "pressure", "electricity", "circuits", "magnetism",
+    "algebra", "geometry", "trigonometry", "logarithms",
+    "vectors", "matrices", "sequences", "series",
+    "quadratics", "exponentials", "derivatives", "integrals",
+    "limits", "optimization", "probability", "averages",
+    "distributions", "standard deviation", "regression",
 };
 #define ASK_N     ((int)(sizeof ASK_ABOUT / sizeof ASK_ABOUT[0]))
 #define ASK_HOLD  46      /* draws a word rests before it leaves */
