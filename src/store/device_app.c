@@ -112,7 +112,9 @@ static void pointer_init(void) {
  * software repaint, which is what pegged the CPU and made the whole app feel like it was
  * struggling.
  */
-#define TAP_SLOP  6             /* pixels of travel still counted as a tap */
+/* 10, not 6. A finger on a pad this size drifts several pixels between touch-down and lift, and a
+ * tight slop turned intended taps into drags that moved the cursor and clicked nothing. */
+#define TAP_SLOP  10
 
 static int DOWN, TRAVEL, SEEN;
 
@@ -157,18 +159,16 @@ static int pointer_poll(in_event *e) {
 
 /* ---- keypad ---------------------------------------------------------------------------------- */
 static int keypad_poll(void) {
+    /* The key currently down. Held across calls so a press is reported once and the loop is never
+     * blocked waiting for a release. */
+    static const t_key *held;
+
     /* Ctrl first, and as a CHORD rather than a modifier flag: ctrl+N and ctrl+S are the only two,
      * and returning them as their own codes keeps app.c from knowing anything about the keypad.
      * Checked before the plain map or ctrl+N would arrive as a bare 'n' in the composer. */
     if (isKeyPressed(KEY_NSPIRE_CTRL)) {
-        if (isKeyPressed(KEY_NSPIRE_N)) {
-            while (isKeyPressed(KEY_NSPIRE_N)) { }
-            return K_NEW;
-        }
-        if (isKeyPressed(KEY_NSPIRE_S)) {
-            while (isKeyPressed(KEY_NSPIRE_S)) { }
-            return K_SEARCH;
-        }
+        if (isKeyPressed(KEY_NSPIRE_N)) { held = &KEY_NSPIRE_N; return K_NEW; }
+        if (isKeyPressed(KEY_NSPIRE_S)) { held = &KEY_NSPIRE_S; return K_SEARCH; }
     }
     static const struct { const t_key *k; int c; } MAP[] = {
         { &KEY_NSPIRE_ESC, K_ESC }, { &KEY_NSPIRE_ENTER, K_ENTER }, { &KEY_NSPIRE_TAB, K_TAB },
@@ -186,11 +186,20 @@ static int keypad_poll(void) {
         { &KEY_NSPIRE_U,'u' },{ &KEY_NSPIRE_V,'v' },{ &KEY_NSPIRE_W,'w' },{ &KEY_NSPIRE_X,'x' },
         { &KEY_NSPIRE_Y,'y' },{ &KEY_NSPIRE_Z,'z' },
     };
+    /* EDGE-TRIGGERED, NOT BLOCKING. This used to spin in `while (isKeyPressed(k)) {}` until the
+     * key came back up, so the entire loop stopped for as long as a finger rested on a key: no
+     * repaint, no pointer, nothing. Typing at a normal rate meant the app was stalled most of the
+     * time, which is what "I can't even type, it's so slow" was.
+     *
+     * Now the key that is down is remembered and reported ONCE; the loop keeps running while it is
+     * held, and the next press is only accepted after a release. Same one-character-per-press
+     * behaviour, without stopping the world to get it. */
+    if (held) {
+        if (isKeyPressed(*held)) return 0;        /* still down: already reported, keep going */
+        held = 0;
+    }
     for (unsigned i = 0; i < sizeof MAP / sizeof MAP[0]; i++) {
-        if (isKeyPressed(*MAP[i].k)) {
-            while (isKeyPressed(*MAP[i].k)) { }      /* debounce to one edge */
-            return MAP[i].c;
-        }
+        if (isKeyPressed(*MAP[i].k)) { held = MAP[i].k; return MAP[i].c; }
     }
     return 0;
 }
@@ -465,6 +474,13 @@ int main(void) {
      * painted only when something actually changed. app_set_now() answers that question, so a
      * resting screen paints nothing and the rotation still runs on its own schedule.
      */
+    /* CONFIGURE THE TIMER BEFORE READING IT. clock_start() was only ever called on the generation
+     * path, so the loop's clock read an SP804 that nothing had put into free-running mode: the
+     * value was not a monotonic tick and the elapsed milliseconds derived from it advanced wildly.
+     * That is why the placeholder cycled many times a second against a 4.2 s timer. This repo
+     * already carries the rule -- bench/common.h configures LOAD and CONTROL before reading, and
+     * reading raw once produced a 2^32 underflow -- and the loop was reading raw. */
+    clock_start();
     uint32_t t0 = clock_raw();
     unsigned last_paint = 0;
     while (!app_should_quit()) {
@@ -473,7 +489,19 @@ int main(void) {
 
         if (pointer_poll(&e)) { app_event(&e); dirty = 1; }
         int k = keypad_poll();
-        if (k) { e.kind = IN_KEY; e.key = k; app_event(&e); dirty = 1; }
+        if (k) {
+            /* ENTER CLICKS WHATEVER THE CURSOR IS ON, when the cursor is on a control. Placing a
+             * pointer accurately on a 2cm pad is genuinely hard, and requiring a tap -- which on an
+             * absolute pad also MOVES the cursor to wherever the finger lands -- means the aim is
+             * lost at the moment of clicking. Position with the pad, commit with a key. Enter still
+             * sends when the cursor is not over anything. */
+            if (k == K_ENTER && app_hit_control(CX, CY)) {
+                e.kind = IN_CLICK; e.x = CX; e.y = CY;
+            } else {
+                e.kind = IN_KEY; e.key = k;
+            }
+            app_event(&e); dirty = 1;
+        }
 
         unsigned now = clock_ms_since(t0);
         if (app_set_now(now)) dirty = 1;

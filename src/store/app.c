@@ -171,7 +171,7 @@ static const char *ASK_ABOUT[] = {
     "vectors", "matrices", "sequences", "series",
     "quadratics", "exponentials", "derivatives", "integrals",
     "limits", "optimization", "probability", "averages",
-    "distributions", "standard deviation", "regression",
+    "distributions", "regression",
 };
 #define ASK_N     ((int)(sizeof ASK_ABOUT / sizeof ASK_ABOUT[0]))
 
@@ -633,14 +633,14 @@ static void magnifier(int x, int y, int R, uint16_t c) {
 /* The panel-toggle and exit marks, as functions because each is drawn from TWO places now and a
  * second hand-inlined copy is how they diverge. Both are sized to the same 20x20 plate and the
  * same 1px weight as the magnifier and the pencil, so every control in the app is one class. */
-static void panel_icon(int x, int y, uint16_t c) {   /* 13x12 inside a 20x20 plate */
+static void panel_icon(int x, int y, uint16_t c) {   /* 15x14 inside a 24x24 plate */
     /* TWO nested outlines, not one. A 1px stroke at this size is a hairline on this panel and the
      * icons read as unfinished beside the OS's own, which are heavier. Doubling the edge costs
      * nothing and is the difference between a drawn icon and a sketched one. */
-    gfx_rrect_outline(x + 4, y + 4, 13, 12, 2, c);
-    gfx_rrect_outline(x + 5, y + 5, 11, 10, 1, c);
-    gfx_vline(x + 9,  y + 4, 12, c);
-    gfx_vline(x + 10, y + 4, 12, c);
+    gfx_rrect_outline(x + 5, y + 5, 15, 14, 2, c);
+    gfx_rrect_outline(x + 6, y + 6, 13, 12, 1, c);
+    gfx_vline(x + 11, y + 5, 14, c);
+    gfx_vline(x + 12, y + 5, 14, c);
 }
 static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 optical box */
     for (int i = 0; i < 9; i++) {
@@ -762,27 +762,27 @@ static void draw_sidebar(void) {
     /* EVENLY distributed: 3 * 20 + 4 * 5 = 80 = SIDE_W, so the gap between any two icons and the
      * gap at either end are all 5px. The previous layout pinned one icon left and two right, which
      * left 19px on one side of the pair and 2px on the other -- not a grouping, just lopsided. */
-    R_NEW    = (gfx_rect){ 5,  3, 20, 20 };
-    R_SEARCH = (gfx_rect){ 30, 3, 20, 20 };
-    R_TOGGLE = (gfx_rect){ 55, 3, 20, 20 };
+    R_NEW    = (gfx_rect){ 4,  3, 24, 24 };
+    R_SEARCH = (gfx_rect){ 32, 3, 24, 24 };
+    R_TOGGLE = (gfx_rect){ 60, 3, 24, 24 };
 
     /* Hover darkens the plate AND the glyph. The plate alone is a very small cue at 20px on a
      * panel with this contrast; the ink moving from C_INK2 to C_INK is what actually reads. */
     {   int hot = HOVER && inside(R_NEW, MX, MY);
-        gfx_rrect(R_NEW.x, R_NEW.y, 20, 20, 5, hot ? C_SEL : C_SIDE);
-        pencil(R_NEW.x + 4, R_NEW.y + 3, hot ? C_INK : C_INK2);
+        gfx_rrect(R_NEW.x, R_NEW.y, 24, 24, 6, hot ? C_SEL : C_SIDE);
+        pencil(R_NEW.x + 5, R_NEW.y + 5, hot ? C_INK : C_INK2);
     }
     {   int sh = HOVER && inside(R_SEARCH, MX, MY);
-        gfx_rrect(R_SEARCH.x, R_SEARCH.y, 20, 20, 5, sh ? C_SEL : C_SIDE);
-        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 4, 4, sh ? C_INK : C_INK2);
+        gfx_rrect(R_SEARCH.x, R_SEARCH.y, 24, 24, 6, sh ? C_SEL : C_SIDE);
+        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 5, 5, sh ? C_INK : C_INK2);
     }
     {   int th = HOVER && inside(R_TOGGLE, MX, MY);
-        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 20, 20, 5, th ? C_SEL : C_SIDE);
+        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 24, 24, 6, th ? C_SEL : C_SIDE);
         panel_icon(R_TOGGLE.x, R_TOGGLE.y, th ? C_INK : C_INK2);
     }
 
     /* A heading over nothing is furniture. */
-    if (NCHATS) gfx_text(9, TOP_H + 8, "Recents", F_SM, C_INK3, C_SIDE);
+    if (NCHATS) gfx_text(9, TOP_H + 6, "Recents", F_SM, C_INK3, C_SIDE);
 
     /* The list SCROLLS. It used to break at the first row that did not fit, which silently hid up
      * to six of a twelve-session cap -- unreachable, with nothing on screen admitting it. Hiding
@@ -796,7 +796,10 @@ static void draw_sidebar(void) {
          * once, so the scrollbar only ever appears if that cap changes. */
         /* +26 puts the first row 4px below the "Recents" box (TOP_H+8, 13 tall -> ends at
          * TOP_H+21) instead of hard against it. The 15px pitch still lands CHAT_FIT on 12. */
-        int top = TOP_H + 26, bot = GFX_H - 6;
+        /* +24 with TOP_H at 30. "Recents" occupies TOP_H+6 .. TOP_H+18 and R_CHAT[0] starts at
+         * top-2, so this leaves 4px of air under the heading and still lands CHAT_FIT on 12 --
+         * the taller icon band cost a row and this is where it comes back. */
+        int top = TOP_H + 24, bot = GFX_H - 6;
         CHAT_FIT = (bot - top) / 15;
         if (CHAT_FIT < 1) CHAT_FIT = 1;
         R_LIST = (gfx_rect){ 0, top - 4, SIDE_W, bot - top + 8 };
@@ -890,11 +893,11 @@ static void draw_main(void) {
      * (y=3) and the F_BIG box is 18 (y=4), so the two share a centre line at 13. */
     int tx = x0 + PAD;
     if (!SIDEBAR) {
-        R_TOGGLE = (gfx_rect){ 5, 3, 20, 20 };
+        R_TOGGLE = (gfx_rect){ 4, 3, 24, 24 };
         int th = HOVER && inside(R_TOGGLE, MX, MY);
-        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 20, 20, 5, th ? C_SEL : C_BG);
+        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 24, 24, 6, th ? C_SEL : C_BG);
         panel_icon(R_TOGGLE.x, R_TOGGLE.y, C_INK2);
-        tx = R_TOGGLE.x + 20 + 6;
+        tx = R_TOGGLE.x + 24 + 6;
     }
 
     /* The title is the CHAT's title, and on the new-chat screen there is no chat. "ChatTLM" was
@@ -905,7 +908,7 @@ static void draw_main(void) {
          * boxed in beside it, and the string is the chat's own opening words, which the transcript
          * repeats immediately underneath. Bold keeps it the heading of the pane without it being
          * the largest thing on screen. Box 15 in a 26px band centres at y=5. */
-        gfx_text_ellipsis(tx, 5, CHATS[CUR].title, F_UIB, C_INK, C_BG, GFX_W - 30 - tx);
+        gfx_text_ellipsis(tx, 7, CHATS[CUR].title, F_UIB, C_INK, C_BG, GFX_W - 30 - tx);
 
     /* EXIT, top right, always drawn. ESC has always quit, but nothing on screen said so, and a
      * judge handed the calculator does not know the key. An affordance that exists only in the
@@ -913,9 +916,9 @@ static void draw_main(void) {
     /* Same 20x20 plate, same corner radius and same weight as the sidebar's three. It was an 18px
      * box with a 2px-thick hand-drawn X, which made it visibly heavier and smaller than every
      * other control on screen. */
-    R_EXIT = (gfx_rect){ GFX_W - 25, 3, 20, 20 };
+    R_EXIT = (gfx_rect){ GFX_W - 28, 3, 24, 24 };
     {   int hot = HOVER && inside(R_EXIT, MX, MY);
-        gfx_rrect(R_EXIT.x, R_EXIT.y, 20, 20, 5, hot ? C_EXIT_HOT : C_BG);
+        gfx_rrect(R_EXIT.x, R_EXIT.y, 24, 24, 6, hot ? C_EXIT_HOT : C_BG);
         exit_icon(R_EXIT.x, R_EXIT.y, hot ? C_ERRFG : C_INK2);
     }
     /* No rule under the title. The desktop build draws none -- #topbar has no border -- and at
@@ -1389,6 +1392,15 @@ void app_status_done(unsigned ms, const char *tool_call, const char *tool_result
     STATUS[0] = 0; STATUS_MONO[0] = 0;
 }
 int app_hit_stop(int x, int y) { return BUSY && inside(R_SEND, x, y); }
+
+int app_hit_control(int x, int y) {
+    if (SEARCH_ON) return 1;                    /* the sheet is modal: any click means something */
+    if (inside(R_EXIT, x, y) || inside(R_SEND, x, y)) return 1;
+    if (inside(R_NEW, x, y) || inside(R_SEARCH, x, y) || inside(R_TOGGLE, x, y)) return 1;
+    for (int i = 0; i < NCHAT_ROWS; i++)
+        if (inside(R_TRASH[i], x, y) || inside(R_CHAT[i], x, y)) return 1;
+    return 0;
+}
 
 void app_stream_end(void) {
     if (pending) pending->done = 1;

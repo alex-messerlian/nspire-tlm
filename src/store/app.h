@@ -86,11 +86,16 @@ int  app_clock_hour(void);
 /* 80, not 88. With the footer gone and the theme control gone the column carries three 20px icons
  * and a list; 88 left dead space at both ends of the icon band and took 8px the transcript could
  * use. At 80 the three icons distribute with equal 5px gaps -- 3*20 + 4*5 = 80 exactly. */
-#define SIDE_W   80
+/* 88 again, and deliberately. 24px icon plates need 3*24 + 4*4 = 88 to sit on even 4px gaps; at 80
+ * the gaps collapse to 2 and the band looks crammed. The 8px goes back to the sidebar because
+ * legible controls matter more here than eight columns of transcript. */
+#define SIDE_W   88
 /* 26, not 24. The band carries 20px icons, and at 24 they had 2px of air above and below -- they
  * read as jammed into the corner rather than placed. The F_BIG title still clears it: drawn at
  * y=4 with an 18px box, so 4..22 inside 26. */
-#define TOP_H    26
+/* 30, for the 24px plates: y=3 puts them at 3..27 with 3px under, and the F_UIB title box of 15
+ * centres at (30-15)/2 = 7. */
+#define TOP_H    30
 /* 43, not 40. The dock carries a 24px field AND the disclaimer line beneath it: 3 + 24 + 2 + 13
  * fills 41 of 43. At 40 the field had to stay 20px tall, which is where the composer's proportions
  * went wrong -- the web field is 54px against a 34px send button, a ratio of 1.59, and 20px against
@@ -169,6 +174,9 @@ void app_status(const char *label, const char *mono);
  * pass tool_call = NULL when no tool ran, and it will not claim one. */
 void app_status_done(unsigned ms, const char *tool_call, const char *tool_result, int tool_ok);
 int  app_hit_stop(int x, int y);
+/* Is (x,y) on something clickable? The device uses it so ENTER can activate whatever the cursor is
+ * resting on, which is how you commit a click without a tap moving the cursor first. */
+int  app_hit_control(int x, int y);
 /* Build the context string for the next turn, newest-first until `budget_chars` is spent.
  * Recent turns go in verbatim; older ones fall back to their compact form; anything that still
  * does not fit is dropped silently. Returns characters written. */

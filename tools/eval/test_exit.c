@@ -378,8 +378,11 @@ int main(void) {
     }
 
     /* the hover STATE: it must reset when the cursor leaves, or the next hover resumes mid-scroll */
+    /* Hover from the ROW's own rect, not from coordinates that were right when they were typed.
+     * MX=40, MY=50 stopped being on row zero the moment the icon band got taller. */
     reset(); seed("Speed from distance and time on a long straight road"); CUR = -1;
-    MX = 40; MY = 50; HOVER = 1; app_draw();
+    HOVER = 1; app_draw();
+    MX = R_CHAT[0].x + 10; MY = R_CHAT[0].y + R_CHAT[0].h / 2; app_draw();
     T("hovering a row arms the marquee", MARQ_AT >= 0, 1);
     /* It advances with the CLOCK, not with draws.
      *
@@ -422,8 +425,12 @@ int main(void) {
     /* Recents is drawn at TOP_H+8 with F_SM's 13px box, so it ends at TOP_H+21. The first row's
      * highlight starts at R_CHAT[0].y and must clear that, with air rather than exactly abutting:
      * three text bands stacked with no separation is what "the spacing is terrible" meant. */
-    T("the first row clears Recents",   R_CHAT[0].y >= TOP_H + 8 + gfx_font_h(F_SM), 1);
-    T("with air, not flush",            R_CHAT[0].y - (TOP_H + 8 + gfx_font_h(F_SM)) >= 3, 1);
+    /* "Recents" is drawn at TOP_H+6 with F_SM's 13px box, so it ends at TOP_H+19. Written as one
+     * expression rather than two magic numbers, because the icon band grew twice this session and
+     * each time the literal went stale while the property it stood for did not. */
+    {   int recents_bottom = TOP_H + 6 + gfx_font_h(F_SM);
+        T("the first row clears Recents", R_CHAT[0].y >= recents_bottom, 1);
+        T("with air, not flush",          R_CHAT[0].y - recents_bottom >= 3, 1); }
     T("the icons have air in the band", R_NEW.y >= 3 && R_NEW.y + R_NEW.h <= TOP_H - 2, 1);
 
     /* the three icons are EVENLY spaced -- equal gaps between them and at both ends */
