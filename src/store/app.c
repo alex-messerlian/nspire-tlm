@@ -25,7 +25,7 @@ static const uint16_t PAL_LIGHT[P_N] = {
     [P_RES] = HEX(0xEDF7F0), [P_RESLN] = HEX(0xCFE8D8), [P_RESFG] = HEX(0x186A3B),
     [P_ERR] = HEX(0xFDF2F2), [P_ERRFG] = HEX(0xA8342C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0xE6E6E6), [P_BAR] = HEX(0xEDEDED),
-    [P_EXIT_HOT] = HEX(0xF3D9D7), [P_FIELD_LN] = HEX(0xD9D9D9), [P_SEND_OFF] = HEX(0xD5D5D5),
+    [P_EXIT_HOT] = HEX(0xF3D9D7), [P_FIELD] = HEX(0xFFFFFF), [P_FIELD_LN] = HEX(0xD9D9D9), [P_SEND_OFF] = HEX(0xD5D5D5),
     [P_SHEET] = HEX(0xFFFFFF),   /* white on a dimmed page */
 };
 /* Dark is not inverted light. Surfaces LIFT as they come forward, as on the web -- and this panel
@@ -39,7 +39,7 @@ static const uint16_t PAL_DARK[P_N] = {
     [P_RES] = HEX(0x16281D), [P_RESLN] = HEX(0x27492F), [P_RESFG] = HEX(0x79D497),
     [P_ERR] = HEX(0x2C1B1B), [P_ERRFG] = HEX(0xF0857C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0x3A3A3A), [P_BAR] = HEX(0x333333),
-    [P_EXIT_HOT] = HEX(0x4A2A28), [P_FIELD_LN] = HEX(0x3A3A3A), [P_SEND_OFF] = HEX(0x3D3D3D),
+    [P_EXIT_HOT] = HEX(0x4A2A28), [P_FIELD] = HEX(0x303030), [P_FIELD_LN] = HEX(0x303030), [P_SEND_OFF] = HEX(0x3D3D3D),
     [P_SHEET] = HEX(0x2E2E2E),   /* lifted OFF the page, since the scrim cannot sink it */
 };
 
@@ -62,11 +62,6 @@ void app_set_theme(int mode) {
 
 /* Deliberately phrased as a person would ask, not as the store phrases a relation -- these are
  * examples of USE, and they have to still make sense once the relation flow is gone. */
-static const char *SUGGEST[3] = {
-    "A car goes 150 m in 12 s. Find the speed.",
-    "A 2 kg mass is raised 5 m. Find the potential energy.",
-    "3 A flows through 4 ohm. Find the voltage.",
-};
 
 static const char *PERSIST;          /* NULL = do not persist (host harness) */
 
@@ -93,7 +88,9 @@ static char STATUS[48], STATUS_MONO[40];
 /* hit regions, recomputed every frame so hover testing and click handling can never disagree
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
-static gfx_rect R_EXIT, R_THEME, R_SUGGEST[3];              /* always visible: leaving must not depend on knowing a key */
+static gfx_rect R_EXIT, R_THEME;
+static void draw_composer(int x0, int w, int cy);
+static int EMPTY_COMPOSER;   /* set per-frame: the composer was drawn centred, so do not dock it */              /* always visible: leaving must not depend on knowing a key */
 static int ABORT;                    /* set by ESC or Stop; polled by the generation loop */
 static int NCHAT_ROWS;
 static int CHAT_SCROLL;              /* index of the first chat row drawn */
@@ -700,8 +697,18 @@ static void draw_sidebar(void) {
     }
 
     gfx_hline(0, GFX_H - DOCK_H, SIDE_W, C_LINE);
-    gfx_text(8, GFX_H - DOCK_H + 5,  "396 MHz",    F_UI, C_INK2, C_SIDE);
-    gfx_text(8, GFX_H - DOCK_H + 18, "2.68 tok/s", F_UI, C_INK3, C_SIDE);
+    /* `.side-foot` compressed to what 88 px holds. MEASURED, not eyeballed: F_UI is 15 px tall, so
+     * the web's three rows need 45 px in a 40 px dock, and "TI-Nspire CX II" alone is 86 px in an
+     * 88 px column -- the first attempt at a faithful port clipped both, visibly.
+     *
+     * So the two NUMBERS survive and the device name goes. The name is the one part the reader can
+     * already see (they are holding it); parameters and throughput are the part they cannot. The
+     * values carry their own units so the labels are not needed either, which is what buys the fit:
+     * 75 px and 56 px against 82 px of usable width. */
+    {   int fy = GFX_H - DOCK_H + 5, lh = gfx_font_h(F_UI);
+        gfx_text(6, fy,      "7.2M params", F_UI, C_INK2, C_SIDE);
+        gfx_text(6, fy + lh, "2.68 tok/s",  F_UI, C_INK3, C_SIDE);
+    }
 }
 
 /* Text width available inside a question bubble, for a given pane width.
@@ -740,27 +747,29 @@ static void draw_main(void) {
     int top = TOP_H + 1, bot = GFX_H - DOCK_H;
     gfx_clip(x0, top, w, bot - top);
 
+    EMPTY_COMPOSER = 0;
     if (CUR < 0) {
-        /* Three examples, TAPPABLE. They were static prose with no hit rect and no handler, so the
-         * only thing a new user could do on this screen was guess at the keypad.
+        /* This is a scaled rendering of the web empty state, not a re-layout of it. There, `#empty`
+         * is `justify-content:center; align-items:center` with the composer reparented INTO it --
+         * so the heading and the field sit together in the middle of the pane and the bottom dock
+         * is empty. The device did neither: it pinned the heading top-left and left the composer
+         * docked, which is why the two screens read as different products.
          *
-         * Tapping one puts its text in the composer and nothing else -- it does not send, and it
-         * does not pick anything. That is deliberate: a suggestion the person can still edit is
-         * useful under any architecture, and this app is moving to direct typing where there is
-         * nothing to pick. */
-        gfx_text(px0, top + 22, "What can I work out?", F_BIG, C_INK, C_BG);
-        gfx_text(px0, top + 44, "Ask in your own words.", F_UI, C_INK3, C_BG);
-        for (int i = 0; i < 3; i++) {
-            int y = top + 66 + i * 20;
-            R_SUGGEST[i] = (gfx_rect){ px0 - 4, y - 3, pw + 8, 18 };
-            int hot = HOVER && inside(R_SUGGEST[i], MX, MY);
-            uint16_t bg = hot ? C_SEL : C_BG;
-            if (hot) gfx_rrect(R_SUGGEST[i].x, R_SUGGEST[i].y, R_SUGGEST[i].w, R_SUGGEST[i].h, 5, bg);
-            /* an arrow, so the row reads as something you can act on rather than as a caption */
-            for (int k = 0; k < 4; k++) gfx_fill(px0 + 2 + k, y + 8 - k, 1, 1, C_INK3);
-            gfx_fill(px0 + 5, y + 4, 1, 5, C_INK3);
-            gfx_text_ellipsis(px0 + 14, y, SUGGEST[i], F_UI, hot ? C_INK : C_INK2, bg, pw - 20);
-        }
+         * The suggestion rows are gone. They ellipsised at this width ("A car goes 150 m in 12 s.
+         * Find ..."), so the one thing they existed to do -- show what a question looks like -- was
+         * exactly what they could not do here. */
+        int gap = 14;
+        int hh = gfx_font_h(F_BIG);
+        int blk = hh + gap + 20;                             /* heading + gap + field */
+        int cy0 = top + (bot - top - blk) / 2;
+        if (cy0 < top + 6) cy0 = top + 6;
+
+        /* Heading then field, nothing between -- `#empty` is `h1` + composer and no subtitle. The
+         * "Ask in your own words." line was mine, not the design's. */
+        const char *h1 = "What can I work out?";
+        gfx_text(x0 + (w - gfx_text_w(h1, F_BIG)) / 2, cy0, h1, F_BIG, C_INK, C_BG);
+        draw_composer(x0, w, cy0 + hh + gap);
+        EMPTY_COMPOSER = 1;
     } else {
         app_chat *c = &CHATS[CUR];
         int lh0 = gfx_font_h(F_UI) + 2, total = 6;
@@ -797,30 +806,7 @@ static void draw_main(void) {
     }
     gfx_clip_reset();
 
-    /* composer */
-    int cy = GFX_H - DOCK_H + 3;
-    R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, 20 };
-    gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_BG);
-    gfx_rrect_outline(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD_LN);
-    if (COMPOSE_N) {
-        gfx_text_ellipsis(R_FIELD.x + 9, cy + 3, COMPOSE, F_UI, C_INK, C_BG, R_FIELD.w - 34);
-        int cw = gfx_text_w(COMPOSE, F_UI);
-        if (cw < R_FIELD.w - 40) gfx_vline(R_FIELD.x + 9 + cw + 1, cy + 4, 12, C_INK);
-    } else {
-        gfx_text(R_FIELD.x + 9, cy + 3, "Ask a physics question", F_UI, C_INK3, C_BG);
-    }
-    /* While generating, the send arrow becomes a STOP square -- the same control, so there is
-     * always exactly one button there and it always does the thing the state calls for. */
-    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 20, cy + 2, 16, 16 };
-    if (BUSY) {
-        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, C_INK);
-        gfx_fill(R_SEND.x + 5, R_SEND.y + 5, 6, 6, C_BG);
-    } else {
-        uint16_t sb = COMPOSE_N ? C_INK : C_SEND_OFF;
-        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, sb);
-        for (int i = 0; i < 5; i++) gfx_hline(R_SEND.x + 8 - i, R_SEND.y + 5 + i, 1, C_BG);
-        gfx_vline(R_SEND.x + 8, R_SEND.y + 5, 7, C_BG);
-    }
+    if (!EMPTY_COMPOSER) draw_composer(x0, w, GFX_H - DOCK_H + 3);
 
     /* The footer carries the one key worth knowing, and says what it does HERE -- ESC means "back"
      * inside a chat and "quit" at home, so a single fixed label would be wrong half the time. */
@@ -839,6 +825,35 @@ static void draw_cursor(void) {
         gfx_hline(MX, MY + i, wdt, C_INK);
     }
     gfx_hline(MX, MY + 10, 4, C_BG);
+}
+
+/* The composer is drawn at a caller-chosen y because it MOVES. On the web build `placeComposer()`
+ * reparents the same field between `#centerComposer` and `#bottomComposer`; this is that, and it is
+ * the reason the function takes a coordinate instead of reading DOCK_H itself. */
+static void draw_composer(int x0, int w, int cy) {
+    R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, 20 };
+    gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD);
+    gfx_rrect_outline(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD_LN);
+    if (COMPOSE_N) {
+        gfx_text_ellipsis(R_FIELD.x + 9, cy + 3, COMPOSE, F_UI, C_INK, C_FIELD, R_FIELD.w - 34);
+        int cw = gfx_text_w(COMPOSE, F_UI);
+        if (cw < R_FIELD.w - 40) gfx_vline(R_FIELD.x + 9 + cw + 1, cy + 4, 12, C_INK);
+    } else {
+        gfx_text(R_FIELD.x + 9, cy + 3, "Ask ChatTLM", F_UI, C_INK3, C_FIELD);
+    }
+    /* While generating, the send arrow becomes a STOP square -- the same control, so there is
+     * always exactly one button there and it always does the thing the state calls for. */
+    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 20, cy + 2, 16, 16 };
+    if (BUSY) {
+        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, C_INK);
+        gfx_fill(R_SEND.x + 5, R_SEND.y + 5, 6, 6, C_BG);
+    } else {
+        uint16_t sb = COMPOSE_N ? C_INK : C_SEND_OFF;
+        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, sb);
+        for (int i = 0; i < 5; i++) gfx_hline(R_SEND.x + 8 - i, R_SEND.y + 5 + i, 1, C_BG);
+        gfx_vline(R_SEND.x + 8, R_SEND.y + 5, 7, C_BG);
+    }
+
 }
 
 void app_draw(void) {
@@ -874,12 +889,6 @@ void app_event(const in_event *e) {
         }
         if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
         if (CUR < 0 && !SEARCH_ON) {
-            for (int i = 0; i < 3; i++)
-                if (inside(R_SUGGEST[i], MX, MY)) {
-                    snprintf(COMPOSE, sizeof COMPOSE, "%s", SUGGEST[i]);
-                    COMPOSE_N = (int)strlen(COMPOSE);
-                    return;                      /* fills the box; the person still presses send */
-                }
         }
         if (SIDEBAR && inside(R_THEME, MX, MY)) {   /* auto -> light -> dark -> auto */
             app_set_theme((THEME_MODE + 1) % 3);

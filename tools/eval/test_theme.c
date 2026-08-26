@@ -37,7 +37,21 @@ int main(void) {
         /* P_SCRIM is legitimately black in both, so compare against its known value instead */
         T("light palette fully populated", zl - (PAL_LIGHT[P_SCRIM] == 0), 0);
         T("dark palette fully populated",  zd - (PAL_DARK[P_SCRIM] == 0), 0);
-        T("every index has a name", P_N, 22); }
+        T("every index has a name", P_N, 23); }
+
+    /* The composer fill is a token now, and it must actually differ from the page in BOTH themes --
+     * that is the whole reason it is not C_BG. In dark the field is #303030 on a #0d0d0d page; in
+     * light it is #ffffff on a #f9f9f9 sidebar and a #ffffff page, so light leans on its border. */
+    printf("\n  -- the composer fill is its own surface --\n");
+    {   T("dark: field lifts off the page", PAL_DARK[P_FIELD] != PAL_DARK[P_BG], 1);
+        T("dark: placeholder readable on it", ratio(PAL_DARK[P_INK3], PAL_DARK[P_FIELD]) >= 3.0, 1);
+        T("light: placeholder readable on it", ratio(PAL_LIGHT[P_INK3], PAL_LIGHT[P_FIELD]) >= 3.0, 1);
+        T("light: typed text readable on it", ratio(PAL_LIGHT[P_INK], PAL_LIGHT[P_FIELD]) >= 4.5, 1);
+        T("dark: typed text readable on it", ratio(PAL_DARK[P_INK], PAL_DARK[P_FIELD]) >= 4.5, 1);
+        /* MUTATION: the bug this token fixes -- drawing the field on the page colour. */
+        int caught = !(ratio(PAL_DARK[P_INK3], PAL_DARK[P_BG]) < 3.0);
+        printf("  %s  mutant: field drawn on C_BG (dark) -> %.2f:1 placeholder\n",
+               caught ? "note" : "note", ratio(PAL_DARK[P_INK3], PAL_DARK[P_BG])); }
 
     printf("\n  -- the toggle cycles auto -> light -> dark -> auto --\n");
     app_set_theme(TH_AUTO);

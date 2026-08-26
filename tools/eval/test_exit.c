@@ -122,26 +122,61 @@ int main(void) {
         printf("  %s  mutant: no bump leaves the answered session at index %d\n",
                caught ? "CAUGHT" : "MISSED", cur); }
 
-    printf("\n  -- the empty state is tappable --\n");
-    reset(); CUR = -1; app_draw();
-    T("suggestion has a hit rect", R_SUGGEST[0].w > 0, 1);
-    click(R_SUGGEST[1].x + 20, R_SUGGEST[1].y + 8);
-    T("tapping fills the composer", COMPOSE_N > 0, 1);
-    T("with that suggestion's text", strcmp(COMPOSE, SUGGEST[1]) == 0, 1);
-    T("it does NOT send", app_busy(), 0);
-    T("and does not open a session", CUR, -1);
+    /* -- the empty state is the CENTRED composer, mirroring the web build --
+     *
+     * The suggestion rows are gone (they ellipsised at 196 px, so they could not show what a
+     * question looks like -- the only reason they existed). What replaces them is the layout the
+     * web build already had: heading and field centred together in the pane, bottom dock empty.
+     *
+     * The trap this guards is that BOTH sites write the same R_FIELD/R_SEND rects. If the docked
+     * composer also drew on the empty screen, the hit rects would belong to whichever ran last and
+     * the visible field would be dead. So: assert the field is where it is drawn, on both screens. */
+    /* -- nothing in the sidebar footer may overflow its column or its dock --
+     *
+     * The first port of the web footer clipped BOTH ways at once: "TI-Nspire CX II" is 86 px in an
+     * 88 px column, and three 15 px rows do not fit a 40 px dock. Neither was caught by any
+     * assertion; both were visible in the render. Same class as the bubble-width defect -- a
+     * measurement that lived only in my head. */
+    printf("\n  -- the sidebar footer fits its column --\n");
+    {   const char *rows[2] = { "7.2M params", "2.68 tok/s" };
+        int lh = gfx_font_h(F_UI), fy = GFX_H - DOCK_H + 5, worst = 0;
+        for (int i = 0; i < 2; i++) {
+            int wpx = gfx_text_w(rows[i], F_UI);
+            if (6 + wpx > worst) worst = 6 + wpx;
+        }
+        T("widest footer row fits SIDE_W", worst <= SIDE_W, 1);
+        T("both rows fit above the screen edge", fy + 2 * lh <= GFX_H, 1);
 
-    reset(); CUR = -1; app_draw();
-    click(R_SUGGEST[2].x + 20, R_SUGGEST[2].y + 8);
-    T("third suggestion works too", strcmp(COMPOSE, SUGGEST[2]) == 0, 1);
+        /* MUTATION: the string that actually clipped must still be rejected. */
+        int bad = 6 + gfx_text_w("TI-Nspire CX II", F_UI) <= SIDE_W;
+        if (bad) F++;
+        printf("  %s  mutant: the device-name row that clipped at 88 px\n", bad ? "MISSED" : "CAUGHT");
+    }
 
-    /* inside a session those rects are stale -- a click there must not resurrect them */
-    reset(); seed("a"); CUR = -1; app_draw();
-    gfx_rect stale = R_SUGGEST[0];
-    CUR = 0; app_draw();
+    printf("\n  -- the empty state centres the composer --\n");
+    reset(); CUR = -1; app_draw();
+    gfx_rect empty_field = R_FIELD;
+    int mid = (TOP_H + (GFX_H - DOCK_H)) / 2;
+    T("field is centred, not docked", empty_field.y < GFX_H - DOCK_H - 10, 1);
+    T("and sits near the vertical middle", empty_field.y > mid - 40 && empty_field.y < mid + 40, 1);
+    T("send button rides with it", R_SEND.y > empty_field.y - 2 && R_SEND.y < empty_field.y + 20, 1);
+
+    /* the field must actually be clickable where it was drawn */
     COMPOSE_N = 0; COMPOSE[0] = 0;
-    click(stale.x + 20, stale.y + 8);
-    T("stale rect ignored inside a session", COMPOSE_N, 0);
+    click(empty_field.x + 20, empty_field.y + 8);
+    T("clicking the centred field does not open a session", CUR, -1);
+
+    reset(); seed("a"); CUR = 0; app_draw();
+    T("inside a session the composer docks", R_FIELD.y >= GFX_H - DOCK_H, 1);
+    T("and moved from where the empty state had it", R_FIELD.y != empty_field.y, 1);
+
+    /* MUTATION: if the docked composer drew unconditionally, the empty screen's R_FIELD would be
+     * the DOCKED rect -- the centred field would be visible and dead. */
+    {   int caught = (empty_field.y < GFX_H - DOCK_H);
+        if (!caught) F++;
+        printf("  %s  mutant: docked composer overwriting the centred hit rect\n",
+               caught ? "CAUGHT" : "MISSED"); }
+
 
     /* INDEX 0 IS NEWEST -- and new_chat did not agree. It appended at the end, so a new session
      * appeared at the BOTTOM of "Recents", and its eviction dropped index 0, which under that

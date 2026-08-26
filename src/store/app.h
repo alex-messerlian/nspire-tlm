@@ -17,7 +17,7 @@
 enum {
     P_BG, P_SIDE, P_LINE, P_INK, P_INK2, P_INK3, P_BUBBLE, P_SEL,
     P_TOOL, P_TOOLLN, P_RES, P_RESLN, P_RESFG, P_ERR, P_ERRFG,
-    P_SCRIM, P_TRASH_HOT, P_BAR, P_EXIT_HOT, P_FIELD_LN, P_SEND_OFF, P_SHEET,
+    P_SCRIM, P_TRASH_HOT, P_BAR, P_EXIT_HOT, P_FIELD, P_FIELD_LN, P_SEND_OFF, P_SHEET,
     P_N
 };
 extern uint16_t TLM_PAL[P_N];
@@ -41,6 +41,10 @@ extern uint16_t TLM_PAL[P_N];
 #define C_TRASH_HOT TLM_PAL[P_TRASH_HOT]
 #define C_BAR       TLM_PAL[P_BAR]
 #define C_EXIT_HOT  TLM_PAL[P_EXIT_HOT]
+/* The composer's fill, and NOT reusable as C_BUBBLE. They coincide in dark (both #303030) and
+ * differ in light (#ffffff vs #f4f4f4), so sharing one token would have been correct on exactly
+ * the theme anyone checked first. */
+#define C_FIELD     TLM_PAL[P_FIELD]
 #define C_FIELD_LN  TLM_PAL[P_FIELD_LN]
 #define C_SEND_OFF  TLM_PAL[P_SEND_OFF]
 /* Modal surface. NOT the same token as the page, which is the mistake it exists to prevent: a

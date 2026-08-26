@@ -99,51 +99,80 @@ static void pointer_init(void) {
 
 /* Returns 1 if an event was produced.
  *
- * Tap versus drag. app.c has handled IN_SCROLL since it was written and NOTHING EVER SENT ONE --
- * the poll only ever produced IN_MOVE and IN_CLICK, so the transcript scrolled by arrow key alone
- * and the session list not at all. A handler with no producer reads as a feature and is not one;
- * same shape as the provenance check that was written, unit-tested, and never called.
+ * RELATIVE motion, not absolute. The pad reports where the finger IS, and mapping that straight to
+ * a screen position makes the cursor teleport to wherever you happen to touch down, then snap back
+ * the moment you lift and re-touch -- which is what it did. A pad this small cannot be an absolute
+ * digitiser anyway: it is ~1/4 the aspect of the panel, so absolute mapping also means you can only
+ * reach a screen position by touching the corresponding fraction of a 2 cm pad.
  *
- * A finger down that then moves emits IN_SCROLL deltas; a finger down that lifts having barely
- * moved emits one IN_CLICK. Direction is natural: dragging up pushes content up. */
-#define TAP_SLOP 5                    /* pixels of travel still counted as a tap */
+ * So it behaves like a trackpad. Contact establishes a reference point and does NOT move the
+ * cursor; subsequent motion moves it by the delta. Lifting clears the reference, so the next touch
+ * resumes from where the cursor already is instead of jumping.
+ *
+ * Tap versus drag is unchanged and still needed: app.c has handled IN_SCROLL since it was written
+ * and nothing ever emitted one.
+ */
+#define TAP_SLOP  5             /* pixels of cursor travel still counted as a tap */
+#define PAD_GAIN  3             /* cursor pixels per pad unit, x256 -- tuned for a 320px panel */
 
-static int DOWN, LAST_Y, TRAVEL;
+static int DOWN, HAVE_REF, REF_X, REF_Y, TRAVEL;
+/* Sub-pixel remainder. The pad is higher-resolution than the panel, so `delta * GFX_W / PAD_W`
+ * truncates every small movement to ZERO -- slow, precise motion would move the cursor not at all
+ * while fast motion worked, which reads as a dead pad rather than as a scaling bug. Carrying the
+ * remainder in 1/256ths makes fine motion accumulate instead of being discarded. */
+static int ACC_X, ACC_Y;
 
 static int pointer_poll(in_event *e) {
     touchpad_report_t r;
     if (touchpad_scan(&r) != 0) return 0;
 
+    int active = r.contact || r.proximity;
+    if (!active) {
+        /* Lift. Drop the reference so the next touch does not jump, and turn a short press into a
+         * click. */
+        HAVE_REF = 0;
+        if (DOWN) {
+            DOWN = 0;
+            e->x = CX; e->y = CY; e->hover = 0;
+            if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; return 1; }
+        }
+        return 0;
+    }
+
+    if (!HAVE_REF) {                      /* first sample of a touch: anchor, do not move */
+        HAVE_REF = 1; REF_X = r.x; REF_Y = r.y; TRAVEL = 0; ACC_X = ACC_Y = 0;
+        if (r.contact) DOWN = 1;
+        e->x = CX; e->y = CY; e->hover = r.proximity && !r.contact; e->kind = IN_MOVE;
+        return 1;
+    }
+
+    /* Pad coordinates are scaled to the panel so a full swipe crosses roughly the full screen,
+     * then multiplied by a gain. Pad y is bottom-up; the screen is top-down. */
+    ACC_X += (r.x - REF_X) * GFX_W * 128 * PAD_GAIN / (PAD_W ? PAD_W : 1);
+    ACC_Y += (REF_Y - r.y) * GFX_H * 128 * PAD_GAIN / (PAD_H ? PAD_H : 1);
+    REF_X = r.x; REF_Y = r.y;
+    int dx = ACC_X / 256, dy = ACC_Y / 256;
+    ACC_X -= dx * 256; ACC_Y -= dy * 256;      /* keep the remainder, do not discard it */
+
     if (r.contact) {
-        CX = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
-        CY = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));   /* pad y is bottom-up */
-        if (CX < 0) CX = 0;
-        if (CX >= GFX_W) CX = GFX_W - 1;
-        if (CY < 0) CY = 0;
-        if (CY >= GFX_H) CY = GFX_H - 1;
-        e->x = CX; e->y = CY; e->hover = 0;
-        if (!DOWN) { DOWN = 1; LAST_Y = CY; TRAVEL = 0; e->kind = IN_MOVE; return 1; }
-        int d = CY - LAST_Y;
-        TRAVEL += d < 0 ? -d : d;
-        if (d > 1 || d < -1) { LAST_Y = CY; e->kind = IN_SCROLL; e->dy = -d; return 1; }
-        e->kind = IN_MOVE; return 1;
+        DOWN = 1;
+        TRAVEL += (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
+        /* A press that is moving vertically scrolls; the cursor stays put. */
+        if (dy > 1 || dy < -1) {
+            e->x = CX; e->y = CY; e->hover = 0;
+            e->kind = IN_SCROLL; e->dy = -dy;
+            return 1;
+        }
     }
 
-    if (DOWN) {                                  /* release: a short press is a click */
-        DOWN = 0;
-        e->x = CX; e->y = CY; e->hover = 0;
-        if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; return 1; }
-        return 0;                                /* it was a drag; the scrolls already went out */
-    }
-
-    if (!r.proximity) return 0;
-    CX = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
-    CY = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));
+    CX += dx; CY += dy;
     if (CX < 0) CX = 0;
     if (CX >= GFX_W) CX = GFX_W - 1;
     if (CY < 0) CY = 0;
     if (CY >= GFX_H) CY = GFX_H - 1;
-    e->x = CX; e->y = CY; e->hover = 1; e->kind = IN_MOVE;
+    e->x = CX; e->y = CY;
+    e->hover = r.proximity && !r.contact;
+    e->kind = IN_MOVE;
     return 1;
 }
 
@@ -371,12 +400,13 @@ void app_request(const char *question, const char *rid) {
 
         if (isKeyPressed(KEY_NSPIRE_ESC)) { stopped = 1; }
         else {
-            touchpad_report_t r;             /* a tap on Stop counts the same as the key */
-            if (touchpad_scan(&r) == 0 && r.contact) {
-                int tx = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
-                int ty = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));
-                if (app_hit_stop(tx, ty)) stopped = 1;
-            }
+            /* A tap on Stop counts the same as the key. This asks where the CURSOR is, not where
+             * the finger is: pointing is relative now, so pad coordinates no longer name a screen
+             * position at all. Mapping them as if they did would have made Stop respond to a touch
+             * in the corresponding corner of the pad while ignoring a tap with the cursor sitting
+             * on the button -- the exact inversion of what the user sees. */
+            touchpad_report_t r;
+            if (touchpad_scan(&r) == 0 && r.contact && app_hit_stop(CX, CY)) stopped = 1;
         }
         if (app_take_abort()) stopped = 1;
         if (stopped) break;

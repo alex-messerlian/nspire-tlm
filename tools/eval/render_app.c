@@ -99,6 +99,11 @@ int main(int argc, char **argv) {
         MX = 300; MY = 220;                 /* cursor parked off the sheet */
     } else if (!strcmp(screen, "chat")) {
         CUR = 2; MX = 300; MY = 220;
+    } else if (!strcmp(screen, "empty")) {
+        NCHATS = 0; CUR = -1; MX = 300; MY = 220;   /* the first-run screen, nothing seeded */
+    } else if (!strcmp(screen, "emptydark")) {
+        NCHATS = 0; CUR = -1; MX = 300; MY = 220;
+        app_set_theme(TH_DARK);
     } else {
         MX = 46; MY = 50; HOVER = 1;        /* hovering the Search row, to show its state */
     }
