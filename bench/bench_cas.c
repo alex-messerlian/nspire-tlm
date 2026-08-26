@@ -129,6 +129,21 @@ typedef struct { const char *desc; int p1_kind, p2_kind, p4_kind, p5_kind; } att
  * 3 = pointer to a pointer (out-param shape) */
 enum { A_NULL = 0, A_BLOCK, A_INT, A_PPTR };
 
+/* ---- ROUND 2 ------------------------------------------------------------------------------------
+ * Round 1 ran all nine hypotheses on hardware with ZERO resets and returned a clear signal:
+ *
+ *     rc=0    on attempts 4, 8, 9   -- every attempt where p4 was a valid pointer
+ *     rc=1020 on attempts 1,2,3,5,6,7 -- every attempt where p4 was NULL
+ *
+ * So p4 is REQUIRED and is where the result goes. 1020 is this API's invalid-argument code.
+ *
+ * Round 1 could not finish the job because of a gap in round 1: it dumped b1, b2, i4, i5 and pp2 --
+ * and never dumped b4, which is the buffer the successful attempts actually passed. The handle was
+ * very likely sitting in it, unprinted. MathExprToStr was then called with NULL handles, returned
+ * rc=0 sixteen times, and gave out=0x0 every time -- success at doing nothing.
+ *
+ * Round 2 dumps every buffer, and then tries the handle arrangements that p4's contents suggest.
+ */
 static const attempt ATTEMPTS[] = {
     /* Everything NULL but the expression. Many OS entry points return an error code for this rather
      * than dereferencing, so it is the cheapest way to learn the return-value convention. */
@@ -145,6 +160,48 @@ static const attempt ATTEMPTS[] = {
     { "all four = blocks",               A_BLOCK, A_BLOCK, A_BLOCK, A_BLOCK },
 };
 #define NATTEMPTS ((int)(sizeof ATTEMPTS / sizeof ATTEMPTS[0]))
+
+/* First 32 bytes as words, plus a note if anything is non-zero -- the handle will be a pointer. */
+static void dump_block(const char *name, const char *b) {
+    const uint32_t *w = (const uint32_t *)(const void *)b;
+    int any = 0;
+    for (int i = 0; i < 8; i++) if (w[i]) any = 1;
+    say("  %s: %08lX %08lX %08lX %08lX %08lX %08lX %08lX %08lX%s",
+        name, (unsigned long)w[0], (unsigned long)w[1], (unsigned long)w[2], (unsigned long)w[3],
+        (unsigned long)w[4], (unsigned long)w[5], (unsigned long)w[6], (unsigned long)w[7],
+        any ? "   <-- NON-ZERO" : "");
+}
+
+/* Given a successful evaluate, try every plausible way of handing the result to MathExprToStr.
+ * Each candidate is built only from memory we own or values the OS just wrote there. */
+static void try_render(char *b4blk) {
+    uint32_t *w = (uint32_t *)(void *)b4blk;
+    struct { const char *desc; void *h1; void *h2; } C[] = {
+        { "h1=b4          h2=NULL",        (void *)b4blk,        0 },
+        { "h1=*(void**)b4 h2=NULL",        (void *)(uintptr_t)w[0], 0 },
+        { "h1=NULL        h2=b4",          0,                    (void *)b4blk },
+        { "h1=b4          h2=b4+4",        (void *)b4blk,        (void *)(b4blk + 4) },
+        { "h1=*(void**)b4 h2=*(void**)b4+4", (void *)(uintptr_t)w[0], (void *)(uintptr_t)w[1] },
+        { "h1=&b4         h2=NULL",        (void *)&b4blk,       0 },
+    };
+    for (unsigned i = 0; i < sizeof C / sizeof C[0]; i++) {
+        uint16_t *out = 0;
+        say("  render try %u: %s", i + 1, C[i].desc);
+        int rc = TI_MS_MathExprToStr(C[i].h1, C[i].h2, &out);
+        say("    rc=%d out=%p", rc, (void *)out);
+        if (rc == 0 && out) {
+            char ascii[128];
+            unsigned n = (unsigned)utf16_strlen(out);
+            if (n > 120) n = 120;
+            utf162ascii(ascii, out, (int)n);
+            ascii[n] = 0;
+            say("    *** STRING: \"%s\" ***", ascii);
+            say("    *** if that reads 2, the OS CAS IS DRIVEABLE. Stop and report this line. ***");
+            return;
+        }
+    }
+    say("  no handle arrangement produced a string");
+}
 
 int main(void) {
     if (!resolve_paths()) {
@@ -251,31 +308,19 @@ int main(void) {
     say("RETURNED rc=%d  (no reset)", rc);
 
     /* Anything non-zero anywhere is a clue about which argument received output. */
-    say("after: b1[0..7]=%02X %02X %02X %02X %02X %02X %02X %02X",
-        (unsigned char)b1[0],(unsigned char)b1[1],(unsigned char)b1[2],(unsigned char)b1[3],
-        (unsigned char)b1[4],(unsigned char)b1[5],(unsigned char)b1[6],(unsigned char)b1[7]);
-    say("after: b2[0..7]=%02X %02X %02X %02X %02X %02X %02X %02X",
-        (unsigned char)b2[0],(unsigned char)b2[1],(unsigned char)b2[2],(unsigned char)b2[3],
-        (unsigned char)b2[4],(unsigned char)b2[5],(unsigned char)b2[6],(unsigned char)b2[7]);
+    /* DUMP EVERY BUFFER. Round 1 printed b1 and b2 and not b4 -- and b4 was the only one the
+     * successful attempts passed. A buffer you hand to a routine and then do not read is a
+     * measurement you did not take. */
+    dump_block("b1", b1); dump_block("b2", b2);
+    dump_block("b4", b4); dump_block("b5", b5);
     say("after: i4=%d i5=%d pp2=%p", i4, i5, pp2);
 
     /* ---- Step 3: only if evaluate returned something, try to render it. ---------------------- */
     if (rc == 0) {
-        say("rc==0, attempting TI_MS_MathExprToStr on the same buffers");
-        uint16_t *out = 0;
-        int rc2 = TI_MS_MathExprToStr(p1, p2, &out);
-        say("MathExprToStr rc=%d out=%p", rc2, (void *)out);
-        if (out) {
-            char ascii[128];
-            unsigned n = (unsigned)utf16_strlen(out);
-            if (n > 120) n = 120;
-            utf162ascii(ascii, out, (int)n);
-            ascii[n] = 0;
-            say("RESULT STRING: \"%s\"", ascii);
-            say("*** if that reads 2, the OS CAS is driveable and the architecture changes. ***");
-        }
+        say("rc==0 -- walking handle arrangements for the result");
+        try_render(b4);
     } else {
-        say("rc!=0, not attempting the string conversion");
+        say("rc=%d (1020 = invalid argument on this API), not rendering", rc);
     }
 
     say("attempt %d survived.", idx + 1);
