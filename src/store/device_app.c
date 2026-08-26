@@ -35,15 +35,47 @@
 #define TLM_MMIO32(a)   (*(volatile uint32_t *)(uintptr_t)(a))
 #define TLM_32K_HZ      32768u
 
+/* What the timer looked like before we touched it, so it can be put back.
+ *
+ * The guard below reads as "only configure it if nobody else is running it", and that is NOT what
+ * it tests. It tests whether the timer is already in EXACTLY THE MODE WE WANT: enabled and
+ * free-running. A timer the OS owns in any other mode fails that test and gets reprogrammed
+ * underneath it, and nothing ever put it back -- the app simply returned.
+ *
+ * docs/HARDWARE.md C3 lists 0x900D0000 as [SOURCED] from Hackspire and UNMEASURED. Ownership was
+ * never established on device. Writing to a peripheral whose owner is unknown and not restoring it
+ * is indefensible whatever it turns out to break, and this calculator has dropped off USB after a
+ * run repeatedly, which is a symptom in search of exactly this kind of cause.
+ *
+ * TO BE CLEAR: that this CAUSES the USB drop is a hypothesis and is not measured. The restore is
+ * correct on its own terms regardless of whether it turns out to be the culprit. */
+static uint32_t SAVED_CTRL, SAVED_LOAD;
+static int      CLOCK_TOUCHED;
+
 static void clock_start(void) {
-    /* Only configure it if nobody else is running it: an already-enabled free-running timer is
-     * almost certainly the OS's, and stopping it would be rude and probably fatal. */
     uint32_t c = TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL);
     if (!((c & (1u << 7)) && (c & (1u << 1)))) {
+        /* Snapshot ONCE, on the first reconfiguration. Saving on every call would capture our own
+         * settings on the second pass and restore those, which is not a restore at all. */
+        if (!CLOCK_TOUCHED) {
+            SAVED_CTRL = c;
+            SAVED_LOAD = TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_LOAD);
+            CLOCK_TOUCHED = 1;
+        }
         TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL) = 0;
         TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_LOAD) = 0xFFFFFFFFu;
         TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL) = (1u << 7) | (1u << 1);
     }
+}
+/* Puts the timer back exactly as it was found. Disabled first: the SP804 latches LOAD while the
+ * timer runs, so writing LOAD to a live timer sets the reload value without taking effect, and the
+ * counter carries on from wherever we left it. */
+static void clock_restore(void) {
+    if (!CLOCK_TOUCHED) return;
+    TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL) = 0;
+    TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_LOAD) = SAVED_LOAD;
+    TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_CTRL) = SAVED_CTRL;
+    CLOCK_TOUCHED = 0;
 }
 static uint32_t clock_raw(void) { return TLM_MMIO32(TLM_TIMER_32K + TLM_SP804_VALUE); }
 
@@ -537,6 +569,7 @@ static void die(const char *what, const char *detail) {
     gfx_text(12, GFX_H - 20, "Press ESC to exit.", F_UI, C_INK3, C_BG);
     gfx_present();
     while (!isKeyPressed(KEY_NSPIRE_ESC)) { }
+    clock_restore();
     gfx_free();
 }
 
@@ -627,6 +660,7 @@ int main(void) {
     }
     if (MODEL_READY) rq_free();
     ns_tok_free(&TK); ns_free(&ST);
+    clock_restore();                             /* hand the hardware back before leaving */
     gfx_free();
     return 0;
 }
