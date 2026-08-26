@@ -193,25 +193,51 @@ static int keypad_poll(void) {
      * blocked waiting for a release. */
     static const t_key *held;
 
-    /* THE RELEASE CHECK COMES FIRST. It used to sit after this branch, so a held ctrl+N re-fired
-     * start_new_chat() every pass: the screen sat on the new-chat view and never moved, which
-     * looks precisely like the shortcut doing nothing. ctrl+S was worse, reopening search with an
-     * empty query 40 times a second. */
+    /* THE RELEASE CHECK COMES FIRST. It used to sit after the chord branch, so a held ctrl+N
+     * re-fired start_new_chat() every pass: the screen sat on the new-chat view and never moved,
+     * which looks precisely like the shortcut doing nothing. */
     if (held) {
         if (isKeyPressed(*held)) return 0;     /* still down: already reported */
         held = 0;
     }
 
-    /* Ctrl as a CHORD rather than a modifier flag, so app.c never learns how this keypad spells
-     * "held". Checked before the plain map, or ctrl+N would arrive as a bare 'n' in the composer. */
-    if (isKeyPressed(KEY_NSPIRE_CTRL)) {
-        if (isKeyPressed(KEY_NSPIRE_N)) { held = &KEY_NSPIRE_N; return K_NEW; }
-        if (isKeyPressed(KEY_NSPIRE_S)) { held = &KEY_NSPIRE_S; return K_SEARCH; }
-        if (isKeyPressed(KEY_NSPIRE_B)) { held = &KEY_NSPIRE_B; return K_PANEL; }
-        return 0;                              /* ctrl alone types nothing */
+    /* CTRL IS STICKY, AND ALSO WORKS HELD.
+     *
+     * The calculator's own ctrl is a sticky modifier: you tap it and it applies to the next key.
+     * Requiring it to be HELD meant half the ways a person would naturally reach for a shortcut
+     * silently did nothing. Both work now: hold ctrl and press the letter, or tap ctrl and then
+     * press the letter afterwards.
+     *
+     * `armed` is set only when ctrl is released WITHOUT having been used, so holding it down for a
+     * chord does not also leave it armed for the following keystroke. Any non-shortcut key clears
+     * it and types normally, so a stray tap on ctrl cannot swallow the next letter. */
+    static int ctrl_was, ctrl_armed, ctrl_used;
+    int ctrl_now = isKeyPressed(KEY_NSPIRE_CTRL);
+    if (ctrl_now && !ctrl_was) ctrl_used = 0;                  /* ctrl went down */
+    if (!ctrl_now && ctrl_was && !ctrl_used) ctrl_armed = 1;   /* tapped alone: arm it */
+    ctrl_was = ctrl_now;
+
+    if (ctrl_now || ctrl_armed) {
+        struct { const t_key *k; int c; } CH[] = {
+            { &KEY_NSPIRE_N, K_NEW }, { &KEY_NSPIRE_S, K_SEARCH },
+            { &KEY_NSPIRE_B, K_PANEL }, { &KEY_NSPIRE_Q, K_QUIT },
+        };
+        for (unsigned i = 0; i < sizeof CH / sizeof CH[0]; i++) {
+            if (isKeyPressed(*CH[i].k)) {
+                held = CH[i].k; ctrl_used = 1; ctrl_armed = 0;
+                return CH[i].c;
+            }
+        }
+        if (ctrl_now) return 0;        /* ctrl held on its own types nothing */
     }
+
     static const struct { const t_key *k; int c; } MAP[] = {
-        { &KEY_NSPIRE_ESC, K_ESC }, { &KEY_NSPIRE_ENTER, K_ENTER }, { &KEY_NSPIRE_TAB, K_TAB },
+        /* BOTH enter keys. The keypad has two -- RET (0x10,0x001) is the big one at the bottom
+         * right, ENTER (0x10,0x002) the other -- and only the second was mapped, so pressing the
+         * obvious key did nothing at all. Reaching for ESC after that is what actually quit the
+         * app, from the home screen with an empty box. */
+        { &KEY_NSPIRE_RET, K_ENTER }, { &KEY_NSPIRE_ENTER, K_ENTER },
+        { &KEY_NSPIRE_ESC, K_ESC }, { &KEY_NSPIRE_TAB, K_TAB },
         { &KEY_NSPIRE_DEL, K_BACK }, { &KEY_NSPIRE_UP, K_UP }, { &KEY_NSPIRE_DOWN, K_DOWN },
         { &KEY_NSPIRE_SPACE, ' ' }, { &KEY_NSPIRE_PERIOD, '.' },
         { &KEY_NSPIRE_0, '0' }, { &KEY_NSPIRE_1, '1' }, { &KEY_NSPIRE_2, '2' },
@@ -235,7 +261,11 @@ static int keypad_poll(void) {
      * held, and the next press is only accepted after a release. Same one-character-per-press
      * behaviour, without stopping the world to get it. */
     for (unsigned i = 0; i < sizeof MAP / sizeof MAP[0]; i++) {
-        if (isKeyPressed(*MAP[i].k)) { held = MAP[i].k; return MAP[i].c; }
+        if (isKeyPressed(*MAP[i].k)) {
+            held = MAP[i].k;
+            ctrl_armed = 0;            /* a stray ctrl tap must not swallow this key */
+            return MAP[i].c;
+        }
     }
     return 0;
 }
@@ -527,21 +557,29 @@ int main(void) {
      * It also idles the core between passes rather than spinning, which is the other half of why
      * the app felt like it was struggling.
      */
-    const unsigned STEP_MS = 25;           /* 40 passes a second: ample for keys and a scroll */
+    /* INPUT IS POLLED FIVE TIMES PER FRAME.
+     *
+     * At one poll per 25ms frame, a brisk tap could begin and end between two polls and never be
+     * seen at all -- which is why a click sometimes took two or three goes. Drawing at 40fps is
+     * plenty; SAMPLING at 40Hz is not, because a tap is an event with a beginning and an end and
+     * both have to fall inside the window. Input runs at 200Hz now and the frame rate is unchanged.
+     */
+    const unsigned POLL_MS = 5, POLLS_PER_FRAME = 5;
     unsigned now = 0;
     while (!app_should_quit()) {
-        in_event e; memset(&e, 0, sizeof e);
         int dirty = 0;
 
-        if (pointer_poll(&e)) { app_event(&e); dirty = 1; }
-        int k = keypad_poll();
-        if (k) { e.kind = IN_KEY; e.key = k; app_event(&e); dirty = 1; }
+        for (unsigned s = 0; s < POLLS_PER_FRAME && !app_should_quit(); s++) {
+            in_event e; memset(&e, 0, sizeof e);
+            if (pointer_poll(&e)) { app_event(&e); dirty = 1; }
+            int k = keypad_poll();
+            if (k) { e.kind = IN_KEY; e.key = k; app_event(&e); dirty = 1; }
+            msleep(POLL_MS);
+            now += POLL_MS;
+        }
 
         if (app_set_now(now)) dirty = 1;
         if (dirty) app_draw();
-
-        msleep(STEP_MS);
-        now += STEP_MS;
     }
     if (MODEL_READY) rq_free();
     ns_tok_free(&TK); ns_free(&ST);

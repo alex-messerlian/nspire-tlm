@@ -140,6 +140,7 @@ static int hit(gfx_rect r, int x, int y) { return nearest_is(r, x, y); }
  * each reads it, and the marquee's helper sits above the placeholder's table. */
 static unsigned NOW_MS;
 
+static int FIELD_FOCUS;      /* the composer is the typing target and says so */
 static int SEL_ROW;          /* keyboard selection in the session list */
 static int MARQ_AT = -1;
 static unsigned MARQ_T0;              /* NOW_MS when the cursor arrived on this row */
@@ -1209,6 +1210,11 @@ static void draw_composer(int x0, int w, int cy) {
         /* Blinks on the app clock, half a second on and half off. A steady bar reads as a piece
          * of the layout; a blinking one reads as the insertion point. */
         if (last_w < tw - 2 && (NOW_MS / 500u) % 2u == 0u) gfx_vline(cxx, cyy, 12, C_INK);
+    } else if (FIELD_FOCUS) {
+        /* Focused and empty: a blinking caret and no placeholder. The caret is the thing that says
+         * "type here", so the hint beside it would be saying the same thing twice, and the two
+         * would overlap at the same x. */
+        if ((NOW_MS / 500u) % 2u == 0u) gfx_vline(R_FIELD.x + 10, cy + 6, 12, C_INK);
     } else if (CUR >= 0) {
         /* Inside a session the composer is a reply box, not an invitation. The rotating subject
          * belongs to the new-chat screen, where it is answering "what is this thing for"; carrying
@@ -1347,6 +1353,9 @@ void app_event(const in_event *e) {
                 if (inside(R_CHAT[i], MX, MY))  { CUR = CHAT_AT[i]; SCROLL = 0; return; }
             }
         }
+        /* Clicking the box makes it the typing target. Typing already went there, but nothing on
+         * screen said so, so the bar looked inert until a character appeared in it. */
+        if (inside(R_FIELD, MX, MY)) { FIELD_FOCUS = 1; return; }
         if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) {
             app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return;
         }
@@ -1367,11 +1376,17 @@ void app_event(const in_event *e) {
             return;
         }
         if (k == K_ESC)  {
-            if (BUSY)         { ABORT = 1; return; }   /* interrupt first, never navigate away */
-            else if (COMPOSE_N) { COMPOSE_N = 0; COMPOSE[0] = 0; return; }  /* then clear the box */
-            else if (CUR >= 0)  { CUR = -1; return; }                       /* then go home */
-            QUIT = 1; return;                                               /* then leave */
+            /* ESC NO LONGER QUITS. It interrupts, then clears the box, then goes home, and stops
+             * there. One stray press on the home screen used to end the app outright, and that is
+             * exactly what happened when the main enter key turned out to be unmapped: enter did
+             * nothing, ESC was the next thing tried, and the second press exited. Leaving is the X
+             * button, which is on screen and now has a hitbox, or ctrl+Q. */
+            if (BUSY)           { ABORT = 1; return; }   /* interrupt, never navigate away */
+            else if (COMPOSE_N) { COMPOSE_N = 0; COMPOSE[0] = 0; return; }
+            else if (CUR >= 0)  { CUR = -1; return; }
+            return;
         }
+        if (k == K_QUIT) { QUIT = 1; return; }
         if (k == K_TAB)  { SIDEBAR = !SIDEBAR; return; }
         /* Chords work from anywhere, including mid-compose, which is the point of having them. */
         if (k == K_NEW)    { start_new_chat(); return; }

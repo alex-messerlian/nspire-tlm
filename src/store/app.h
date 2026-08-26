@@ -123,6 +123,7 @@ typedef struct {
 #define K_NEW    0x110      /* ctrl+N */
 #define K_SEARCH 0x111      /* ctrl+S */
 #define K_PANEL  0x112      /* ctrl+B: show or hide the side panel */
+#define K_QUIT   0x113      /* ctrl+Q: leave, since ESC no longer does */
 
 typedef struct {
     char  q[160];      /* the question as typed */

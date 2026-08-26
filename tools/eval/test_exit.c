@@ -59,9 +59,35 @@ int main(void) {
     T("in a chat: ESC goes home",            CUR, -1);
     T("in a chat: ESC does NOT quit",        app_should_quit(), 0);
 
+    /* ESC MUST NEVER QUIT, from any state.
+     *
+     * It used to, from the home screen with an empty box, and that is what actually ended the app
+     * when the main enter key turned out to be unmapped: enter did nothing, ESC was the next thing
+     * reached for, and the second press exited. Leaving is a deliberate act now -- the X button,
+     * which is on screen, or ctrl+Q. */
     reset();
-    key(K_ESC);
-    T("at home: ESC quits",                  app_should_quit(), 1);
+    key(K_ESC); key(K_ESC); key(K_ESC);
+    T("at home: ESC does not quit",          app_should_quit(), 0);
+    reset(); seed("a"); CUR = 0; key(K_ESC); key(K_ESC);
+    T("from a chat either",                  app_should_quit(), 0);
+    reset(); COMPOSE_N = 2; snprintf(COMPOSE, sizeof COMPOSE, "hi");
+    key(K_ESC); key(K_ESC);
+    T("nor after clearing the box",          app_should_quit(), 0);
+
+    /* the two ways out that DO exist */
+    reset();
+    key(K_QUIT);
+    T("ctrl+Q quits",                        app_should_quit(), 1);
+    reset(); CUR = -1; app_draw();
+    click(R_EXIT.x + R_EXIT.w / 2, R_EXIT.y + R_EXIT.h / 2);
+    T("and the X button quits",              app_should_quit(), 1);
+
+    /* MUTATION: the shipped behaviour, where a stray ESC at home ended the session. */
+    {   reset();
+        key(K_ESC);
+        int caught = !app_should_quit();
+        if (!caught) F++;
+        printf("  %s  mutant: ESC quitting from the home screen\n", caught ? "CAUGHT" : "MISSED"); }
 
     reset(); seed("a"); CUR = 0; SEARCH_ON = 1;
     key(K_ESC);
