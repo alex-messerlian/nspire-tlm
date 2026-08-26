@@ -178,6 +178,19 @@ static int pointer_poll(in_event *e) {
 
 /* ---- keypad ---------------------------------------------------------------------------------- */
 static int keypad_poll(void) {
+    /* Ctrl first, and as a CHORD rather than a modifier flag: ctrl+N and ctrl+S are the only two,
+     * and returning them as their own codes keeps app.c from knowing anything about the keypad.
+     * Checked before the plain map or ctrl+N would arrive as a bare 'n' in the composer. */
+    if (isKeyPressed(KEY_NSPIRE_CTRL)) {
+        if (isKeyPressed(KEY_NSPIRE_N)) {
+            while (isKeyPressed(KEY_NSPIRE_N)) { }
+            return K_NEW;
+        }
+        if (isKeyPressed(KEY_NSPIRE_S)) {
+            while (isKeyPressed(KEY_NSPIRE_S)) { }
+            return K_SEARCH;
+        }
+    }
     static const struct { const t_key *k; int c; } MAP[] = {
         { &KEY_NSPIRE_ESC, K_ESC }, { &KEY_NSPIRE_ENTER, K_ENTER }, { &KEY_NSPIRE_TAB, K_TAB },
         { &KEY_NSPIRE_DEL, K_BACK }, { &KEY_NSPIRE_UP, K_UP }, { &KEY_NSPIRE_DOWN, K_DOWN },

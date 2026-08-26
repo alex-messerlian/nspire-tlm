@@ -119,6 +119,27 @@ static void draw_composer(int x0, int w, int cy);
  * being shown, which is the answer to "should there be a character limit": there is no limit on
  * what you can type, only on how much of it is on screen at once. A hard cap would silently
  * refuse keystrokes, and a composer that ignores the keypad is worse than one that scrolls. */
+/* THE PLACEHOLDER NAMES WHAT THIS THING IS FOR.
+ *
+ * "Ask ChatTLM" told a reader the app's name, which the title bar already did, and nothing about
+ * what it can answer -- on a calculator handed to someone cold, that is the whole question. The
+ * subject rotates instead, and the word slides up out of the line while the next slides in, so the
+ * change reads as one control changing its mind rather than as text being redrawn.
+ *
+ * The prefix does not move. Only the word travels, clipped to the line box, which is what makes it
+ * legible at 15px: two strings crossing in a 15px window is already the most motion this panel can
+ * carry without smearing.
+ *
+ * Driven by the draw loop like the title marquee, so it needs no clock and stops when the app
+ * stops drawing. */
+static const char *ASK_ABOUT[] = {
+    "speed", "energy", "forces", "circuits", "momentum", "acceleration",
+};
+#define ASK_N     ((int)(sizeof ASK_ABOUT / sizeof ASK_ABOUT[0]))
+#define ASK_HOLD  46      /* draws a word rests before it leaves */
+#define ASK_SLIDE 9       /* draws the crossfade takes */
+static int ASK_T;
+
 #define COMPOSE_MAX_LINES 4
 #define COMPOSE_LH        15     /* F_UI's box */
 
@@ -959,7 +980,25 @@ static void draw_composer(int x0, int w, int cy) {
         int cxx = R_FIELD.x + 9 + last_w + 1, cyy = cy + 6 + (shown - 1) * COMPOSE_LH;
         if (last_w < tw - 2) gfx_vline(cxx, cyy, 12, C_INK);
     } else {
-        gfx_text(R_FIELD.x + 9, cy + 5, "Ask ChatTLM", F_UI, C_INK3, C_FIELD);
+        const char *pre = "Ask me about ";
+        int px = R_FIELD.x + 9, py = cy + 5, lh = COMPOSE_LH;
+        gfx_text(px, py, pre, F_UI, C_INK3, C_FIELD);
+
+        int wx = px + gfx_text_w(pre, F_UI);
+        int cycle = ASK_HOLD + ASK_SLIDE;
+        int i = (ASK_T / cycle) % ASK_N, phase = ASK_T % cycle;
+
+        /* Clipped to exactly one line, so the word arriving from below and the one leaving above
+         * are both cut at the field's text band instead of drawing over the caret row. */
+        gfx_clip(wx, py, R_FIELD.w - (wx - R_FIELD.x) - 22, lh);
+        if (phase < ASK_HOLD) {
+            gfx_text(wx, py, ASK_ABOUT[i], F_UI, C_INK3, C_FIELD);
+        } else {
+            int d = ((phase - ASK_HOLD) * lh) / ASK_SLIDE;   /* 0 -> lh over the slide */
+            gfx_text(wx, py - d,      ASK_ABOUT[i],             F_UI, C_INK3, C_FIELD);
+            gfx_text(wx, py + lh - d, ASK_ABOUT[(i + 1) % ASK_N], F_UI, C_INK3, C_FIELD);
+        }
+        gfx_clip_reset();
     }
     /* 14, not 16. In a 20px field a 16px disc leaves 2px of margin and reads as a plug filling
      * the end of the pill rather than as a button sitting inside it. */
@@ -977,6 +1016,7 @@ static void draw_composer(int x0, int w, int cy) {
 }
 
 void app_draw(void) {
+    ASK_T++;                 /* the placeholder rotates on the draw loop */
     gfx_clear(C_BG);
     if (SIDEBAR) draw_sidebar();
     draw_main();
@@ -986,6 +1026,13 @@ void app_draw(void) {
 }
 
 /* ---- input ------------------------------------------------------------------------------------ */
+/* What the New chat control and ctrl+N both do. It does NOT create a session -- new_chat() runs on
+ * the first send -- it returns to the empty screen and clears the box. Named because the button
+ * and the chord were about to hold two copies of that, and the chord's copy called new_chat(),
+ * which would have left an untitled empty session in the list on every press. */
+static void start_new_chat(void) { CUR = -1; SCROLL = 0; COMPOSE_N = 0; COMPOSE[0] = 0; }
+static void open_search(void)    { SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); }
+
 void app_event(const in_event *e) {
     if (e->kind == IN_MOVE)  { MX = e->x; MY = e->y; HOVER = e->hover; return; }
     if (e->kind == IN_SCROLL) {
@@ -1010,11 +1057,9 @@ void app_event(const in_event *e) {
         if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
         if (BUSY && inside(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
         if (inside(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
-        if (inside(R_SEARCH, MX, MY)) {
-            SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); return;
-        }
+        if (inside(R_SEARCH, MX, MY)) { open_search(); return; }
         if (SIDEBAR) {
-            if (inside(R_NEW, MX, MY)) { CUR = -1; SCROLL = 0; COMPOSE_N = 0; COMPOSE[0] = 0; return; }
+            if (inside(R_NEW, MX, MY)) { start_new_chat(); return; }
             for (int i = 0; i < NCHAT_ROWS; i++) {
                 if (inside(R_TRASH[i], MX, MY)) { delete_chat(CHAT_AT[i]); return; }
                 if (inside(R_CHAT[i], MX, MY))  { CUR = CHAT_AT[i]; SCROLL = 0; return; }
@@ -1046,6 +1091,9 @@ void app_event(const in_event *e) {
             QUIT = 1; return;                                               /* then leave */
         }
         if (k == K_TAB)  { SIDEBAR = !SIDEBAR; return; }
+        /* Chords work from anywhere, including mid-compose, which is the point of having them. */
+        if (k == K_NEW)    { start_new_chat(); return; }
+        if (k == K_SEARCH) { open_search(); return; }
         if (k == K_BACK) { if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0; return; }
         if (k == K_ENTER){ if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; } return; }
         if (k == K_DOWN) { SCROLL += 16; return; }

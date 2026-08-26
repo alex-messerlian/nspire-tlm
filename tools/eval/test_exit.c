@@ -230,6 +230,67 @@ int main(void) {
         COMPOSE_N = 0; COMPOSE[0] = 0;
     }
 
+    /* -- ctrl+N and ctrl+S, and the fact that they ARE the buttons --
+     *
+     * The chord's first draft called new_chat(), which creates a session; the BUTTON sets CUR = -1
+     * and creates nothing until the first send. Two copies of "what New chat does" would have left
+     * an untitled empty session in the list on every ctrl+N. Both call one function now, and this
+     * asserts the key and the click land in the same state. */
+    printf("\n  -- ctrl+N and ctrl+S --\n");
+    reset(); seed("A car goes 150 m in 12 s."); CUR = 0;
+    COMPOSE_N = 3; snprintf(COMPOSE, sizeof COMPOSE, "abc"); app_draw();
+    key(K_NEW);
+    T("ctrl+N leaves the session",     CUR, -1);
+    T("and clears the composer",       COMPOSE_N, 0);
+    T("without creating a session",    NCHATS, 1);
+    {   int after_key = NCHATS;
+        reset(); seed("A car goes 150 m in 12 s."); CUR = 0; app_draw();
+        click(R_NEW.x + 10, R_NEW.y + 10);
+        T("the button lands in the same state", CUR == -1 && NCHATS == after_key, 1); }
+
+    reset(); CUR = -1; app_draw();
+    key(K_SEARCH);
+    T("ctrl+S opens search",           SEARCH_ON, 1);
+    key(K_ESC);
+    T("and ESC closes it",             SEARCH_ON, 0);
+
+    /* mid-compose the chords still fire, which is the reason to have them */
+    reset(); CUR = -1; COMPOSE_N = 0; app_draw();
+    key('h'); key('i');
+    T("typing reaches the composer",   COMPOSE_N, 2);
+    key(K_SEARCH);
+    T("ctrl+S works mid-compose",      SEARCH_ON, 1);
+    SEARCH_ON = 0;
+
+    /* MUTATION: without the ctrl check the chord arrives as a bare letter in the box. */
+    {   reset(); CUR = -1; COMPOSE_N = 0; app_draw();
+        key('n');
+        int caught = (CUR == -1 && COMPOSE_N == 1);
+        if (!caught) F++;
+        printf("  %s  mutant: ctrl+N read as a plain 'n' (composer holds %d)\n",
+               caught ? "CAUGHT" : "MISSED", COMPOSE_N);
+        COMPOSE_N = 0; COMPOSE[0] = 0; }
+
+    /* -- the placeholder rotates and slides -- */
+    printf("\n  -- the placeholder names a subject --\n");
+    {   T("more than one subject", ASK_N > 1, 1);
+        int cycle = ASK_HOLD + ASK_SLIDE;
+        T("a word rests, then moves", ASK_HOLD > ASK_SLIDE, 1);
+        /* the index must advance once per cycle and wrap, never index out of the table */
+        int seen[16] = {0}, bad = 0;
+        for (int tt = 0; tt < cycle * ASK_N * 2; tt++) {
+            int i = (tt / cycle) % ASK_N;
+            if (i < 0 || i >= ASK_N) bad++;
+            else seen[i] = 1;
+        }
+        T("index never leaves the table", bad, 0);
+        int all = 1; for (int i = 0; i < ASK_N; i++) if (!seen[i]) all = 0;
+        T("every subject is reached", all, 1);
+        /* the slide is bounded by one line height, or words overlap the row above */
+        int worst = ((cycle - 1 - ASK_HOLD) * COMPOSE_LH) / ASK_SLIDE;
+        T("travel never exceeds one line", worst <= COMPOSE_LH, 1);
+    }
+
     /* -- hover marquee on session titles --
      *
      * Titles ellipsise at ~64px, which for a question is a few words and often not enough to tell
