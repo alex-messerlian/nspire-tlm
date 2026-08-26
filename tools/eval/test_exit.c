@@ -271,24 +271,37 @@ int main(void) {
                caught ? "CAUGHT" : "MISSED", COMPOSE_N);
         COMPOSE_N = 0; COMPOSE[0] = 0; }
 
-    /* -- the placeholder rotates and slides -- */
-    printf("\n  -- the placeholder names a subject --\n");
+    /* -- the placeholder says a different thing on each screen --
+     *
+     * The rotating subject answers "what is this for", which is a new-chat question. Inside a
+     * session it would keep advertising the app to someone already using it, and put motion beside
+     * the answer they are reading. */
+    printf("\n  -- the placeholder names a subject, on the right screen --\n");
     {   T("more than one subject", ASK_N > 1, 1);
         int cycle = ASK_HOLD + ASK_SLIDE;
         T("a word rests, then moves", ASK_HOLD > ASK_SLIDE, 1);
-        /* the index must advance once per cycle and wrap, never index out of the table */
-        int seen[16] = {0}, bad = 0;
+        int bad = 0, seen[16] = {0};
         for (int tt = 0; tt < cycle * ASK_N * 2; tt++) {
             int i = (tt / cycle) % ASK_N;
-            if (i < 0 || i >= ASK_N) bad++;
-            else seen[i] = 1;
+            if (i < 0 || i >= ASK_N) bad++; else seen[i] = 1;
         }
         T("index never leaves the table", bad, 0);
         int all = 1; for (int i = 0; i < ASK_N; i++) if (!seen[i]) all = 0;
         T("every subject is reached", all, 1);
-        /* the slide is bounded by one line height, or words overlap the row above */
         int worst = ((cycle - 1 - ASK_HOLD) * COMPOSE_LH) / ASK_SLIDE;
         T("travel never exceeds one line", worst <= COMPOSE_LH, 1);
+
+        /* Which text is drawn is decided by CUR, so read the pixels: the two strings differ in
+         * width, and the rotating one is the only one that changes between draws. */
+        reset(); CUR = -1; COMPOSE_N = 0; app_draw();
+        int empty_w = gfx_text_w("Ask me about ", F_UI) + gfx_text_w(ASK_ABOUT[0], F_UI);
+        reset(); seed("A car goes 150 m in 12 s."); CUR = 0; COMPOSE_N = 0; app_draw();
+        int chat_w = gfx_text_w("Type a message...", F_UI);
+        T("the two screens use different copy", empty_w != chat_w, 1);
+        /* MUTATION: one placeholder everywhere is what this replaces. */
+        if (empty_w == chat_w) F++;
+        printf("  %s  mutant: the same placeholder on both screens\n",
+               empty_w != chat_w ? "CAUGHT" : "MISSED");
     }
 
     /* -- hover marquee on session titles --

@@ -934,7 +934,7 @@ static void draw_main(void) {
          * is why the new-chat screen shows the bar alone. */
         /* F_XS. It is a disclaimer under a text box -- the least important line on the screen --
          * and at F_SM it was the same size as the session titles, which are navigation. */
-        const char *note = "ChatTLM can make mistakes.";
+        const char *note = "Please double-check responses.";
         gfx_text(x0 + (w - gfx_text_w(note, F_XS)) / 2, cy + compose_field_h(w) + 3,
                  note, F_XS, C_INK3, C_BG);
     }
@@ -979,6 +979,12 @@ static void draw_composer(int x0, int w, int cy) {
         /* the caret follows the text, on the last visible line */
         int cxx = R_FIELD.x + 9 + last_w + 1, cyy = cy + 6 + (shown - 1) * COMPOSE_LH;
         if (last_w < tw - 2) gfx_vline(cxx, cyy, 12, C_INK);
+    } else if (CUR >= 0) {
+        /* Inside a session the composer is a reply box, not an invitation. The rotating subject
+         * belongs to the new-chat screen, where it is answering "what is this thing for"; carrying
+         * it into a conversation would keep advertising the app to someone already using it, and
+         * put motion next to the answer they are reading. */
+        gfx_text(R_FIELD.x + 9, cy + 5, "Type a message...", F_UI, C_INK3, C_FIELD);
     } else {
         const char *pre = "Ask me about ";
         int px = R_FIELD.x + 9, py = cy + 5, lh = COMPOSE_LH;
@@ -1241,15 +1247,22 @@ void app_status(const char *label, const char *mono) {
 }
 void app_status_done(unsigned ms, const char *tool_call, const char *tool_result, int tool_ok) {
     if (!pending) return;
-    /* The line that STAYS. It reports elapsed time always, and a tool only when one ran -- a
-     * summary that claims "used eval" on a turn with no call would be a fabricated provenance
-     * claim, which is the exact thing the hidden result chip was doing before. */
-    if (tool_call && tool_call[0])
-        snprintf(pending->sum, sizeof pending->sum, "%u.%us  %s %s %s",
-                 ms / 1000, (ms % 1000) / 100, tool_call, tool_ok ? "->" : "refused",
-                 tool_result ? tool_result : "");
+    /* The line that STAYS, and it is elapsed time only.
+     *
+     * It used to read "22.4s eval(150/12) -> 12.5", which is the runtime's vocabulary: `eval` is an
+     * internal tool name and `150/12` is source syntax. It also put the answer's number on screen a
+     * SECOND time, in a different notation, leaving the reader to reconcile the two. The call is
+     * still executed, still logged, and still the reason the number is right; it is simply not the
+     * reader's problem. The live line names the step while it runs, which is where that belongs.
+     *
+     * A refusal is different: nothing was computed, and saying so is not vocabulary, it is the
+     * outcome. */
+    if (tool_call && tool_call[0] && !tool_ok)
+        snprintf(pending->sum, sizeof pending->sum, "%u.%us  tool refused",
+                 ms / 1000, (ms % 1000) / 100);
     else
         snprintf(pending->sum, sizeof pending->sum, "%u.%us", ms / 1000, (ms % 1000) / 100);
+    (void)tool_result;
     STATUS[0] = 0; STATUS_MONO[0] = 0;
 }
 int app_hit_stop(int x, int y) { return BUSY && inside(R_SEND, x, y); }
