@@ -256,6 +256,8 @@ void memory_map_weights(TransformerWeights *w, Config* p, void* ptr, uint8_t sha
     w->wcls = shared_classifier ? w->q_tokens : init_quantized_tensors(&ptr, 1, p->dim * p->vocab_size);
 }
 
+long long rq_expected_size(const Config *p, int shared_classifier, int gs);
+
 void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weights,
                      int* fd, float** data, ssize_t* file_size) {
     FILE *file = fopen(checkpoint, "rb");
@@ -289,6 +291,21 @@ void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weigh
     fseek(file, 0, SEEK_END); // move file pointer to end of file
     *file_size = ftell(file); // get the file size, in bytes
     fclose(file);
+    /* THE FILE MUST BE THE SIZE ITS OWN CONFIG IMPLIES, checked before anything is mapped.
+     *
+     * Without this, a truncated checkpoint mapped cleanly and memory_map_weights walked past the
+     * end of the allocation -- measured on device with a 96-byte file whose header prefix was
+     * valid, so every check above passed and the process died with no message on the first token.
+     * Silence is the bug: the caller could not tell a bad file from a hang. */
+    {   long long want = rq_expected_size(config, shared_classifier, group_size);
+        if (want != (long long)*file_size) {
+            fprintf(stderr, "FATAL: %s is %lld bytes, but dim=%d layers=%d vocab=%d GS=%d "
+                            "implies %lld. The file is truncated or does not match this build.\n",
+                    checkpoint, (long long)*file_size, config->dim, config->n_layers,
+                    config->vocab_size, group_size, want);
+            exit(EXIT_FAILURE);
+        }
+    }
     // memory map the Transformer weights into the data pointer
 #ifdef _TINSPIRE
     nspire_set_checkpoint_path(checkpoint);
@@ -312,6 +329,80 @@ void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weigh
 #ifdef _TINSPIRE
     printf("  stage: memory_map_weights done\n");
 #endif
+}
+
+/* ------------------------------------------------------------------------------------------------
+ * CHECKPOINT SIZE, DERIVED RATHER THAN TRUSTED.
+ *
+ * read_checkpoint took *file_size from ftell and mmapped exactly that, then pointed the weights at
+ * data + 256 without ever asking whether the file was big enough to hold them. A truncated
+ * checkpoint therefore did not fail: it mapped, and memory_map_weights walked pointers past the end
+ * of the allocation. Measured on the device, the model file was 96 bytes -- a valid header prefix,
+ * so magic, version, Config and the GS check ALL PASSED -- and the app died on the user's first
+ * send with no message, which reads as the program quitting rather than as a bad file.
+ *
+ * The layout is fully determined by the Config, so the exact byte count is computable and there is
+ * no reason to guess. Verified against the shipped model: this returns 7,464,832, which is its size
+ * to the byte.
+ *
+ * long long throughout: dim * vocab_size overflows int for vocabularies this project may yet try,
+ * and a size check that overflows is worse than none because it reports a confident wrong answer. */
+long long rq_expected_size(const Config *p, int shared_classifier, int gs) {
+    const long long L = p->n_layers, D = p->dim, H = p->hidden_dim, V = p->vocab_size;
+    const long long hs = D / p->n_heads, kv = (long long)p->n_kv_heads * hs, q = (long long)p->n_heads * hs;
+    /* fp32 rmsnorm weights, which are NOT quantized */
+    long long bytes = 256 + (2 * L * D + D) * 4;
+    /* Each quantized tensor costs one byte per element plus one fp32 scale per group. */
+    long long elems = V * D                    /* q_tokens                       */
+                    + L * (D * q)              /* wq                             */
+                    + L * (D * kv) * 2         /* wk, wv                         */
+                    + L * (q * D)              /* wo                             */
+                    + L * (D * H) * 2          /* w1, w3                         */
+                    + L * (H * D)              /* w2                             */
+                    + (shared_classifier ? 0 : D * V);
+    if (gs <= 0) return -1;
+    return bytes + elems + (elems / gs) * 4;
+}
+
+/* Returns 0 when the checkpoint is loadable, else nonzero with a reason in `why`.
+ *
+ * Separate from read_checkpoint because that function exit()s on every failure path, and a process
+ * that vanishes is indistinguishable from a hang -- the standing rule this project adopted after
+ * the Phase 2 bring-up cost five device cycles to silence. Callers that can draw on a screen should
+ * probe first and say what is wrong; nothing here allocates, so probing is cheap enough to run at
+ * startup rather than on the first send. */
+int rq_probe(const char *path, char *why, int cap) {
+    FILE *f = fopen(path, "rb");
+    if (!f) { snprintf(why, cap, "cannot open %s", path); return 1; }
+    uint32_t magic = 0; int version = 0, gs = 0; Config c; uint8_t shared = 0;
+    int head_ok = fread(&magic, sizeof magic, 1, f) == 1
+               && fread(&version, sizeof version, 1, f) == 1
+               && fread(&c, sizeof c, 1, f) == 1
+               && fread(&shared, sizeof shared, 1, f) == 1
+               && fread(&gs, sizeof gs, 1, f) == 1;
+    if (!head_ok) { fclose(f); snprintf(why, cap, "header truncated"); return 1; }
+    fseek(f, 0, SEEK_END);
+    long long actual = (long long)ftell(f);
+    fclose(f);
+    if (magic != 0x616b3432) { snprintf(why, cap, "bad magic"); return 1; }
+    if (version != 2)        { snprintf(why, cap, "version %d, need 2", version); return 1; }
+    /* Only the device build pins GS at compile time; on the host it is a runtime global, so there
+     * is nothing to compare against. A wrong GS is still caught there, by the size check below:
+     * the scale count is elems/gs, so changing it changes the derived byte total. */
+#ifdef FIXED_GS
+    if (gs != FIXED_GS)      { snprintf(why, cap, "GS %d, built for %d", gs, FIXED_GS); return 1; }
+#endif
+    if (c.dim <= 0 || c.n_heads <= 0 || c.n_layers <= 0 || c.vocab_size <= 0 || c.hidden_dim <= 0) {
+        snprintf(why, cap, "config has a non-positive dimension"); return 1;
+    }
+    long long want = rq_expected_size(&c, shared, gs);
+    /* EXACT, not a lower bound. A file LARGER than the layout is as wrong as a short one: it means
+     * the Config and the payload disagree, and the weights would be read at the wrong offsets. */
+    if (actual != want) {
+        snprintf(why, cap, "file is %lld bytes, layout needs %lld", actual, want);
+        return 1;
+    }
+    return 0;
 }
 
 void build_transformer(Transformer *t, char* checkpoint_path) {

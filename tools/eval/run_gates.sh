@@ -31,7 +31,10 @@ $PY tools/eval/test_scope.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_sc
 # gates exist to catch, pointed at the gates themselves: a suite nothing runs is a suite that does
 # not exist. Every one of these is built from source that ships.
 $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_ui_errs" || { printf "  %-20s FAIL\n" "test_ui_errs"; fail=1; }
-for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme; do
+# test_ckpt guards the LOADER. It is listed here and not only in the Makefile because this file,
+# not TESTS, is what decides whether the suite passed -- a roster kept in two places drifts, and
+# the half nobody reads is the half that silently stops running.
+for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt; do
     if [ ! -x "build/$b" ]; then
         # A MISSING binary is a failure, not a skip. "cannot check" and "checked and clean" must
         # never share an exit status.

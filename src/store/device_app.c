@@ -77,6 +77,7 @@ static unsigned clock_ms_since(uint32_t start) {
 
 FILE *g_nspire_log = 0;
 extern void  rq_build(const char *path);
+extern int   rq_probe(const char *path, char *why, int cap);
 extern float *rq_forward(int token, int pos);
 extern int   rq_vocab(void);
 extern void  rq_free(void);
@@ -288,6 +289,8 @@ static int argmax(const float *v, int n) { int b = 0; for (int i = 1; i < n; i++
 static const char *DATA_DIRS[] = { "/documents/tlm/", "/documents/slm/", "/documents/ndless/",
                                    "/documents/bench/", "/documents/" };
 static char DATA_DIR[32];
+static int  MODEL_OK = 0;          /* set by rq_probe at startup; gates the send path */
+static char MODEL_WHY[160];        /* why not, in words the reader can act on */
 
 static const char *dpath(const char *leaf) {
     static char buf[80];
@@ -372,6 +375,13 @@ void app_request(const char *question, const char *rid) {
     app_status("Reading", ST.rec[idx].name);
     app_draw();
 
+    /* Checked at startup by rq_probe, so this cannot reach read_checkpoint's exit() path. */
+    if (!MODEL_OK) {
+        char msg[220];
+        snprintf(msg, sizeof msg, "<a> The model file could not be loaded: %s. "
+                                  "Re-copy model4096.bin.tns to the calculator.<end>", MODEL_WHY);
+        app_stream_token(msg); app_stream_end(); return;
+    }
     if (!MODEL_READY) { rq_build(dpath("model4096.bin.tns")); MODEL_READY = 1; }
     int V = rq_vocab();
 
@@ -517,6 +527,18 @@ int main(void) {
         die("No directory holds all three data files.", why);
         return 1;
     }
+    /* PROBE THE MODEL AT STARTUP, not on the first send.
+     *
+     * rq_build() reaches read_checkpoint(), which exit()s. Loading it lazily therefore meant a bad
+     * checkpoint killed the process the moment the reader pressed enter, which looks exactly like
+     * the app quitting on send and is what it was measured doing: the model on the device was a
+     * 96-byte truncated file whose header prefix passed every check the loader had.
+     *
+     * This does not abort. A calculator that opens, lists its sessions and says WHY it cannot
+     * answer is far more useful in front of a judge than one that disappears, and the reason is
+     * exact enough to act on. */
+    if (rq_probe(dpath("model4096.bin.tns"), MODEL_WHY, sizeof MODEL_WHY) == 0) MODEL_OK = 1;
+
     if (ns_tok_load(&TK, dpath("tok4096.tok.tns")) != NST_OK) {
         die("Tokenizer failed to load.", dpath("tok4096.tok.tns"));
         ns_free(&ST);

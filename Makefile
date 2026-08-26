@@ -45,7 +45,7 @@ HOST_LINK := src/store/gfx.c src/store/chatstore.c $(BUILD)/hoststub.o
 # reach its file-scope state; the others link toolrun.c and the evaluator.
 TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme
 TESTS_EVAL := test_toolrun
-TESTS_PLAIN:= test_chatstore
+TESTS_PLAIN:= test_chatstore test_ckpt
 TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN)
 
 .PHONY: all tests device check clean
@@ -81,6 +81,11 @@ $(BUILD)/test_toolrun: tools/eval/test_toolrun.c src/store/toolrun.c src/store/t
 
 $(BUILD)/test_chatstore: tools/eval/test_chatstore.c src/store/chatstore.c src/store/chatstore.h | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/chatstore.c src/store/gfx.c -lm
+
+# Compiles runq_nspire.c on the HOST, which is the point: the loader that runs on the calculator is
+# the one under test, not a reimplementation of its rules.
+$(BUILD)/test_ckpt: tools/eval/test_ckpt.c src/runq_nspire.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -DFIXED_GS=96 -o $@ $< -lm
 
 # ---- device ----------------------------------------------------------------------------------
 device: $(BUILD)/chattlm.tns
