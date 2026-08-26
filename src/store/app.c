@@ -692,8 +692,11 @@ static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 o
  * 2px strokes because this is a solid mark rather than an outline: the same optical weight as the
  * 1px outlines beside it. */
 static void plus_icon(int x, int y, uint16_t c) {
-    gfx_fill(x + 4,  y + 11, 16, 2, c);      /* the bar, centred in a 16x16 cell */
-    gfx_fill(x + 11, y + 4,  2, 16, c);
+    /* 1px, matching the outlines beside it. At 2px this was a solid mark next to two hairline
+     * outlines and read as the heaviest thing on the row -- the reasoning that it needed doubling
+     * to carry the same optical weight was simply wrong on this panel. */
+    gfx_fill(x + 4,  y + 11, 16, 1, c);      /* the bar, centred in a 16x16 cell */
+    gfx_fill(x + 11, y + 4,  1, 16, c);
 }
 
 static void pencil(int x, int y, uint16_t c) {
@@ -1199,7 +1202,10 @@ static void draw_composer(int x0, int w, int cy) {
             "   #   ",
             "   #   ",
         };
-        blit(R_SEND.x + 3, R_SEND.y + 3, ARROW, 7, C_BG, C_BG);
+        /* +4 across, +3 down. Vertically it now reads centred; horizontally the half-pixel it
+         * cannot avoid is better spent leaning right than left, which is where it was asked to
+         * sit. */
+        blit(R_SEND.x + 4, R_SEND.y + 3, ARROW, 7, C_BG, C_BG);
     }
 
 }
