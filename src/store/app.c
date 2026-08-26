@@ -229,6 +229,23 @@ static gfx_rect R_LIST;              /* the scrollable list area, for hit-testin
 
 static void clamp_scroll(int content_h, int view_h);
 
+/* HIT TESTING IS MORE FORGIVING THAN DRAWING.
+ *
+ * A 24px plate is a small target for a cursor driven by a 2 cm pad, and requiring the pointer to
+ * land inside the drawn box means near-misses do nothing at all. The rect a control is DRAWN in
+ * and the rect it RESPONDS to are different things, and only the first one needs to be exact.
+ *
+ * 5px on every side. Chosen so the three icons in the sidebar band, which sit on a 28px pitch,
+ * gain reach without their boxes meeting: 24 + 5 + 5 = 34 would overlap, so the helper also stops
+ * short of the midpoint between neighbours by clamping to the pitch. */
+#define HIT_PAD 5
+
+static int inside_pad(gfx_rect r, int x, int y, int pad) {
+    return x >= r.x - pad && x < r.x + r.w + pad &&
+           y >= r.y - pad && y < r.y + r.h + pad;
+}
+static int hit(gfx_rect r, int x, int y) { return inside_pad(r, x, y, HIT_PAD); }
+
 static int inside(gfx_rect r, int x, int y) {
     return x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
 }
@@ -819,15 +836,15 @@ static void draw_sidebar(void) {
 
     /* Hover darkens the plate AND the glyph. The plate alone is a very small cue at 20px on a
      * panel with this contrast; the ink moving from C_INK2 to C_INK is what actually reads. */
-    {   int hot = HOVER && inside(R_NEW, MX, MY);
+    {   int hot = HOVER && hit(R_NEW, MX, MY);
         gfx_rrect(R_NEW.x, R_NEW.y, 24, 24, 6, hot ? C_SEL : C_SIDE);
         plus_icon(R_NEW.x, R_NEW.y, hot ? C_INK : C_INK2);
     }
-    {   int sh = HOVER && inside(R_SEARCH, MX, MY);
+    {   int sh = HOVER && hit(R_SEARCH, MX, MY);
         gfx_rrect(R_SEARCH.x, R_SEARCH.y, 24, 24, 6, sh ? C_SEL : C_SIDE);
         magnifier(R_SEARCH.x + 4, R_SEARCH.y + 4, 6, sh ? C_INK : C_INK2);
     }
-    {   int th = HOVER && inside(R_TOGGLE, MX, MY);
+    {   int th = HOVER && hit(R_TOGGLE, MX, MY);
         gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 24, 24, 6, th ? C_SEL : C_SIDE);
         panel_icon(R_TOGGLE.x, R_TOGGLE.y, th ? C_INK : C_INK2);
     }
@@ -949,7 +966,7 @@ static void draw_main(void) {
     int tx = x0 + PAD;
     if (!SIDEBAR) {
         R_TOGGLE = (gfx_rect){ 4, 3, 24, 24 };
-        int th = HOVER && inside(R_TOGGLE, MX, MY);
+        int th = HOVER && hit(R_TOGGLE, MX, MY);
         gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 24, 24, 6, th ? C_SEL : C_BG);
         panel_icon(R_TOGGLE.x, R_TOGGLE.y, C_INK2);
         tx = R_TOGGLE.x + 24 + 6;
@@ -972,7 +989,7 @@ static void draw_main(void) {
      * box with a 2px-thick hand-drawn X, which made it visibly heavier and smaller than every
      * other control on screen. */
     R_EXIT = (gfx_rect){ GFX_W - 28, 3, 24, 24 };
-    {   int hot = HOVER && inside(R_EXIT, MX, MY);
+    {   int hot = HOVER && hit(R_EXIT, MX, MY);
         gfx_rrect(R_EXIT.x, R_EXIT.y, 24, 24, 6, hot ? C_EXIT_HOT : C_BG);
         exit_icon(R_EXIT.x, R_EXIT.y, hot ? C_ERRFG : C_INK2);
     }
@@ -1127,8 +1144,18 @@ static void draw_composer(int x0, int w, int cy) {
     R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, fh };
     /* The radius stays a half-height pill at one line and stops growing after that, so a tall
      * field is a rounded rectangle rather than a lozenge. */
-    gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, fh > 24 ? 12 : fh / 2, C_FIELD);
-    gfx_rrect_outline(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD_LN);
+    /* A SOLID RING WITH THE MIDDLE PUNCHED OUT, rather than a stroked outline.
+     *
+     * gfx_rrect_outline walks the curve a pixel at a time, and on a pill the "corner" is nearly the
+     * whole end -- radius 12 on a 24px height -- so the steps are far enough apart to leave visible
+     * gaps and the edge reads as a dotted line. Filling the border colour and then filling the
+     * interior over it gives a continuous 2px edge with no rasterisation seams at all. */
+    {   int rad = fh > 24 ? 12 : fh / 2;
+        gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, rad, C_FIELD_LN);
+        gfx_rrect(R_FIELD.x + 2, R_FIELD.y + 2, R_FIELD.w - 4, R_FIELD.h - 4,
+                  rad > 2 ? rad - 2 : 1, C_FIELD);
+    }
+
     if (COMPOSE_N) {
         /* Wrapped, and scrolled to the END: with more than COMPOSE_MAX_LINES the earlier lines
          * move off the top so what you are typing stays visible. Clipped to the field, because a
@@ -1275,18 +1302,18 @@ void app_event(const in_event *e) {
             SEARCH_ON = 0;                     /* click outside a row closes, as on the web */
             return;
         }
-        if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
-        if (BUSY && inside(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
-        if (inside(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
-        if (inside(R_SEARCH, MX, MY)) { open_search(); return; }
+        if (hit(R_EXIT, MX, MY)) { QUIT = 1; return; }
+        if (BUSY && hit(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
+        if (hit(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
+        if (hit(R_SEARCH, MX, MY)) { open_search(); return; }
         if (SIDEBAR) {
-            if (inside(R_NEW, MX, MY)) { start_new_chat(); return; }
+            if (hit(R_NEW, MX, MY)) { start_new_chat(); return; }
             for (int i = 0; i < NCHAT_ROWS; i++) {
                 if (inside(R_TRASH[i], MX, MY)) { delete_chat(CHAT_AT[i]); return; }
                 if (inside(R_CHAT[i], MX, MY))  { CUR = CHAT_AT[i]; SCROLL = 0; return; }
             }
         }
-        if (inside(R_SEND, MX, MY) && COMPOSE_N && !BUSY) {
+        if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) {
             app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return;
         }
         return;

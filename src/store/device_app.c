@@ -119,10 +119,13 @@ static int DOWN, TRAVEL, HAVE_REF, REF_X, REF_Y, ACC_X, ACC_Y;
 static int accel(int d) {
     int a = d < 0 ? -d : d;
     /* thresholds in PAD units per sample; tuned so a deliberate swipe crosses the screen */
-    int mul = a < 3 ? 128            /* 0.5x: fine placement                */
-            : a < 8 ? 256            /* 1x                                   */
-            : a < 18 ? 512           /* 2x                                   */
-                     : 896;          /* 3.5x: a flick crosses the screen     */
+    /* HALVED, roughly. The first curve topped out at 3.5x and a flick overshot the whole screen,
+     * so the cursor arrived somewhere past wherever you were aiming. These reach 2x, which still
+     * crosses most of the panel in one stroke while leaving the top end controllable. */
+    int mul = a < 4 ? 96             /* 0.375x: fine placement              */
+            : a < 10 ? 192           /* 0.75x                                */
+            : a < 20 ? 320           /* 1.25x                                */
+                     : 512;          /* 2x: a firm swipe still crosses far   */
     return d * mul;
 }
 

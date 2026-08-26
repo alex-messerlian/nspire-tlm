@@ -280,6 +280,41 @@ int main(void) {
     key(K_ENTER);
     T("enter sends when the box has text", COMPOSE_N, 0);
 
+    /* -- controls respond outside their drawn box --
+     *
+     * A 24px plate is a small target for a cursor driven by a 2 cm pad. The rect a control is
+     * DRAWN in and the one it RESPONDS to are different things, and only the first needs to be
+     * exact. What must hold is that hover and click agree: a control that lights up where it
+     * cannot be clicked, or clicks where it never lit, is worse than one that simply misses. */
+    printf("\n  -- controls have a hitbox --\n");
+    reset(); CUR = -1; app_draw();
+    {   int outside_x = R_NEW.x - 3, mid_y = R_NEW.y + R_NEW.h / 2;
+        T("a near miss is still inside the box", outside_x < R_NEW.x, 1);
+
+        /* hover: does it light up? */
+        HOVER = 1; MX = outside_x; MY = mid_y; app_draw();
+        const uint16_t *fb = gfx_buf();
+        int lit = 0;
+        for (int y = R_NEW.y + 2; y < R_NEW.y + R_NEW.h - 2; y++)
+            if (fb[y * GFX_W + R_NEW.x + R_NEW.w - 2] == C_SEL) lit++;
+        T("it highlights on a near miss", lit > 0, 1);
+
+        /* click at the same point must do the same thing */
+        CUR = 0; click(outside_x, mid_y);
+        T("and clicking there fires it", CUR, -1);
+
+        /* far enough away it must NOT fire, or every stray click hits something */
+        reset(); CUR = 0; app_draw();
+        click(R_NEW.x - 40, R_NEW.y + R_NEW.h / 2);
+        T("a real miss still misses", CUR, 0);
+
+        /* MUTATION: an exact-rect hit test rejects the near miss the hover accepted. */
+        int caught = !inside(R_NEW, outside_x, mid_y);
+        if (!caught) F++;
+        printf("  %s  mutant: exact-rect hit testing, where a near miss does nothing\n",
+               caught ? "CAUGHT" : "MISSED");
+    }
+
     /* -- ctrl+N and ctrl+S, and the fact that they ARE the buttons --
      *
      * The chord's first draft called new_chat(), which creates a session; the BUTTON sets CUR = -1
