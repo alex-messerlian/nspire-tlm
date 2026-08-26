@@ -619,7 +619,9 @@ static void magnifier(int x, int y, int R, uint16_t c) {
     for (int j = -R; j <= R; j++)
         for (int i = -R; i <= R; i++) {
             int d = i * i + j * j;
-            if (d <= R * R && d > (R - 2) * (R - 2)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
+            /* (R-1), not (R-2): at R=6 a two-pixel ring closes up into a blob rather than a
+             * lens, and it was the heaviest of the three glyphs by some way. */
+            if (d <= R * R && d > (R - 1) * (R - 1)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
         }
     for (int k = 0; k < R - 1; k++) gfx_fill(x + 2*R - 2 + k, y + 2*R - 2 + k, 2, 1, c);  /* handle */
 }
@@ -653,13 +655,16 @@ static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 o
 
 static void pencil(int x, int y, uint16_t c) {
     /* A page open at its top-right corner, the pencil crossing the gap. 16x16, 1px. */
-    gfx_hline(x,      y + 5,  7, c);       /* top, stopping short of the corner */
-    gfx_vline(x,      y + 5, 14, c);       /* left */
-    gfx_hline(x,      y + 18, 15, c);      /* bottom */
-    gfx_vline(x + 14, y + 11, 8, c);       /* right, resuming below the gap */
-    for (int k = 0; k < 9; k++)            /* the pencil */
-        gfx_fill(x + 6 + k, y + 10 - k, 2, 1, c);
-    gfx_fill(x + 5, y + 11, 2, 2, c);      /* its tip */
+    /* The page: 13 wide, 12 tall, open at the top-right. Its bottom edge was 15 wide against a
+     * 13-wide box, so the shape ran past its own corner and looked oversized and crooked. */
+    gfx_hline(x + 1,  y + 6,  7, c);       /* top, stopping short of the corner */
+    gfx_vline(x + 1,  y + 6, 12, c);       /* left */
+    gfx_hline(x + 1,  y + 17, 13, c);      /* bottom */
+    gfx_vline(x + 13, y + 11, 7, c);       /* right, resuming below the gap */
+    /* The pencil crosses the open corner and STOPS inside the 16px box. */
+    for (int k = 0; k < 7; k++)
+        gfx_fill(x + 7 + k, y + 11 - k, 2, 1, c);
+    gfx_fill(x + 6, y + 12, 2, 2, c);      /* its tip */
 }
 
 /* Draw `s` with the parts matching any term in the BOLD face. The device had no equivalent of the
@@ -1024,8 +1029,35 @@ static void draw_main(void) {
  * shape is the point, and 16 rows of literal are easier to check by eye than the arithmetic that
  * would generate them.
  */
-/* There is no cursor. The pad scrolls and the keys do everything else -- see the note on
- * pointer_poll in device_app.c for why three attempts at one were all worse than none. */
+/* The pointer. Slimmer than the 16-row version, which read as a lump.
+ *
+ * '#' is the outline, '.' the fill, ' ' transparent: an ink edge around a background body, so it
+ * stays legible over the white pane, the grey sidebar and a dark bubble alike. Written out rather
+ * than generated, because a loop lost half of this shape twice -- once here and once on the send
+ * arrow -- and twelve rows of literal can be checked by eye. */
+static const char *CURSOR[] = {
+    "#",
+    "##",
+    "#.#",
+    "#..#",
+    "#...#",
+    "#....#",
+    "#.....#",
+    "#......#",
+    "#...####",
+    "#..#",
+    "#.#",
+    "##",
+};
+
+static void draw_cursor(void) {
+    int rows = (int)(sizeof CURSOR / sizeof CURSOR[0]);
+    for (int y = 0; y < rows; y++)
+        for (int x = 0; CURSOR[y][x]; x++) {
+            if (CURSOR[y][x] == ' ') continue;
+            gfx_fill(MX + x, MY + y, 1, 1, CURSOR[y][x] == '#' ? C_INK : C_BG);
+        }
+}
 
 /* The composer is drawn at a caller-chosen y because it MOVES. On the web build `placeComposer()`
  * reparents the same field between `#centerComposer` and `#bottomComposer`; this is that, and it is
@@ -1053,7 +1085,9 @@ static void draw_composer(int x0, int w, int cy) {
         gfx_clip_reset();
         /* the caret follows the text, on the last visible line */
         int cxx = R_FIELD.x + 9 + last_w + 1, cyy = cy + 6 + (shown - 1) * COMPOSE_LH;
-        if (last_w < tw - 2) gfx_vline(cxx, cyy, 12, C_INK);
+        /* Blinks on the app clock, half a second on and half off. A steady bar reads as a piece
+         * of the layout; a blinking one reads as the insertion point. */
+        if (last_w < tw - 2 && (NOW_MS / 500u) % 2u == 0u) gfx_vline(cxx, cyy, 12, C_INK);
     } else if (CUR >= 0) {
         /* Inside a session the composer is a reply box, not an invitation. The rotating subject
          * belongs to the new-chat screen, where it is answering "what is this thing for"; carrying
@@ -1135,6 +1169,7 @@ void app_draw(void) {
     if (SIDEBAR) draw_sidebar();
     draw_main();
     if (SEARCH_ON) draw_search();
+    draw_cursor();          /* last, so nothing occludes it */
     gfx_present();
 }
 
