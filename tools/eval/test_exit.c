@@ -146,6 +146,40 @@ int main(void) {
      * 88 px column, and three 15 px rows do not fit a 40 px dock. Neither was caught by any
      * assertion; both were visible in the render. Same class as the bubble-width defect -- a
      * measurement that lived only in my head. */
+    /* -- closing the sidebar must not hide the way back --
+     *
+     * R_TOGGLE kept whatever rect it held when the sidebar last drew, so with the sidebar closed
+     * the control was still CLICKABLE and no longer VISIBLE. A rect-only assertion would have
+     * passed throughout, because the rect was never the thing that broke -- so this reads the
+     * framebuffer and requires ink inside the plate. Same class as IN_SCROLL being handled with
+     * nothing emitting it. */
+    printf("\n  -- the sidebar can be reopened after closing it --\n");
+    reset(); seed("A car goes 150 m in 12 s."); CUR = -1;
+    SIDEBAR = 0; HOVER = 0; MX = MY = 0; app_draw();
+    T("the toggle is on screen", R_TOGGLE.x >= 0 && R_TOGGLE.y >= 0, 1);
+    T("and inside the top bar",  R_TOGGLE.y + R_TOGGLE.h <= TOP_H, 1);
+    {   /* ink, not just geometry: at least one pixel of the plate differs from the page ground */
+        const uint16_t *fb = gfx_buf();
+        int ink = 0;
+        for (int yy = R_TOGGLE.y; yy < R_TOGGLE.y + R_TOGGLE.h; yy++)
+            for (int xx = R_TOGGLE.x; xx < R_TOGGLE.x + R_TOGGLE.w; xx++)
+                if (fb[yy * GFX_W + xx] != C_BG) ink++;
+        T("something is actually DRAWN there", ink > 0, 1);
+
+        /* MUTATION: the shipped bug drew nothing when closed. An empty plate is the failure. */
+        if (!(ink > 0)) F++;
+        printf("  %s  mutant: a clickable rect with no pixels under it (%d px of ink)\n",
+               ink > 0 ? "CAUGHT" : "MISSED", ink);
+    }
+    click(R_TOGGLE.x + 10, R_TOGGLE.y + 10);
+    T("clicking it reopens the sidebar", SIDEBAR, 1);
+
+    /* every control is one class: same plate, same size */
+    reset(); CUR = -1; app_draw();
+    T("exit matches the sidebar icons", R_EXIT.w == R_NEW.w && R_EXIT.h == R_NEW.h, 1);
+    T("and sits on the same row",       R_EXIT.y == R_NEW.y, 1);
+    T("exit clears the screen edge",    R_EXIT.x + R_EXIT.w <= GFX_W - 3, 1);
+
     /* -- hover marquee on session titles --
      *
      * Titles ellipsise at ~64px, which for a question is a few words and often not enough to tell
@@ -192,7 +226,12 @@ int main(void) {
     T("every kept session is visible", CHAT_FIT >= MAX_CHATS, 1);
     T("all of them actually drew",     NCHAT_ROWS, MAX_CHATS);
     T("the last row clears the screen", R_CHAT[MAX_CHATS-1].y + R_CHAT[MAX_CHATS-1].h <= GFX_H, 1);
-    T("the first row clears Recents",   R_CHAT[0].y >= TOP_H + 2 + gfx_font_h(F_SM), 1);
+    /* Recents is drawn at TOP_H+8 with F_SM's 13px box, so it ends at TOP_H+21. The first row's
+     * highlight starts at R_CHAT[0].y and must clear that, with air rather than exactly abutting:
+     * three text bands stacked with no separation is what "the spacing is terrible" meant. */
+    T("the first row clears Recents",   R_CHAT[0].y >= TOP_H + 8 + gfx_font_h(F_SM), 1);
+    T("with air, not flush",            R_CHAT[0].y - (TOP_H + 8 + gfx_font_h(F_SM)) >= 3, 1);
+    T("the icons have air in the band", R_NEW.y >= 3 && R_NEW.y + R_NEW.h <= TOP_H - 2, 1);
 
     /* the three icons are EVENLY spaced -- equal gaps between them and at both ends */
     {   int g0 = R_NEW.x;                              /* left edge to first */

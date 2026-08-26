@@ -82,8 +82,15 @@ int  app_clock_hour(void);
  * and a list; 88 left dead space at both ends of the icon band and took 8px the transcript could
  * use. At 80 the three icons distribute with equal 5px gaps -- 3*20 + 4*5 = 80 exactly. */
 #define SIDE_W   80
-#define TOP_H    24
-#define DOCK_H   40
+/* 26, not 24. The band carries 20px icons, and at 24 they had 2px of air above and below -- they
+ * read as jammed into the corner rather than placed. The F_BIG title still clears it: drawn at
+ * y=4 with an 18px box, so 4..22 inside 26. */
+#define TOP_H    26
+/* 44, not 40. The dock carries a 24px field AND the disclaimer line beneath it: 3 + 24 + 2 + 13
+ * fills 42 of 44. At 40 the field had to stay 20px tall, which is where the composer's proportions
+ * went wrong -- the web field is 54px against a 34px send button, a ratio of 1.59, and 20px against
+ * a 14px button is 1.43. At 24 it is 1.71 and the pill reads as a pill again. */
+#define DOCK_H   44
 #define PAD      8
 
 typedef enum { IN_NONE = 0, IN_MOVE, IN_CLICK, IN_KEY, IN_SCROLL } in_kind;

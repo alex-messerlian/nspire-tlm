@@ -520,6 +520,20 @@ static void magnifier(int x, int y, int R, uint16_t c) {
  * "New chat" and meaningless once the label went away and it had to carry the button alone. This
  * is the same figure the SVG draws: a page open at its top-right corner, with the pencil crossing
  * the gap. 13x13 from (x,y). */
+/* The panel-toggle and exit marks, as functions because each is drawn from TWO places now and a
+ * second hand-inlined copy is how they diverge. Both are sized to the same 20x20 plate and the
+ * same 1px weight as the magnifier and the pencil, so every control in the app is one class. */
+static void panel_icon(int x, int y, uint16_t c) {   /* 13x12 inside a 20x20 plate */
+    gfx_rrect_outline(x + 4, y + 4, 13, 12, 2, c);
+    gfx_vline(x + 9, y + 4, 12, c);
+}
+static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 optical box */
+    for (int i = 0; i < 9; i++) {
+        gfx_fill(x + 5 + i, y + 5 + i, 1, 1, c);
+        gfx_fill(x + 5 + i, y + 13 - i, 1, 1, c);
+    }
+}
+
 static void pencil(int x, int y, uint16_t c) {
     gfx_hline(x,      y + 3,  6, c);       /* top edge, stopping short of the corner */
     gfx_vline(x,      y + 3, 10, c);       /* left edge */
@@ -630,9 +644,9 @@ static void draw_sidebar(void) {
     /* EVENLY distributed: 3 * 20 + 4 * 5 = 80 = SIDE_W, so the gap between any two icons and the
      * gap at either end are all 5px. The previous layout pinned one icon left and two right, which
      * left 19px on one side of the pair and 2px on the other -- not a grouping, just lopsided. */
-    R_NEW    = (gfx_rect){ 5,  2, 20, 20 };
-    R_SEARCH = (gfx_rect){ 30, 2, 20, 20 };
-    R_TOGGLE = (gfx_rect){ 55, 2, 20, 20 };
+    R_NEW    = (gfx_rect){ 5,  3, 20, 20 };
+    R_SEARCH = (gfx_rect){ 30, 3, 20, 20 };
+    R_TOGGLE = (gfx_rect){ 55, 3, 20, 20 };
 
     {   int hot = HOVER && inside(R_NEW, MX, MY);
         gfx_rrect(R_NEW.x, R_NEW.y, 20, 20, 5, hot ? C_SEL : C_SIDE);
@@ -644,12 +658,11 @@ static void draw_sidebar(void) {
     }
     {   int th = HOVER && inside(R_TOGGLE, MX, MY);
         gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 20, 20, 5, th ? C_SEL : C_SIDE);
-        gfx_rrect_outline(R_TOGGLE.x + 4, R_TOGGLE.y + 4, 13, 12, 2, C_INK2);
-        gfx_vline(R_TOGGLE.x + 9, R_TOGGLE.y + 4, 12, C_INK2);
+        panel_icon(R_TOGGLE.x, R_TOGGLE.y, C_INK2);
     }
 
     /* A heading over nothing is furniture. */
-    if (NCHATS) gfx_text(9, TOP_H + 2, "Recents", F_SM, C_INK3, C_SIDE);
+    if (NCHATS) gfx_text(9, TOP_H + 8, "Recents", F_SM, C_INK3, C_SIDE);
 
     /* The list SCROLLS. It used to break at the first row that did not fit, which silently hid up
      * to six of a twelve-session cap -- unreachable, with nothing on screen admitting it. Hiding
@@ -661,7 +674,9 @@ static void draw_sidebar(void) {
         /* F_SM's box is 13, so a row is 14 on a 15px pitch instead of 17-on-18. Between that and
          * the reclaimed footer band, CHAT_FIT reaches 12 -- the whole MAX_CHATS cap, visible at
          * once, so the scrollbar only ever appears if that cap changes. */
-        int top = TOP_H + 18, bot = GFX_H - 6;
+        /* +26 puts the first row 4px below the "Recents" box (TOP_H+8, 13 tall -> ends at
+         * TOP_H+21) instead of hard against it. The 15px pitch still lands CHAT_FIT on 12. */
+        int top = TOP_H + 26, bot = GFX_H - 6;
         CHAT_FIT = (bot - top) / 15;
         if (CHAT_FIT < 1) CHAT_FIT = 1;
         R_LIST = (gfx_rect){ 0, top - 4, SIDE_W, bot - top + 8 };
@@ -747,21 +762,38 @@ static void draw_main(void) {
     int w  = GFX_W - x0;
     gfx_fill(x0, 0, w, GFX_H, C_BG);
 
-    /* top bar: ChatTLM when empty, the chat's title inside a chat */
-    const char *title = (CUR >= 0) ? CHATS[CUR].title : "ChatTLM";
-    gfx_text_ellipsis(x0 + PAD, 4, title, F_BIG, C_INK, C_BG, w - 2 * PAD - 30);
+    /* With the sidebar closed there was NOTHING on screen to reopen it. R_TOGGLE kept whatever
+     * rect it held when the sidebar last drew, so the control stayed clickable while being
+     * invisible -- an affordance that exists only in the source, which is the thing the exit
+     * button's own comment warns about. Closed, the toggle moves into the top bar.
+     *
+     * The title starts after it, and both are centred in TOP_H: the icon plate is 20 in a 26 band
+     * (y=3) and the F_BIG box is 18 (y=4), so the two share a centre line at 13. */
+    int tx = x0 + PAD;
+    if (!SIDEBAR) {
+        R_TOGGLE = (gfx_rect){ 5, 3, 20, 20 };
+        int th = HOVER && inside(R_TOGGLE, MX, MY);
+        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 20, 20, 5, th ? C_SEL : C_BG);
+        panel_icon(R_TOGGLE.x, R_TOGGLE.y, C_INK2);
+        tx = R_TOGGLE.x + 20 + 6;
+    }
+
+    /* The title is the CHAT's title, and on the new-chat screen there is no chat. "ChatTLM" was
+     * being stated three times on one screen -- top bar, "Ask ChatTLM" in the field, and
+     * "ChatTLM can make mistakes" under it -- while the heading already identifies the app. */
+    if (CUR >= 0)
+        gfx_text_ellipsis(tx, 4, CHATS[CUR].title, F_BIG, C_INK, C_BG, GFX_W - 30 - tx);
 
     /* EXIT, top right, always drawn. ESC has always quit, but nothing on screen said so, and a
      * judge handed the calculator does not know the key. An affordance that exists only in the
      * source is not an affordance. */
-    R_EXIT = (gfx_rect){ GFX_W - 22, 3, 18, 18 };
+    /* Same 20x20 plate, same corner radius and same weight as the sidebar's three. It was an 18px
+     * box with a 2px-thick hand-drawn X, which made it visibly heavier and smaller than every
+     * other control on screen. */
+    R_EXIT = (gfx_rect){ GFX_W - 25, 3, 20, 20 };
     {   int hot = HOVER && inside(R_EXIT, MX, MY);
-        gfx_rrect(R_EXIT.x, R_EXIT.y, 18, 18, 4, hot ? C_EXIT_HOT : C_BG);
-        uint16_t xc = hot ? C_ERRFG : C_INK2;
-        for (int i = 0; i < 9; i++) {          /* an X, both diagonals, 2px */
-            gfx_fill(R_EXIT.x + 5 + i, R_EXIT.y + 5 + i, 2, 1, xc);
-            gfx_fill(R_EXIT.x + 5 + i, R_EXIT.y + 13 - i, 2, 1, xc);
-        }
+        gfx_rrect(R_EXIT.x, R_EXIT.y, 20, 20, 5, hot ? C_EXIT_HOT : C_BG);
+        exit_icon(R_EXIT.x, R_EXIT.y, hot ? C_ERRFG : C_INK2);
     }
     /* No rule under the title. The desktop build draws none -- #topbar has no border -- and at
      * 231px wide a full-width divider under a 60px word reads as a seam across the pane rather
@@ -832,7 +864,14 @@ static void draw_main(void) {
     }
     gfx_clip_reset();
 
-    if (!EMPTY_COMPOSER) draw_composer(x0, w, GFX_H - DOCK_H + 3);
+    if (!EMPTY_COMPOSER) {
+        int cy = GFX_H - DOCK_H + 3;
+        draw_composer(x0, w, cy);
+        /* The web's `.note`, and only under the DOCKED field -- `#empty` has no counterpart, which
+         * is why the new-chat screen shows the bar alone. */
+        const char *note = "ChatTLM can make mistakes.";
+        gfx_text(x0 + (w - gfx_text_w(note, F_SM)) / 2, cy + 26, note, F_SM, C_INK3, C_BG);
+    }
 
 }
 
@@ -851,21 +890,21 @@ static void draw_cursor(void) {
  * reparents the same field between `#centerComposer` and `#bottomComposer`; this is that, and it is
  * the reason the function takes a coordinate instead of reading DOCK_H itself. */
 static void draw_composer(int x0, int w, int cy) {
-    R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, 20 };
-    gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD);
+    R_FIELD = (gfx_rect){ x0 + PAD, cy, w - 2 * PAD, 24 };
+    gfx_rrect(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 12, C_FIELD);
     gfx_rrect_outline(R_FIELD.x, R_FIELD.y, R_FIELD.w, R_FIELD.h, 10, C_FIELD_LN);
     if (COMPOSE_N) {
-        gfx_text_ellipsis(R_FIELD.x + 9, cy + 3, COMPOSE, F_UI, C_INK, C_FIELD, R_FIELD.w - 34);
+        gfx_text_ellipsis(R_FIELD.x + 9, cy + 5, COMPOSE, F_UI, C_INK, C_FIELD, R_FIELD.w - 34);
         int cw = gfx_text_w(COMPOSE, F_UI);
-        if (cw < R_FIELD.w - 40) gfx_vline(R_FIELD.x + 9 + cw + 1, cy + 4, 12, C_INK);
+        if (cw < R_FIELD.w - 40) gfx_vline(R_FIELD.x + 9 + cw + 1, cy + 6, 12, C_INK);
     } else {
-        gfx_text(R_FIELD.x + 9, cy + 3, "Ask ChatTLM", F_UI, C_INK3, C_FIELD);
+        gfx_text(R_FIELD.x + 9, cy + 5, "Ask ChatTLM", F_UI, C_INK3, C_FIELD);
     }
     /* While generating, the send arrow becomes a STOP square -- the same control, so there is
      * always exactly one button there and it always does the thing the state calls for. */
     /* 14, not 16. In a 20px field a 16px disc leaves 2px of margin and reads as a plug filling
      * the end of the pill rather than as a button sitting inside it. */
-    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 18, cy + 3, 14, 14 };
+    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 19, cy + 5, 14, 14 };
     if (BUSY) {
         gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 7, C_INK);
         gfx_fill(R_SEND.x + 4, R_SEND.y + 4, 6, 6, C_BG);
