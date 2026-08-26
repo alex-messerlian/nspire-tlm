@@ -497,10 +497,20 @@ static void magnifier(int x, int y, uint16_t c) {
 
 /* compose glyph for New chat: the web row has one and the device row did not, so the two rows sat
  * on different text baselines. */
+/* The "new chat" mark, drawn to read as the web's edit icon rather than as a stray diagonal.
+ *
+ * It used to be a 7px shaft with two dots, which at 11px reads as "/" -- fine beside the word
+ * "New chat" and meaningless once the label went away and it had to carry the button alone. This
+ * is the same figure the SVG draws: a page open at its top-right corner, with the pencil crossing
+ * the gap. 11x11 from (x,y). */
 static void pencil(int x, int y, uint16_t c) {
-    for (int k = 0; k < 7; k++) gfx_fill(x + 2 + k, y + 8 - k, 2, 1, c);   /* shaft */
-    gfx_fill(x + 1, y + 8, 2, 2, c);                                       /* tip  */
-    gfx_fill(x + 8, y + 1, 2, 2, c);                                       /* eraser */
+    gfx_hline(x,     y + 3,  5, c);        /* top edge, stopping short of the corner */
+    gfx_vline(x,     y + 3,  8, c);        /* left edge */
+    gfx_hline(x,     y + 10, 9, c);        /* bottom edge */
+    gfx_vline(x + 8, y + 6,  5, c);        /* right edge, resuming below the gap */
+    for (int k = 0; k < 5; k++)            /* the pencil, through the open corner */
+        gfx_fill(x + 4 + k, y + 5 - k, 2, 1, c);
+    gfx_fill(x + 3, y + 6, 2, 2, c);       /* its tip */
 }
 
 /* Draw `s` with the parts matching any term in the BOLD face. The device had no equivalent of the
@@ -612,11 +622,20 @@ static void draw_sidebar(void) {
             gfx_fill(cx - 5, cy - 5, 2, 2, C_INK2); gfx_fill(cx + 4, cy + 4, 2, 2, C_INK2);
             gfx_fill(cx + 4, cy - 5, 2, 2, C_INK2); gfx_fill(cx - 5, cy + 4, 2, 2, C_INK2);
         } else if (THEME_MODE == TH_DARK) {      /* moon: a disc with a bite out of it */
+            /* The bite is ABOVE and right of the disc, not below it. With it at (4,+3) the two
+             * circles overlapped through the centre and what survived was a claw, not a crescent
+             * -- unrecognisable at 11px, which is the only size it is ever drawn at.
+             *
+             * A near, small bite on the SAME axis is what produces a crescent: the two edges stay
+             * roughly parallel, so the limb keeps an even thickness and the horns reach past the
+             * waist on both sides. Found by generating every (bite centre, radius) pair and
+             * keeping only those whose top and bottom rows extend further right than the middle
+             * row -- the arithmetic definition of concave, which a blob fails. */
             for (int dy = -5; dy <= 5; dy++)
                 for (int dx = -5; dx <= 5; dx++) {
                     int d = dx*dx + dy*dy;
-                    int bite = (dx-4)*(dx-4) + (dy-3)*(dy-3);
-                    if (d <= 25 && bite > 25) gfx_fill(cx + dx, cy + dy, 1, 1, C_INK2);
+                    int bite = (dx-2)*(dx-2) + dy*dy;
+                    if (d <= 25 && bite > 17) gfx_fill(cx + dx, cy + dy, 1, 1, C_INK2);
                 }
         } else {                                  /* calculator: follow the device */
             gfx_rrect_outline(cx - 5, cy - 6, 11, 13, 2, C_INK2);
@@ -636,22 +655,31 @@ static void draw_sidebar(void) {
         gfx_vline(R_TOGGLE.x + 8, R_TOGGLE.y + 4, 11, C_INK2);
     }
 
-    R_NEW = (gfx_rect){ 4, TOP_H + 2, SIDE_W - 8, 18 };
+    /* New chat is the FOURTH icon, on the same band -- pencil at the left end, the other three at
+     * the right, which is the desktop's own grouping (primary action left, tools right).
+     *
+     * It was a full-width labelled row beneath, because "New chat" plus its pencil is 70px and the
+     * three icons are 58px: 128px of content in an 88px column, so one row was arithmetically
+     * impossible WITH the label. Dropping the label removes the constraint rather than working
+     * around it -- 4*18 + gaps fits with room to spare -- and buys back the 24px the second row
+     * cost, which is an extra session visible in the list. */
+    R_NEW = (gfx_rect){ 4, 3, 18, 18 };
     {   int hot = HOVER && inside(R_NEW, MX, MY);
-        uint16_t nb = hot ? C_SEL : C_SIDE;
-        if (hot) gfx_rrect(R_NEW.x, R_NEW.y, R_NEW.w, R_NEW.h, 5, nb);
-        pencil(R_NEW.x + 5, R_NEW.y + 3, C_INK2);
-        gfx_text(R_NEW.x + 20, R_NEW.y + 2, "New chat", F_UIB, C_INK, nb);
+        gfx_rrect(R_NEW.x, R_NEW.y, 18, 18, 4, hot ? C_SEL : C_SIDE);
+        pencil(R_NEW.x + 4, R_NEW.y + 4, C_INK2);
     }
 
     /* A heading over nothing is furniture. */
-    if (NCHATS) gfx_text(10, TOP_H + 26, "Recents", F_UI, C_INK3, C_SIDE);
+    if (NCHATS) gfx_text(10, TOP_H + 2, "Recents", F_UI, C_INK3, C_SIDE);
 
     /* The list SCROLLS. It used to break at the first row that did not fit, which silently hid up
      * to six of a twelve-session cap -- unreachable, with nothing on screen admitting it. Hiding
      * data is worse than truncating it, because truncation is visible. */
     {
-        int top = TOP_H + 42, bot = GFX_H - DOCK_H - 6;
+        /* +20, not +18: "Recents" is drawn at TOP_H+2 and F_UI's box is 15 tall, so it occupies rows
+         * 26..40. R_CHAT[0] starts at top-2, so top must be at least 43 for the first row's
+         * highlight not to sit on the heading's last row. 44 keeps CHAT_FIT at 8. */
+        int top = TOP_H + 20, bot = GFX_H - DOCK_H - 6;
         CHAT_FIT = (bot - top) / 18;
         if (CHAT_FIT < 1) CHAT_FIT = 1;
         R_LIST = (gfx_rect){ 0, top - 4, SIDE_W, bot - top + 8 };
@@ -740,11 +768,14 @@ static void draw_main(void) {
             gfx_fill(R_EXIT.x + 5 + i, R_EXIT.y + 13 - i, 2, 1, xc);
         }
     }
-    gfx_hline(x0, TOP_H, w, C_LINE);
+    /* No rule under the title. The desktop build draws none -- #topbar has no border -- and at
+     * 231px wide a full-width divider under a 60px word reads as a seam across the pane rather
+     * than as structure. The sidebar's vline still separates the two columns, which is the only
+     * division that carries meaning here. */
 
     /* transcript */
     int px0 = x0 + PAD, pw = w - 2 * PAD;
-    int top = TOP_H + 1, bot = GFX_H - DOCK_H;
+    int top = TOP_H, bot = GFX_H - DOCK_H;
     gfx_clip(x0, top, w, bot - top);
 
     EMPTY_COMPOSER = 0;
@@ -808,12 +839,6 @@ static void draw_main(void) {
 
     if (!EMPTY_COMPOSER) draw_composer(x0, w, GFX_H - DOCK_H + 3);
 
-    /* The footer carries the one key worth knowing, and says what it does HERE -- ESC means "back"
-     * inside a chat and "quit" at home, so a single fixed label would be wrong half the time. */
-    const char *foot = BUSY ? "ESC or Stop to interrupt"
-                            : (CUR >= 0 ? "ESC for home  -  X to exit"
-                                        : "ESC or X to exit");
-    gfx_text(x0 + (w - gfx_text_w(foot, F_UI)) / 2, GFX_H - 14, foot, F_UI, C_INK3, C_BG);
 }
 
 static void draw_cursor(void) {
@@ -888,8 +913,6 @@ void app_event(const in_event *e) {
             return;
         }
         if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
-        if (CUR < 0 && !SEARCH_ON) {
-        }
         if (SIDEBAR && inside(R_THEME, MX, MY)) {   /* auto -> light -> dark -> auto */
             app_set_theme((THEME_MODE + 1) % 3);
             return;
