@@ -108,7 +108,11 @@ if __name__ == "__main__":
              "typedef struct { unsigned short cp; unsigned char w; unsigned int off; unsigned short len; } ns_glyph;"]
     tmp = pathlib.Path("/tmp/_f.h")
     total = 0
-    for path, size, name in ((FONT, 13, "FONT_UI"), (BOLD, 13, "FONT_UIB"), (FONT, 15, "FONT_BIG")):
+    # FONT_SM exists for the session list. At 13px a title got ~11 characters in an 80px column and
+    # the rows needed an 18px pitch; at 11px it gets more of the title AND a 15px pitch, so the whole
+    # MAX_CHATS cap fits without scrolling. It is the only place a fourth face earns its ~20 KB.
+    for path, size, name in ((FONT, 13, "FONT_UI"), (BOLD, 13, "FONT_UIB"), (FONT, 15, "FONT_BIG"),
+                             (FONT, 11, "FONT_SM")):
         h, blob, n = render(path, size, name, tmp)
         parts.append(tmp.read_text())
         total += blob

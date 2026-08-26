@@ -18,7 +18,16 @@ static void T(const char *n, int got, int want) {
 }
 static void key(int k) { in_event e; memset(&e,0,sizeof e); e.kind=IN_KEY; e.key=k; app_event(&e); }
 static void click(int x, int y) { in_event e; memset(&e,0,sizeof e); e.kind=IN_CLICK; e.x=x; e.y=y; app_event(&e); }
-static void reset(void) { app_init(); ABORT = 0; QUIT = 0; BUSY = 0; SEARCH_ON = 0; app_draw(); }
+/* app_init() clears the chat state but NOT the view state, so SIDEBAR, the cursor and HOVER
+ * survived reset() and leaked between cases. A click in one test that happens to land on
+ * R_TOGGLE collapses the sidebar for every test after it, and the ones that then measure sidebar
+ * geometry fail for a reason that has nothing to do with what they assert. Restore all of it. */
+static void reset(void) {
+    app_init();
+    ABORT = 0; QUIT = 0; BUSY = 0; SEARCH_ON = 0;
+    SIDEBAR = 1; HOVER = 0; MX = MY = 0; SCROLL = 0; CHAT_SCROLL = 0;
+    app_draw();
+}
 static void seed(const char *title) {
     app_chat *c = &CHATS[NCHATS++];
     memset(c,0,sizeof *c); snprintf(c->title,sizeof c->title,"%s",title);
@@ -137,21 +146,109 @@ int main(void) {
      * 88 px column, and three 15 px rows do not fit a 40 px dock. Neither was caught by any
      * assertion; both were visible in the render. Same class as the bubble-width defect -- a
      * measurement that lived only in my head. */
-    printf("\n  -- the sidebar footer fits its column --\n");
-    {   const char *rows[2] = { "7.2M params", "2.68 tok/s" };
-        int lh = gfx_font_h(F_UI), fy = GFX_H - DOCK_H + 5, worst = 0;
-        for (int i = 0; i < 2; i++) {
-            int wpx = gfx_text_w(rows[i], F_UI);
-            if (6 + wpx > worst) worst = 6 + wpx;
-        }
-        T("widest footer row fits SIDE_W", worst <= SIDE_W, 1);
-        T("both rows fit above the screen edge", fy + 2 * lh <= GFX_H, 1);
+    /* -- hover marquee on session titles --
+     *
+     * Titles ellipsise at ~64px, which for a question is a few words and often not enough to tell
+     * two sessions apart. On hover the full title scrolls left, STOPS at its end, and resets when
+     * the cursor leaves. The clamp is the part worth asserting: without it the title keeps going
+     * and scrolls off its own left edge, leaving a blank row that reads as a rendering fault. */
+    printf("\n  -- session titles marquee on hover --\n");
+    {   T("still at rest during the hold",  marq_off(MARQ_HOLD, 40), 0);
+        T("has not moved one draw before",  marq_off(MARQ_HOLD - 1, 40), 0);
+        T("moves after the hold",           marq_off(MARQ_HOLD + 2 * MARQ_DIV, 40) > 0, 1);
+        T("advances one px per MARQ_DIV",   marq_off(MARQ_HOLD + 10 * MARQ_DIV, 40), 10);
+        T("STOPS at the end",               marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40), 40);
+        T("never exceeds the overflow",     marq_off(999999, 40), 40);
+        T("a title that fits never moves",  marq_off(999999, 0), 0);
+        T("negative overflow is not motion", marq_off(999999, -12), 0);
 
-        /* MUTATION: the string that actually clipped must still be rejected. */
-        int bad = 6 + gfx_text_w("TI-Nspire CX II", F_UI) <= SIDE_W;
-        if (bad) F++;
-        printf("  %s  mutant: the device-name row that clipped at 88 px\n", bad ? "MISSED" : "CAUGHT");
+        /* MUTATION: drop the clamp and a long title runs off its own left edge. */
+        int unclamped = (MARQ_HOLD + 400 * MARQ_DIV - MARQ_HOLD) / MARQ_DIV;
+        int caught = (marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40) != unclamped);
+        if (!caught) F++;
+        printf("  %s  mutant: no clamp -> travel %d px against a 40 px overflow\n",
+               caught ? "CAUGHT" : "MISSED", unclamped);
     }
+
+    /* the hover STATE: it must reset when the cursor leaves, or the next hover resumes mid-scroll */
+    reset(); seed("Speed from distance and time on a long straight road"); CUR = -1;
+    MX = 40; MY = 50; HOVER = 1; app_draw();
+    T("hovering a row arms the marquee", MARQ_AT >= 0, 1);
+    {   int t0 = MARQ_T; app_draw();
+        T("each draw advances it", MARQ_T > t0, 1); }
+    MX = 300; MY = 220; app_draw();
+    T("leaving the list disarms it", MARQ_AT, -1);
+
+    /* -- the icon band, and what the reclaimed footer band bought --
+     *
+     * The footer used to spend all of DOCK_H on two numbers that never change while the app runs.
+     * With it gone and the list on F_SM's tighter pitch, CHAT_FIT reaches MAX_CHATS: every session
+     * the app will keep is visible at once. That is the assertion worth holding, because it is the
+     * property a future pitch or padding change would quietly break. */
+    printf("\n  -- the sidebar column --\n");
+    reset();
+    for (int i = 0; i < MAX_CHATS; i++) seed("A car goes 150 m in 12 s. Find the speed.");
+    CUR = -1; app_draw();
+    T("every kept session is visible", CHAT_FIT >= MAX_CHATS, 1);
+    T("all of them actually drew",     NCHAT_ROWS, MAX_CHATS);
+    T("the last row clears the screen", R_CHAT[MAX_CHATS-1].y + R_CHAT[MAX_CHATS-1].h <= GFX_H, 1);
+    T("the first row clears Recents",   R_CHAT[0].y >= TOP_H + 2 + gfx_font_h(F_SM), 1);
+
+    /* the three icons are EVENLY spaced -- equal gaps between them and at both ends */
+    {   int g0 = R_NEW.x;                              /* left edge to first */
+        int g1 = R_SEARCH.x - (R_NEW.x + R_NEW.w);     /* first to second */
+        int g2 = R_TOGGLE.x - (R_SEARCH.x + R_SEARCH.w);
+        int g3 = SIDE_W - (R_TOGGLE.x + R_TOGGLE.w);   /* last to the divider */
+        T("gaps are equal", g0 == g1 && g1 == g2 && g2 == g3, 1);
+        T("and the icons are the same size",
+          R_NEW.w == R_SEARCH.w && R_SEARCH.w == R_TOGGLE.w &&
+          R_NEW.h == R_SEARCH.h && R_SEARCH.h == R_TOGGLE.h, 1);
+        T("all on one row", R_NEW.y == R_SEARCH.y && R_SEARCH.y == R_TOGGLE.y, 1);
+        T("the band fits the column", R_TOGGLE.x + R_TOGGLE.w <= SIDE_W, 1);
+        /* MUTATION: the old lopsided layout -- one icon left, two right -- had g0=4 and g2=2
+         * against a 19px hole in the middle. */
+        int lop0 = 4, lop1 = 88 - 45 - (4 + 20), lop2 = 88 - 23 - (88 - 45 + 20);
+        int caught = !(lop0 == lop1 && lop1 == lop2);
+        if (!caught) F++;
+        printf("  %s  mutant: the lopsided band (gaps %d / %d / %d)\n",
+               caught ? "CAUGHT" : "MISSED", lop0, lop1, lop2);
+    }
+
+    /* the footer is GONE, not merely moved off-screen */
+    T("no footer text is drawn in the dock band", R_LIST.y + R_LIST.h > GFX_H - DOCK_H, 1);
+
+    /* -- hover marquee on session titles --
+     *
+     * Titles ellipsise at ~64px, which for a question is a few words and often not enough to tell
+     * two sessions apart. On hover the full title scrolls left, STOPS at its end, and resets when
+     * the cursor leaves. The clamp is the part worth asserting: without it the title keeps going
+     * and scrolls off its own left edge, leaving a blank row that reads as a rendering fault. */
+    printf("\n  -- session titles marquee on hover --\n");
+    {   T("still at rest during the hold",  marq_off(MARQ_HOLD, 40), 0);
+        T("has not moved one draw before",  marq_off(MARQ_HOLD - 1, 40), 0);
+        T("moves after the hold",           marq_off(MARQ_HOLD + 2 * MARQ_DIV, 40) > 0, 1);
+        T("advances one px per MARQ_DIV",   marq_off(MARQ_HOLD + 10 * MARQ_DIV, 40), 10);
+        T("STOPS at the end",               marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40), 40);
+        T("never exceeds the overflow",     marq_off(999999, 40), 40);
+        T("a title that fits never moves",  marq_off(999999, 0), 0);
+        T("negative overflow is not motion", marq_off(999999, -12), 0);
+
+        /* MUTATION: drop the clamp and a long title runs off its own left edge. */
+        int unclamped = (MARQ_HOLD + 400 * MARQ_DIV - MARQ_HOLD) / MARQ_DIV;
+        int caught = (marq_off(MARQ_HOLD + 400 * MARQ_DIV, 40) != unclamped);
+        if (!caught) F++;
+        printf("  %s  mutant: no clamp -> travel %d px against a 40 px overflow\n",
+               caught ? "CAUGHT" : "MISSED", unclamped);
+    }
+
+    /* the hover STATE: it must reset when the cursor leaves, or the next hover resumes mid-scroll */
+    reset(); seed("Speed from distance and time on a long straight road"); CUR = -1;
+    MX = 40; MY = 50; HOVER = 1; app_draw();
+    T("hovering a row arms the marquee", MARQ_AT >= 0, 1);
+    {   int t0 = MARQ_T; app_draw();
+        T("each draw advances it", MARQ_T > t0, 1); }
+    MX = 300; MY = 220; app_draw();
+    T("leaving the list disarms it", MARQ_AT, -1);
 
     printf("\n  -- the empty state centres the composer --\n");
     reset(); CUR = -1; app_draw();

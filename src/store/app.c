@@ -88,7 +88,25 @@ static char STATUS[48], STATUS_MONO[40];
 /* hit regions, recomputed every frame so hover testing and click handling can never disagree
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
-static gfx_rect R_EXIT, R_THEME;
+static gfx_rect R_EXIT;
+/* Hover marquee for session titles.
+ *
+ * Titles are ellipsised at ~64px, which for a question is a few words -- often not enough to tell
+ * two sessions apart. On hover the full title scrolls left, stops at its end and stays there;
+ * moving away resets it. MARQ_AT is the chat index under the cursor and MARQ_T counts draws since
+ * it arrived, so the animation is driven by the redraw loop and needs no clock. */
+static int MARQ_AT = -1, MARQ_T;
+#define MARQ_HOLD 12      /* draws to wait before moving, so a pass-through does not twitch */
+#define MARQ_DIV  2       /* draws per pixel of travel */
+
+/* Travel after `t` draws, for a title overflowing its band by `overflow` px. Its own function so
+ * the clamp can be tested directly: without it the title scrolls off its own left edge and the row
+ * ends up blank, which looks like a rendering fault rather than a missing bound. */
+static int marq_off(int t, int overflow) {
+    if (overflow <= 0 || t <= MARQ_HOLD) return 0;
+    int off = (t - MARQ_HOLD) / MARQ_DIV;
+    return off > overflow ? overflow : off;
+}
 static void draw_composer(int x0, int w, int cy);
 static int EMPTY_COMPOSER;   /* set per-frame: the composer was drawn centred, so do not dock it */              /* always visible: leaving must not depend on knowing a key */
 static int ABORT;                    /* set by ESC or Stop; polled by the generation loop */
@@ -485,14 +503,13 @@ static void snippet_of(const app_chat *c, char terms[MAX_TERMS][TERM_MAX], int n
 
 /* A 9px lens. gfx_rrect_outline at r=4 degenerates to a diamond -- its corner test is a radius
  * compare per row, which is right at r>=6 and visibly wrong below it. */
-static void magnifier(int x, int y, uint16_t c) {
-    const int R = 4;
+static void magnifier(int x, int y, int R, uint16_t c) {
     for (int j = -R; j <= R; j++)
         for (int i = -R; i <= R; i++) {
             int d = i * i + j * j;
             if (d <= R * R && d > (R - 2) * (R - 2)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
         }
-    for (int k = 0; k < 4; k++) gfx_fill(x + 7 + k, y + 7 + k, 2, 1, c);   /* handle */
+    for (int k = 0; k < R; k++) gfx_fill(x + 2*R - 1 + k, y + 2*R - 1 + k, 2, 1, c);  /* handle */
 }
 
 /* compose glyph for New chat: the web row has one and the device row did not, so the two rows sat
@@ -502,15 +519,15 @@ static void magnifier(int x, int y, uint16_t c) {
  * It used to be a 7px shaft with two dots, which at 11px reads as "/" -- fine beside the word
  * "New chat" and meaningless once the label went away and it had to carry the button alone. This
  * is the same figure the SVG draws: a page open at its top-right corner, with the pencil crossing
- * the gap. 11x11 from (x,y). */
+ * the gap. 13x13 from (x,y). */
 static void pencil(int x, int y, uint16_t c) {
-    gfx_hline(x,     y + 3,  5, c);        /* top edge, stopping short of the corner */
-    gfx_vline(x,     y + 3,  8, c);        /* left edge */
-    gfx_hline(x,     y + 10, 9, c);        /* bottom edge */
-    gfx_vline(x + 8, y + 6,  5, c);        /* right edge, resuming below the gap */
-    for (int k = 0; k < 5; k++)            /* the pencil, through the open corner */
-        gfx_fill(x + 4 + k, y + 5 - k, 2, 1, c);
-    gfx_fill(x + 3, y + 6, 2, 2, c);       /* its tip */
+    gfx_hline(x,      y + 3,  6, c);       /* top edge, stopping short of the corner */
+    gfx_vline(x,      y + 3, 10, c);       /* left edge */
+    gfx_hline(x,      y + 12, 11, c);      /* bottom edge */
+    gfx_vline(x + 10, y + 7,  6, c);       /* right edge, resuming below the gap */
+    for (int k = 0; k < 6; k++)            /* the pencil, through the open corner */
+        gfx_fill(x + 5 + k, y + 6 - k, 2, 1, c);
+    gfx_fill(x + 4, y + 7, 2, 2, c);       /* its tip */
 }
 
 /* Draw `s` with the parts matching any term in the BOLD face. The device had no equivalent of the
@@ -564,7 +581,7 @@ static void draw_search(void) {
 
     /* field */
     gfx_hline(SX + 10, SY + 27, SW - 20, C_LINE);
-    magnifier(SX + 11, SY + 8, C_INK3);
+    magnifier(SX + 11, SY + 8, 4, C_INK3);
     if (SQ_N) gfx_text(SX + 28, SY + 7, SQ, F_UI, C_INK, C_SHEET);
     else      gfx_text(SX + 28, SY + 7, "Search chats...", F_UI, C_INK3, C_SHEET);
     if (SQ_N) gfx_vline(SX + 29 + gfx_text_w(SQ, F_UI), SY + 8, 12, C_INK);
@@ -603,74 +620,36 @@ static void draw_sidebar(void) {
     gfx_fill(0, 0, SIDE_W, GFX_H, C_SIDE);
     gfx_vline(SIDE_W, 0, GFX_H, C_LINE);
 
-    /* header: toggle on the right, matching the main bar's height so both sit on one line */
-    /* [search][toggle], right-aligned and the same size, as on the web header */
-    R_TOGGLE = (gfx_rect){ SIDE_W - 21, 3, 18, 18 };
-    R_SEARCH = (gfx_rect){ SIDE_W - 41, 3, 18, 18 };
-    R_THEME  = (gfx_rect){ SIDE_W - 61, 3, 18, 18 };
-    {   int th = HOVER && inside(R_THEME, MX, MY);
-        gfx_rrect(R_THEME.x, R_THEME.y, 18, 18, 4, th ? C_SEL : C_SIDE);
-        int cx = R_THEME.x + 9, cy = R_THEME.y + 9;
-        if (THEME_MODE == TH_LIGHT) {            /* sun: a disc with eight rays */
-            for (int dy = -3; dy <= 3; dy++)
-                for (int dx = -3; dx <= 3; dx++)
-                    if (dx*dx + dy*dy <= 9) gfx_fill(cx + dx, cy + dy, 1, 1, C_INK2);
-            for (int k = 0; k < 4; k++) {
-                gfx_fill(cx - 6 + 12*(k&1), cy, 2, 1, C_INK2);       /* left / right */
-                gfx_fill(cx, cy - 6 + 12*(k&1), 1, 2, C_INK2);       /* up / down    */
-            }
-            gfx_fill(cx - 5, cy - 5, 2, 2, C_INK2); gfx_fill(cx + 4, cy + 4, 2, 2, C_INK2);
-            gfx_fill(cx + 4, cy - 5, 2, 2, C_INK2); gfx_fill(cx - 5, cy + 4, 2, 2, C_INK2);
-        } else if (THEME_MODE == TH_DARK) {      /* moon: a disc with a bite out of it */
-            /* The bite is ABOVE and right of the disc, not below it. With it at (4,+3) the two
-             * circles overlapped through the centre and what survived was a claw, not a crescent
-             * -- unrecognisable at 11px, which is the only size it is ever drawn at.
-             *
-             * A near, small bite on the SAME axis is what produces a crescent: the two edges stay
-             * roughly parallel, so the limb keeps an even thickness and the horns reach past the
-             * waist on both sides. Found by generating every (bite centre, radius) pair and
-             * keeping only those whose top and bottom rows extend further right than the middle
-             * row -- the arithmetic definition of concave, which a blob fails. */
-            for (int dy = -5; dy <= 5; dy++)
-                for (int dx = -5; dx <= 5; dx++) {
-                    int d = dx*dx + dy*dy;
-                    int bite = (dx-2)*(dx-2) + dy*dy;
-                    if (d <= 25 && bite > 17) gfx_fill(cx + dx, cy + dy, 1, 1, C_INK2);
-                }
-        } else {                                  /* calculator: follow the device */
-            gfx_rrect_outline(cx - 5, cy - 6, 11, 13, 2, C_INK2);
-            gfx_fill(cx - 3, cy - 4, 7, 3, C_INK2);
-            for (int r2 = 0; r2 < 2; r2++)
-                for (int c2 = 0; c2 < 3; c2++)
-                    gfx_fill(cx - 3 + c2*3, cy + 1 + r2*3, 1, 1, C_INK2);
-        }
+    /* The icon band. THREE controls, 20x20 on a 22px pitch: new chat at the left end, search
+     * and the panel toggle at the right -- the desktop's grouping, primary action apart from tools.
+     *
+     * There is no theme control. It cycled auto -> light -> dark and spent a quarter of the band
+     * on a choice the machine can make itself: TH_AUTO reads the clock. Removing it is what buys
+     * the remaining three the room to go from 18px to 20px, which at arm's length is the
+     * difference between a glyph that reads and one that does not. */
+    /* EVENLY distributed: 3 * 20 + 4 * 5 = 80 = SIDE_W, so the gap between any two icons and the
+     * gap at either end are all 5px. The previous layout pinned one icon left and two right, which
+     * left 19px on one side of the pair and 2px on the other -- not a grouping, just lopsided. */
+    R_NEW    = (gfx_rect){ 5,  2, 20, 20 };
+    R_SEARCH = (gfx_rect){ 30, 2, 20, 20 };
+    R_TOGGLE = (gfx_rect){ 55, 2, 20, 20 };
+
+    {   int hot = HOVER && inside(R_NEW, MX, MY);
+        gfx_rrect(R_NEW.x, R_NEW.y, 20, 20, 5, hot ? C_SEL : C_SIDE);
+        pencil(R_NEW.x + 4, R_NEW.y + 3, C_INK2);
     }
     {   int sh = HOVER && inside(R_SEARCH, MX, MY);
-        gfx_rrect(R_SEARCH.x, R_SEARCH.y, 18, 18, 4, sh ? C_SEL : C_SIDE);
-        magnifier(R_SEARCH.x + 4, R_SEARCH.y + 4, C_INK2);
+        gfx_rrect(R_SEARCH.x, R_SEARCH.y, 20, 20, 5, sh ? C_SEL : C_SIDE);
+        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 4, 4, C_INK2);
     }
     {   int th = HOVER && inside(R_TOGGLE, MX, MY);
-        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 18, 18, 4, th ? C_SEL : C_SIDE);
-        gfx_rrect_outline(R_TOGGLE.x + 3, R_TOGGLE.y + 4, 13, 11, 2, C_INK2);
-        gfx_vline(R_TOGGLE.x + 8, R_TOGGLE.y + 4, 11, C_INK2);
-    }
-
-    /* New chat is the FOURTH icon, on the same band -- pencil at the left end, the other three at
-     * the right, which is the desktop's own grouping (primary action left, tools right).
-     *
-     * It was a full-width labelled row beneath, because "New chat" plus its pencil is 70px and the
-     * three icons are 58px: 128px of content in an 88px column, so one row was arithmetically
-     * impossible WITH the label. Dropping the label removes the constraint rather than working
-     * around it -- 4*18 + gaps fits with room to spare -- and buys back the 24px the second row
-     * cost, which is an extra session visible in the list. */
-    R_NEW = (gfx_rect){ 4, 3, 18, 18 };
-    {   int hot = HOVER && inside(R_NEW, MX, MY);
-        gfx_rrect(R_NEW.x, R_NEW.y, 18, 18, 4, hot ? C_SEL : C_SIDE);
-        pencil(R_NEW.x + 4, R_NEW.y + 4, C_INK2);
+        gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 20, 20, 5, th ? C_SEL : C_SIDE);
+        gfx_rrect_outline(R_TOGGLE.x + 4, R_TOGGLE.y + 4, 13, 12, 2, C_INK2);
+        gfx_vline(R_TOGGLE.x + 9, R_TOGGLE.y + 4, 12, C_INK2);
     }
 
     /* A heading over nothing is furniture. */
-    if (NCHATS) gfx_text(10, TOP_H + 2, "Recents", F_UI, C_INK3, C_SIDE);
+    if (NCHATS) gfx_text(9, TOP_H + 2, "Recents", F_SM, C_INK3, C_SIDE);
 
     /* The list SCROLLS. It used to break at the first row that did not fit, which silently hid up
      * to six of a twelve-session cap -- unreachable, with nothing on screen admitting it. Hiding
@@ -679,8 +658,11 @@ static void draw_sidebar(void) {
         /* +20, not +18: "Recents" is drawn at TOP_H+2 and F_UI's box is 15 tall, so it occupies rows
          * 26..40. R_CHAT[0] starts at top-2, so top must be at least 43 for the first row's
          * highlight not to sit on the heading's last row. 44 keeps CHAT_FIT at 8. */
-        int top = TOP_H + 20, bot = GFX_H - DOCK_H - 6;
-        CHAT_FIT = (bot - top) / 18;
+        /* F_SM's box is 13, so a row is 14 on a 15px pitch instead of 17-on-18. Between that and
+         * the reclaimed footer band, CHAT_FIT reaches 12 -- the whole MAX_CHATS cap, visible at
+         * once, so the scrollbar only ever appears if that cap changes. */
+        int top = TOP_H + 18, bot = GFX_H - 6;
+        CHAT_FIT = (bot - top) / 15;
         if (CHAT_FIT < 1) CHAT_FIT = 1;
         R_LIST = (gfx_rect){ 0, top - 4, SIDE_W, bot - top + 8 };
 
@@ -691,16 +673,35 @@ static void draw_sidebar(void) {
         int over = NCHATS > CHAT_FIT;
         int rowmax = over ? SIDE_W - 14 : SIDE_W - 8;   /* leave room for the bar when it shows */
 
+        /* One tick per draw. Reset when nothing is hovered so the next hover starts from the
+         * left rather than resuming mid-scroll. */
+        int any_hot = 0;
+        MARQ_T++;
+
         NCHAT_ROWS = 0;
         for (int r = 0; r < CHAT_FIT && CHAT_SCROLL + r < NCHATS; r++) {
-            int i = CHAT_SCROLL + r, y = top + r * 18;
+            int i = CHAT_SCROLL + r, y = top + r * 15;
             CHAT_AT[r] = i;
-            R_CHAT[r]  = (gfx_rect){ 4, y - 2, rowmax, 17 };
-            R_TRASH[r] = (gfx_rect){ rowmax - 12, y - 1, 14, 14 };
+            R_CHAT[r]  = (gfx_rect){ 4, y - 2, rowmax, 14 };
+            R_TRASH[r] = (gfx_rect){ rowmax - 13, y - 1, 13, 13 };
             int hot = HOVER && inside(R_CHAT[r], MX, MY);
+            if (hot) any_hot = 1;
             uint16_t bg = (i == CUR || hot) ? C_SEL : C_SIDE;
             if (i == CUR || hot) gfx_rrect(R_CHAT[r].x, R_CHAT[r].y, R_CHAT[r].w, R_CHAT[r].h, 5, bg);
-            gfx_text_ellipsis(10, y, CHATS[i].title, F_UI, C_INK, bg, rowmax - (hot ? 26 : 10));
+            {   int avail = rowmax - (hot ? 26 : 10);   /* the trash takes room only while hovered */
+                int tw = gfx_text_w(CHATS[i].title, F_SM);
+                if (hot && tw > avail) {
+                    if (MARQ_AT != i) { MARQ_AT = i; MARQ_T = 0; }
+                    int off = marq_off(MARQ_T, tw - avail);
+                    /* Clipped to the title band, so the scrolled tail cannot run under the trash
+                     * or out of the sidebar. */
+                    gfx_clip(9, y, avail, gfx_font_h(F_SM));
+                    gfx_text(9 - off, y, CHATS[i].title, F_SM, C_INK, bg);
+                    gfx_clip_reset();
+                } else {
+                    gfx_text_ellipsis(9, y, CHATS[i].title, F_SM, C_INK, bg, avail);
+                }
+            }
             if (hot) {                    /* trash appears only on hover, as on the web */
                 int tx = R_TRASH[r].x, ty = R_TRASH[r].y;
                 uint16_t tb = inside(R_TRASH[r], MX, MY) ? C_TRASH_HOT : bg;
@@ -714,9 +715,11 @@ static void draw_sidebar(void) {
             }
             NCHAT_ROWS = r + 1;
         }
+        if (!any_hot) MARQ_AT = -1;
+
         /* A scrollbar, so "there is more" is visible rather than inferred. */
         if (over) {
-            int track_h = CHAT_FIT * 18, tx = SIDE_W - 7;
+            int track_h = CHAT_FIT * 15, tx = SIDE_W - 7;
             int knob = track_h * CHAT_FIT / NCHATS; if (knob < 12) knob = 12;
             int ky = top - 2 + (track_h - knob) * CHAT_SCROLL / maxs;
             gfx_rrect(tx, top - 2, 3, track_h, 1, C_BAR);
@@ -724,20 +727,12 @@ static void draw_sidebar(void) {
         }
     }
 
-    gfx_hline(0, GFX_H - DOCK_H, SIDE_W, C_LINE);
-    /* `.side-foot` compressed to what 88 px holds. MEASURED, not eyeballed: F_UI is 15 px tall, so
-     * the web's three rows need 45 px in a 40 px dock, and "TI-Nspire CX II" alone is 86 px in an
-     * 88 px column -- the first attempt at a faithful port clipped both, visibly.
-     *
-     * So the two NUMBERS survive and the device name goes. The name is the one part the reader can
-     * already see (they are holding it); parameters and throughput are the part they cannot. The
-     * values carry their own units so the labels are not needed either, which is what buys the fit:
-     * 75 px and 56 px against 82 px of usable width. */
-    {   int fy = GFX_H - DOCK_H + 5, lh = gfx_font_h(F_UI);
-        gfx_text(6, fy,      "7.2M params", F_UI, C_INK2, C_SIDE);
-        gfx_text(6, fy + lh, "2.68 tok/s",  F_UI, C_INK3, C_SIDE);
-    }
+    /* No sidebar footer. It spent the whole DOCK_H band -- a sixth of the column -- restating two
+     * numbers that do not change while the app runs and that the poster and the README both carry.
+     * The list gets the band instead: CHAT_FIT goes from 8 rows to 10, which is most of the
+     * MAX_CHATS cap visible without scrolling. */
 }
+
 
 /* Text width available inside a question bubble, for a given pane width.
  *
@@ -868,15 +863,17 @@ static void draw_composer(int x0, int w, int cy) {
     }
     /* While generating, the send arrow becomes a STOP square -- the same control, so there is
      * always exactly one button there and it always does the thing the state calls for. */
-    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 20, cy + 2, 16, 16 };
+    /* 14, not 16. In a 20px field a 16px disc leaves 2px of margin and reads as a plug filling
+     * the end of the pill rather than as a button sitting inside it. */
+    R_SEND = (gfx_rect){ R_FIELD.x + R_FIELD.w - 18, cy + 3, 14, 14 };
     if (BUSY) {
-        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, C_INK);
-        gfx_fill(R_SEND.x + 5, R_SEND.y + 5, 6, 6, C_BG);
+        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 7, C_INK);
+        gfx_fill(R_SEND.x + 4, R_SEND.y + 4, 6, 6, C_BG);
     } else {
         uint16_t sb = COMPOSE_N ? C_INK : C_SEND_OFF;
-        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 8, sb);
-        for (int i = 0; i < 5; i++) gfx_hline(R_SEND.x + 8 - i, R_SEND.y + 5 + i, 1, C_BG);
-        gfx_vline(R_SEND.x + 8, R_SEND.y + 5, 7, C_BG);
+        gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 7, sb);
+        for (int i = 0; i < 4; i++) gfx_hline(R_SEND.x + 7 - i, R_SEND.y + 4 + i, 1, C_BG);
+        gfx_vline(R_SEND.x + 7, R_SEND.y + 4, 6, C_BG);
     }
 
 }
@@ -913,10 +910,6 @@ void app_event(const in_event *e) {
             return;
         }
         if (inside(R_EXIT, MX, MY)) { QUIT = 1; return; }
-        if (SIDEBAR && inside(R_THEME, MX, MY)) {   /* auto -> light -> dark -> auto */
-            app_set_theme((THEME_MODE + 1) % 3);
-            return;
-        }
         if (BUSY && inside(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
         if (inside(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
         if (inside(R_SEARCH, MX, MY)) {

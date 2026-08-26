@@ -78,7 +78,10 @@ int  app_clock_hour(void);
 /* 320x240 is a fifth the width of the desktop layout, so proportions are re-derived rather than
  * scaled: an 18%-wide sidebar would be 58px and unreadable, a scaled-down 260px would eat a
  * third of the screen. 88px holds ~13 characters of a chat title, which is the useful minimum. */
-#define SIDE_W   88
+/* 80, not 88. With the footer gone and the theme control gone the column carries three 20px icons
+ * and a list; 88 left dead space at both ends of the icon band and took 8px the transcript could
+ * use. At 80 the three icons distribute with equal 5px gaps -- 3*20 + 4*5 = 80 exactly. */
+#define SIDE_W   80
 #define TOP_H    24
 #define DOCK_H   40
 #define PAD      8
