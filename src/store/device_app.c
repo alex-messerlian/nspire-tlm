@@ -113,8 +113,17 @@ static void pointer_init(void) {
  * The remainder is carried in 1/256ths: the pad out-resolves the panel, so a plain divide throws
  * away every slow movement and the cursor simply refuses to budge under a careful finger.
  */
-static int DOWN, TRAVEL, HAVE_REF, REF_X, REF_Y, ACC_X, ACC_Y;
-#define TAP_SLOP 10           /* cursor px of travel still counted as a tap */
+static int DOWN, TRAVEL, HAVE_REF, REF_X, REF_Y, ACC_X, ACC_Y, PAD_TRAVEL, MOVING;
+#define TAP_SLOP  10          /* cursor px of travel still counted as a tap */
+/* A TAP MUST NOT MOVE THE POINTER, which is why clicking took two goes.
+ *
+ * The second sample after touch-down moved the cursor, so the finger jitter of a tap dragged the
+ * pointer a few pixels off whatever it was aimed at and the click landed elsewhere. Tapping again
+ * appeared to work only because the first tap had already shifted the cursor onto the target.
+ *
+ * Nothing moves until the finger has travelled past this much, in PAD units. Below it the touch is
+ * a tap; above it, it is a swipe and stays one for the rest of the contact. */
+#define MOVE_DEADZONE 7
 
 static int accel(int d) {
     int a = d < 0 ? -d : d;
@@ -122,10 +131,12 @@ static int accel(int d) {
     /* HALVED, roughly. The first curve topped out at 3.5x and a flick overshot the whole screen,
      * so the cursor arrived somewhere past wherever you were aiming. These reach 2x, which still
      * crosses most of the panel in one stroke while leaving the top end controllable. */
-    int mul = a < 4 ? 96             /* 0.375x: fine placement              */
-            : a < 10 ? 192           /* 0.75x                                */
-            : a < 20 ? 320           /* 1.25x                                */
-                     : 512;          /* 2x: a firm swipe still crosses far   */
+    /* Eased down again, about a fifth, to smooth the top end. The pointer was reported as good at
+     * the previous curve and just slightly quick. */
+    int mul = a < 4 ? 80             /* 0.31x: fine placement                */
+            : a < 10 ? 152           /* 0.59x                                 */
+            : a < 20 ? 256           /* 1x                                    */
+                     : 400;          /* 1.56x                                 */
     return d * mul;
 }
 
@@ -143,13 +154,21 @@ static int pointer_poll(in_event *e) {
     }
 
     if (!HAVE_REF) {                           /* first sample: anchor, do NOT move */
-        HAVE_REF = 1; DOWN = 1; TRAVEL = 0;
+        HAVE_REF = 1; DOWN = 1; TRAVEL = 0; PAD_TRAVEL = 0; MOVING = 0;
         REF_X = r.x; REF_Y = r.y; ACC_X = ACC_Y = 0;
         return 0;
     }
 
     int dx = r.x - REF_X, dy = REF_Y - r.y;    /* pad y is bottom-up */
     REF_X = r.x; REF_Y = r.y;
+
+    /* Below the dead zone this is still a tap. The reference keeps tracking, so when it does turn
+     * into a swipe the cursor carries on from where it is rather than jumping by the slack. */
+    if (!MOVING) {
+        PAD_TRAVEL += (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
+        if (PAD_TRAVEL <= MOVE_DEADZONE) return 0;
+        MOVING = 1;
+    }
 
     ACC_X += accel(dx) * GFX_W / (PAD_W ? PAD_W : 1);
     ACC_Y += accel(dy) * GFX_H / (PAD_H ? PAD_H : 1);

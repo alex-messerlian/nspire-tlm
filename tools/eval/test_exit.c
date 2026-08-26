@@ -308,7 +308,31 @@ int main(void) {
         click(R_NEW.x - 40, R_NEW.y + R_NEW.h / 2);
         T("a real miss still misses", CUR, 0);
 
-        /* MUTATION: an exact-rect hit test rejects the near miss the hover accepted. */
+        /* THE GAP BETWEEN TWO ICONS BELONGS TO THE NEARER ONE.
+     *
+     * A 10px pad on 24px plates set 28px apart makes neighbouring boxes overlap, and a first-match
+     * test would hand the whole overlap to whichever control happens to be checked first. Resolving
+     * by distance means the midpoint splits cleanly and no icon can steal its neighbour's clicks. */
+    {   reset(); CUR = -1; HOVER = 1; app_draw();
+        int y = R_NEW.y + R_NEW.h / 2;
+        int gap_l = R_NEW.x + R_NEW.w, gap_r = R_SEARCH.x;   /* the gap between icon 1 and 2 */
+        int mid = (gap_l + gap_r) / 2;
+        T("just left of the midpoint is New chat", hit(R_NEW, mid - 2, y), 1);
+        T("and NOT search",                        hit(R_SEARCH, mid - 2, y), 0);
+        T("just right of it is search",            hit(R_SEARCH, mid + 2, y), 1);
+        T("and NOT New chat",                      hit(R_NEW, mid + 2, y), 0);
+        T("exactly one control claims any point",
+          hit(R_NEW, mid - 2, y) + hit(R_SEARCH, mid - 2, y) + hit(R_TOGGLE, mid - 2, y), 1);
+
+        /* MUTATION: first-match over overlapping padded boxes gives BOTH a claim. */
+        int both = inside_pad(R_NEW, mid + 2, y, HIT_PAD) &&
+                   inside_pad(R_SEARCH, mid + 2, y, HIT_PAD);
+        if (!both) F++;
+        printf("  %s  mutant: padded boxes DO overlap (%d), so first-match would bias the gap\n",
+               both ? "CAUGHT" : "MISSED", both);
+    }
+
+    /* MUTATION: an exact-rect hit test rejects the near miss the hover accepted. */
         int caught = !inside(R_NEW, outside_x, mid_y);
         if (!caught) F++;
         printf("  %s  mutant: exact-rect hit testing, where a near miss does nothing\n",

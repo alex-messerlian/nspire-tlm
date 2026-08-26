@@ -89,6 +89,47 @@ static char STATUS[48], STATUS_MONO[40];
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
 static gfx_rect R_EXIT;
+/* Declared up here with the other controls rather than beside the search sheet's state, because
+ * hit testing has to see every control that competes for a click in one place. */
+static gfx_rect R_SEARCH;
+
+/* 10, and resolved by NEAREST rather than by first match.
+ *
+ * 5 was still too small. The obstacle to simply raising it is that the three sidebar icons sit on a
+ * 28px pitch with 24px plates, so anything past 2px of padding makes neighbouring boxes overlap --
+ * and with a first-match test the control checked earliest silently wins the whole overlap, which
+ * biases every near-miss towards one icon.
+ *
+ * So the question a click asks is not "am I inside this box" but "which control am I closest to,
+ * and is it close enough". Overlap stops mattering, because the midpoint between two neighbours
+ * always resolves to the nearer one. */
+#define HIT_PAD 10
+
+/* Squared distance from a point to a rect; 0 inside. Squared, to keep it integer. */
+static int rect_d2(gfx_rect r, int x, int y) {
+    int dx = x < r.x ? r.x - x : (x >= r.x + r.w ? x - (r.x + r.w - 1) : 0);
+    int dy = y < r.y ? r.y - y : (y >= r.y + r.h ? y - (r.y + r.h - 1) : 0);
+    return dx * dx + dy * dy;
+}
+static int inside_pad(gfx_rect r, int x, int y, int pad) {
+    return rect_d2(r, x, y) <= pad * pad;
+}
+
+/* Every control that competes for a click, in one place, so hover and hit testing cannot disagree
+ * about what exists. */
+static int nearest_is(gfx_rect r, int x, int y) {
+    if (rect_d2(r, x, y) > HIT_PAD * HIT_PAD) return 0;
+    /* No need to exclude r itself: its own distance equals `best`, and the test below is strict. */
+    int best = rect_d2(r, x, y);
+    gfx_rect *cand[] = { &R_NEW, &R_SEARCH, &R_TOGGLE, &R_EXIT, &R_SEND };
+    for (int i = 0; i < (int)(sizeof cand / sizeof cand[0]); i++) {
+        if (cand[i]->w <= 0) continue;
+        int d = rect_d2(*cand[i], x, y);
+        if (d < best) return 0;                /* something else is closer */
+    }
+    return 1;
+}
+static int hit(gfx_rect r, int x, int y) { return nearest_is(r, x, y); }
 /* Hover marquee for session titles.
  *
  * Titles are ellipsised at ~64px, which for a question is a few words -- often not enough to tell
@@ -238,13 +279,6 @@ static void clamp_scroll(int content_h, int view_h);
  * 5px on every side. Chosen so the three icons in the sidebar band, which sit on a 28px pitch,
  * gain reach without their boxes meeting: 24 + 5 + 5 = 34 would overlap, so the helper also stops
  * short of the midpoint between neighbours by clamping to the pitch. */
-#define HIT_PAD 5
-
-static int inside_pad(gfx_rect r, int x, int y, int pad) {
-    return x >= r.x - pad && x < r.x + r.w + pad &&
-           y >= r.y - pad && y < r.y + r.h + pad;
-}
-static int hit(gfx_rect r, int x, int y) { return inside_pad(r, x, y, HIT_PAD); }
 
 static int inside(gfx_rect r, int x, int y) {
     return x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
@@ -525,7 +559,7 @@ static int  SQ_N;
 static int  SHIT[MAX_CHATS], NSHIT, SSEL;
 static int  SSCROLL;                 /* first hit row drawn in the sheet */
 #define SHEET_ROWS 5                 /* what fits in a 320x240 sheet without covering the composer */
-static gfx_rect R_SEARCH, R_SROW[MAX_CHATS];
+static gfx_rect R_SROW[MAX_CHATS];
 
 #define MAX_TERMS 5
 #define TERM_MAX  20
