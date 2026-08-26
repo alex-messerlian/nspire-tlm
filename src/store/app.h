@@ -122,6 +122,7 @@ typedef struct {
  * rather than as a flag -- the app never has to know how the hardware spells "held". */
 #define K_NEW    0x110      /* ctrl+N */
 #define K_SEARCH 0x111      /* ctrl+S */
+#define K_PANEL  0x112      /* ctrl+B: show or hide the side panel */
 
 typedef struct {
     char  q[160];      /* the question as typed */

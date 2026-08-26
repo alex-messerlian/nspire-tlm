@@ -97,32 +97,71 @@ static void pointer_init(void) {
     if (ti && ti->width && ti->height) { PAD_W = ti->width; PAD_H = ti->height; }
 }
 
-/* NO POINTER. The touchpad SCROLLS and nothing else.
+/* RELATIVE, WITH ACCELERATION, which is the part the earlier relative attempt was missing.
  *
- * Three cursors were tried here -- absolute, then relative, then absolute again -- and all three
- * failed the same way: the pad is about 2 cm across, so aiming at a 24px control means either a
- * jump on touch-down or a stroke you cannot finish, and on an absolute pad the very tap that
- * commits a click also MOVES the cursor to wherever the finger landed. There is no OS cursor to
- * fall back on either: the SDK exposes no cursor API, and an Ndless program owns the framebuffer,
- * so the pointer the calculator draws in its own menus does not exist in here.
+ * A tap never teleports the cursor: touching down only anchors a reference, and the cursor moves
+ * by the DELTA of a swipe from there. That is the behaviour asked for, and it is what the absolute
+ * version got wrong.
  *
- * The app is driven by keys, which this keypad is genuinely good at, and the pad does the one
- * thing a pad this size does well. Vertical drags scroll.
+ * The reason the first relative attempt was unusable was gain, not principle. At a fixed 1.5x a
+ * 2 cm pad cannot cross a 320px screen in one stroke, so reaching anything meant repeated
+ * swipe-lift-swipe. Acceleration fixes that the way every real trackpad does: a slow swipe stays
+ * near 1:1 so a 24px control can be settled on precisely, while a fast one is multiplied so the
+ * whole screen is one flick away. Speed is measured per sample in pad units, and the multiplier is
+ * a step function rather than a curve because integer arithmetic here has to stay cheap.
+ *
+ * The remainder is carried in 1/256ths: the pad out-resolves the panel, so a plain divide throws
+ * away every slow movement and the cursor simply refuses to budge under a careful finger.
  */
+static int DOWN, TRAVEL, HAVE_REF, REF_X, REF_Y, ACC_X, ACC_Y;
+#define TAP_SLOP 10           /* cursor px of travel still counted as a tap */
+
+static int accel(int d) {
+    int a = d < 0 ? -d : d;
+    /* thresholds in PAD units per sample; tuned so a deliberate swipe crosses the screen */
+    int mul = a < 3 ? 128            /* 0.5x: fine placement                */
+            : a < 8 ? 256            /* 1x                                   */
+            : a < 18 ? 512           /* 2x                                   */
+                     : 896;          /* 3.5x: a flick crosses the screen     */
+    return d * mul;
+}
+
 static int pointer_poll(in_event *e) {
     touchpad_report_t r;
     if (touchpad_scan(&r) != 0) return 0;
 
-    static int last_y, have;
-    if (!r.contact) { have = 0; return 0; }
-    if (!have) { have = 1; last_y = r.y; return 0; }
+    if (!r.contact) {                         /* lift: drop the anchor, finish a tap */
+        HAVE_REF = 0;
+        if (DOWN) {
+            DOWN = 0;
+            if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; e->x = CX; e->y = CY; return 1; }
+        }
+        return 0;
+    }
 
-    int dy = last_y - r.y;                 /* pad y is bottom-up, screen y is top-down */
-    if (dy > -3 && dy < 3) return 0;       /* a resting finger jitters; ignore it */
-    last_y = r.y;
+    if (!HAVE_REF) {                           /* first sample: anchor, do NOT move */
+        HAVE_REF = 1; DOWN = 1; TRAVEL = 0;
+        REF_X = r.x; REF_Y = r.y; ACC_X = ACC_Y = 0;
+        return 0;
+    }
 
-    e->kind = IN_SCROLL;
-    e->dy = dy * GFX_H / (PAD_H ? PAD_H : 1);
+    int dx = r.x - REF_X, dy = REF_Y - r.y;    /* pad y is bottom-up */
+    REF_X = r.x; REF_Y = r.y;
+
+    ACC_X += accel(dx) * GFX_W / (PAD_W ? PAD_W : 1);
+    ACC_Y += accel(dy) * GFX_H / (PAD_H ? PAD_H : 1);
+    int mx = ACC_X / 256, my = ACC_Y / 256;
+    ACC_X -= mx * 256; ACC_Y -= my * 256;      /* keep the remainder */
+    if (!mx && !my) return 0;
+
+    TRAVEL += (mx < 0 ? -mx : mx) + (my < 0 ? -my : my);
+    CX += mx; CY += my;
+    if (CX < 0) CX = 0;
+    if (CX >= GFX_W) CX = GFX_W - 1;
+    if (CY < 0) CY = 0;
+    if (CY >= GFX_H) CY = GFX_H - 1;
+
+    e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1;
     return 1;
 }
 
@@ -132,12 +171,22 @@ static int keypad_poll(void) {
      * blocked waiting for a release. */
     static const t_key *held;
 
-    /* Ctrl first, and as a CHORD rather than a modifier flag: ctrl+N and ctrl+S are the only two,
-     * and returning them as their own codes keeps app.c from knowing anything about the keypad.
-     * Checked before the plain map or ctrl+N would arrive as a bare 'n' in the composer. */
+    /* THE RELEASE CHECK COMES FIRST. It used to sit after this branch, so a held ctrl+N re-fired
+     * start_new_chat() every pass: the screen sat on the new-chat view and never moved, which
+     * looks precisely like the shortcut doing nothing. ctrl+S was worse, reopening search with an
+     * empty query 40 times a second. */
+    if (held) {
+        if (isKeyPressed(*held)) return 0;     /* still down: already reported */
+        held = 0;
+    }
+
+    /* Ctrl as a CHORD rather than a modifier flag, so app.c never learns how this keypad spells
+     * "held". Checked before the plain map, or ctrl+N would arrive as a bare 'n' in the composer. */
     if (isKeyPressed(KEY_NSPIRE_CTRL)) {
         if (isKeyPressed(KEY_NSPIRE_N)) { held = &KEY_NSPIRE_N; return K_NEW; }
         if (isKeyPressed(KEY_NSPIRE_S)) { held = &KEY_NSPIRE_S; return K_SEARCH; }
+        if (isKeyPressed(KEY_NSPIRE_B)) { held = &KEY_NSPIRE_B; return K_PANEL; }
+        return 0;                              /* ctrl alone types nothing */
     }
     static const struct { const t_key *k; int c; } MAP[] = {
         { &KEY_NSPIRE_ESC, K_ESC }, { &KEY_NSPIRE_ENTER, K_ENTER }, { &KEY_NSPIRE_TAB, K_TAB },
@@ -163,10 +212,6 @@ static int keypad_poll(void) {
      * Now the key that is down is remembered and reported ONCE; the loop keeps running while it is
      * held, and the next press is only accepted after a release. Same one-character-per-press
      * behaviour, without stopping the world to get it. */
-    if (held) {
-        if (isKeyPressed(*held)) return 0;        /* still down: already reported, keep going */
-        held = 0;
-    }
     for (unsigned i = 0; i < sizeof MAP / sizeof MAP[0]; i++) {
         if (isKeyPressed(*MAP[i].k)) { held = MAP[i].k; return MAP[i].c; }
     }

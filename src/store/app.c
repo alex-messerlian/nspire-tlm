@@ -619,9 +619,9 @@ static void magnifier(int x, int y, int R, uint16_t c) {
     for (int j = -R; j <= R; j++)
         for (int i = -R; i <= R; i++) {
             int d = i * i + j * j;
-            if (d <= R * R && d > (R - 3) * (R - 3)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
+            if (d <= R * R && d > (R - 2) * (R - 2)) gfx_fill(x + R + i, y + R + j, 1, 1, c);
         }
-    for (int k = 0; k < R; k++) gfx_fill(x + 2*R - 1 + k, y + 2*R - 1 + k, 2, 2, c);  /* handle */
+    for (int k = 0; k < R - 1; k++) gfx_fill(x + 2*R - 2 + k, y + 2*R - 2 + k, 2, 1, c);  /* handle */
 }
 
 /* compose glyph for New chat: the web row has one and the device row did not, so the two rows sat
@@ -635,14 +635,14 @@ static void magnifier(int x, int y, int R, uint16_t c) {
 /* The panel-toggle and exit marks, as functions because each is drawn from TWO places now and a
  * second hand-inlined copy is how they diverge. Both are sized to the same 20x20 plate and the
  * same 1px weight as the magnifier and the pencil, so every control in the app is one class. */
-static void panel_icon(int x, int y, uint16_t c) {   /* 15x14 inside a 24x24 plate */
-    /* TWO nested outlines, not one. A 1px stroke at this size is a hairline on this panel and the
-     * icons read as unfinished beside the OS's own, which are heavier. Doubling the edge costs
-     * nothing and is the difference between a drawn icon and a sketched one. */
-    gfx_rrect_outline(x + 5, y + 5, 15, 14, 2, c);
-    gfx_rrect_outline(x + 6, y + 6, 13, 12, 1, c);
-    gfx_vline(x + 11, y + 5, 14, c);
-    gfx_vline(x + 12, y + 5, 14, c);
+/* ALL THREE GLYPHS ARE 16x16 ON THE SAME ORIGIN, x+4 y+4 inside a 24x24 plate, and all are 1px.
+ * Doubling the strokes made them heavy rather than larger, and each grew by a different amount so
+ * the three stopped matching each other. Size comes from the geometry now; weight does not. */
+static void panel_icon(int x, int y, uint16_t c) {
+    /* radius 2, not 3: at 16x14 the larger radius leaves visible gaps at each corner, so the box
+     * reads as broken rather than rounded. */
+    gfx_rrect_outline(x + 4, y + 5, 16, 14, 2, c);
+    gfx_vline(x + 10, y + 5, 14, c);
 }
 static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 optical box */
     for (int i = 0; i < 9; i++) {
@@ -652,16 +652,14 @@ static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 o
 }
 
 static void pencil(int x, int y, uint16_t c) {
-    /* Every edge 2px, for the same reason as panel_icon. */
-    for (int d = 0; d < 2; d++) {
-        gfx_hline(x,          y + 3 + d,  6, c);      /* top, stopping short of the corner */
-        gfx_vline(x + d,      y + 3,     10, c);      /* left */
-        gfx_hline(x,          y + 11 + d, 11, c);     /* bottom */
-        gfx_vline(x + 10 - d, y + 7,      5, c);      /* right, resuming below the gap */
-    }
-    for (int k = 0; k < 6; k++)                       /* the pencil, through the open corner */
-        gfx_fill(x + 5 + k, y + 6 - k, 2, 2, c);
-    gfx_fill(x + 4, y + 7, 3, 3, c);                  /* its tip */
+    /* A page open at its top-right corner, the pencil crossing the gap. 16x16, 1px. */
+    gfx_hline(x,      y + 5,  7, c);       /* top, stopping short of the corner */
+    gfx_vline(x,      y + 5, 14, c);       /* left */
+    gfx_hline(x,      y + 18, 15, c);      /* bottom */
+    gfx_vline(x + 14, y + 11, 8, c);       /* right, resuming below the gap */
+    for (int k = 0; k < 9; k++)            /* the pencil */
+        gfx_fill(x + 6 + k, y + 10 - k, 2, 1, c);
+    gfx_fill(x + 5, y + 11, 2, 2, c);      /* its tip */
 }
 
 /* Draw `s` with the parts matching any term in the BOLD face. The device had no equivalent of the
@@ -772,11 +770,11 @@ static void draw_sidebar(void) {
      * panel with this contrast; the ink moving from C_INK2 to C_INK is what actually reads. */
     {   int hot = HOVER && inside(R_NEW, MX, MY);
         gfx_rrect(R_NEW.x, R_NEW.y, 24, 24, 6, hot ? C_SEL : C_SIDE);
-        pencil(R_NEW.x + 5, R_NEW.y + 5, hot ? C_INK : C_INK2);
+        pencil(R_NEW.x + 4, R_NEW.y + 4, hot ? C_INK : C_INK2);
     }
     {   int sh = HOVER && inside(R_SEARCH, MX, MY);
         gfx_rrect(R_SEARCH.x, R_SEARCH.y, 24, 24, 6, sh ? C_SEL : C_SIDE);
-        magnifier(R_SEARCH.x + 5, R_SEARCH.y + 5, 5, sh ? C_INK : C_INK2);
+        magnifier(R_SEARCH.x + 4, R_SEARCH.y + 4, 6, sh ? C_INK : C_INK2);
     }
     {   int th = HOVER && inside(R_TOGGLE, MX, MY);
         gfx_rrect(R_TOGGLE.x, R_TOGGLE.y, 24, 24, 6, th ? C_SEL : C_SIDE);
@@ -1094,8 +1092,13 @@ static void draw_composer(int x0, int w, int cy) {
     } else {
         uint16_t sb = COMPOSE_N ? C_INK : C_SEND_OFF;
         gfx_rrect(R_SEND.x, R_SEND.y, R_SEND.w, R_SEND.h, 7, sb);
-        for (int i = 0; i < 4; i++) gfx_hline(R_SEND.x + 7 - i, R_SEND.y + 4 + i, 1, C_BG);
-        gfx_vline(R_SEND.x + 7, R_SEND.y + 4, 6, C_BG);
+        /* BOTH barbs. Only the left one was ever drawn, so the head was half an arrow -- the same
+         * mistake the cursor had. */
+        for (int i = 0; i < 4; i++) {
+            gfx_fill(R_SEND.x + 7 - i, R_SEND.y + 4 + i, 1, 1, C_BG);   /* left barb  */
+            gfx_fill(R_SEND.x + 7 + i, R_SEND.y + 4 + i, 1, 1, C_BG);   /* right barb */
+        }
+        gfx_vline(R_SEND.x + 7, R_SEND.y + 4, 7, C_BG);
     }
 
 }
@@ -1204,6 +1207,7 @@ void app_event(const in_event *e) {
         /* Chords work from anywhere, including mid-compose, which is the point of having them. */
         if (k == K_NEW)    { start_new_chat(); return; }
         if (k == K_SEARCH) { open_search(); return; }
+        if (k == K_PANEL)  { SIDEBAR = !SIDEBAR; return; }
         if (k == K_BACK) { if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0; return; }
         if (k == K_ENTER) {
             if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return; }
