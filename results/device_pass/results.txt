@@ -1,0 +1,90 @@
+
+=== bench_platform ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+A1_model_id_900A0000=0x00000202 (expect 0x202 for CX II)
+hwtype=1
+is_cx2=1
+A3_cpu_clock_hz=396000000
+power_state=BATTERY(396) -- valid
+pmu_raw_0x30=0x21020303
+pmu_raw_0x20=0x10000000
+pmu_raw_0x810=0x00000111
+cp15_main_id=0x41069265
+cp15_cache_type=0x1D112152
+cp15_control=0x0005107F
+caches_separate=yes (Harvard)
+A11_dcache=8192 bytes, 32-byte line, 4-way (raw size_f=4 assoc_f=2 M=0 len_f=2)
+A10_icache=16384 bytes, 32-byte line, 4-way (raw size_f=5 assoc_f=2 M=0 len_f=2)
+C1_fast_timer_measured_hz=98978534 (wiki claims 99000000)
+C5_resolution_ns=10.10
+C6_wrap_period_s=43 -- runs longer than this MUST handle wrap
+C7_timer_owned_by_os=fast=no (we configured it) slow=no (we configured it)
+A12_chase=1 KB: 14.99 ns/access (ticks=296915)
+A12_chase=2 KB: 15.15 ns/access (ticks=300061)
+A12_chase=4 KB: 15.15 ns/access (ticks=300050)
+A12_chase=8 KB: 15.16 ns/access (ticks=300234)
+A12_chase=16 KB: 211.33 ns/access (ticks=4183536)
+A12_chase=32 KB: 262.68 ns/access (ticks=5200037)
+A12_chase=64 KB: 262.68 ns/access (ticks=5200064)
+A12_chase=128 KB: 262.68 ns/access (ticks=5200065)
+A12_chase=256 KB: 262.68 ns/access (ticks=5200037)
+A12_note=cache size = largest KB before the latency step; line size needs a separate stride sweep
+
+=== bench_mac ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+timer_hz_derived=99000000 (APB = CPU/4, from the PMU)
+cpu_hz=396000000 (BATTERY(396) -- valid)
+B10_int8_naive_MMAC_s=47
+B10_cycles_per_MAC=8.28
+B11_int16_smla_MMAC_s=28
+B11_cycles_per_MAC=13.75 (architectural floor is 1.00)
+B11b_int16_plain_C_MMAC_s=22
+B11c_int8_word_MMAC_s=54 (1 LDR per 4 MACs)
+B11d_int8_word2_MMAC_s=53 (2 words/iter, loads further from use)
+B12_softfloat_MMAC_s=3
+B12_softfloat_slowdown_vs_B11=9x
+D4_crossover_note=compare B11 against B4 from bench_mem: int4 is compute-bound iff B11 < 2*B4/bytes_per_mac
+
+=== bench_flash ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+timer_hz_derived=99000000 (APB = CPU/4, from the PMU)
+B8_flash_seq_MB_s=2 (8388608 bytes, 64 KB chunks, first read after write -- may be OS-cached)
+B9_flash_rand4k_us=49526.9 per 4096-byte read (256 reads)
+B9_ple_verdict=PLE viable iff this x rows_per_token stays well under the per-token budget; at 2 tok/s that budget is 500 ms
+
+=== bench_mem ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+timer_hz_derived=99000000 (APB = CPU/4, from the PMU)
+B1_largest_malloc_bytes=22872064 (21 MB)
+B2_total_heap_bytes=26214400 in 25 x 1048576-byte chunks
+B2_total_heap_bytes=27918336 in 426 x 65536-byte chunks
+B4_dram_read_MB_s=97 (buf=4096 KB, reps=4, ticks=17039601)
+B5_memcpy_MB_s=73 (counting bytes copied, not touched)
+B7_sram_read_probe=0xE59FF018 0xE203000F 0x8F88CDAE 0x00000000 (offsets 0, 64K, 128K, 192K)
+B6_sram_read_MB_s=372 (32 KB window x 256 -- likely cache-resident, see note)
+B6_note=if B6 ~= B4 the window fit in D-cache and this measured cache, not SRAM; enlarge the window past A11 and rerun
+B7_sram_writable=NOT TESTED -- writing here may crash the OS; decide by hand from the read probe
+
+=== bench_forward ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+model=/documents/tlm/model4096.bin.tns
+
+=== bench_forward ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+model=/documents/tlm/model4096.bin.tns
+
+=== bench_forward ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+model=/documents/tlm/model4096.bin.tns
+
+=== bench_rtc ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+rtc_raw_first=1787717691 (0x6A8E683B)
+rtc_delta_over_5s=5 ticks in 163840 32k-counts (5.000 s)
+rtc_rate_hz=1.0000
+rtc_running=YES
+rtc_epoch_candidate_1=as-unix-1970: 2026-08-26 04:14:56 UTC
+rtc_epoch_candidate_2=as-2000-epoch: 2056-08-25 04:14:56 UTC
+rtc_epoch_candidate_3=as-ntp-1900:  438498954-07-04 11:15:12 UTC
+rtc_note=SDK gettimeofday() assigns this register straight to tv_sec (Unix). If candidate_1 matches your watch, that assumption holds on this unit.
+rtc_todo=STILL UNVERIFIED: battery-pull persistence, and whether the OS date setting writes this register. Set the clock in the OS, re-run, and compare.

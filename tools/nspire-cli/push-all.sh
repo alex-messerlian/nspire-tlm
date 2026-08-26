@@ -71,6 +71,30 @@ $NSP ls /models >/dev/null 2>&1 || { echo "  FATAL: /models does not exist"; exi
 $NSP ls /tlm    >/dev/null 2>&1 || { echo "  FATAL: /tlm does not exist"; exit 1; }
 echo "  /bench, /models and /tlm present"
 
+# ---- GS GATE ---------------------------------------------------------------------------------
+# Refuse to push a checkpoint the binary cannot load.
+#
+# THIS HAS NOW COST THREE DEVICE PASSES. read_checkpoint compares the file's group_size against the
+# compile-time FIXED_GS and exit()s on mismatch, so the failure is total and instant: the program
+# prints one line and vanishes. build/ holds BOTH a GS=32 and a GS=96 export of the same weights
+# with names a glance does not distinguish -- model4096.bin and model4096_gs96.bin -- and the
+# transfer set had the wrong one. Every program that loads a model died at the same line.
+#
+# A comment saying "use the gs96 one" is what failed twice. This is a check.
+GS_WANT=$(grep -oE '^#define FIXED_GS [0-9]+' src/runq_nspire.c | grep -oE '[0-9]+$')
+GS_HAVE=$(od -An -tu4 -j37 -N4 build/transfer/model4096.bin.tns 2>/dev/null | tr -d ' ')
+if [ -z "$GS_WANT" ] || [ -z "$GS_HAVE" ]; then
+    echo "  FATAL: could not read the group size from the binary or the checkpoint"; exit 1
+fi
+if [ "$GS_WANT" != "$GS_HAVE" ]; then
+    echo "  FATAL: build/transfer/model4096.bin.tns is GS=$GS_HAVE but the binary is built for GS=$GS_WANT."
+    echo "         read_checkpoint() will print FATAL and exit() on the device."
+    echo "         build/ has both exports; copy the matching one:"
+    echo "           cp build/model4096_gs96.bin build/transfer/model4096.bin.tns   # for GS=96"
+    exit 1
+fi
+echo "  GS gate: checkpoint and binary both GS=$GS_WANT"
+
 echo "--- programs ---"
 send tools/eval/eval_device.tns  /eval_device.tns
 send src/llama2.tns              /llama2.tns
