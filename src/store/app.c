@@ -25,6 +25,10 @@ static const uint16_t PAL_LIGHT[P_N] = {
     [P_RES] = HEX(0xEDF7F0), [P_RESLN] = HEX(0xCFE8D8), [P_RESFG] = HEX(0x186A3B),
     [P_ERR] = HEX(0xFDF2F2), [P_ERRFG] = HEX(0xA8342C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0xE6E6E6), [P_BAR] = HEX(0xEDEDED),
+    [P_DANGER] = HEX(0xD93025),
+    /* A real tint, not another grey. C_SEL renders 17 levels off white, which reads on a
+     * desktop panel and is close to invisible on a reflective calculator LCD in daylight. */
+    [P_SELTEXT] = HEX(0xBBD6F2),
     [P_EXIT_HOT] = HEX(0xF3D9D7), [P_FIELD] = HEX(0xFFFFFF), [P_FIELD_LN] = HEX(0xD7D7D7), [P_SEND_OFF] = HEX(0xD5D5D5),
     [P_SHEET] = HEX(0xFFFFFF),   /* white on a dimmed page */
 };
@@ -39,6 +43,10 @@ static const uint16_t PAL_DARK[P_N] = {
     [P_RES] = HEX(0x16281D), [P_RESLN] = HEX(0x27492F), [P_RESFG] = HEX(0x79D497),
     [P_ERR] = HEX(0x2C1B1B), [P_ERRFG] = HEX(0xF0857C),
     [P_SCRIM] = HEX(0x000000), [P_TRASH_HOT] = HEX(0x3A3A3A), [P_BAR] = HEX(0x333333),
+    /* Lighter than the light theme's red, not darker. Red on a dark ground loses contrast fast,
+     * and a warning nobody can read is decoration. */
+    [P_DANGER] = HEX(0xF87171),
+    [P_SELTEXT] = HEX(0x2C4A6B),
     [P_EXIT_HOT] = HEX(0x4A2A28), [P_FIELD] = HEX(0x303030), [P_FIELD_LN] = HEX(0x303030), [P_SEND_OFF] = HEX(0x3B3B3B),
     [P_SHEET] = HEX(0x383838),   /* lifted OFF the page, since the scrim cannot sink it */
 };
@@ -114,6 +122,47 @@ static const char *PERSIST;          /* NULL = do not persist (host harness) */
 static void persist(void) {
     if (PERSIST) chat_save(PERSIST, CHATS, NCHATS, CUR);
 }
+static unsigned NOW_MS;            /* wall clock the UI ticks on; set by app_set_now */
+
+/* THE CLIPBOARD. The device has no system clipboard, so this is it: one buffer, app-scoped.
+ *
+ * 512 bytes rather than the composer's 160, because copy has to be able to hold an answer that the
+ * composer could never accept. Paste truncates at the composer's own limit instead of refusing,
+ * since a paste that silently does nothing is the failure this project keeps writing rules about. */
+static char CLIP[512];
+static const char *FEEDBACK;        /* append-only rating log; 0 on the host */
+void app_set_feedback(const char *path) { FEEDBACK = path; }
+
+/* A short confirmation for actions that leave no visible trace. Copy is the case that needs it:
+ * without a receipt, pressing it looks exactly like pressing nothing. */
+static char TOAST[48];
+static unsigned TOAST_UNTIL;
+#define TOAST_MS 1600
+
+/* Appends one rating to the feedback log. The highlight is a receipt for the click; THIS is the
+ * record, and it is what makes a thumb worth pressing at all on a device nobody exports from.
+ *
+ * Append-only and flushed per press: the calculator loses power without warning, and a rating that
+ * only exists in a buffer is a rating that did not happen. */
+static void feedback_write(int up, const char *q, const char *a) {
+    if (!FEEDBACK) return;                    /* host tests have nothing to write to */
+    FILE *f = fopen(FEEDBACK, "a");
+    if (!f) return;
+    fprintf(f, "%s\t%s\t%s\n", up > 0 ? "up" : "down", q ? q : "", a ? a : "");
+    fclose(f);
+}
+
+static void toast(const char *msg) {
+    snprintf(TOAST, sizeof TOAST, "%s", msg);
+    TOAST_UNTIL = NOW_MS + TOAST_MS;
+}
+/* Returns 1 when something was copied, so the caller can say which. */
+static int clip_set(const char *s) {
+    if (!s || !*s) return 0;
+    snprintf(CLIP, sizeof CLIP, "%s", s);
+    return 1;
+}
+
 void app_set_persist(const char *path) {
     PERSIST = path;
     if (!path) return;
@@ -123,6 +172,20 @@ void app_set_persist(const char *path) {
 }
 static char COMPOSE[160];          /* what is being typed */
 static int  COMPOSE_N;
+static void clip_paste(void) {
+    if (!CLIP[0]) { toast("Clipboard is empty"); return; }
+    int room = (int)sizeof COMPOSE - 1 - COMPOSE_N;
+    if (room <= 0) { toast("Message box is full"); return; }
+    int n = (int)strlen(CLIP);
+    int take = n < room ? n : room;
+    memcpy(COMPOSE + COMPOSE_N, CLIP, (size_t)take);
+    COMPOSE_N += take; COMPOSE[COMPOSE_N] = 0;
+    /* Says so when it could not take all of it. Truncating quietly is how a paste looks like it
+     * worked and is not what was copied. */
+    if (take < n) toast("Pasted, trimmed to fit");
+    else          toast("Pasted");
+}
+
 static int  BUSY;
 
 /* live status, drawn above the streaming answer */
@@ -132,6 +195,17 @@ static char STATUS[48], STATUS_MONO[40];
  * about where something is -- they read the same rectangles. */
 static gfx_rect R_TOGGLE, R_NEW, R_CHAT[MAX_CHATS], R_TRASH[MAX_CHATS], R_FIELD, R_SEND;
 static gfx_rect R_EXIT;
+/* Copy / thumb-up / thumb-down, per turn. Recorded every frame, like every other rect here, so
+ * hover testing and click handling cannot disagree about what exists. */
+static int SEL_TURN = -1, SEL_SPAN = -1, SEL_A, SEL_B, SEL_ANCHOR, DRAGGING;
+static gfx_rect R_ANS[MAX_TURNS];      /* each answer's drawn block, for probing and for ctrl+c */
+static gfx_rect R_ACT[MAX_TURNS][3];
+static int NACT_ROWS;
+/* Reserved under EVERY answer, painted only on hover. Reserving it unconditionally is the point:
+ * revealing a control that also takes space would reflow the transcript under the pointer, so the
+ * thing you were reaching for moves as you reach for it. */
+#define ACT_H  16
+#define ACT_SZ 14
 /* Declared up here with the other controls rather than beside the search sheet's state, because
  * hit testing has to see every control that competes for a click in one place. */
 static gfx_rect R_SEARCH;
@@ -183,7 +257,7 @@ static int hit(gfx_rect r, int x, int y) { return nearest_is(r, x, y); }
  * it arrived, so the animation is driven by the redraw loop and needs no clock. */
 /* The app's millisecond clock, fed by app_set_now(). Declared ahead of BOTH animations because
  * each reads it, and the marquee's helper sits above the placeholder's table. */
-static unsigned NOW_MS;
+/* Declared above, beside the toast that needs it. */
 
 static int FIELD_FOCUS;      /* the composer is the typing target and says so */
 static int SEL_ROW;          /* keyboard selection in the session list */
@@ -334,6 +408,10 @@ void app_init(void) {
     SEL_ROW = 0;
     app_set_theme(THEME_MODE);   /* fill the palette before anything draws */
     NCHATS = 0; CUR = -1; SCROLL = 0; COMPOSE[0] = 0; COMPOSE_N = 0;
+    /* Selection is per-transcript, so it cannot survive a reset. Three separate defects in this
+     * file have been state that app_init forgot -- the sidebar, the marquee clock, and the modal
+     * settings flag, which ate the next test's clicks. */
+    SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; DRAGGING = 0;
 }
 int app_should_quit(void) { return QUIT; }
 
@@ -571,23 +649,117 @@ static int draw_status(int x, int y, int w, const char *label, const char *mono,
     return lh + 4;
 }
 
-static int draw_answer(int x, int y, int w, const char *raw, int draw) {
+/* ---- selection -------------------------------------------------------------------------------
+ * A selection is one contiguous byte range inside ONE text span of ONE answer.
+ *
+ * Not "anywhere on screen": an answer is a sequence of spans, each wrapped independently, and a
+ * range spanning two of them would have to describe text that is never laid out as one block. The
+ * copy BUTTON covers the whole-answer case, so the drag only has to cover the part of it a reader
+ * would pick out by hand. */
+
+/* Draws an answer, and optionally reports the span and byte offset under a pixel.
+ *
+ * ONE function for both, because a probe that walked spans differently than the draw would report
+ * the offset of a character that is not there. `draw` 0 measures, exactly as before. */
+static int draw_answer_ex(int x, int y, int w, const char *raw, int draw,
+                          int sel_span, int sel_a, int sel_b,
+                          int probe_x, int probe_y, int *out_span, int *out_off) {
     int lh = gfx_font_h(F_UI) + 2, cy = y;
     const char *p = raw;
     char buf[512]; sp_kind k;
+    int si = 0;
+    if (out_span) { *out_span = -1; *out_off = -1; }
     while ((p = span_next(p, &k, buf, sizeof buf)) != 0) {
         if (k == SP_TEXT) {
             const char *s = buf; while (*s == ' ') s++;
             if (*s) {
                 static char disp[640];
                 to_display(s, disp, sizeof disp);
-                int n = gfx_text_wrap(x, cy, disp, F_UI, C_INK, C_BG, w, lh, draw);
+                int n;
+                if (draw && si == sel_span && sel_b > sel_a)
+                    n = gfx_text_wrap_sel(x, cy, disp, F_UI, C_INK, C_BG, w, lh, sel_a, sel_b, C_SELTEXT);
+                else
+                    n = gfx_text_wrap(x, cy, disp, F_UI, C_INK, C_BG, w, lh, draw);
+                if (out_span && probe_y >= cy && probe_y < cy + n * lh) {
+                    int off = gfx_text_wrap_hit(x, cy, disp, F_UI, w, lh, probe_x, probe_y);
+                    if (off >= 0) { *out_span = si; *out_off = off; }
+                }
                 cy += n * lh;
+                si++;
             }
         }
         if (!*p) break;
     }
     return cy - y;
+}
+static int draw_answer(int x, int y, int w, const char *raw, int draw) {
+    return draw_answer_ex(x, y, w, raw, draw, -1, 0, 0, 0, -1, 0, 0);
+}
+
+/* The display text of the idx'th text span, derived the same way draw_answer_ex derives it. */
+static const char *span_disp(const char *raw, int idx) {
+    static char disp[640];
+    const char *p = raw; char buf[512]; sp_kind k; int si = 0;
+    while ((p = span_next(p, &k, buf, sizeof buf)) != 0) {
+        if (k == SP_TEXT) {
+            const char *s = buf; while (*s == ' ') s++;
+            if (*s) {
+                if (si == idx) { to_display(s, disp, sizeof disp); return disp; }
+                si++;
+            }
+        }
+        if (!*p) break;
+    }
+    return 0;
+}
+static int sel_active(void) { return SEL_TURN >= 0 && SEL_B > SEL_A; }
+static void sel_clear(void) { SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; }
+static const char *sel_text(void) {
+    static char out[512];
+    if (!sel_active() || CUR < 0 || SEL_TURN >= CHATS[CUR].nturns) return 0;
+    const char *d = span_disp(CHATS[CUR].turn[SEL_TURN].a, SEL_SPAN);
+    if (!d) return 0;
+    int dl = (int)strlen(d);
+    int a = SEL_A, b = SEL_B;
+    if (a < 0) a = 0;
+    if (b > dl) b = dl;                        /* the text can change under a stale selection */
+    if (b <= a) return 0;
+    int n = b - a;
+    if (n > (int)sizeof out - 1) n = (int)sizeof out - 1;
+    memcpy(out, d + a, (size_t)n); out[n] = 0;
+    return out;
+}
+static const char *answer_under_pointer(void) {
+    if (CUR < 0) return 0;
+    for (int i = 0; i < CHATS[CUR].nturns && i < MAX_TURNS; i++)
+        if (R_ANS[i].w > 0 && inside(R_ANS[i], MX, MY)) return CHATS[CUR].turn[i].a;
+    return 0;
+}
+/* Locates (turn, span, offset) under a pixel, using each answer's RECORDED draw origin so the
+ * probe lays the text out exactly where it was painted. */
+static int sel_probe(int x, int y, int *turn, int *span, int *off) {
+    if (CUR < 0) return 0;
+    for (int i = 0; i < CHATS[CUR].nturns && i < MAX_TURNS; i++) {
+        if (R_ANS[i].w <= 0 || !inside(R_ANS[i], x, y)) continue;
+        int sp, of;
+        draw_answer_ex(R_ANS[i].x, R_ANS[i].y, R_ANS[i].w, CHATS[CUR].turn[i].a, 0,
+                       -1, 0, 0, x, y, &sp, &of);
+        if (sp >= 0) { *turn = i; *span = sp; *off = of; return 1; }
+    }
+    return 0;
+}
+static void sel_begin(int x, int y) {
+    int tn, sp, of;
+    if (!sel_probe(x, y, &tn, &sp, &of)) { sel_clear(); return; }
+    SEL_TURN = tn; SEL_SPAN = sp; SEL_ANCHOR = of; SEL_A = SEL_B = of;
+}
+static void sel_extend(int x, int y) {
+    int tn, sp, of;
+    if (SEL_TURN < 0) { sel_begin(x, y); return; }
+    if (!sel_probe(x, y, &tn, &sp, &of)) return;      /* off the text: keep what we have */
+    if (tn != SEL_TURN || sp != SEL_SPAN) return;     /* drags do not cross blocks */
+    SEL_A = of < SEL_ANCHOR ? of : SEL_ANCHOR;
+    SEL_B = of < SEL_ANCHOR ? SEL_ANCHOR : of;
 }
 
 
@@ -719,6 +891,44 @@ static void blit(int x, int y, const char *const *rows, int n, uint16_t ink, uin
  * the circle -- thin on the diagonals, doubled on the axes -- which at this size reads as notches,
  * or as the user put it, a gear. R is kept in the signature because the search sheet draws a
  * smaller one. */
+/* The three answer actions, written out for the same reason as the lens and the cursor: every
+ * shape in this file that was generated by a loop has lost part of itself at least once. At 11px a
+ * thumb is four or five decisions wide, and a loop makes all of them badly. */
+static const char *IC_COPY[] = {
+    "   ########",
+    "   #      #",
+    "   #      #",
+    "#######   #",
+    "#     #   #",
+    "#     #   #",
+    "#     #####",
+    "#     #    ",
+    "#     #    ",
+    "#######    ",
+};
+static const char *IC_UP[] = {
+    "     ##    ",
+    "    #  #   ",
+    "    #  #   ",
+    "    #  #   ",
+    " ####  ####",
+    " #        #",
+    " #        #",
+    " #        #",
+    " ##########",
+};
+static const char *IC_DOWN[] = {
+    " ##########",
+    " #        #",
+    " #        #",
+    " #        #",
+    " ####  ####",
+    "    #  #   ",
+    "    #  #   ",
+    "    #  #   ",
+    "     ##    ",
+};
+
 static const char *LENS11[] = {
     "   ####   ",
     " ##    ## ",
@@ -1012,14 +1222,19 @@ static void draw_sidebar(void) {
             }
             if (hot) {                    /* trash appears only on hover, as on the web */
                 int tx = R_TRASH[r].x, ty = R_TRASH[r].y;
-                uint16_t tb = inside(R_TRASH[r], MX, MY) ? C_TRASH_HOT : bg;
-                gfx_rrect(tx, ty, 14, 14, 3, tb);
-                gfx_hline(tx + 3, ty + 4, 9, C_INK2);      /* lid */
-                gfx_hline(tx + 6, ty + 2, 3, C_INK2);      /* handle */
-                gfx_vline(tx + 4, ty + 5, 7, C_INK2);      /* body sides */
-                gfx_vline(tx + 10, ty + 5, 7, C_INK2);
-                gfx_hline(tx + 4, ty + 11, 7, C_INK2);     /* base */
-                gfx_vline(tx + 7, ty + 6, 5, C_INK2);      /* tine */
+                /* TWO hover levels, because they answer different questions. The row being hot
+                 * says "this is the session you are pointing at"; the icon being hot says "release
+                 * here and it is gone". Sharing one grey plate for both meant the only warning
+                 * before a destructive click was a plate the row already had. */
+                int on_icon = inside(R_TRASH[r], MX, MY);
+                uint16_t ink = on_icon ? C_DANGER : C_INK2;
+                gfx_rrect(tx, ty, 14, 14, 3, on_icon ? C_TRASH_HOT : bg);
+                gfx_hline(tx + 3, ty + 4, 9, ink);         /* lid */
+                gfx_hline(tx + 6, ty + 2, 3, ink);         /* handle */
+                gfx_vline(tx + 4, ty + 5, 7, ink);         /* body sides */
+                gfx_vline(tx + 10, ty + 5, 7, ink);
+                gfx_hline(tx + 4, ty + 11, 7, ink);        /* base */
+                gfx_vline(tx + 7, ty + 6, 5, ink);         /* tine */
             }
             NCHAT_ROWS = r + 1;
         }
@@ -1140,18 +1355,34 @@ static void draw_main(void) {
                 total += draw_status(0, 0, pw, STATUS, STATUS_MONO, 1, 0);
             else if (t->done && t->sum[0])
                 total += draw_status(0, 0, pw, t->sum, 0, 0, 0);
-            total += t->a[0] ? draw_answer(0, 0, pw, t->a, 0) + 10 : 20;
+            total += t->a[0] ? draw_answer(0, 0, pw, t->a, 0) + 10 + ACT_H : 20;
         }
         clamp_scroll(total, bot - top);
         int y = top + 6 - SCROLL;
         for (int i = 0; i < c->nturns; i++) {
             app_turn *t = &c->turn[i];
-            /* question, right-aligned in a bubble */
+            /* The question bubble SHRINKS TO ITS TEXT and sits flush right.
+             *
+             * It used to be drawn at a fixed `pw - 16` whatever the question said, so "hi" got the
+             * same slab as a three-line problem and the text sat against its left edge with a hand
+             * of empty bubble beside it. The comment here claimed "right-aligned" the whole time,
+             * which was true of nothing in the code beneath it.
+             *
+             * maxtw is still the cap, so the wrap and the line count are unchanged; the only new
+             * number is how much of that width the text actually uses. Measured and drawn at the
+             * SAME maxtw deliberately -- measuring at one width and drawing at another is the
+             * bubble defect that took a 60-case sweep to find, and it would come straight back if
+             * this wrapped at the shrunken width instead. */
             int lh = gfx_font_h(F_UI) + 2;
-            int lines = gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh, 0);
+            int maxtw = qbubble_textw(pw);
+            int lines = gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, maxtw, lh, 0);
+            int tw = gfx_text_wrap_w(t->q, F_UI, maxtw);
+            if (tw > maxtw) tw = maxtw;                  /* belt: never wider than the cap */
             int bh = lines * lh + 8;
-            gfx_rrect(px0 + 16, y, pw - 16, bh, 7, C_BUBBLE);
-            gfx_text_wrap(px0 + 24, y + 4, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh, 1);
+            int bw = tw + 16;                            /* 8px of padding on each side */
+            int bx = px0 + pw - bw;                      /* flush against the pane's right edge */
+            gfx_rrect(bx, y, bw, bh, 7, C_BUBBLE);
+            gfx_text_wrap(bx + 8, y + 4, t->q, F_UI, C_INK, C_BUBBLE, maxtw, lh, 1);
             y += bh + 8;
             /* The status line sits between the question and the answer: live while this turn is
              * generating, and the permanent one-line summary once it is done. */
@@ -1160,7 +1391,37 @@ static void draw_main(void) {
             else if (t->done && t->sum[0])
                 y += draw_status(px0, y, pw, t->sum, 0, 0, 1);
 
-            if (t->a[0]) y += draw_answer(px0, y, pw, t->a, 1) + 10;
+            if (t->a[0]) {
+                /* The selected span is highlighted by the SAME call that draws the rest, so a
+                 * highlight can never land on text that is not there. */
+                int ah = draw_answer_ex(px0, y, pw, t->a, 1,
+                                        i == SEL_TURN ? SEL_SPAN : -1, SEL_A, SEL_B,
+                                        0, -1, 0, 0);
+                /* Recorded for the drag probe and for ctrl+c with no selection. */
+                R_ANS[i] = (gfx_rect){ px0, y, pw, ah };
+                int ay = y + ah + 1;
+                /* The whole answer plus its reserved row is the hover target, not the icons alone.
+                 * Requiring the pointer to already be on a 14px control before that control
+                 * appears is a chicken-and-egg the reader cannot win. */
+                gfx_rect band = { px0, y, pw, ah + ACT_H };
+                int show = HOVER && inside(band, MX, MY);
+                for (int k = 0; k < 3; k++)
+                    R_ACT[i][k] = (gfx_rect){ px0 + k * (ACT_SZ + 4), ay, ACT_SZ, ACT_SZ };
+                if (i + 1 > NACT_ROWS) NACT_ROWS = i + 1;
+                /* A rating stays lit once given, hover or not: it is the answer to "what did I say
+                 * about this one", which is not a question about where the pointer is. */
+                for (int k = 0; k < 3; k++) {
+                    int rated = (k == 1 && t->rating > 0) || (k == 2 && t->rating < 0);
+                    if (!show && !rated) continue;
+                    gfx_rect r = R_ACT[i][k];
+                    int on = HOVER && inside(r, MX, MY);
+                    if (on) gfx_rrect(r.x, r.y, r.w, r.h, 3, C_TRASH_HOT);
+                    uint16_t ink = rated ? C_INK : (on ? C_INK : C_INK3);
+                    blit(r.x + 2, r.y + 2, k == 0 ? IC_COPY : k == 1 ? IC_UP : IC_DOWN,
+                         k == 0 ? 10 : 9, ink, C_BG);
+                }
+                y += ah + 10 + ACT_H;
+            }
             else { gfx_fill(px0, y + 4, 5, 9, C_INK); y += 20; }   /* streaming caret */
         }
     }
@@ -1176,6 +1437,17 @@ static void draw_main(void) {
         const char *note = "Please double-check responses.";
         gfx_text(x0 + (w - gfx_text_w(note, F_XS)) / 2, cy + compose_field_h(w) + 3,
                  note, F_XS, C_INK3, C_BG);
+    }
+
+    /* The toast, last, so it sits over everything. Copy and paste leave no other trace, and a
+     * control that looks identical whether it worked or not is the silence problem again. */
+    if (TOAST[0]) {
+        int tw = gfx_text_w(TOAST, F_SM) + 16, th = gfx_font_h(F_SM) + 8;
+        int tx = x0 + (w - tw) / 2, ty = GFX_H - dock - th - 6;
+        if (ty < TOP_H + 4) ty = TOP_H + 4;
+        gfx_rrect(tx, ty, tw, th, 5, C_SHEET);
+        gfx_rrect_outline(tx, ty, tw, th, 5, C_LINE);
+        gfx_text(tx + 8, ty + 4, TOAST, F_SM, C_INK, C_SHEET);
     }
 
 }
@@ -1232,14 +1504,35 @@ static const char *CURSOR[] = {
  * unfindable by any means other than being told. The theme moved out of the icon band for the
  * opposite reason: it is set once and then never touched, so it was spending a quarter of a
  * permanent row on a decision made on first run. */
+/* One number, used by the table below AND by the height that has to contain it. Two places knowing
+ * the row count is how the sheet overflowed three times. */
+#define SHORTCUT_N 7
+
 static void draw_settings(void) {
-    /* 150, not 132. The content is a title, a label, a chip row, a second label and five key rows,
-     * which comes to 142px from the top inset, and at 132 the last row drew straight through the
-     * bottom edge and onto the transcript. Sized to what it holds. */
-    /* 174. The timezone row adds 20px and at 150 the last shortcut line drew through the bottom
-     * edge onto the transcript -- the second time this sheet has outgrown a hardcoded height, so
-     * the render is checked for ink below it rather than trusted. */
-    const int W = 232, H = 174, X = (GFX_W - W) / 2, Y = 30;
+    /* THE HEIGHT IS COMPUTED, not written down. It was hardcoded at 132, then 150, then 174, and
+     * outgrew every one of them: each time the last row drew through the bottom edge and onto the
+     * transcript, and each time the fix was to measure the render and pick a bigger number. Adding
+     * ctrl+c and ctrl+v would have been the fourth.
+     *
+     * A constant that has to be re-derived whenever the content changes is a constant that will be
+     * wrong again. This sums the same row heights the drawing code below uses, so a new row cannot
+     * overflow it -- the sheet grows instead. */
+    const int lh_sm = gfx_font_h(F_SM);
+    const int H = 8                          /* top inset                        */
+               + gfx_font_h(F_UIB) + 6       /* title                            */
+               + lh_sm + 3 + 16 + 8          /* Appearance label, chips, gap     */
+               + lh_sm + 8                   /* time zone row                    */
+               + lh_sm + 2                   /* Shortcuts label                  */
+               + SHORTCUT_N * (lh_sm + 2)    /* the key rows                     */
+               + 8;                          /* bottom inset                     */
+    /* Y follows the height rather than leading it. 30 is where it belongs -- just under the top
+     * bar -- but a computed height can now exceed what is left below that line, and at exactly
+     * 240 the bottom border was clipped by the screen edge with a margin of 0. It floats up only
+     * as far as it has to, and only when it has to. */
+    const int W = 232, X = (GFX_W - W) / 2;
+    int Y = 30;
+    if (Y + H > GFX_H - 6) Y = GFX_H - 6 - H;
+    if (Y < 4) Y = 4;
     gfx_dim(C_SCRIM, 28);
     gfx_rrect(X - 1, Y - 1, W + 2, H + 2, 9, C_LINE);
     gfx_rrect(X, Y, W, H, 8, C_SHEET);
@@ -1301,12 +1594,13 @@ static void draw_settings(void) {
          * different chord entirely; both cases work but only one should be printed.
          * F_SM rather than F_XS: 9px is fine for a disclaimer nobody reads twice and too small for
          * a reference somebody is squinting at to learn the app. */
-        static const char *K[5][2] = {
+        static const char *K[SHORTCUT_N][2] = {
             { "ctrl n", "New chat" },   { "ctrl s", "Search" },
-            { "ctrl b", "Side panel" }, { "ctrl esc", "Quit" },
+            { "ctrl b", "Side panel" }, { "ctrl c", "Copy" },
+            { "ctrl v", "Paste" },      { "ctrl esc", "Quit" },
             { "esc",    "Back" },
         };
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < SHORTCUT_N; i++) {
             gfx_text(X + 10, y, K[i][0], F_SM, C_INK2, C_SHEET);
             gfx_text(X + 76, y, K[i][1], F_SM, C_INK3, C_SHEET);
             y += gfx_font_h(F_SM) + 2;
@@ -1442,6 +1736,10 @@ int app_set_now(unsigned ms) {
     if (BUSY) return 1;                       /* a running turn owns the screen */
 
     int moved = 0;
+    /* A toast has to be redrawn when it EXPIRES, not only when it appears -- otherwise it hangs on
+     * screen until something else happens to trigger a frame, which on an idle calculator can be
+     * a long time. */
+    if (TOAST[0] && ms >= TOAST_UNTIL) { TOAST[0] = 0; moved = 1; }
     if (CUR < 0 && !COMPOSE_N && !SEARCH_ON) {
         /* the rotating placeholder: only while it is the thing on screen */
         unsigned cycle = ASK_HOLD_MS + ASK_SLIDE_MS;
@@ -1479,7 +1777,15 @@ static void start_new_chat(void) { CUR = -1; SCROLL = 0; COMPOSE_N = 0; COMPOSE[
 static void open_search(void)    { SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); }
 
 void app_event(const in_event *e) {
-    if (e->kind == IN_MOVE)  { MX = e->x; MY = e->y; HOVER = e->hover; return; }
+    if (e->kind == IN_MOVE)  {
+        MX = e->x; MY = e->y; HOVER = e->hover;
+        /* Press starts a selection, press-and-move extends it, release leaves it standing. The
+         * selection outlives the drag deliberately: ctrl+c comes after the finger lifts. */
+        if (e->pressed && !DRAGGING)      { DRAGGING = 1; sel_begin(MX, MY); }
+        else if (e->pressed && DRAGGING)  { sel_extend(MX, MY); }
+        else if (!e->pressed && DRAGGING) { DRAGGING = 0; }
+        return;
+    }
     if (e->kind == IN_SCROLL) {
         /* over the sidebar the wheel moves the SESSION LIST; over the pane it moves the transcript */
         if (SIDEBAR && !SEARCH_ON && inside(R_LIST, MX, MY)) {
@@ -1492,6 +1798,10 @@ void app_event(const in_event *e) {
 
     if (e->kind == IN_CLICK) {
         MX = e->x; MY = e->y;
+        /* A plain tap drops the selection, as it does everywhere else. A press-DRAG never reaches
+         * here: the pointer layer reports its release as a move, precisely so the gesture that
+         * makes a selection cannot also be the gesture that clears it. */
+        sel_clear();
         if (SETTINGS_ON) {
             /* Modal: it consumes clicks under it, and a click outside closes it. */
             if (inside(R_SET_TZM, MX, MY)) { app_set_tz_index(app_tz_index() - 1); return; }
@@ -1519,6 +1829,29 @@ void app_event(const in_event *e) {
         }
         if (hit(R_EXIT, MX, MY)) { SETTINGS_ON = !SETTINGS_ON; return; }
         if (BUSY && hit(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
+        /* Answer actions. Tested before the sidebar and the composer because they sit in the
+         * transcript, which nothing else claims. inside() rather than hit(): these are three 14px
+         * controls 4px apart, and hit()'s 10px slop would let a press between two of them resolve
+         * to whichever is nearer -- fine for a lone button in a corner, wrong for a cluster where
+         * the neighbour is thumbs-DOWN. */
+        if (CUR >= 0) {
+            for (int i = 0; i < NACT_ROWS && i < CHATS[CUR].nturns; i++) {
+                app_turn *t = &CHATS[CUR].turn[i];
+                if (inside(R_ACT[i][0], MX, MY)) {
+                    toast(clip_set(t->a) ? "Copied" : "Nothing to copy"); return;
+                }
+                if (inside(R_ACT[i][1], MX, MY)) {
+                    t->rating = t->rating > 0 ? 0 : 1;      /* pressing again clears it */
+                    if (t->rating) feedback_write(1, t->q, t->a);
+                    return;
+                }
+                if (inside(R_ACT[i][2], MX, MY)) {
+                    t->rating = t->rating < 0 ? 0 : -1;
+                    if (t->rating) feedback_write(-1, t->q, t->a);
+                    return;
+                }
+            }
+        }
         if (hit(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
         if (hit(R_SEARCH, MX, MY)) { open_search(); return; }
         if (SIDEBAR) {
@@ -1579,6 +1912,15 @@ void app_event(const in_event *e) {
         if (k == K_NEW)    { start_new_chat(); return; }
         if (k == K_SEARCH) { open_search(); return; }
         if (k == K_PANEL)  { SIDEBAR = !SIDEBAR; return; }
+        if (k == K_PASTE)  { clip_paste(); return; }
+        if (k == K_COPY)   {
+            /* Selection first, since that is what the reader just made. Failing that, the answer
+             * under the pointer, so ctrl+c does the obvious thing without a drag. */
+            if (sel_active()) { toast(clip_set(sel_text()) ? "Copied" : "Nothing to copy"); return; }
+            const char *a = answer_under_pointer();
+            toast(a && clip_set(a) ? "Copied" : "Select some text first");
+            return;
+        }
         if (k == K_BACK) { if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0; return; }
         if (k == K_ENTER) {
             if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return; }

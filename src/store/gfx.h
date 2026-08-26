@@ -59,6 +59,20 @@ int  gfx_text_ellipsis(int x, int y, const char *utf8, gfx_font f, uint16_t fg, 
  * call site would be a second copy of the wrapping rule, and the two would drift. */
 int  gfx_text_wrap_ex(int x, int y, const char *utf8, gfx_font f, uint16_t fg, uint16_t bg,
                       int maxw, int line_h, int draw, int *out_last_w);
+/* Width of the WIDEST line when `utf8` is wrapped at `maxw`, so a box can be sized to its text.
+ * gfx_text_wrap_ex reports the LAST line, which is the wrong number for this: the last line of a
+ * two-line question is usually the short one. */
+int  gfx_text_wrap_w(const char *utf8, gfx_font f, int maxw);
+
+/* Draws with the BYTE RANGE [sel_a, sel_b) on `selbg`. Offsets are into `utf8` itself, so a caller
+ * can hold a selection without holding a copy of the laid-out text. */
+int  gfx_text_wrap_sel(int x, int y, const char *utf8, gfx_font f, uint16_t fg, uint16_t bg,
+                       int maxw, int line_h, int sel_a, int sel_b, uint16_t selbg);
+/* The inverse: the byte offset under pixel (px, py), or -1 when that pixel is not on any line.
+ * Past the end of a line returns that line's end rather than -1, so a drag off the right edge
+ * selects to the end of the line instead of dropping the selection. */
+int  gfx_text_wrap_hit(int x, int y, const char *utf8, gfx_font f, int maxw, int line_h,
+                       int px, int py);
 int  gfx_text_wrap(int x, int y, const char *utf8, gfx_font f, uint16_t fg, uint16_t bg,
                    int maxw, int line_h, int draw);
 #endif

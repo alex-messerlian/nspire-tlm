@@ -37,7 +37,35 @@ int main(void) {
         /* P_SCRIM is legitimately black in both, so compare against its known value instead */
         T("light palette fully populated", zl - (PAL_LIGHT[P_SCRIM] == 0), 0);
         T("dark palette fully populated",  zd - (PAL_DARK[P_SCRIM] == 0), 0);
-        T("every index has a name", P_N, 23); }
+        /* A tripwire on the COUNT, so adding a palette slot cannot pass without someone deciding
+         * what it looks like in both themes and whether it is readable. Bump it deliberately. */
+        T("every index has a name", P_N, 25); }
+
+    printf("\n  -- the danger red is READABLE where it is actually drawn --\n");
+    {   /* The trash renders on the sidebar, and on C_TRASH_HOT once the pointer is on the icon
+         * itself, so both grounds are asserted. 3.0 is the large/graphic threshold: this is a 14px
+         * icon made of 1px strokes, not body text. A red nobody can read is decoration, and the
+         * dark theme is where that fails silently -- a red dark enough to look right on white
+         * disappears into a dark sidebar. */
+        T("light: danger on the sidebar",   ratio(PAL_LIGHT[P_DANGER], PAL_LIGHT[P_SIDE]) >= 3.0, 1);
+        T("dark:  danger on the sidebar",   ratio(PAL_DARK[P_DANGER],  PAL_DARK[P_SIDE])  >= 3.0, 1);
+        T("light: danger on its hot plate", ratio(PAL_LIGHT[P_DANGER], PAL_LIGHT[P_TRASH_HOT]) >= 3.0, 1);
+        T("dark:  danger on its hot plate", ratio(PAL_DARK[P_DANGER],  PAL_DARK[P_TRASH_HOT])  >= 3.0, 1);
+        /* And it must READ as a warning, not as more ink: distinct from the colour the icon uses
+         * when it is merely revealed. Identical values would pass every contrast arm above. */
+        T("light: danger differs from rest state", PAL_LIGHT[P_DANGER] != PAL_LIGHT[P_INK2], 1);
+        T("dark:  danger differs from rest state", PAL_DARK[P_DANGER]  != PAL_DARK[P_INK2],  1); }
+
+    printf("\n  -- selected text stays READABLE, and the band is actually visible --\n");
+    {   /* The first selection band was C_SEL, 17 levels off white. It passed every contrast arm
+         * that asked about the TEXT and was nearly invisible on the device, because nothing asked
+         * whether the BAND could be told from the page. Both questions are asked here. */
+        T("light: ink on the band", ratio(PAL_LIGHT[P_INK], PAL_LIGHT[P_SELTEXT]) >= 4.5, 1);
+        T("dark:  ink on the band", ratio(PAL_DARK[P_INK],  PAL_DARK[P_SELTEXT])  >= 4.5, 1);
+        T("light: the band differs from the page",
+          ratio(PAL_LIGHT[P_SELTEXT], PAL_LIGHT[P_BG]) >= 1.25, 1);
+        T("dark:  the band differs from the page",
+          ratio(PAL_DARK[P_SELTEXT],  PAL_DARK[P_BG])  >= 1.25, 1); }
 
     /* The composer fill is a token now, and it must actually differ from the page in BOTH themes --
      * that is the whole reason it is not C_BG. In dark the field is #303030 on a #0d0d0d page; in

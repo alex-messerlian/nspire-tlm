@@ -18,6 +18,8 @@ enum {
     P_BG, P_SIDE, P_LINE, P_INK, P_INK2, P_INK3, P_BUBBLE, P_SEL,
     P_TOOL, P_TOOLLN, P_RES, P_RESLN, P_RESFG, P_ERR, P_ERRFG,
     P_SCRIM, P_TRASH_HOT, P_BAR, P_EXIT_HOT, P_FIELD, P_FIELD_LN, P_SEND_OFF, P_SHEET,
+    P_DANGER,          /* destructive intent: the trash under a direct pointer */
+    P_SELTEXT,         /* the band behind selected text */
     P_N
 };
 extern uint16_t TLM_PAL[P_N];
@@ -51,6 +53,8 @@ extern uint16_t TLM_PAL[P_N];
  * scrim cannot darken a near-black ground -- 28% of nothing is nothing once RGB565 quantises it --
  * so in dark the sheet must LIFT off the page instead of the page sinking behind it. */
 #define C_SHEET     TLM_PAL[P_SHEET]
+#define C_DANGER    TLM_PAL[P_DANGER]
+#define C_SELTEXT   TLM_PAL[P_SELTEXT]
 
 /* Three states, cycled by the header button, matching the web exactly:
  *   TH_AUTO   follow the device -- on the calculator that means the CLOCK, since the Nspire OS has
@@ -114,6 +118,11 @@ typedef struct {
     in_kind kind;
     int x, y;          /* cursor position, screen pixels */
     int hover;         /* pointer is near the pad but not pressed -- drives hover states */
+    /* The touchpad's PHYSICAL click, which is a different thing from `hover`: contact is a finger
+     * resting on the pad, pressed is that finger pushing it down. Hover moves the cursor; pressed
+     * and moving drags a selection. Without the distinction there is no gesture left for
+     * selecting, because plain movement is already spoken for. */
+    int pressed;
     int key;           /* ASCII, or one of the K_ codes below */
     int dy;            /* scroll delta */
 } in_event;
@@ -130,6 +139,8 @@ typedef struct {
 #define K_SEARCH 0x111      /* ctrl+S */
 #define K_PANEL  0x112      /* ctrl+B: show or hide the side panel */
 #define K_QUIT   0x113      /* ctrl+Q: leave, since ESC no longer does */
+#define K_COPY   0x114
+#define K_PASTE  0x115
 
 typedef struct {
     char  q[160];      /* the question as typed */
@@ -139,6 +150,11 @@ typedef struct {
      * model having produced well-formed markup, which is exactly what fails 50% of the time. */
     char  sum[72];
     int   done;
+    /* -1 down, 0 unrated, +1 up. IN MEMORY ONLY, deliberately: persisting it would change
+     * chat_load's field order and silently discard every chat already on the device, and the
+     * durable half of this signal is the feedback file, which app_set_feedback appends to on every
+     * press. The highlight is a receipt for the click, not the record. */
+    signed char rating;
 } app_turn;
 
 #define MAX_TURNS 16
@@ -151,6 +167,9 @@ typedef struct {
     int used;
 } app_chat;
 
+/* Where thumbs-up/down land. Append-only, one line per press, so a rating survives even though
+ * the highlight does not. Pass 0 to disable (the host tests have no filesystem to write to). */
+void app_set_feedback(const char *path);
 void app_init(void);
 void app_event(const in_event *e);
 void app_draw(void);

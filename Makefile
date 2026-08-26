@@ -43,7 +43,7 @@ HOST_LINK := src/store/gfx.c src/store/chatstore.c $(BUILD)/hoststub.o
 # ---- host tests ------------------------------------------------------------------------------
 # Two groups, because they differ in what they link. INCLUDES_APP suites #include app.c directly to
 # reach its file-scope state; the others link toolrun.c and the evaluator.
-TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme
+TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme test_select
 TESTS_EVAL := test_toolrun
 TESTS_PLAIN:= test_chatstore test_ckpt
 TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN)

@@ -99,6 +99,19 @@ int main(int argc, char **argv) {
         MX = 300; MY = 220;                 /* cursor parked off the sheet */
     } else if (!strcmp(screen, "chat")) {
         CUR = 2; MX = 300; MY = 220;
+    } else if (!strcmp(screen, "actions")) {
+        /* Pointer parked on the first answer, which is what reveals the action row. The transcript
+         * has to be drawn once first: R_ANS is filled during the draw, and hovering is meaningless
+         * before anything knows where the answer is. */
+        CUR = 2; HOVER = 1; MX = 300; MY = 220;
+        app_draw();
+        MX = R_ANS[0].x + 20; MY = R_ANS[0].y + 6;
+    } else if (!strcmp(screen, "selected")) {
+        /* A live selection, made the way a drag makes one: probe the text, then extend. */
+        CUR = 2; HOVER = 1; MX = 300; MY = 220;
+        app_draw();
+        sel_begin(R_ANS[0].x + 4, R_ANS[0].y + 4);
+        sel_extend(R_ANS[0].x + 120, R_ANS[0].y + 4);
     } else if (!strcmp(screen, "typing") || !strcmp(screen, "typinglong")) {
         CUR = 2; MX = 300; MY = 220;
         const char *s = !strcmp(screen, "typinglong")

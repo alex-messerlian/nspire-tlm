@@ -126,6 +126,8 @@ static int DOWN, TRAVEL, HAVE_REF, REF_X, REF_Y, ACC_X, ACC_Y, PAD_TRAVEL, MOVIN
  * a tap; above it, it is a swipe and stays one for the rest of the contact. */
 #define MOVE_DEADZONE 7
 
+static int WAS_PRESSED;                   /* touchpad click state, for drag detection */
+
 static int accel(int d) {
     int a = d < 0 ? -d : d;
     /* thresholds in PAD units per sample; tuned so a deliberate swipe crosses the screen */
@@ -147,11 +149,26 @@ static int pointer_poll(in_event *e) {
 
     if (!r.contact) {                         /* lift: drop the anchor, finish a tap */
         HAVE_REF = 0;
+        /* A press-drag ends here, and it is NOT a tap however little the cursor moved: reporting a
+         * click would clear the selection the drag just made. */
+        if (WAS_PRESSED) {
+            WAS_PRESSED = 0; DOWN = 0; TRAVEL = 0;
+            e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1; e->pressed = 0;
+            return 1;
+        }
         if (DOWN) {
             DOWN = 0;
             if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; e->x = CX; e->y = CY; return 1; }
         }
         return 0;
+    }
+
+    /* The press EDGE is reported even with no movement, so the app sees where a drag started.
+     * Everything below only fires when the cursor actually moves, which would swallow a press. */
+    if (r.pressed != WAS_PRESSED) {
+        WAS_PRESSED = r.pressed;
+        e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1; e->pressed = r.pressed;
+        return 1;
     }
 
     if (!HAVE_REF) {                           /* first sample: anchor, do NOT move */
@@ -184,7 +201,7 @@ static int pointer_poll(in_event *e) {
     if (CY < 0) CY = 0;
     if (CY >= GFX_H) CY = GFX_H - 1;
 
-    e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1;
+    e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1; e->pressed = r.pressed;
     return 1;
 }
 
@@ -222,6 +239,9 @@ static int keypad_poll(void) {
         struct { const t_key *k; int c; } CH[] = {
             { &KEY_NSPIRE_N, K_NEW }, { &KEY_NSPIRE_S, K_SEARCH },
             { &KEY_NSPIRE_B, K_PANEL }, { &KEY_NSPIRE_ESC, K_QUIT },
+            /* Both chord styles come free: the sticky-ctrl logic above already accepts ctrl held
+             * with the letter, or ctrl tapped and released and then the letter. */
+            { &KEY_NSPIRE_C, K_COPY }, { &KEY_NSPIRE_V, K_PASTE },
         };
         for (unsigned i = 0; i < sizeof CH / sizeof CH[0]; i++) {
             if (isKeyPressed(*CH[i].k)) {
@@ -549,6 +569,8 @@ int main(void) {
     /* Sessions survive the run. RAM-only was tolerable while exiting was obscure; it stopped being
      * so the moment there was a button for it. */
     app_set_persist(dpath("chats.tns.tns"));
+    /* Ratings outlive the highlight: one line per press, appended. */
+    app_set_feedback(dpath("feedback.tns.tns"));
     app_draw();
 
     /* THE LOOP DECIDES WHEN TO PAINT, and that is the whole fix for both the lag and the animation.

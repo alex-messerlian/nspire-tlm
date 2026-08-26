@@ -185,17 +185,32 @@ int gfx_text_ellipsis(int x, int y, const char *s, gfx_font f, uint16_t fg, uint
     return x - x0;
 }
 
-int gfx_text_wrap(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t bg,
-                  int maxw, int line_h, int draw) {
-    return gfx_text_wrap_ex(x, y, s, f, fg, bg, maxw, line_h, draw, 0);
-}
-int gfx_text_wrap_ex(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t bg,
-                     int maxw, int line_h, int draw, int *out_last_w) {
+/* ONE WRAP WALK. Everything that wraps text goes through this.
+ *
+ * There were three copies of this loop by the time selection needed a fourth -- draw, measure-last,
+ * measure-widest -- each carrying its own transcription of the break rule: longest prefix that
+ * fits, broken at the last space, hard-broken when a single word exceeds the line. Every copy is a
+ * place the rule can drift, and a measure that breaks differently than the draw is exactly the
+ * bubble-width defect this file already carries a warning about. The public functions below are
+ * thin callers; none of them reimplements the walk.
+ *
+ * Optional outputs, all skippable:
+ *   out_last_w  width of the LAST line          (caret placement)
+ *   out_widest  width of the WIDEST line        (sizing a box to its text)
+ *   sel_a/sel_b BYTE range drawn on selbg       (selection highlight)
+ *   probe_x/y   a pixel; out_off gets the byte offset under it, or -1
+ * Returns the line count in every mode. */
+static int wrap_walk(int x, int y, const char *s0, gfx_font f, uint16_t fg, uint16_t bg,
+                     int maxw, int line_h, int draw,
+                     int *out_last_w, int *out_widest,
+                     int sel_a, int sel_b, uint16_t selbg,
+                     int probe_x, int probe_y, int *out_off) {
     fontref F = fref(f);
-    int lines = 0;
+    const char *s = s0;
+    int lines = 0, widest = 0;
+    if (out_off) *out_off = -1;
     while (*s) {
-        /* find the longest prefix that fits, breaking at the last space */
-        const char *p = s, *lastsp = 0;
+        const char *start = s, *p = s, *lastsp = 0;
         int w = 0; unsigned cp;
         while (*p) {
             const char *nx = u8(p, &cp);
@@ -206,24 +221,79 @@ int gfx_text_wrap_ex(int x, int y, const char *s, gfx_font f, uint16_t fg, uint1
             w += gw; p = nx;
         }
         const char *end = *p ? (lastsp ? lastsp : p) : p;
-        if (end == s) end = p;                /* a single word longer than the line: hard-break */
-        if (out_last_w) {                     /* width of THIS line; the last one to run wins */
-            int lw = 0; const char *q = s; unsigned c2;
+        if (end == start) end = p;            /* a single word longer than the line: hard-break */
+
+        if (out_last_w || out_widest) {       /* width of THIS line */
+            int lw = 0; const char *q = start; unsigned c2;
             while (q < end) { q = u8(q, &c2); const ns_glyph *g = find(F, c2); if (g) lw += g->w; }
-            *out_last_w = lw;
+            if (out_last_w) *out_last_w = lw; /* the last line to run wins */
+            if (lw > widest) widest = lw;
         }
-        if (draw) {
-            int xx = x; const char *q = s;
+
+        int ly = y + lines * line_h;
+        /* PROBE and DRAW share one glyph walk, so the offset reported is the offset of the glyph
+         * actually painted there. Two walks would let a hit land one character off. */
+        if (draw || (out_off && probe_y >= ly && probe_y < ly + line_h)) {
+            int xx = x; const char *q = start;
+            int on_line = out_off && probe_y >= ly && probe_y < ly + line_h;
+            /* A click past the end of a line selects to the line end, not nothing. */
+            if (on_line && probe_x < x) *out_off = (int)(start - s0);
             while (q < end) {
+                const char *qs = q;
                 q = u8(q, &cp);
                 const ns_glyph *g = find(F, cp);
-                if (g) xx += draw_glyph(xx, y + lines * line_h, g, F, fg, bg);
+                int gw = g ? g->w : 0;
+                if (draw && g) {
+                    int off = (int)(qs - s0);
+                    int sel = (sel_a >= 0 && off >= sel_a && off < sel_b);
+                    /* THE HIGHLIGHT IS PAINTED, not passed. draw_glyph writes only where the glyph
+                     * has alpha and uses bg purely to blend its antialiased edges, so handing it a
+                     * selection colour tinted a few edge pixels and produced no visible highlight
+                     * at all -- the first render of this showed none, and the pixels could not say
+                     * whether the range was empty or the colour too faint.
+                     *
+                     * Filled per glyph rather than per run: advance widths tile exactly, so the
+                     * band is continuous, and spaces inside the selection are covered without a
+                     * second walk to find where the run starts and ends. line_h, not the glyph box,
+                     * so consecutive lines meet with no white seam between them. */
+                    if (sel) gfx_fill(xx, ly, gw, line_h, selbg);
+                    draw_glyph(xx, ly, g, F, fg, sel ? selbg : bg);
+                }
+                if (on_line && probe_x >= xx && probe_x < xx + gw) *out_off = (int)(qs - s0);
+                xx += gw;
             }
+            if (on_line && probe_x >= xx) *out_off = (int)(end - s0);
         }
+
         lines++;
         s = end;
         while (*s == ' ') s++;
         if (lines > 200) break;               /* runaway guard */
+        if (s == start) break;                /* no progress: refuse to spin */
     }
+    if (out_widest) *out_widest = widest;
     return lines;
+}
+
+int gfx_text_wrap(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t bg,
+                  int maxw, int line_h, int draw) {
+    return wrap_walk(x, y, s, f, fg, bg, maxw, line_h, draw, 0, 0, -1, -1, 0, 0, -1, 0);
+}
+int gfx_text_wrap_ex(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t bg,
+                     int maxw, int line_h, int draw, int *out_last_w) {
+    return wrap_walk(x, y, s, f, fg, bg, maxw, line_h, draw, out_last_w, 0, -1, -1, 0, 0, -1, 0);
+}
+int gfx_text_wrap_w(const char *s, gfx_font f, int maxw) {
+    int widest = 0;
+    wrap_walk(0, 0, s, f, 0, 0, maxw, 1, 0, 0, &widest, -1, -1, 0, 0, -1, 0);
+    return widest;
+}
+int gfx_text_wrap_sel(int x, int y, const char *s, gfx_font f, uint16_t fg, uint16_t bg,
+                      int maxw, int line_h, int sel_a, int sel_b, uint16_t selbg) {
+    return wrap_walk(x, y, s, f, fg, bg, maxw, line_h, 1, 0, 0, sel_a, sel_b, selbg, 0, -1, 0);
+}
+int gfx_text_wrap_hit(int x, int y, const char *s, gfx_font f, int maxw, int line_h, int px, int py) {
+    int off = -1;
+    wrap_walk(x, y, s, f, 0, 0, maxw, line_h, 0, 0, 0, -1, -1, 0, px, py, &off);
+    return off;
 }
