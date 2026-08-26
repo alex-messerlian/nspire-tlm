@@ -69,6 +69,10 @@ int  app_theme(void);
  * in which case this returns light, because guessing dark on an unknown clock is worse than a
  * wrong-but-legible default. */
 int  app_auto_is_dark(int hour);
+/* Hours from UTC. The device has no timezone and its RTC is a bare seconds counter, so AUTO cannot
+ * tell local day from night without being told this. */
+int  app_tz(void);
+void app_set_tz(int hours);
 
 /* Local hour 0-23, or NEGATIVE when there is no usable clock.
  *

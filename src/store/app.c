@@ -46,6 +46,23 @@ static const uint16_t PAL_DARK[P_N] = {
 /* The clock decides only when the mode is AUTO. A negative hour means the clock could not be read;
  * light is returned then, because a wrong-but-legible default beats guessing dark on no evidence.
  * Day is 06:00-18:00, per the owner's spec. */
+/* HOURS OFFSET FROM UTC. The RTC is a bare seconds counter and the calculator has no notion of a
+ * timezone anywhere, so app_clock_hour() can only report UTC. "System" was therefore calling it
+ * night at 10am for anyone far from Greenwich -- at UTC-10 the clock reads 20:00 and AUTO goes
+ * dark in broad daylight, which is exactly what was reported.
+ *
+ * It cannot be derived, so it is asked for. In memory only: persisting it means a settings file,
+ * and the theme is a one-tap fix if this is wrong. */
+static int TZ_OFFSET;
+
+int app_tz(void) { return TZ_OFFSET; }
+void app_set_tz(int h) {
+    if (h < -12) h = -12;
+    if (h > 14)  h = 14;                     /* the real range of civil offsets */
+    TZ_OFFSET = h;
+    app_set_theme(app_theme());              /* re-resolve AUTO against the new local time */
+}
+
 int app_auto_is_dark(int hour) {
     if (hour < 0 || hour > 23) return 0;
     return !(hour >= 6 && hour < 18);
@@ -55,7 +72,11 @@ int app_theme(void) { return THEME_MODE; }
 void app_set_theme(int mode) {
     THEME_MODE = mode;
     int dark = (mode == TH_DARK);
-    if (mode == TH_AUTO) dark = app_auto_is_dark(app_clock_hour());
+    if (mode == TH_AUTO) {
+        int h = app_clock_hour();
+        if (h >= 0) { h = (h + TZ_OFFSET) % 24; if (h < 0) h += 24; }
+        dark = app_auto_is_dark(h);
+    }
     const uint16_t *src = dark ? PAL_DARK : PAL_LIGHT;
     for (int i = 0; i < P_N; i++) TLM_PAL[i] = src[i];
 }
@@ -92,7 +113,7 @@ static gfx_rect R_EXIT;
 /* Declared up here with the other controls rather than beside the search sheet's state, because
  * hit testing has to see every control that competes for a click in one place. */
 static gfx_rect R_SEARCH;
-static gfx_rect R_SET_THEME, R_SET_QUIT;   /* rows inside the settings sheet */
+static gfx_rect R_SET_THEME, R_SET_QUIT, R_SET_TZM, R_SET_TZP;   /* rows inside the settings sheet */
 static int SETTINGS_ON;
 
 /* 10, and resolved by NEAREST rather than by first match.
@@ -728,51 +749,20 @@ static void panel_icon(int x, int y, uint16_t c) {
     gfx_rrect_outline(x + 4, y + 5, 16, 14, 2, c);
     gfx_vline(x + 10, y + 5, 14, c);
 }
-/* A GEAR, not an X.
+/* AN EXCLAMATION MARK, not a gear.
  *
- * The X was the only way out and it sat in the corner looking like a window chrome control on a
- * device that has no windows. What belongs there is the way into the app's own settings; leaving
- * is one item inside it, alongside the shortcut key and the theme.
+ * A gear is a ring, eight teeth and a hole, and at 16px on this panel there are not enough pixels
+ * for any of them to read: the teeth merge into the ring and the whole thing closes up. This is a
+ * bar and a dot, which is legible at any size and still says "there is something to read here".
  *
- * 16x16 on the same origin as the other glyphs: a ring with eight teeth and a hole. */
-static const char *GEAR[] = {
-    "    #    #    ",
-    "   ###  ###   ",
-    "   ##########  ",
-    "  ############ ",
-    " ##   ####   ##",
-    "###  ##  ##  ##",
-    "##  ##    ##  #",
-    "#   #      #   ",
-    "##  ##    ##  #",
-    "###  ##  ##  ##",
-    " ##   ####   ##",
-    "  ############ ",
-    "   ##########  ",
-    "   ###  ###   ",
-    "    #    #    ",
-};
-static void gear_icon(int x, int y, uint16_t c) {
-    /* Drawn as a ring plus teeth rather than from the table above, which reads better at this size:
-     * a filled gear silhouette closes up into a blob on this panel. */
-    /* MEASURED to occupy exactly x+4..x+19 and y+4..y+19, the same 16x16 envelope as the pencil,
-     * lens and panel, so its ink centres on (11.5, 11.5) like theirs. Drawn from cx=11 with the
-     * teeth reaching 7 one way and 8 the other: the envelope has to be EVEN to centre in a 24px
-     * plate, and a shape built symmetrically about an integer centre is always odd. It measured
-     * 17px centred on (12.0, 12.0) before this, which is a pixel larger than its neighbours and
-     * half a pixel down and right of them. */
-    const int cx = x + 11, cy = y + 11, R = 6;
-    for (int j = -R; j <= R; j++)
-        for (int i = -R; i <= R; i++) {
-            int d = i * i + j * j;
-            if (d <= R * R && d > (R - 2) * (R - 2)) gfx_fill(cx + i, cy + j, 1, 1, c);
-        }
-    /* four teeth on the axes */
-    gfx_fill(cx - 1, cy - 7, 2, 3, c);   gfx_fill(cx - 1, cy + 6, 2, 3, c);
-    gfx_fill(cx - 7, cy - 1, 3, 2, c);   gfx_fill(cx + 6, cy - 1, 3, 2, c);
-    /* and four on the diagonals */
-    gfx_fill(cx - 5, cy - 5, 2, 2, c);   gfx_fill(cx + 4, cy + 4, 2, 2, c);
-    gfx_fill(cx + 4, cy - 5, 2, 2, c);   gfx_fill(cx - 5, cy + 4, 2, 2, c);
+ * Same 16x16 envelope as the other glyphs, centred on (11.5, 11.5) like theirs. */
+static void info_icon(int x, int y, uint16_t c) {
+    /* 2px wide at x+11 and spanning y+4..y+19, so its ink centres on (11.5, 11.5) exactly like the
+     * pencil, lens and panel. A 3px stem cannot: an odd width centres on a whole pixel, and the
+     * 24px plate's centre falls between two. Measured, not judged by eye -- the gear that preceded
+     * this was a pixel large and half a pixel down and right without looking obviously wrong. */
+    gfx_fill(x + 11, y + 4,  2, 11, c);      /* the stem */
+    gfx_fill(x + 11, y + 17, 2, 3,  c);      /* the dot   */
 }
 
 /* NEW CHAT IS A PLUS, not a pencil.
@@ -1068,7 +1058,7 @@ static void draw_main(void) {
     R_EXIT = (gfx_rect){ GFX_W - 28, 3, 24, 24 };
     {   int hot = HOVER && hit(R_EXIT, MX, MY);
         gfx_rrect(R_EXIT.x, R_EXIT.y, 24, 24, 6, hot ? C_SEL : C_BG);
-        gear_icon(R_EXIT.x, R_EXIT.y, hot ? C_INK : C_INK2);
+        info_icon(R_EXIT.x, R_EXIT.y, hot ? C_INK : C_INK2);
     }
     /* No rule under the title. The desktop build draws none -- #topbar has no border -- and at
      * 231px wide a full-width divider under a 60px word reads as a seam across the pane rather
@@ -1214,7 +1204,10 @@ static void draw_settings(void) {
     /* 150, not 132. The content is a title, a label, a chip row, a second label and five key rows,
      * which comes to 142px from the top inset, and at 132 the last row drew straight through the
      * bottom edge and onto the transcript. Sized to what it holds. */
-    const int W = 232, H = 150, X = (GFX_W - W) / 2, Y = 30;
+    /* 174. The timezone row adds 20px and at 150 the last shortcut line drew through the bottom
+     * edge onto the transcript -- the second time this sheet has outgrown a hardcoded height, so
+     * the render is checked for ink below it rather than trusted. */
+    const int W = 232, H = 174, X = (GFX_W - W) / 2, Y = 30;
     gfx_dim(C_SCRIM, 28);
     gfx_rrect(X - 1, Y - 1, W + 2, H + 2, 9, C_LINE);
     gfx_rrect(X, Y, W, H, 8, C_SHEET);
@@ -1241,30 +1234,58 @@ static void draw_settings(void) {
         y += 22;
     }
 
+    /* The offset, shown only when System is the choice, because it changes nothing otherwise and
+     * a control that does nothing is worse than no control. */
+    if (app_theme() == TH_AUTO) {
+        char tz[32];
+        int h = app_clock_hour();
+        snprintf(tz, sizeof tz, "UTC%+d", app_tz());
+        gfx_text(X + 10, y, "Time zone", F_SM, C_INK3, C_SHEET);
+        int bx = X + 10 + gfx_text_w("Time zone ", F_SM);
+        R_SET_TZM = (gfx_rect){ bx, y - 1, 15, 15 };
+        R_SET_TZP = (gfx_rect){ bx + 19, y - 1, 15, 15 };
+        gfx_rrect_outline(R_SET_TZM.x, R_SET_TZM.y, 15, 15, 4, C_LINE);
+        gfx_rrect_outline(R_SET_TZP.x, R_SET_TZP.y, 15, 15, 4, C_LINE);
+        gfx_fill(R_SET_TZM.x + 4, R_SET_TZM.y + 7, 7, 1, C_INK2);
+        gfx_fill(R_SET_TZP.x + 4, R_SET_TZP.y + 7, 7, 1, C_INK2);
+        gfx_fill(R_SET_TZP.x + 7, R_SET_TZP.y + 4, 1, 7, C_INK2);
+        gfx_text(bx + 40, y, tz, F_SM, C_INK2, C_SHEET);
+        /* what it resolves to, so the setting can be checked rather than guessed at */
+        if (h >= 0) {
+            char now[32];
+            int lh = (h + app_tz()) % 24; if (lh < 0) lh += 24;
+            snprintf(now, sizeof now, "%02d:00 local", lh);
+            gfx_text(bx + 92, y, now, F_SM, C_INK3, C_SHEET);
+        } else {
+            /* "no clock" rather than "clock unreadable": the long form is 85px starting at
+             * bx+92, which runs 12px past the sheet's right edge. */
+            gfx_text(bx + 92, y, "no clock", F_SM, C_INK3, C_SHEET);
+        }
+        y += 20;
+    }
+
     /* the shortcut key */
     gfx_text(X + 10, y, "Shortcuts", F_SM, C_INK3, C_SHEET);
     y += gfx_font_h(F_SM) + 2;
-    {   static const char *K[5][2] = {
-            { "ctrl N", "New chat" },   { "ctrl S", "Search" },
-            { "ctrl B", "Side panel" }, { "ctrl esc", "Quit" },
+    {   /* LOWERCASE letters. "ctrl N" reads as though the shift is part of it, which would be a
+         * different chord entirely; both cases work but only one should be printed.
+         * F_SM rather than F_XS: 9px is fine for a disclaimer nobody reads twice and too small for
+         * a reference somebody is squinting at to learn the app. */
+        static const char *K[5][2] = {
+            { "ctrl n", "New chat" },   { "ctrl s", "Search" },
+            { "ctrl b", "Side panel" }, { "ctrl esc", "Quit" },
             { "esc",    "Back" },
         };
         for (int i = 0; i < 5; i++) {
-            gfx_text(X + 10, y, K[i][0], F_XS, C_INK2, C_SHEET);
-            gfx_text(X + 66, y, K[i][1], F_XS, C_INK3, C_SHEET);
-            y += gfx_font_h(F_XS) + 1;
+            gfx_text(X + 10, y, K[i][0], F_SM, C_INK2, C_SHEET);
+            gfx_text(X + 76, y, K[i][1], F_SM, C_INK3, C_SHEET);
+            y += gfx_font_h(F_SM) + 2;
         }
     }
 
-    /* leaving */
-    R_SET_QUIT = (gfx_rect){ X + W - 66, Y + H - 24, 56, 16 };
-    {   int hot = HOVER && inside(R_SET_QUIT, MX, MY);
-        gfx_rrect(R_SET_QUIT.x, R_SET_QUIT.y, R_SET_QUIT.w, R_SET_QUIT.h, 4,
-                  hot ? C_EXIT_HOT : C_SHEET);
-        gfx_rrect_outline(R_SET_QUIT.x, R_SET_QUIT.y, R_SET_QUIT.w, R_SET_QUIT.h, 4, C_LINE);
-        gfx_text(R_SET_QUIT.x + 14, R_SET_QUIT.y + 1, "Quit", F_SM,
-                 hot ? C_ERRFG : C_INK2, hot ? C_EXIT_HOT : C_SHEET);
-    }
+    /* NO QUIT BUTTON. It sat inside a sheet people open to read the shortcut key, one slip from
+     * ending the session, and it is not needed: ctrl+esc is listed two lines above. A destructive
+     * control does not belong in a reference panel. */
 }
 
 static void draw_cursor(void) {
@@ -1443,7 +1464,8 @@ void app_event(const in_event *e) {
         MX = e->x; MY = e->y;
         if (SETTINGS_ON) {
             /* Modal: it consumes clicks under it, and a click outside closes it. */
-            if (inside(R_SET_QUIT, MX, MY)) { QUIT = 1; return; }
+            if (inside(R_SET_TZM, MX, MY)) { app_set_tz(app_tz() - 1); return; }
+            if (inside(R_SET_TZP, MX, MY)) { app_set_tz(app_tz() + 1); return; }
             if (inside(R_SET_THEME, MX, MY)) {
                 /* which of the three chips: measured the same way they are drawn */
                 static const char *NAME[3] = { "System", "Light", "Dark" };

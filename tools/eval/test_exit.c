@@ -89,9 +89,26 @@ int main(void) {
     click(R_EXIT.x + R_EXIT.w / 2, R_EXIT.y + R_EXIT.h / 2);
     T("the gear opens settings",             SETTINGS_ON, 1);
     T("and does not quit",                   app_should_quit(), 0);
+    /* THE SHEET HAS NO QUIT BUTTON. It sat inside a panel people open to read the shortcut key,
+     * one slip from ending the session, and it was never needed: ctrl+esc is listed two lines
+     * above it. A destructive control does not belong in a reference panel. */
     app_draw();
-    click(R_SET_QUIT.x + R_SET_QUIT.w / 2, R_SET_QUIT.y + R_SET_QUIT.h / 2);
-    T("Quit inside settings quits",          app_should_quit(), 1);
+    click(R_SET_THEME.x + 4, R_SET_THEME.y + 4);
+    T("clicking inside the sheet does not quit", app_should_quit(), 0);
+    /* clicking away closes it */
+    app_draw();
+    click(GFX_W - 4, GFX_H - 4);
+    T("a click outside closes the sheet",    SETTINGS_ON, 0);
+    T("and still does not quit",             app_should_quit(), 0);
+    /* esc closes it too */
+    reset(); CUR = -1; app_draw();
+    click(R_EXIT.x + 12, R_EXIT.y + 12);
+    key(K_ESC);
+    T("esc closes the sheet",                SETTINGS_ON, 0);
+    T("without quitting",                    app_should_quit(), 0);
+    /* and the only way out is the chord */
+    reset(); key(K_QUIT);
+    T("ctrl+esc is the way out",             app_should_quit(), 1);
 
     /* MUTATION: the shipped behaviour, where a stray ESC at home ended the session. */
     {   reset();

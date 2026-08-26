@@ -49,6 +49,41 @@ int main(void) {
      * moved P_SHEET from #2E2E2E to #303030, which left it distinct in the table and IDENTICAL to
      * P_BUBBLE and P_FIELD on the glass. Every existing contrast assertion still passed, because
      * they all compare against the page. Compare the surfaces to each other, post-quantisation. */
+    /* -- AUTO resolves against LOCAL time, not UTC --
+     *
+     * app_clock_hour() can only report UTC: the RTC is a bare seconds counter and the calculator
+     * has no notion of a timezone anywhere. So AUTO was calling it night at 10am for anyone far
+     * from Greenwich. At UTC-10 the clock reads 20:00 in broad daylight, which is precisely the
+     * report that led here. */
+    printf("\n  -- AUTO uses local time --\n");
+    {   T("UTC noon is day",            app_auto_is_dark(12), 0);
+        T("UTC midnight is night",      app_auto_is_dark(0), 1);
+        T("06:00 is the first day hour", app_auto_is_dark(6), 0);
+        T("18:00 is the first night hour", app_auto_is_dark(18), 1);
+        T("an unreadable clock is not night", app_auto_is_dark(-1), 0);
+
+        /* the offset itself */
+        app_set_tz(0);
+        T("offset starts where it is put", app_tz(), 0);
+        app_set_tz(-10);
+        T("it takes a negative offset",    app_tz(), -10);
+        app_set_tz(-99);
+        T("and clamps below -12",          app_tz(), -12);
+        app_set_tz(99);
+        T("and above +14",                 app_tz(), 14);
+
+        /* the shift itself: 20:00 UTC at -10 is 10:00 local, which is day */
+        {   int h = (20 + (-10)) % 24; if (h < 0) h += 24;
+            T("20:00 UTC at -10 is 10:00 local", h, 10);
+            T("and 10:00 local is day",          app_auto_is_dark(h), 0);
+            /* MUTATION: the shipped behaviour, which read the same instant as night */
+            int caught = (app_auto_is_dark(20) != app_auto_is_dark(h));
+            if (!caught) F++;
+            printf("  %s  mutant: AUTO on raw UTC calls 10am local night\n",
+                   caught ? "CAUGHT" : "MISSED"); }
+        app_set_tz(0);
+    }
+
     printf("\n  -- surfaces are distinct after RGB565 --\n");
     {   struct { const char *a, *b; uint16_t x, y; } pairs[] = {
             { "dark sheet",  "dark bubble", PAL_DARK[P_SHEET],  PAL_DARK[P_BUBBLE] },
