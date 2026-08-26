@@ -233,6 +233,53 @@ int main(void) {
         COMPOSE_N = 0; COMPOSE[0] = 0;
     }
 
+    /* -- the app is reachable with keys alone --
+     *
+     * There is no cursor any more, so every route that used to need one has to exist as a key or
+     * it is simply gone. This is the check that the removal did not strand anything. */
+    printf("\n  -- no pointer: keys reach the list --\n");
+    reset(); for (int i = 0; i < 4; i++) seed("A car goes 150 m in 12 s.");
+    CUR = -1; COMPOSE_N = 0; app_draw();
+    T("a session starts selected", SEL_ROW, 0);
+    key(K_DOWN); key(K_DOWN);
+    T("down moves the selection", SEL_ROW, 2);
+    key(K_UP);
+    T("up moves it back", SEL_ROW, 1);
+    for (int i = 0; i < 20; i++) key(K_DOWN);
+    T("it stops at the last session", SEL_ROW, NCHATS - 1);
+    for (int i = 0; i < 40; i++) key(K_UP);
+    T("and at the first", SEL_ROW, 0);
+    key(K_ENTER);
+    T("enter opens the selected session", CUR, 0);
+
+    /* the selection must be VISIBLE, or the arrows move something nobody can see */
+    reset(); for (int i = 0; i < 3; i++) seed("A car goes 150 m in 12 s.");
+    CUR = -1; HOVER = 0; SEL_ROW = 1; app_draw();
+    {   /* Sample the row's GROUND, in a column past the end of the title, not the whole rect.
+         * Counting C_SEL anywhere in the rect also counts the antialiased edge pixels of the text,
+         * which land on that exact value often enough to report 20 of them in a row that is not
+         * selected at all. The oracle was wrong, not the code. */
+        const uint16_t *fb = gfx_buf();
+        int lit = 0, plain = 0;
+        int probe1 = R_CHAT[1].x + R_CHAT[1].w - 3;
+        int probe2 = R_CHAT[2].x + R_CHAT[2].w - 3;
+        for (int y = R_CHAT[1].y + 2; y < R_CHAT[1].y + R_CHAT[1].h - 2; y++)
+            if (fb[y * GFX_W + probe1] == C_SEL) lit++;
+        for (int y = R_CHAT[2].y + 2; y < R_CHAT[2].y + R_CHAT[2].h - 2; y++)
+            if (fb[y * GFX_W + probe2] == C_SEL) plain++;
+        T("the selected row is highlighted", lit > 0, 1);
+        T("and an unselected one is not",    plain, 0);
+        if (!(lit > 0)) F++;
+        printf("  %s  mutant: arrows moving a selection nothing draws (%d px lit)\n",
+               lit > 0 ? "CAUGHT" : "MISSED", lit);
+    }
+
+    /* typing still wins over selection: the arrows must not eat a composed message */
+    reset(); seed("A car goes 150 m in 12 s."); CUR = -1; app_draw();
+    key('h'); key('i');
+    key(K_ENTER);
+    T("enter sends when the box has text", COMPOSE_N, 0);
+
     /* -- ctrl+N and ctrl+S, and the fact that they ARE the buttons --
      *
      * The chord's first draft called new_chat(), which creates a session; the BUTTON sets CUR = -1

@@ -99,6 +99,7 @@ static gfx_rect R_EXIT;
  * each reads it, and the marquee's helper sits above the placeholder's table. */
 static unsigned NOW_MS;
 
+static int SEL_ROW;          /* keyboard selection in the session list */
 static int MARQ_AT = -1;
 static unsigned MARQ_T0;              /* NOW_MS when the cursor arrived on this row */
 #define MARQ_HOLD_MS 420      /* wait before moving, so a pass-through does not twitch */
@@ -233,6 +234,7 @@ static int inside(gfx_rect r, int x, int y) {
 }
 
 void app_init(void) {
+    SEL_ROW = 0;
     app_set_theme(THEME_MODE);   /* fill the palette before anything draws */
     NCHATS = 0; CUR = -1; SCROLL = 0; COMPOSE[0] = 0; COMPOSE_N = 0;
 }
@@ -823,8 +825,12 @@ static void draw_sidebar(void) {
             R_TRASH[r] = (gfx_rect){ rowmax - 13, y - 1, 13, 13 };
             int hot = HOVER && inside(R_CHAT[r], MX, MY);
             if (hot) any_hot = 1;
-            uint16_t bg = (i == CUR || hot) ? C_SEL : C_SIDE;
-            if (i == CUR || hot) gfx_rrect(R_CHAT[r].x, R_CHAT[r].y, R_CHAT[r].w, R_CHAT[r].h, 5, bg);
+            /* Selected by the arrows, or open, or under the finger: all three look the same,
+             * because they mean the same thing to the reader. A selection the keys move but the
+             * screen does not show is the unwired-affordance bug again. */
+            int sel = (CUR < 0 && i == SEL_ROW);
+            uint16_t bg = (i == CUR || hot || sel) ? C_SEL : C_SIDE;
+            if (i == CUR || hot || sel) gfx_rrect(R_CHAT[r].x, R_CHAT[r].y, R_CHAT[r].w, R_CHAT[r].h, 4, bg);
             {   int avail = rowmax - (hot ? 26 : 10);   /* the trash takes room only while hovered */
                 int tw = gfx_text_w(CHATS[i].title, F_SM);
                 if (hot && tw > avail) {
@@ -1020,35 +1026,8 @@ static void draw_main(void) {
  * shape is the point, and 16 rows of literal are easier to check by eye than the arithmetic that
  * would generate them.
  */
-static const char *CURSOR[] = {
-    "#",
-    "##",
-    "#.#",
-    "#..#",
-    "#...#",
-    "#....#",
-    "#.....#",
-    "#......#",
-    "#.......#",
-    "#........#",
-    "#....#####",
-    "#..#.#",
-    "#.# #.#",
-    "##  #.#",
-    "#    #.#",
-    "     ###",
-};
-
-static void draw_cursor(void) {
-    int rows = (int)(sizeof CURSOR / sizeof CURSOR[0]);
-    for (int y = 0; y < rows; y++) {
-        const char *row = CURSOR[y];
-        for (int x = 0; row[x]; x++) {
-            if (row[x] == ' ') continue;
-            gfx_fill(MX + x, MY + y, 1, 1, row[x] == '#' ? C_INK : C_BG);
-        }
-    }
-}
+/* There is no cursor. The pad scrolls and the keys do everything else -- see the note on
+ * pointer_poll in device_app.c for why three attempts at one were all worse than none. */
 
 /* The composer is drawn at a caller-chosen y because it MOVES. On the web build `placeComposer()`
  * reparents the same field between `#centerComposer` and `#bottomComposer`; this is that, and it is
@@ -1153,7 +1132,6 @@ void app_draw(void) {
     if (SIDEBAR) draw_sidebar();
     draw_main();
     if (SEARCH_ON) draw_search();
-    draw_cursor();
     gfx_present();
 }
 
@@ -1227,7 +1205,21 @@ void app_event(const in_event *e) {
         if (k == K_NEW)    { start_new_chat(); return; }
         if (k == K_SEARCH) { open_search(); return; }
         if (k == K_BACK) { if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0; return; }
-        if (k == K_ENTER){ if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; } return; }
+        if (k == K_ENTER) {
+            if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return; }
+            /* an empty box on the home screen means "open what is selected" */
+            if (CUR < 0 && NCHATS && SEL_ROW >= 0 && SEL_ROW < NCHATS) {
+                CUR = SEL_ROW; SCROLL = 0; return;
+            }
+            return;
+        }
+        /* WITHOUT A POINTER THE ARROWS ARE THE ONLY WAY INTO THE LIST, so on the home screen they
+         * move a selection through the sessions and ENTER opens the selected one. Inside a chat
+         * there is nothing to select, so they keep scrolling the transcript. */
+        if (CUR < 0 && NCHATS) {
+            if (k == K_DOWN) { if (SEL_ROW + 1 < NCHATS) SEL_ROW++; return; }
+            if (k == K_UP)   { if (SEL_ROW > 0) SEL_ROW--; return; }
+        }
         if (k == K_DOWN) { SCROLL += 16; return; }
         if (k == K_UP)   { SCROLL -= 16; if (SCROLL < 0) SCROLL = 0; return; }
         if (k >= 32 && k < 127 && COMPOSE_N < (int)sizeof COMPOSE - 1) {

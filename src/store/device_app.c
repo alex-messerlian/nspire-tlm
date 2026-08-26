@@ -97,63 +97,32 @@ static void pointer_init(void) {
     if (ti && ti->width && ti->height) { PAD_W = ti->width; PAD_H = ti->height; }
 }
 
-/* Returns 1 if an event was produced.
+/* NO POINTER. The touchpad SCROLLS and nothing else.
  *
- * ABSOLUTE, and that is a reversal. Relative was tried because touching down teleported the cursor
- * and lifting snapped it back, which is genuinely how a trackpad should not behave. But this pad is
- * about 2 cm wide with no room to re-stroke, so relative motion made the 20px icons at the top of
- * the sidebar effectively unreachable: you could not get there in one pass and lifting to try again
- * did not help. Absolute has a real flaw and is still the better one, because every target is
- * directly reachable by touching the matching part of the pad.
+ * Three cursors were tried here -- absolute, then relative, then absolute again -- and all three
+ * failed the same way: the pad is about 2 cm across, so aiming at a 24px control means either a
+ * jump on touch-down or a stroke you cannot finish, and on an absolute pad the very tap that
+ * commits a click also MOVES the cursor to wherever the finger landed. There is no OS cursor to
+ * fall back on either: the SDK exposes no cursor API, and an Ndless program owns the framebuffer,
+ * so the pointer the calculator draws in its own menus does not exist in here.
  *
- * Two things make it behave. The cursor only follows a REAL contact, not mere proximity, so a hand
- * resting near the pad does not drag it around. And an event is emitted only when the cursor
- * actually CHANGED: every sample used to produce one, and each event forced a full 320x240
- * software repaint, which is what pegged the CPU and made the whole app feel like it was
- * struggling.
+ * The app is driven by keys, which this keypad is genuinely good at, and the pad does the one
+ * thing a pad this size does well. Vertical drags scroll.
  */
-/* 10, not 6. A finger on a pad this size drifts several pixels between touch-down and lift, and a
- * tight slop turned intended taps into drags that moved the cursor and clicked nothing. */
-#define TAP_SLOP  10
-
-static int DOWN, TRAVEL, SEEN;
-
 static int pointer_poll(in_event *e) {
     touchpad_report_t r;
     if (touchpad_scan(&r) != 0) return 0;
 
-    if (!r.contact && !r.proximity) {          /* hand away: settle, and finish a tap */
-        SEEN = 0;
-        if (DOWN) {
-            DOWN = 0;
-            e->x = CX; e->y = CY; e->hover = 0;
-            if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; return 1; }
-        }
-        return 0;
-    }
+    static int last_y, have;
+    if (!r.contact) { have = 0; return 0; }
+    if (!have) { have = 1; last_y = r.y; return 0; }
 
-    if (!r.contact) {                          /* hovering only: report it, do not move */
-        if (DOWN) { DOWN = 0; e->x = CX; e->y = CY; e->hover = 1;
-                    if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; return 1; } }
-        return 0;
-    }
+    int dy = last_y - r.y;                 /* pad y is bottom-up, screen y is top-down */
+    if (dy > -3 && dy < 3) return 0;       /* a resting finger jitters; ignore it */
+    last_y = r.y;
 
-    int nx = (int)((long)r.x * GFX_W / (PAD_W ? PAD_W : 1));
-    int ny = GFX_H - 1 - (int)((long)r.y * GFX_H / (PAD_H ? PAD_H : 1));
-    if (nx < 0) nx = 0;
-    if (nx >= GFX_W) nx = GFX_W - 1;
-    if (ny < 0) ny = 0;
-    if (ny >= GFX_H) ny = GFX_H - 1;
-
-    if (!SEEN) { SEEN = 1; DOWN = 1; TRAVEL = 0; }
-    else {
-        int dx = nx - CX, dy = ny - CY;
-        TRAVEL += (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-    }
-
-    if (nx == CX && ny == CY) return 0;        /* nothing moved: do not spend a repaint */
-    CX = nx; CY = ny;
-    e->x = CX; e->y = CY; e->hover = 1; e->kind = IN_MOVE;
+    e->kind = IN_SCROLL;
+    e->dy = dy * GFX_H / (PAD_H ? PAD_H : 1);
     return 1;
 }
 
@@ -480,35 +449,32 @@ int main(void) {
      * That is why the placeholder cycled many times a second against a 4.2 s timer. This repo
      * already carries the rule -- bench/common.h configures LOAD and CONTROL before reading, and
      * reading raw once produced a 2^32 underflow -- and the loop was reading raw. */
-    clock_start();
-    uint32_t t0 = clock_raw();
-    unsigned last_paint = 0;
+    /* PACED BY msleep, with the elapsed time ACCUMULATED from it.
+     *
+     * Milliseconds were derived from the SP804 directly and that was wrong twice over: the timer
+     * was never configured, and then it was trusted while nothing had put it in free-running mode.
+     * msleep() is the SDK's own primitive and is monotonic by construction, so a loop built on it
+     * CANNOT race. If msleep overshoots the animation runs slow, which is benign; the raw-timer
+     * version ran unboundedly fast, which is what shipped.
+     *
+     * It also idles the core between passes rather than spinning, which is the other half of why
+     * the app felt like it was struggling.
+     */
+    const unsigned STEP_MS = 25;           /* 40 passes a second: ample for keys and a scroll */
+    unsigned now = 0;
     while (!app_should_quit()) {
         in_event e; memset(&e, 0, sizeof e);
         int dirty = 0;
 
         if (pointer_poll(&e)) { app_event(&e); dirty = 1; }
         int k = keypad_poll();
-        if (k) {
-            /* ENTER CLICKS WHATEVER THE CURSOR IS ON, when the cursor is on a control. Placing a
-             * pointer accurately on a 2cm pad is genuinely hard, and requiring a tap -- which on an
-             * absolute pad also MOVES the cursor to wherever the finger lands -- means the aim is
-             * lost at the moment of clicking. Position with the pad, commit with a key. Enter still
-             * sends when the cursor is not over anything. */
-            if (k == K_ENTER && app_hit_control(CX, CY)) {
-                e.kind = IN_CLICK; e.x = CX; e.y = CY;
-            } else {
-                e.kind = IN_KEY; e.key = k;
-            }
-            app_event(&e); dirty = 1;
-        }
+        if (k) { e.kind = IN_KEY; e.key = k; app_event(&e); dirty = 1; }
 
-        unsigned now = clock_ms_since(t0);
         if (app_set_now(now)) dirty = 1;
+        if (dirty) app_draw();
 
-        /* At most ~30 frames a second. Beyond that the panel cannot show the difference and the
-         * core has better things to do; below it the slide stops looking like motion. */
-        if (dirty && now - last_paint >= 33) { app_draw(); last_paint = now; }
+        msleep(STEP_MS);
+        now += STEP_MS;
     }
     if (MODEL_READY) rq_free();
     ns_tok_free(&TK); ns_free(&ST);
