@@ -78,6 +78,8 @@ send bench/bench_platform.tns    /bench_platform.tns
 send bench/bench_mem.tns         /bench_mem.tns
 send bench/bench_mac.tns         /bench_mac.tns
 send bench/bench_flash.tns       /bench_flash.tns
+send bench/bench_rtc.tns         /bench_rtc.tns
+send bench/bench_cas.tns         /bench_cas.tns
 
 # ChatTLM: the demo. Nothing staged this set before -- push-all.sh created /bench and /models and
 # never touched build/transfer/, so a fresh device had no /tlm at all and the app exited at boot.
