@@ -220,7 +220,7 @@ static int keypad_poll(void) {
     if (ctrl_now || ctrl_armed) {
         struct { const t_key *k; int c; } CH[] = {
             { &KEY_NSPIRE_N, K_NEW }, { &KEY_NSPIRE_S, K_SEARCH },
-            { &KEY_NSPIRE_B, K_PANEL }, { &KEY_NSPIRE_Q, K_QUIT },
+            { &KEY_NSPIRE_B, K_PANEL }, { &KEY_NSPIRE_ESC, K_QUIT },
         };
         for (unsigned i = 0; i < sizeof CH / sizeof CH[0]; i++) {
             if (isKeyPressed(*CH[i].k)) {

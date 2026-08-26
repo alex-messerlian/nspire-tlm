@@ -92,6 +92,8 @@ static gfx_rect R_EXIT;
 /* Declared up here with the other controls rather than beside the search sheet's state, because
  * hit testing has to see every control that competes for a click in one place. */
 static gfx_rect R_SEARCH;
+static gfx_rect R_SET_THEME, R_SET_QUIT;   /* rows inside the settings sheet */
+static int SETTINGS_ON;
 
 /* 10, and resolved by NEAREST rather than by first match.
  *
@@ -726,11 +728,51 @@ static void panel_icon(int x, int y, uint16_t c) {
     gfx_rrect_outline(x + 4, y + 5, 16, 14, 2, c);
     gfx_vline(x + 10, y + 5, 14, c);
 }
-static void exit_icon(int x, int y, uint16_t c) {    /* an X on the same 13x12 optical box */
-    for (int i = 0; i < 9; i++) {
-        gfx_fill(x + 5 + i, y + 5 + i, 1, 1, c);
-        gfx_fill(x + 5 + i, y + 13 - i, 1, 1, c);
-    }
+/* A GEAR, not an X.
+ *
+ * The X was the only way out and it sat in the corner looking like a window chrome control on a
+ * device that has no windows. What belongs there is the way into the app's own settings; leaving
+ * is one item inside it, alongside the shortcut key and the theme.
+ *
+ * 16x16 on the same origin as the other glyphs: a ring with eight teeth and a hole. */
+static const char *GEAR[] = {
+    "    #    #    ",
+    "   ###  ###   ",
+    "   ##########  ",
+    "  ############ ",
+    " ##   ####   ##",
+    "###  ##  ##  ##",
+    "##  ##    ##  #",
+    "#   #      #   ",
+    "##  ##    ##  #",
+    "###  ##  ##  ##",
+    " ##   ####   ##",
+    "  ############ ",
+    "   ##########  ",
+    "   ###  ###   ",
+    "    #    #    ",
+};
+static void gear_icon(int x, int y, uint16_t c) {
+    /* Drawn as a ring plus teeth rather than from the table above, which reads better at this size:
+     * a filled gear silhouette closes up into a blob on this panel. */
+    /* MEASURED to occupy exactly x+4..x+19 and y+4..y+19, the same 16x16 envelope as the pencil,
+     * lens and panel, so its ink centres on (11.5, 11.5) like theirs. Drawn from cx=11 with the
+     * teeth reaching 7 one way and 8 the other: the envelope has to be EVEN to centre in a 24px
+     * plate, and a shape built symmetrically about an integer centre is always odd. It measured
+     * 17px centred on (12.0, 12.0) before this, which is a pixel larger than its neighbours and
+     * half a pixel down and right of them. */
+    const int cx = x + 11, cy = y + 11, R = 6;
+    for (int j = -R; j <= R; j++)
+        for (int i = -R; i <= R; i++) {
+            int d = i * i + j * j;
+            if (d <= R * R && d > (R - 2) * (R - 2)) gfx_fill(cx + i, cy + j, 1, 1, c);
+        }
+    /* four teeth on the axes */
+    gfx_fill(cx - 1, cy - 7, 2, 3, c);   gfx_fill(cx - 1, cy + 6, 2, 3, c);
+    gfx_fill(cx - 7, cy - 1, 3, 2, c);   gfx_fill(cx + 6, cy - 1, 3, 2, c);
+    /* and four on the diagonals */
+    gfx_fill(cx - 5, cy - 5, 2, 2, c);   gfx_fill(cx + 4, cy + 4, 2, 2, c);
+    gfx_fill(cx + 4, cy - 5, 2, 2, c);   gfx_fill(cx - 5, cy + 4, 2, 2, c);
 }
 
 /* NEW CHAT IS A PLUS, not a pencil.
@@ -1025,8 +1067,8 @@ static void draw_main(void) {
      * other control on screen. */
     R_EXIT = (gfx_rect){ GFX_W - 28, 3, 24, 24 };
     {   int hot = HOVER && hit(R_EXIT, MX, MY);
-        gfx_rrect(R_EXIT.x, R_EXIT.y, 24, 24, 6, hot ? C_EXIT_HOT : C_BG);
-        exit_icon(R_EXIT.x, R_EXIT.y, hot ? C_ERRFG : C_INK2);
+        gfx_rrect(R_EXIT.x, R_EXIT.y, 24, 24, 6, hot ? C_SEL : C_BG);
+        gear_icon(R_EXIT.x, R_EXIT.y, hot ? C_INK : C_INK2);
     }
     /* No rule under the title. The desktop build draws none -- #topbar has no border -- and at
      * 231px wide a full-width divider under a 60px word reads as a seam across the pane rather
@@ -1161,6 +1203,69 @@ static const char *CURSOR[] = {
     "#.#",
     "##",
 };
+
+/* SETTINGS. The gear's contents: what the keys do, and how the theme is chosen.
+ *
+ * The shortcut key lives here because a chord nobody can discover is not a feature -- ctrl+B was
+ * unfindable by any means other than being told. The theme moved out of the icon band for the
+ * opposite reason: it is set once and then never touched, so it was spending a quarter of a
+ * permanent row on a decision made on first run. */
+static void draw_settings(void) {
+    /* 150, not 132. The content is a title, a label, a chip row, a second label and five key rows,
+     * which comes to 142px from the top inset, and at 132 the last row drew straight through the
+     * bottom edge and onto the transcript. Sized to what it holds. */
+    const int W = 232, H = 150, X = (GFX_W - W) / 2, Y = 30;
+    gfx_dim(C_SCRIM, 28);
+    gfx_rrect(X - 1, Y - 1, W + 2, H + 2, 9, C_LINE);
+    gfx_rrect(X, Y, W, H, 8, C_SHEET);
+
+    int y = Y + 8;
+    gfx_text(X + 10, y, "Settings", F_UIB, C_INK, C_SHEET);
+    y += gfx_font_h(F_UIB) + 6;
+
+    /* the theme row: three states, the current one filled */
+    gfx_text(X + 10, y, "Appearance", F_SM, C_INK3, C_SHEET);
+    y += gfx_font_h(F_SM) + 3;
+    {   static const char *NAME[3] = { "System", "Light", "Dark" };
+        int bx = X + 10;
+        R_SET_THEME = (gfx_rect){ bx, y, W - 20, 16 };
+        for (int i = 0; i < 3; i++) {
+            int w = gfx_text_w(NAME[i], F_SM) + 12;
+            int on = (app_theme() == i);
+            gfx_rrect(bx, y, w, 16, 4, on ? C_SEL : C_SHEET);
+            if (!on) gfx_rrect_outline(bx, y, w, 16, 4, C_LINE);
+            gfx_text(bx + 6, y + 1, NAME[i], F_SM, on ? C_INK : C_INK2,
+                     on ? C_SEL : C_SHEET);
+            bx += w + 6;
+        }
+        y += 22;
+    }
+
+    /* the shortcut key */
+    gfx_text(X + 10, y, "Shortcuts", F_SM, C_INK3, C_SHEET);
+    y += gfx_font_h(F_SM) + 2;
+    {   static const char *K[5][2] = {
+            { "ctrl N", "New chat" },   { "ctrl S", "Search" },
+            { "ctrl B", "Side panel" }, { "ctrl esc", "Quit" },
+            { "esc",    "Back" },
+        };
+        for (int i = 0; i < 5; i++) {
+            gfx_text(X + 10, y, K[i][0], F_XS, C_INK2, C_SHEET);
+            gfx_text(X + 66, y, K[i][1], F_XS, C_INK3, C_SHEET);
+            y += gfx_font_h(F_XS) + 1;
+        }
+    }
+
+    /* leaving */
+    R_SET_QUIT = (gfx_rect){ X + W - 66, Y + H - 24, 56, 16 };
+    {   int hot = HOVER && inside(R_SET_QUIT, MX, MY);
+        gfx_rrect(R_SET_QUIT.x, R_SET_QUIT.y, R_SET_QUIT.w, R_SET_QUIT.h, 4,
+                  hot ? C_EXIT_HOT : C_SHEET);
+        gfx_rrect_outline(R_SET_QUIT.x, R_SET_QUIT.y, R_SET_QUIT.w, R_SET_QUIT.h, 4, C_LINE);
+        gfx_text(R_SET_QUIT.x + 14, R_SET_QUIT.y + 1, "Quit", F_SM,
+                 hot ? C_ERRFG : C_INK2, hot ? C_EXIT_HOT : C_SHEET);
+    }
+}
 
 static void draw_cursor(void) {
     int rows = (int)(sizeof CURSOR / sizeof CURSOR[0]);
@@ -1309,6 +1414,7 @@ void app_draw(void) {
     if (SIDEBAR) draw_sidebar();
     draw_main();
     if (SEARCH_ON) draw_search();
+    if (SETTINGS_ON) draw_settings();
     draw_cursor();          /* last, so nothing occludes it */
     gfx_present();
 }
@@ -1335,6 +1441,23 @@ void app_event(const in_event *e) {
 
     if (e->kind == IN_CLICK) {
         MX = e->x; MY = e->y;
+        if (SETTINGS_ON) {
+            /* Modal: it consumes clicks under it, and a click outside closes it. */
+            if (inside(R_SET_QUIT, MX, MY)) { QUIT = 1; return; }
+            if (inside(R_SET_THEME, MX, MY)) {
+                /* which of the three chips: measured the same way they are drawn */
+                static const char *NAME[3] = { "System", "Light", "Dark" };
+                int bx = R_SET_THEME.x;
+                for (int i = 0; i < 3; i++) {
+                    int w = gfx_text_w(NAME[i], F_SM) + 12;
+                    if (MX >= bx && MX < bx + w) { app_set_theme(i); return; }
+                    bx += w + 6;
+                }
+                return;
+            }
+            SETTINGS_ON = 0;
+            return;
+        }
         if (SEARCH_ON) {                       /* the sheet is modal: it eats clicks under it */
             int rows = NSHIT - SSCROLL; if (rows > SHEET_ROWS) rows = SHEET_ROWS;
             for (int i = 0; i < rows; i++)
@@ -1342,7 +1465,7 @@ void app_event(const in_event *e) {
             SEARCH_ON = 0;                     /* click outside a row closes, as on the web */
             return;
         }
-        if (hit(R_EXIT, MX, MY)) { QUIT = 1; return; }
+        if (hit(R_EXIT, MX, MY)) { SETTINGS_ON = !SETTINGS_ON; return; }
         if (BUSY && hit(R_SEND, MX, MY)) { ABORT = 1; return; }   /* Stop, mid-generation */
         if (hit(R_TOGGLE, MX, MY)) { SIDEBAR = !SIDEBAR; return; }
         if (hit(R_SEARCH, MX, MY)) { open_search(); return; }
@@ -1353,12 +1476,16 @@ void app_event(const in_event *e) {
                 if (inside(R_CHAT[i], MX, MY))  { CUR = CHAT_AT[i]; SCROLL = 0; return; }
             }
         }
-        /* Clicking the box makes it the typing target. Typing already went there, but nothing on
-         * screen said so, so the bar looked inert until a character appeared in it. */
-        if (inside(R_FIELD, MX, MY)) { FIELD_FOCUS = 1; return; }
+        /* THE SEND BUTTON IS TESTED FIRST, because R_SEND lies INSIDE R_FIELD. Checking the
+         * field first meant every click on the arrow was swallowed as "focus the box" and the
+         * message was never sent -- a containment bug, not a hit-testing one, introduced the
+         * moment the field became clickable at all. */
         if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) {
             app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return;
         }
+        /* Clicking the box makes it the typing target. Typing already went there, but nothing on
+         * screen said so, so the bar looked inert until a character appeared in it. */
+        if (inside(R_FIELD, MX, MY)) { FIELD_FOCUS = 1; return; }
         return;
     }
 
@@ -1381,11 +1508,19 @@ void app_event(const in_event *e) {
              * exactly what happened when the main enter key turned out to be unmapped: enter did
              * nothing, ESC was the next thing tried, and the second press exited. Leaving is the X
              * button, which is on screen and now has a hitbox, or ctrl+Q. */
-            if (BUSY)           { ABORT = 1; return; }   /* interrupt, never navigate away */
-            else if (COMPOSE_N) { COMPOSE_N = 0; COMPOSE[0] = 0; return; }
-            else if (CUR >= 0)  { CUR = -1; return; }
+            if (SETTINGS_ON)      { SETTINGS_ON = 0; return; }
+            if (BUSY)             { ABORT = 1; return; }   /* interrupt, never navigate away */
+            /* ESC out of the BAR keeps what you typed. Discarding a half-written question because
+             * someone stepped back from the box is destroying work to undo a focus change. A
+             * second press, once the box is no longer the target, clears it. */
+            else if (FIELD_FOCUS)  { FIELD_FOCUS = 0; return; }
+            else if (COMPOSE_N)   { COMPOSE_N = 0; COMPOSE[0] = 0; return; }
+            else if (CUR >= 0)    { CUR = -1; return; }
             return;
         }
+        /* ctrl+ESC, not ctrl+Q. ESC is already the "get out of the thing I am in" key, so ESC
+         * with a modifier is the natural "get out of the app", and it cannot be reached by
+         * accident the way a bare ESC could. */
         if (k == K_QUIT) { QUIT = 1; return; }
         if (k == K_TAB)  { SIDEBAR = !SIDEBAR; return; }
         /* Chords work from anywhere, including mid-compose, which is the point of having them. */

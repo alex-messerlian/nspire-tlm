@@ -108,6 +108,9 @@ int main(int argc, char **argv) {
         snprintf(COMPOSE, sizeof COMPOSE, "%s", s);
         COMPOSE_N = (int)strlen(COMPOSE);
         app_set_theme(TH_DARK);
+    } else if (!strcmp(screen, "settings") || !strcmp(screen, "settingsdark")) {
+        CUR = -1; MX = 300; MY = 220; SETTINGS_ON = 1;
+        if (!strcmp(screen, "settingsdark")) app_set_theme(TH_DARK);
     } else if (!strcmp(screen, "empty")) {
         NCHATS = 0; CUR = -1; MX = 300; MY = 220;   /* the first-run screen, nothing seeded */
     } else if (!strcmp(screen, "emptydark")) {

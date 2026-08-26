@@ -24,7 +24,11 @@ static void click(int x, int y) { in_event e; memset(&e,0,sizeof e); e.kind=IN_C
  * geometry fail for a reason that has nothing to do with what they assert. Restore all of it. */
 static void reset(void) {
     app_init();
-    ABORT = 0; QUIT = 0; BUSY = 0; SEARCH_ON = 0;
+    /* EVERY modal and view flag, not just the ones that existed when this was written. Three
+     * separate cases have now failed because a flag survived reset(): SIDEBAR collapsed by a stray
+     * click, the marquee clock, and now SETTINGS_ON left open, which ate the next test's clicks
+     * because the sheet is modal. The rule is that reset() means reset. */
+    ABORT = 0; QUIT = 0; BUSY = 0; SEARCH_ON = 0; SETTINGS_ON = 0; FIELD_FOCUS = 0;
     SIDEBAR = 1; HOVER = 0; MX = MY = 0; SCROLL = 0; CHAT_SCROLL = 0;
     /* The animation clock too. A timestamp left by an earlier case made NOW_MS - MARQ_T0 underflow
      * and the marquee read as fully travelled before it had moved at all. */
@@ -78,9 +82,16 @@ int main(void) {
     reset();
     key(K_QUIT);
     T("ctrl+Q quits",                        app_should_quit(), 1);
+    /* The corner control is a GEAR now, not an X: it opens settings, and Quit is a row inside.
+     * An X in the corner is window chrome on a device with no windows, and it made leaving the
+     * only thing that corner could do. */
     reset(); CUR = -1; app_draw();
     click(R_EXIT.x + R_EXIT.w / 2, R_EXIT.y + R_EXIT.h / 2);
-    T("and the X button quits",              app_should_quit(), 1);
+    T("the gear opens settings",             SETTINGS_ON, 1);
+    T("and does not quit",                   app_should_quit(), 0);
+    app_draw();
+    click(R_SET_QUIT.x + R_SET_QUIT.w / 2, R_SET_QUIT.y + R_SET_QUIT.h / 2);
+    T("Quit inside settings quits",          app_should_quit(), 1);
 
     /* MUTATION: the shipped behaviour, where a stray ESC at home ended the session. */
     {   reset();
@@ -95,19 +106,17 @@ int main(void) {
     T("search open: ESC does NOT quit",      app_should_quit(), 0);
     T("search open: ESC stays in the chat",  CUR, 0);
 
-    printf("\n  -- the X button: one tap out, from anywhere --\n");
-    const int EX = GFX_W - 22 + 9, EY = 3 + 9;      /* centre of R_EXIT as draw_main places it */
-    reset(); app_draw();
-    click(EX, EY);
-    T("at home: X quits",                    app_should_quit(), 1);
-
+    /* The corner control opens settings from every screen, and never quits. */
+    reset(); CUR = -1; app_draw();
+    click(R_EXIT.x + 12, R_EXIT.y + 12);
+    T("at home: the gear opens settings",    SETTINGS_ON, 1);
     reset(); seed("a"); CUR = 0; app_draw();
-    click(EX, EY);
-    T("inside a chat: X quits (no ESC needed)", app_should_quit(), 1);
-
-    reset(); seed("a"); CUR = 0; SIDEBAR = 0; app_draw();
-    click(EX, EY);
-    T("sidebar collapsed: X still quits",    app_should_quit(), 1);
+    click(R_EXIT.x + 12, R_EXIT.y + 12);
+    T("inside a chat too",                   SETTINGS_ON, 1);
+    reset(); SIDEBAR = 0; app_draw();
+    click(R_EXIT.x + 12, R_EXIT.y + 12);
+    T("with the sidebar collapsed too",      SETTINGS_ON, 1);
+    T("and none of those quit",              app_should_quit(), 0);
 
     printf("\n  -- Stop, mid-generation --\n");
     reset(); seed("a"); CUR = 0; BUSY = 1; app_draw();
