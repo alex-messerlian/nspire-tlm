@@ -61,7 +61,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli $(BUILD)/asmcli
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -104,6 +104,14 @@ $(BUILD)/test_shapecheck: tools/eval/test_shapecheck.c src/store/shapecheck.c sr
 
 # The CLI both Python graders call. WIRING_AUDIT records that two separate graders exist, so a check
 # added once covers half the surface; this is what lets both call the same C.
+# asmcli is THE SHIPPED ASSEMBLER, invoked by train/e2e.py, train/remeasure.py and
+# tools/eval/gate_format_parity.py -- every prompt those harnesses grade comes out of it. It was a
+# committed binary with no rule, so this session's ns_assemble constant-inlining fix reached it only
+# because it happened to be rebuilt by hand. A measurement harness whose prompt builder is a stale
+# artefact is measuring last week's prompts.
+$(BUILD)/asmcli: src/store/asmcli.c src/store/assemble.c src/store/loader.c src/store/assemble.h | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/assemble.c src/store/loader.c -lm
+
 # provcli is what grade.py, select_run.py and score.py all shell out to -- the single most-called
 # check in the repo -- and it was a COMMITTED BINARY that no rule rebuilt. A fix to provenance.c
 # never reached it; every provenance number in this repo came from whatever was compiled at some

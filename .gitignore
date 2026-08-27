@@ -16,3 +16,5 @@ __pycache__/
 *.pyc
 .venv-tok
 vendor
+build/test_*_mut
+*.bak

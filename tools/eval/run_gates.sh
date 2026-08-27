@@ -64,6 +64,10 @@ $PY tools/eval/test_genloop.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_
 # operands and landed on the right number passed. test_score also asserts that score.py and grade.py
 # AGREE, because two graders means every check has to be added twice or it covers half the surface.
 $PY tools/eval/test_score.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_score" || { printf "  %-20s FAIL\n" "test_score"; fail=1; }
+# No tracked binary may exist without a rule that rebuilds it. provcli -- the check the
+# architecture's central claim rests on -- was one, so a fix to provenance.c never reached the
+# running binary. Third instance of the class after the four gate suites and build/asmcli.
+$PY tools/eval/gate_binaries.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "gate_binaries" || { printf "  %-20s FAIL\n" "gate_binaries"; fail=1; }
 # The generator may only emit relations the CLEANED store contains. docs/RESULT_STORE_CLEANING.md
 # deleted 34 records for documented reasons and units_train.json was never re-cleaned; a change that
 # made units_train the iterated set silently re-admitted 24 of them, three named "Strategy".

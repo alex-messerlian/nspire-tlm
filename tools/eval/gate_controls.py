@@ -32,6 +32,14 @@ CONTROLS = {
                         "if (nodecmp(cw, cg) == 0) return TLM_SHAPE_OK;", "if (1) return TLM_SHAPE_OK;"),
     "test_shapecheck": ("src/store/shapecheck.c",
                         "if (nodecmp(cw, cg) == 0) return TLM_SHAPE_OK;", "if (1) return TLM_SHAPE_OK;"),
+    # asmcli, not provcli: `make` has a BUILT-IN `%: %.c` rule, and tools/eval/provcli.c sits beside
+    # tools/eval/provcli, so removing the explicit rule still leaves an implicit one and the gate
+    # (correctly) reports a rule exists. build/asmcli's source is src/store/asmcli.c, a different
+    # directory, so no implicit rule reaches it -- which makes it the target that actually tests the
+    # gate. The limitation is real and documented in gate_binaries.py: this gate detects NO RULE, not
+    # "only an implicit rule that would build it wrong".
+    "gate_binaries":   ("Makefile",
+                        "$(BUILD)/asmcli: src/store/asmcli.c", "$(BUILD)/asmcli_DISABLED:"),
     "test_score":      ("tools/eval/score.py",
                         '                 and r["prov_clean"] is True and r["shape"] != "mismatch")',
                         "                 )"),
