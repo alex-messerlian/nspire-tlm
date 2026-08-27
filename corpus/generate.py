@@ -76,6 +76,73 @@ def sample_value(rng):
     uniform(1.5, 95) produced m = 92.6 kg and r = 70.25 m, which no textbook contains."""
     return rng.choice(_POOL)
 
+
+# A21. THE GIVENS WERE UNCHECKED. A17 filters RESULTS, and every input was drawn from one pool
+# regardless of what the variable IS -- so 69% of documents on the six trigonometric records fed an
+# angle of, for instance, 55.7 radians, which is 8.9 full turns. cos of it is a number, the
+# evaluator computes it, the result is dimensionally fine and every gate passed.
+#
+# THE RANGE IS PER QUANTITY, NOT PER UNIT. The declared unit cannot decide this: `1` covers angles,
+# counts, quantum numbers, refractive indices and plain ratios, and their admissible ranges differ
+# by orders of magnitude. So the class is identified from the VARIABLE and the RECORD together.
+#
+# NARROW AND EXPLICIT, and the limit is the honest part: a variable this table does not recognise
+# is drawn as before. It is a list of quantities somebody has thought about, not a theory of
+# physical plausibility, and "not in the table" must not be read as "checked".
+# A VARIABLE IS AN ANGLE BECAUSE OF WHERE IT APPEARS, NOT WHAT IT IS CALLED. A symbol list had
+# `alpha`, and `alpha` is angular acceleration as often as it is an angle -- it constrained a
+# non-angle in `p=h/lambda` to 2*pi. The property is "this value is consumed as an angle", and the
+# formula says so directly: it is the argument of a trig function, or its unit is rad.
+_TRIG_ARG = re.compile(r"\b(?:sin|cos|tan|asin|acos|atan)\s*\(\s*([^)]*)\)")
+
+def _is_angle(rec, var):
+    unit = ((rec.get("units") or {}).get(var) or "").strip()
+    if unit == "rad": return True
+    if unit not in ("1", ""): return False
+    return any(re.search(rf"(?<![A-Za-z0-9_]){re.escape(var)}(?![A-Za-z0-9_])", a)
+               for a in _TRIG_ARG.findall(rec["f"]))
+
+def quantity_range(rec, var):
+    """(lo, hi, integral, why) for a given, or None if this variable is not in the table."""
+    unit = ((rec.get("units") or {}).get(var) or "").strip()
+    name = (rec.get("name") or "").lower()
+    f = rec["f"]
+    if _is_angle(rec, var):
+        # A physical angle. Full-turn multiples are not wrong arithmetic, they are not a scenario:
+        # no textbook asks for the component of a force at 8.9 turns.
+        return (0.0, 6.28318, False, "an angle beyond one full turn is not a scenario")
+    # THE VARIABLE MUST BE THE INDEX, not merely live in a record about refraction. The first
+    # version keyed on the record NAME alone and applied the [1,4] window to `c`, `h` and `p` in
+    # "Index of refraction" -- constraining the speed of light to at most 4. A range table keyed on
+    # the record instead of the quantity is the same category error as the units field keyed on
+    # position instead of headedness.
+    if var in ("n", "n_1", "n_2") and ("refract" in name or "refract" in f.lower()):
+        return (1.0, 4.0, False, "a refractive index below 1 implies faster than light in vacuum")
+    if var in ("n", "N") and ("quantum" in name or "photon" in name or "level" in name):
+        return (1.0, 12.0, True, "a quantum number is a positive integer")
+    if var == "d" and "degrees of freedom" in name:
+        return (3.0, 7.0, True, "degrees of freedom is a small positive integer")
+    if var in ("N_P", "N_S"):
+        return (1.0, 5000.0, True, "a turns count is a positive integer")
+    if unit == "K" and not var.startswith(("Delta", "delta")):
+        return (1.0, 1.0e4, False, "an absolute temperature is positive and not stellar here")
+    if unit == "m/s" and var != "c" and "light" not in name:
+        return (1.0e-3, 2.9979e8, False, "a material speed cannot exceed c")
+    if unit == "kg":
+        return (1.0e-6, 1.0e6, False, "a laboratory mass")
+    if var in ("p_0", "p_a", "p_atm") and unit in ("Pa",):
+        return (5.0e4, 1.5e5, False, "atmospheric pressure is ~1e5 Pa, not an arbitrary draw")
+    return None
+
+
+def sample_in_range(rng, lo, hi, integral):
+    """Draw from the empirical pool, restricted to the range; fall back to a uniform draw when the
+    pool offers nothing there, so a narrow window cannot silently empty the distribution."""
+    pool = [v for v in _POOL if lo <= v <= hi and (not integral or float(v).is_integer())]
+    if pool: return rng.choice(pool)
+    if integral: return float(rng.randint(int(lo), max(int(lo), int(hi))))
+    return round(rng.uniform(lo, hi), 4)
+
 VAR = re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
 RES = {"pi","e","sin","cos","tan","ln","log","sqrt","exp","d","f","x","t"}
 
@@ -526,7 +593,12 @@ def gen(n, seed=0):
         r = rng.choice(recs)
         lhs, rhs = r["f"].split("=", 1)
         vs = sorted({v for v in VAR.findall(rhs)} - {"pi", "e"})
-        vals = {v: (_const_for(r, v) if _const_for(r, v) is not None else sample_value(rng)) for v in vs}
+        def _draw(v):
+            c = _const_for(r, v)
+            if c is not None: return c
+            rr = quantity_range(r, v)
+            return sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else sample_value(rng)
+        vals = {v: _draw(v) for v in vs}
         expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
         free = [v for v in vs if _const_for(r, v) is None]
         if not free: continue                          # nothing left to ask about

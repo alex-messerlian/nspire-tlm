@@ -305,19 +305,6 @@
   "rid": "76438db8"
  },
  {
-  "f": "Delta_T_F=T_F2-T_F1",
-  "name": "change in Fahrenheit temperature",
-  "units": {
-   "Delta_T_F": "K",
-   "T_F1": "K",
-   "T_F2": "K"
-  },
-  "scope": "m58385",
-  "source": "worked-example",
-  "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "ace7e584"
- },
- {
   "f": "P_ave=I_rms*V_rms",
   "name": "average AC power from rms current and voltage",
   "units": {
@@ -1184,19 +1171,6 @@
   "scope": "m58745",
   "verified": "gates-passed-hand-coverage-unproven",
   "rid": "b19adaa8"
- },
- {
-  "f": "Delta_T_F=((9)/(5))*(T_C2-T_C1)",
-  "name": "Fahrenheit change from a Celsius change",
-  "units": {
-   "Delta_T_F": "K",
-   "T_C1": "K",
-   "T_C2": "K"
-  },
-  "scope": "m58385",
-  "source": "worked-example",
-  "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "528fdd0b"
  },
  {
   "f": "A=((1)/(2))*theta*(r)^(2)",

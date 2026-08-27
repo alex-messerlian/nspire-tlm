@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
-"""The record span the GENERATOR writes must match the one the DEVICE assembles.
+"""PROVISIONAL -- superseded by tools/eval/gate_record_bytes.py. See the note below.
+
+The record span the GENERATOR writes must match the one the DEVICE assembles.
+
+> **PROVISIONAL, and kept only as a second opinion.** This gate compares FOUR FIELDS. The same
+> defect was then found a fifth time, in `missing:`, and a sixth in the `<res>` span -- because a
+> field-comparison gate only ever checks the field somebody had just thought about.
+> `gate_record_bytes.py` diffs the WHOLE record span against `build/asmcli` byte for byte and
+> subsumes every check here.
+>
+> **What this covers that bytes do not:** it names WHICH field diverged, which is a better error
+> message, and it exercises `gen.units_field()` directly so a control can target that function.
+> Neither is a property; both are diagnostics. Delete this gate once gate_record_bytes has run
+> clean across a wider sample of records than the 400 it samples today.
 
 THREE PRODUCERS OF ONE FORMAT, and they disagreed. src/store/assemble.c emits the LHS unit on every
 device prompt -- "units for every variable, LHS included -- the answer needs a unit to state", and

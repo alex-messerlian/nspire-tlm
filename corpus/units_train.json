@@ -330,17 +330,6 @@
   "source": "worked-example"
  },
  {
-  "f": "Delta_T_F=T_F2-T_F1",
-  "name": "(from worked example)",
-  "units": {
-   "Delta_T_F": "K",
-   "T_F1": "K",
-   "T_F2": "K"
-  },
-  "scope": "m58385",
-  "source": "worked-example"
- },
- {
   "f": "Delta_x=x_f-x_0",
   "name": "Calculating Displacement: A Subway Train",
   "units": {
@@ -1386,17 +1375,6 @@
    "q": "C"
   },
   "scope": "m58745"
- },
- {
-  "f": "Delta_T_F=((9)/(5))*(T_C2-T_C1)",
-  "name": "(from worked example)",
-  "units": {
-   "Delta_T_F": "K",
-   "T_C1": "K",
-   "T_C2": "K"
-  },
-  "scope": "m58385",
-  "source": "worked-example"
  },
  {
   "f": "A=((1)/(2))*theta*(r)^(2)",

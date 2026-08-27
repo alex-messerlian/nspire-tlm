@@ -125,6 +125,9 @@ $PY tools/eval/gate_no_orphan_values.py >/dev/null 2>&1 && printf "  %-20s PASS\
 $PY tools/eval/gate_units_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "units_parity" || { printf "  %-20s FAIL\n" "units_parity"; fail=1; }
 # Physically impossible RESULTS -- the class nothing owned, because distribution_gate cannot
 # see digits and dim_gate finds -28.75 a dimensionally fine efficiency.
+# A21: gate_plausible filters RESULTS; every GIVEN was unchecked, and 69% of trig documents fed
+# an angle of several full turns. Range is per QUANTITY, not per unit.
+$PY tools/eval/gate_given_range.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "given_range" || { printf "  %-20s FAIL\n" "given_range"; fail=1; }
 $PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "plausible" || { printf "  %-20s FAIL\n" "plausible"; fail=1; }
 # THE SAME DEFECT WAS FOUND FOUR TIMES, ONE FIELD OVER EACH TIME (units, condition, fit,
 # missing). This compares the whole record span BYTE FOR BYTE against build/asmcli, so it
