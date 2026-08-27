@@ -90,6 +90,19 @@ CONTROLS = {
     # Revert A6 to what shipped: substitute the asked-for quantity into ANY of the 44 mined
     # frames, including the 36 sentence fragments. ASK_ALL, not ASK -- reverting to the reviewed
     # list would not reintroduce the fragments and the control would prove nothing.
+    "items_refs":      ("tools/eval/items.json",  # put the stale reference back
+                        '"A=F/p"', '"A=F/P"'),
+    "stale_figures":   ("docs/LATENCY_BUDGET.md",   # put the stale figure back
+                        "`chars/token = 2.901`", "`chars/token = 3.5`"),
+    # Revert A7: drop the constants back out of the question's givens.
+    # Revert A8: give the mismatch branch its private RHS-only copy of the units rule back.
+    "fit_cue":         ("corpus/generate.py",
+                        "            umap = units_field(rec_r)",
+                        "            umap = ' '.join(f\"{v}:{rec_r['units'][v]}\" for v in sorted("
+                        "{x for x in VAR.findall(rec_r['f'].split('=',1)[1])}) "
+                        "if v in rec_r.get('units',{}))"),
+    "no_orphan_values":("corpus/generate.py",
+                        "        shown  = free + consts", "        shown  = free"),
     "ask_quantity":    ("corpus/generate.py",
                         "        ask  = ask_for(r, quantity_surface(r, rng), rng)",
                         "        ask  = rng.choice(ASK_ALL).format(q=quantity_surface(r, rng))"),
@@ -173,7 +186,11 @@ ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_sc
 
 def run_gate(name):
     name = ALIAS.get(name, name)
-    r = subprocess.run(["bash", "tools/eval/run_gates.sh"], capture_output=True, text=True)
+    # Announce ourselves as the lock holder so run_gates.sh does not refuse OUR invocation --
+    # it refuses everyone else, which is the point. See the guard at the top of that script.
+    _env = dict(os.environ, TLM_CONTROLS_OWNER=str(os.getpid()))
+    r = subprocess.run(["bash", "tools/eval/run_gates.sh"], capture_output=True, text=True,
+                       env=_env)
     for line in r.stdout.splitlines():
         parts = line.split()
         if len(parts) >= 2 and parts[0] == name:
@@ -269,7 +286,14 @@ def main():
         finally:
             f.write_text(original)
             _ORIGINALS.pop(path, None)
-            subprocess.run(["make", "-s", "tests"], capture_output=True)
+            # -B, NOT plain make. Restoring the source is not enough: this run left seven binaries
+            # compiled from mutated sources, and the next plain `run_gates.sh` reported seven
+            # FAILURES that had nothing to do with the tree -- test_tokenizer at 0/581, and half an
+            # hour spent looking for a defect that did not exist. Incremental make decides by
+            # timestamp and the restore can land inside the same granularity, so the only safe
+            # rebuild after a mutation is a forced one. Slower, and this script is already slow by
+            # construction.
+            subprocess.run(["make", "-sB", "tests"], capture_output=True)
         ok = verdict in ("FAIL", "CANNOT")
         print(f"  {'caught  ' if ok else 'SURVIVED'} {name:18} (reverted -> {verdict})")
         if not ok: failures.append(name)

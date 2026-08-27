@@ -912,7 +912,7 @@
   ],
   "expect": "answer",
   "ref": [
-   "f=v/L",
+   "f=v/lambda",
    "400"
   ],
   "hand30": false
@@ -942,7 +942,7 @@
   ],
   "expect": "answer",
   "ref": [
-   "F=P/(1/A)",
+   "F=p/(1/A)",
    "300"
   ],
   "hand30": false
@@ -957,7 +957,7 @@
   ],
   "expect": "answer",
   "ref": [
-   "k=F/x",
+   "k=F/(-1*x)",
    "250"
   ],
   "hand30": false
@@ -1032,7 +1032,7 @@
   ],
   "expect": "answer",
   "ref": [
-   "L=v/f",
+   "lambda=v/f",
    "3"
   ],
   "hand30": false
@@ -1766,7 +1766,7 @@
   ],
   "expect": "symbolic",
   "ref": [
-   "L=v/f"
+   "lambda=v/f"
   ],
   "hand30": false
  },
@@ -1798,14 +1798,14 @@
  },
  {
   "id": "B1-016",
-  "q": "Solve P=F/A for A.",
+  "q": "Solve p=F/A for A.",
   "record": "p=F/A | p:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
    "<tool>solve<arg>p=F/A<arg>A</tool>"
   ],
   "expect": "symbolic",
   "ref": [
-   "A=F/P"
+   "A=F/p"
   ],
   "hand30": true
  },
@@ -1837,14 +1837,14 @@
  },
  {
   "id": "B1-019",
-  "q": "Solve F=k*x for x.",
+  "q": "Solve F=-k*x for x.",
   "record": "F=-k*x | F:N k:N/m x:m | missing:none | Hooke's law, within elastic limit | fit:high",
   "calls": [
    "<tool>solve<arg>F=-k*x<arg>x</tool>"
   ],
   "expect": "symbolic",
   "ref": [
-   "x=F/k"
+   "x=-F/k"
   ],
   "hand30": false
  },

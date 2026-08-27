@@ -398,7 +398,33 @@ def gen(n, seed=0):
         expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
         free = [v for v in vs if _const_for(r, v) is None]
         if not free: continue                          # nothing left to ask about
-        g = ", ".join(f"{v} = {vals[v]:g}" for v in free)
+
+        # A7. CONSTANTS ARE GIVENS, and leaving them out taught the model to fabricate numbers.
+        #
+        # 27 of 141 records carry a resolved constant (g, c, h, G, k_e, R, k_B, eps_0, mu_0). The
+        # value went into the TOOL CALL and into neither the question nor the five-field record, so
+        # 16.2% of documents (measured, 4,000-doc sample) emit a literal that appears NOWHERE in the
+        # model's context. That is the architecture inverted: TOOL_SPEC exists so the model reads
+        # numbers rather than recalling them, and a sixth of the corpus trained it to recall one.
+        #
+        # AND IT MADE THE DEFECT UNGRADEABLE, which is why it survived. Measured on grade.py:
+        #
+        #   constant absent (as shipped)  g=9.81  -> prov False, shape UNCHECKED
+        #   constant absent (as shipped)  g=9810  -> prov False, shape UNCHECKED   <- identical
+        #   constant inlined              g=9.81  -> prov True,  shape ok
+        #   constant inlined              g=9810  -> prov False, shape MISMATCH
+        #
+        # Correct and fabricated were indistinguishable to every grader in the repo. grade.py's own
+        # docstring says the shape check exists for this case -- "the mgh case proves it" -- and it
+        # degraded to `unchecked` on exactly the mgh case. Same shape as dim_gate returning
+        # "unknown": "cannot check" scored as "nothing wrong".
+        #
+        # docs/PROMPT_FORMAT.md section 2 already mandates inlining, build/asmcli already does it on
+        # the device path, and tools/eval/items.json A1-004 does it. The generator did not, so the
+        # corpus disagreed with the runtime that consumes it.
+        consts = [v for v in vs if _const_for(r, v) is not None]
+        shown  = free + consts
+        g = ", ".join(f"{v} = {vals[v]:g}" for v in shown)
         # Decide AFTER the question exists, not before. Two refusal kinds, both from this path:
         #   withhold -> a required given is absent      (D1, missing:X, fit:high)
         #   mismatch -> the record does not fit         (D2, missing:none, fit:low)
@@ -409,8 +435,8 @@ def gen(n, seed=0):
         mismatch = 0.10 <= roll < 0.15
         if withhold:
             drop = rng.choice(vs)
-            free_w = [v for v in free if v != drop]
-            g = ", ".join(f"{v} = {vals[v]:g}" for v in free_w) if free_w else g
+            shown_w = [v for v in shown if v != drop]
+            g = ", ".join(f"{v} = {vals[v]:g}" for v in shown_w) if shown_w else g
         stem = rng.choice(GIVE).format(g=g)
         ask  = ask_for(r, quantity_surface(r, rng), rng)
         # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
@@ -427,8 +453,19 @@ def gen(n, seed=0):
         band = "low" if mismatch else "high"
         rec_r = rng.choice(recs) if mismatch else r
         if mismatch:
-            _vs=sorted({v for v in VAR.findall(rec_r["f"].split("=",1)[1]) if v not in RES})
-            umap=" ".join(f"{v}:{rec_r['units'][v]}" for v in _vs if v in rec_r.get("units",{}))
+            # A8. CALL units_field(), do not re-derive it. This branch carried its own copy that
+            # read the RHS only, so the LHS symbol never got a unit -- and units_field()'s own
+            # docstring records that exact defect being found and fixed. The fix reached one of the
+            # two implementations. Third instance of the pattern, after the loss mask and genloop.
+            #
+            # The cost was not cosmetic. It made fit:low PERFECTLY PREDICTABLE from a formatting
+            # bit: measured over 6,000 documents, the LHS unit was absent from 331/331 = 100.0% of
+            # fit:low records and 42/5,669 = 0.7% of fit:high. A one-bit classifier separates the
+            # refusal classes, so a model can learn "no LHS unit -> say it does not apply" without
+            # ever weighing whether the record fits, and every D2 refusal metric would be measuring
+            # the cue rather than the judgement. Same shape as the topic-scoping artefact: a number
+            # that looks like a capability and is a property of the format.
+            umap = units_field(rec_r)
         docs.append({"q": q, "withhold": drop if withhold else None,
                      "mismatch": (rec_r.get("display") or rec_r.get("name","that quantity")) if mismatch else None,
                      "rec": f"{rec_r['f']} | {umap} | missing:{miss} | "

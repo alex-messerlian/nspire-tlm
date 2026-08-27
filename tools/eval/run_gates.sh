@@ -9,6 +9,28 @@
 #
 # EXIT STATUS IS THE RESULT. 0 = all gates ran and passed. Any non-zero = stop.
 # Exit 2 from a gate means CANNOT CHECK, which is not the same as clean and is also a failure here.
+# REFUSE TO RUN WHILE gate_controls.py IS MUTATING THE TREE. gate_controls deliberately breaks a
+# source file, runs one gate, and restores it. This suite reading a file mid-mutation produces a
+# failure that has nothing to do with the tree you are testing -- observed: shape_spec FAILED here
+# and passed 9/9 standing alone, seconds later, because a control had corpus/generate.py broken at
+# that instant. A red suite that is not about your change is worse than no suite: you go looking
+# for a defect that does not exist.
+#
+# gate_controls took an exclusive lock to stop ITSELF racing; this is the other half. The lock
+# protects the tree from two writers, and this protects a reader from the writer.
+# ...AND IT MUST LET THE LOCK HOLDER THROUGH. gate_controls runs THIS SCRIPT to decide whether a
+# gate fires, while holding the lock. The first version of this guard refused it, so all 23 gates
+# reported ABSENT and the meta-gate said "23 without a proven control" -- a guard that protects a
+# reader from a writer must not block the writer's own reads. gate_controls exports its pid; only
+# that pid's descendants bypass, so a stale variable in an unrelated shell cannot disable this.
+_LOCK="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/.gate_controls.lock"
+if [ -f "$_LOCK" ] && [ "${TLM_CONTROLS_OWNER:-}" != "$(cat "$_LOCK" 2>/dev/null)" ] \
+   && kill -0 "$(cat "$_LOCK" 2>/dev/null)" 2>/dev/null; then
+  echo "REFUSING TO RUN: gate_controls.py (pid $(cat "$_LOCK")) is mutating this tree."
+  echo "  Any failure here would be an artefact of its mutations, not of your change."
+  exit 2
+fi
+
 set -u
 STORE="${1:-corpus/store_clean.json}"
 PY=.venv-tok/bin/python
@@ -76,6 +98,20 @@ $PY tools/eval/gate_event_producers.py >/dev/null 2>&1 && printf "  %-20s PASS\n
 # Unreachable before the corpus restart, so it ratchets against a recorded baseline.
 # A6: 22.5% of the shipped corpus asked for a quantity the record does not compute.
 # Found by reading one generated question; every other gate passed those documents.
+# A3+A4: a derived figure must still match the artefact it came from. chars/token was written
+# as 3.5, corrected to 2.69 in prose in another document, and both were stale at 2.901.
+# items.json ref is DERIVED by executing calls. Commit 25393cc edited q/record/calls by hand
+# to settle three spelling decisions and ref went stale on 7 items -- two of which a correct
+# model could then not pass.
+$PY tools/eval/gate_items_refs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "items_refs" || { printf "  %-20s FAIL\n" "items_refs"; fail=1; }
+$PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }
+# A7: 16.2% of documents used a constant in the CALL that appeared in neither the question nor
+# the record -- recalled, not read -- and while it was absent the graders could not tell a
+# correct constant from a fabricated one (both "unchecked").
+# A8: the D2 branch kept its own copy of the units-field rule, so fit:low was 100% predictable
+# from a one-bit formatting cue and every D2 refusal metric measured the cue.
+$PY tools/eval/gate_fit_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "fit_cue" || { printf "  %-20s FAIL\n" "fit_cue"; fail=1; }
+$PY tools/eval/gate_no_orphan_values.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_orphan_values" || { printf "  %-20s FAIL\n" "no_orphan_values"; fail=1; }
 $PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }
 $PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }
 # The generator may only emit relations the CLEANED store contains. docs/RESULT_STORE_CLEANING.md
