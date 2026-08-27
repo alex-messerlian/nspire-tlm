@@ -32,6 +32,7 @@ need_file "$PY"              "python3 -m venv .venv-tok && .venv-tok/bin/pip ins
 need_file "$STORE"           "the record store; pass a path as \$1 if it lives elsewhere"
 need_file build/store.tns    "python3 tools/store_pack.py $STORE build/store.tns"
 need_file build/tok4096.tok  "python3 tools/tok_pack.py"
+need_file tools/eval/shapecli "make tests   # the structural call check, ARCHITECTURE.md s6"
 if [ "$prereq_missing" -ne 0 ]; then
     echo "GATE SUITE DID NOT RUN -- prerequisites above are missing."
     echo "This is NOT a gate failure. Nothing was checked. Create them and re-run."
@@ -50,6 +51,10 @@ $PY tools/eval/test_scope.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_sc
 # including the two that provenance and dim_gate are both documented as unable to see. Listed here
 # because a rule nothing runs is a rule that will drift from the C that implements it.
 $PY tools/eval/shape_spec.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_spec" || { printf "  %-20s FAIL\n" "shape_spec"; fail=1; }
+# The C implementation, and a mutation pass over it. All-green on a first run triggers the mutation
+# pass, not confidence -- this repo has three recorded cases of a suite that passed everything while
+# measuring nothing.
+$PY tools/eval/shape_mutation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_mutation" || { printf "  %-20s FAIL\n" "shape_mutation"; fail=1; }
 ./build/test_loader build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_loader" || { printf "  %-20s FAIL\n" "test_loader"; fail=1; }
 ./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }
 ./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }
@@ -62,7 +67,7 @@ $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_
 # test_ckpt guards the LOADER. It is listed here and not only in the Makefile because this file,
 # not TESTS, is what decides whether the suite passed -- a roster kept in two places drifts, and
 # the half nobody reads is the half that silently stops running.
-for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_select test_persist; do
+for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_shapecheck test_select test_persist; do
     if [ ! -x "build/$b" ]; then
         # A MISSING binary is a failure, not a skip. "cannot check" and "checked and clean" must
         # never share an exit status.

@@ -17,6 +17,7 @@
 #include "tokenizer.h"
 #include "../../tools/eval/eval.h"
 #include "toolrun.h"
+#include "shapecheck.h"
 
 /* ---- elapsed time -------------------------------------------------------------------------------
  * The status line reports how long a turn took, and this project does not put unmeasured numbers on
@@ -464,6 +465,10 @@ void app_request(const char *question, const char *rid) {
     int stopped = 0;
     static char tool_call[64], tool_res[48];
     int tool_ok = 0; tool_call[0] = 0; tool_res[0] = 0;
+    /* Structural call validation state -- docs/ARCHITECTURE.md s6. Initialised to UNCHECKED, not to
+     * OK: a document that never reaches the check must not read as one that passed it. */
+    static char shape_reason[192];
+    int shape_bad = TLM_SHAPE_UNCHECKED; shape_reason[0] = 0;
     app_status("Thinking", 0);
     app_draw();
 
@@ -511,6 +516,31 @@ void app_request(const char *question, const char *rid) {
                     } }
                 app_status(tool_ok ? "Got" : "Tool refused", tool_res);
                 app_draw();
+
+                /* ---- STRUCTURAL CALL VALIDATION -- docs/ARCHITECTURE.md s6 ------------------
+                 * The runtime is holding the relation and the call it just ran, and until now
+                 * nothing compared them. Provenance checks that the ARGUMENTS trace to supplied
+                 * values, not that the OPERATION is the specified one, so `v=d/t` answered as
+                 * eval((49.0)/(150.0)) is perfectly clean and perfectly inverted.
+                 *
+                 * The document handed in is prompt + everything emitted so far, which is the same
+                 * string the two host graders pass. Note this runs AFTER execution: the result is
+                 * already on screen, and what a mismatch changes is whether the answer composed
+                 * around it is allowed to stand. */
+                {   static char fulldoc[2048], shape_why[192];
+                    int fl = snprintf(fulldoc, sizeof fulldoc, "%s%s", prompt, doc);
+                    if (fl > 0) {
+                        shape_bad = tlm_shape_check_doc(fulldoc, shape_why, sizeof shape_why);
+                        if (shape_bad == TLM_SHAPE_MISMATCH) {
+                            /* A CATEGORY, NEVER A REPAIR. A signal that says "you dropped g" is a
+                             * supplier with extra steps, and that is the incremental drift
+                             * MODEL_RUNTIME_LINE.md exists to prevent. The reader is told the call
+                             * does not match the relation; the model is told nothing. */
+                            app_status("Call does not match the relation", tool_call);
+                            app_draw();
+                        }
+                        snprintf(shape_reason, sizeof shape_reason, "%s", shape_why);
+                    } }
             } else
                 /* Malformed span. Report the evaluator's own no-call code rather than skipping, so
                  * a broken call is visible instead of looking like a clean answer. */

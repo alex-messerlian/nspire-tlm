@@ -35,15 +35,38 @@ int ns_assemble(char *out, int cap, const ns_rec2 *r, const char *question, cons
      * call to trace to the question or the record. Without this the model has nothing to compute
      * with, invents its inputs, and provenance correctly rejects 89% of answers -- which is
      * exactly what the first end-to-end run measured. */
-    if (in && in->nvals > 0) {
-        n = appends(out, cap, n, " ");
-        for (int i = 0; i < in->nvals; i++) {
-            if (i) n = appends(out, cap, n, ", ");
+    /* THE RECORD'S CONSTANTS GO IN BESIDE THEM, and this file has claimed to do it since it was
+     * written -- "constants are inlined", in the header comment above, with no code behind it.
+     * DESIGN_PRINCIPLE.md carries the same claim as capability #4 at 97.5%.
+     *
+     * Three things break without it, and all three were measured (docs/RESULT_MGH_TRACE.md):
+     *   1. The model is handed `U=m*g*h` with two of three values and `missing:none`. Dropping the
+     *      third factor is the best available continuation of that prompt.
+     *   2. prov_call_unsourced sources numbers to the question and the record ONLY, so a CORRECT
+     *      answer citing 9.81 scores unsourced while the WRONG one scores clean -- the grader
+     *      prefers the wrong answer on all 37 constant-bearing records.
+     *   3. tlm_shape_check cannot run: with g unbound the runtime cannot say what the call should
+     *      be, so it returns UNCHECKED for the right call and the wrong one alike.
+     *
+     * Emitted in the SAME `v = value` form as the entered values, because that is the one form the
+     * question span already uses and the form provenance and the shape check both read. */
+    int nwrote = 0;
+    if ((in && in->nvals > 0) || r->nvars) {
+        for (int i = 0; in && i < in->nvals; i++) {
+            n = appends(out, cap, n, nwrote++ ? ", " : " ");
             n = appends(out, cap, n, in->var[i]);
             n = appends(out, cap, n, " = ");
             n = appends(out, cap, n, in->val[i]);
         }
-        n = appends(out, cap, n, ".");
+        for (int k = 0; k < r->nvars; k++) {
+            if (!r->cval[k] || !r->cval[k][0]) continue;
+            if (value_for(in, r->var[k])) continue;   /* the student overrode it; theirs wins */
+            n = appends(out, cap, n, nwrote++ ? ", " : " ");
+            n = appends(out, cap, n, r->var[k]);
+            n = appends(out, cap, n, " = ");
+            n = appends(out, cap, n, r->cval[k]);
+        }
+        if (nwrote) n = appends(out, cap, n, ".");
     }
     n = appends(out, cap, n, "</q><r>");
     n = appends(out, cap, n, r->formula);

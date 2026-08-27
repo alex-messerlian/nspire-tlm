@@ -33,7 +33,8 @@ EVAL_CORE := $(addprefix tools/eval/, fmt.c ast.c units.c parser.c numeric.c der
                                       literal.c integrate.c stat.c dispatch.c)
 
 APP_SRC   := src/store/app.c src/store/gfx.c src/store/loader.c src/store/assemble.c \
-             src/store/tokenizer.c src/store/picker.c src/store/toolrun.c src/store/chatstore.c
+             src/store/tokenizer.c src/store/picker.c src/store/toolrun.c src/store/chatstore.c \
+             src/store/shapecheck.c
 
 DEV_SRC   := src/store/device_app.c $(APP_SRC) src/runq_nspire.c src/nspire.c include/nspire_screen.c
 
@@ -45,13 +46,13 @@ HOST_LINK := src/store/gfx.c src/store/chatstore.c $(BUILD)/hoststub.o
 # reach its file-scope state; the others link toolrun.c and the evaluator.
 TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme test_select test_persist
 TESTS_EVAL := test_toolrun
-TESTS_PLAIN:= test_chatstore test_ckpt
+TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck
 TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN)
 
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -81,6 +82,18 @@ $(BUILD)/test_toolrun: tools/eval/test_toolrun.c src/store/toolrun.c src/store/t
 
 $(BUILD)/test_chatstore: tools/eval/test_chatstore.c src/store/chatstore.c src/store/chatstore.h | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/chatstore.c src/store/gfx.c -lm
+
+# The structural call check (docs/ARCHITECTURE.md section 6). Built against the SHIPPED evaluator
+# core, not a second expression grammar -- a validator with its own parser would disagree with the
+# evaluator on exactly the inputs where disagreement matters.
+$(BUILD)/test_shapecheck: tools/eval/test_shapecheck.c src/store/shapecheck.c src/store/shapecheck.h \
+                          $(EVAL_CORE) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/shapecheck.c $(EVAL_CORE) -lm
+
+# The CLI both Python graders call. WIRING_AUDIT records that two separate graders exist, so a check
+# added once covers half the surface; this is what lets both call the same C.
+tools/eval/shapecli: tools/eval/shapecli.c src/store/shapecheck.c src/store/shapecheck.h $(EVAL_CORE)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/shapecheck.c $(EVAL_CORE) -lm
 
 # Compiles runq_nspire.c on the HOST, which is the point: the loader that runs on the calculator is
 # the one under test, not a reimplementation of its rules.
@@ -141,5 +154,6 @@ check: tests
 	@bash tools/eval/run_gates.sh
 
 clean:
+	rm -f tools/eval/shapecli
 	rm -f $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app $(BUILD)/hoststub.[co] \
 	      $(BUILD)/chattlm.elf $(BUILD)/chattlm.zehn

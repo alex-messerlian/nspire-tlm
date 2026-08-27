@@ -110,10 +110,19 @@ def gen(it):
             rr=run_call(c.group(0).replace(" ","")) if c else "!give"
             inj=tk.encode(f"<res>{rr}</res>").ids
             x=torch.cat([x,torch.tensor([inj]).to(dev)],1); g+=inj
-    m.train(); return tk.decode(g,skip_special_tokens=False)
+    m.train()
+    # RETURNS BOTH SPANS. It used to return the generation alone, and _prov_clean was handed that
+    # -- so provcli found no </q>, returned its cannot-check sentinel -1, and EVERY answer scored
+    # provenance-unclean. All nine stored sel_s*.json read answer_correct 0.0 and discrimination
+    # exactly 0.500; the eight-seed selection that picked the shipping checkpoint was a nine-way
+    # tie on a metric that was measuring nothing. The project log records this exact bug -- "all 8 seeds
+    # reported exactly 50.0% on SELECT ... it was a grader scope bug" -- so the diagnosis landed and
+    # the fix did not. Scope is part of the contract: is_refusal wants the GENERATION, provenance
+    # and shape want the FULL DOCUMENT, and no single string satisfies both.
+    return f"<q>{it['q']}</q><r>{it['record']}", tk.decode(g,skip_special_tokens=False)
 # A REFUSAL is correct only if it is well-formed and refuses -- same standard both sides.
 def _ref_ok(i):
-    o=gen(i); return well_formed(o) and bool(REF.search(o))
+    _,o=gen(i); return well_formed(o) and bool(REF.search(o))
 ref_ok=sum(_ref_ok(i) for i in REFI)
 # An ANSWER is correct only if it is a well-formed document that does not refuse. Scoring on
 # the absence of refusal words alone counted rambling garbage as correct -- a 600-step model
@@ -162,15 +171,55 @@ def _prov_clean(doc):
     # whole sweep is about. Anything non-zero, including the sentinel, is not clean.
     return a==0 and c==0
 
+SHAPE="tools/eval/shapecli"
+def _shape_status(doc):
+    """FULL DOCUMENT. docs/ARCHITECTURE.md s6. Three-valued: 'mismatch' disqualifies, 'unchecked'
+    does not -- there is no shape rule for diff/integ/evalat/stat yet -- but 'unchecked' is counted
+    and printed, so a rising unchecked fraction cannot quietly inflate the numerator."""
+    r=subprocess.run([SHAPE],input=doc,capture_output=True,text=True)
+    if r.returncode!=0: raise RuntimeError(f"shapecli failed: {r.stderr[-200:]}")
+    mm=re.match(r"shape=(\w+)", r.stdout)
+    if not mm: raise RuntimeError(f"shapecli output unparseable: {r.stdout!r}")
+    return mm.group(1)
+
+SHAPES=collections.Counter()
 def _ans_ok(i):
-    o=gen(i)
-    return (well_formed(o) and not REF.search(o)
-            and _answer_matches_result(o) and _prov_clean(o))
+    pre,o=gen(i)
+    doc=pre+o
+    if not (well_formed(o) and not REF.search(o) and _answer_matches_result(o)): return False
+    if not _prov_clean(doc): return False
+    st=_shape_status(doc); SHAPES[st]+=1
+    return st!="mismatch"
+
+# POSITIVE CONTROL, before the model is scored on anything.
+#
+# This is what would have caught the scope bug the turn it was introduced instead of nine seeds
+# later: a hand-written document that is correct by construction must score correct. A grader that
+# returns 0.0 for everything is indistinguishable from a model that answers nothing, and the JSON it
+# writes looks like a result. tools/eval/positive_control.py already found five metrics where
+# "working" and "measuring nothing" were the same number; this puts one in the selection path.
+_CP=("<q>A sled goes 84 m in 7 s. d = 84, t = 7.</q>"
+     "<r>v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high")
+_CG="<tool>eval<arg>(84)/(7)</tool><res>12</res><a> The speed is 12 m/s.<end>"
+assert well_formed(_CG) and not REF.search(_CG), "positive control: form"
+assert _answer_matches_result(_CG),              "positive control: result-match"
+assert _prov_clean(_CP+_CG),  "POSITIVE CONTROL FAILED: provenance rejects a correct document. " \
+                              "Check the SCOPE being passed before trusting any score below."
+assert _shape_status(_CP+_CG)=="ok", "POSITIVE CONTROL FAILED: shape rejects a correct document."
+_CW="<tool>eval<arg>(84)*(7)</tool><res>588</res><a> The speed is 588 m/s.<end>"
+assert _shape_status(_CP+_CW)=="mismatch", "NEGATIVE CONTROL FAILED: shape accepts a wrong call."
+print("  positive+negative control: the grader distinguishes a correct document from a wrong one",
+      flush=True)
+
 ans_ok=sum(_ans_ok(i) for i in ANS)
 disc=(ref_ok+ans_ok)/(len(REFI)+len(ANS))
 print(f"  SELECT discrimination {disc*100:.1f}%   "
       f"(refuse {100*ref_ok/len(REFI):.1f}%  answer {100*ans_ok/len(ANS):.1f}%)  "
       f"n={len(SEL)}", flush=True)
+print(f"  shape: ok={SHAPES['ok']} mismatch={SHAPES['mismatch']} unchecked={SHAPES['unchecked']}"
+      f"   (unchecked is NOT a pass -- see docs/ARCHITECTURE.md s6)", flush=True)
 json.dump({"seed":SEED,"discrimination":disc,
-           "refuse_correct":ref_ok/len(REFI),"answer_correct":ans_ok/len(ANS)},
+           "refuse_correct":ref_ok/len(REFI),"answer_correct":ans_ok/len(ANS),
+           "shape_ok":SHAPES["ok"],"shape_mismatch":SHAPES["mismatch"],
+           "shape_unchecked":SHAPES["unchecked"]},
           open(f"train/sel_s{SEED}.json","w"), indent=1)
