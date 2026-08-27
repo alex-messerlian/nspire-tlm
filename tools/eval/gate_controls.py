@@ -319,26 +319,34 @@ def main():
         if find not in original:
             print(f"  STALE CONTROL  {name}: the text it mutates is gone from {path}")
             failures.append(name); continue
+        _mtime0 = f.stat().st_mtime          # pristine timestamp, put back after the rebuild
         try:
             _write_and_stamp(f, original.replace(find, repl, 1))
-            # -B ON THE MUTATE SIDE TOO. The restore side was fixed first and this one was left
-            # plain, so a mutation to tools/eval/dispatch.c did NOT reach tools/eval/evalcli and
+            # THE MUTATE SIDE NEEDS THE STAMP TOO. It was left plain when the restore side was
+            # fixed, so a mutation to tools/eval/dispatch.c did NOT reach tools/eval/evalcli and
             # the control reported SURVIVED -- which reads as "this gate cannot fail" when the
-            # truth was "the mutation never got there". A half-forced rebuild is worse than none,
-            # because it fails in the direction that looks like a finding about the gate.
+            # truth was "the mutation never got there". A half-invalidated rebuild is worse than
+            # none, because it fails in the direction that looks like a finding about the gate.
             subprocess.run(["make", "-s", "tests"], capture_output=True)
             verdict = run_gate(name)
         finally:
             _write_and_stamp(f, original)
             _ORIGINALS.pop(path, None)
-            # -B, NOT plain make. Restoring the source is not enough: this run left seven binaries
-            # compiled from mutated sources, and the next plain `run_gates.sh` reported seven
-            # FAILURES that had nothing to do with the tree -- test_tokenizer at 0/581, and half an
-            # hour spent looking for a defect that did not exist. Incremental make decides by
-            # timestamp and the restore can land inside the same granularity, so the only safe
-            # rebuild after a mutation is a forced one. Slower, and this script is already slow by
-            # construction.
+            # Rebuild so the restored source reaches every binary. _write_and_stamp above pushed
+            # the mtime clear of make's sub-second granularity, which is what makes plain `make`
+            # sufficient here: an earlier version used `make -B` and cost 6.65 s a call to rebuild
+            # twenty-five binaries in order to invalidate one.
             subprocess.run(["make", "-s", "tests"], capture_output=True)
+            # PUT THE TIMESTAMP BACK. The stamp is a message to make and nothing else; leaving it
+            # leaks two seconds of future into the tree, so every file this harness has ever
+            # mutated looks NEWER than binaries whose content never changed -- and
+            # tools/nspire-cli/push-all.sh then reports the whole device set stale and demands a
+            # rebuild that is not needed. It errs safe, and a gate that cries wolf is how a REAL
+            # staleness warning gets waved through.
+            #
+            # ORDER MATTERS: rebuild first, WITH the bump, so make actually sees the restore; only
+            # then reset. The binary ends up newer than the source, which is the truth.
+            os.utime(f, (_mtime0, _mtime0))
         ok = verdict in ("FAIL", "CANNOT")
         print(f"  {'caught  ' if ok else 'SURVIVED'} {name:18} (reverted -> {verdict})")
         if not ok: failures.append(name)

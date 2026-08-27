@@ -130,6 +130,28 @@ newer_than tools/eval/eval_device.tns tools/eval/device_main.c tools/eval/eval.h
 newer_than src/llama2.tns             src/nspire_main.c src/runq_nspire.c src/nspire.c
 newer_than build/transfer/store.tns.tns     corpus/store_clean.json
 newer_than build/transfer/tok4096.tok.tns   build/tok4096.tok
+
+# ...AND ASK MAKE, because the hand-written lists above are a copy of the Makefiles' prerequisites
+# and a copy goes stale. Measured: eval_device.tns was listed against device_main.c and eval.h only,
+# while tools/eval/Makefile builds it from $(CORE) -- eleven files including dispatch.c. A change to
+# dispatch.c therefore left a STALE eval_device.tns that this gate passed. Same shape as the parity
+# gate comparing one field of five: a check named for a property must cover the property's parts.
+#
+# `make -q TARGET` exits non-zero when the target is out of date and touches nothing. It is the
+# question itself rather than a proxy for it, so it cannot drift from the Makefile the way a list
+# can. Kept ALONGSIDE the explicit lists rather than replacing them: this can only make the gate
+# stricter, and the lists still document the intent for a reader.
+ask_make() {   # ask_make <dir> <target> <label>
+    ( cd "$1" 2>/dev/null && make -q "$2" >/dev/null 2>&1 ) || {
+        echo "  STALE (make): $3 is out of date against its own Makefile prerequisites"; stale=1; }
+}
+ask_make .          build/chattlm.tns        build/chattlm.tns
+ask_make tools/eval eval_device.tns          tools/eval/eval_device.tns
+ask_make src        llama2.tns               src/llama2.tns
+for _b in forward cas platform mem mac flash rtc; do
+    ask_make . "bench/bench_${_b}.tns" "bench/bench_${_b}.tns"
+done
+
 if [ "$stale" -ne 0 ]; then
     echo "  FATAL: at least one program is stale or missing. Pushing a stale binary measures the"
     echo "         previous session. Rebuild everything the transfer set needs:"
