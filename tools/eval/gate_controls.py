@@ -38,6 +38,10 @@ CONTROLS = {
     # directory, so no implicit rule reaches it -- which makes it the target that actually tests the
     # gate. The limitation is real and documented in gate_binaries.py: this gate detects NO RULE, not
     # "only an implicit rule that would build it wrong".
+    "event_producers": ("src/store/device_app.c",
+                        "e->kind = IN_CLICK;", "e->kind = IN_MOVE;"),
+    "distribution_gate": ("tools/eval/distribution_gate.py",
+                        'BASELINE = {"SELECT": 40.0', 'BASELINE = {"SELECT": 5.0'),
     "gate_binaries":   ("Makefile",
                         "$(BUILD)/asmcli: src/store/asmcli.c", "$(BUILD)/asmcli_DISABLED:"),
     "test_score":      ("tools/eval/score.py",
@@ -62,6 +66,18 @@ CONTROLS = {
     "test_toolrun":    ("src/store/toolrun.c",
                         'if (!res[0]) snprintf(res, sizeof res, "!give");',
                         'res[0] = 0;'),
+    # ITEM 10: answer_ok has FIVE conditions and only two were controlled. Each of the other three
+    # is mutated to a constant here -- the failure mode is not a subtle logic error, it is a check
+    # quietly degrading to True, which is exactly what provenance did and what nothing noticed.
+    "test_scope_wf":   ("tools/eval/grade.py",
+                        "def well_formed(generation):\n    o = generation",
+                        "def well_formed(generation):\n    return True\n    o = generation"),
+    "test_scope_ref":  ("tools/eval/grade.py",
+                        "    return bool(REF.search(generation))",
+                        "    return False"),
+    "test_scope_rm":   ("tools/eval/grade.py",
+                        "def answer_matches_result(generation):\n    o = generation",
+                        "def answer_matches_result(generation):\n    return True\n    o = generation"),
     "test_scope":      ("tools/eval/grade.py",
                         "            and answer_matches_result(generation) and prov_clean(prompt + generation)",
                         "            and answer_matches_result(generation)"),
@@ -81,7 +97,12 @@ def gates_in_suite():
     if m: names |= set(m.group(1).split())
     return sorted(names)
 
+# Several controls exercise DIFFERENT clauses of ONE gate. The suffix names the clause; the gate
+# whose verdict is read is the part before the first underscore-suffix in ALIAS.
+ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_scope_rm": "test_scope"}
+
 def run_gate(name):
+    name = ALIAS.get(name, name)
     r = subprocess.run(["bash", "tools/eval/run_gates.sh"], capture_output=True, text=True)
     for line in r.stdout.splitlines():
         parts = line.split()
@@ -91,8 +112,10 @@ def run_gate(name):
 
 def main():
     want = sys.argv[1:]
-    roster = gates_in_suite()
-    missing = [g for g in roster if g not in CONTROLS and g not in UNCONTROLLED_REASON]
+    roster = gates_in_suite() + [k for k in CONTROLS if k in ALIAS]
+    missing = [g for g in roster if g not in CONTROLS and g not in UNCONTROLLED_REASON
+               and g not in ALIAS.values() or (g in ALIAS.values() and g not in CONTROLS)]
+    missing = sorted({g for g in roster if g not in CONTROLS and g not in UNCONTROLLED_REASON})
     print(f"gates in run_gates.sh: {len(roster)}   with a registered control: "
           f"{sum(1 for g in roster if CONTROLS.get(g))}   uncontrolled: {len(missing)}")
     if missing:

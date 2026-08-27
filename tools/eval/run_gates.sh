@@ -68,6 +68,13 @@ $PY tools/eval/test_score.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_sc
 # architecture's central claim rests on -- was one, so a fix to provenance.c never reached the
 # running binary. Third instance of the class after the four gate suites and build/asmcli.
 $PY tools/eval/gate_binaries.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "gate_binaries" || { printf "  %-20s FAIL\n" "gate_binaries"; fail=1; }
+# ITEM 14: every event kind app.c HANDLES must have a producer. WIRING_AUDIT's own closing
+# instruction, never carried out -- and IN_SCROLL is still handled and emitted by nothing.
+$PY tools/eval/gate_event_producers.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "event_producers" || { printf "  %-20s FAIL\n" "event_producers"; fail=1; }
+# ITEM 15: distribution_gate.py was written with a __main__ and an exit code and wired to NOTHING.
+# Its first run says the eval set is 91-95% separable from training against a ~52% noise control.
+# Unreachable before the corpus restart, so it ratchets against a recorded baseline.
+$PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }
 # The generator may only emit relations the CLEANED store contains. docs/RESULT_STORE_CLEANING.md
 # deleted 34 records for documented reasons and units_train.json was never re-cleaned; a change that
 # made units_train the iterated set silently re-admitted 24 of them, three named "Strategy".

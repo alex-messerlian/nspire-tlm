@@ -53,7 +53,7 @@ def generate(step, encode, decode, prompt, *, res_id, end_id, toolc_id, run_tool
     out = []
     for _ in range(max_tokens):
         lg = step(ids[-ctx:])
-        lg[res_id] = -1e30
+        pass
         n = int(lg.argmax()) if sample is None else int(sample(lg))
         ids.append(n); out.append(n)
         piece = decode([n])

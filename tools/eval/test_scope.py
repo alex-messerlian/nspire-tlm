@@ -45,5 +45,26 @@ if grade.prov_clean(G_OK):
     print("FAIL provenance on a bare generation must NOT read clean -- "
           "question-sourced numbers are invisible without the prompt"); fail += 1
 
-print(f"{'FAILED' if fail else 'PASS'}: {len(CASES)} answer/refusal cases + 4 scope assertions, {fail} failure(s)")
+# ---- answer_matches_result: the condition nothing tested ---------------------------------------
+#
+# gate_controls found that this function can be replaced by `return True` and EVERY gate still
+# passes. It is one of the five conditions in answer_ok, and its whole job is that the number in the
+# prose is the number the runtime computed -- the difference between "the model reported the result"
+# and "the model wrote a number". The other four conditions are guarded; this one was not.
+_AMR = [
+    ("states the injected result",            "<tool>e<arg>84/7</tool><res>12</res><a> 12 m/s.<end>",           True),
+    ("rounds it, legitimately",               "<tool>e<arg>84/7</tool><res>12.5</res><a> About 13 m/s.<end>",   True),
+    ("states a DIFFERENT number",             "<tool>e<arg>84/7</tool><res>12</res><a> 99 m/s.<end>",           False),
+    ("states no number at all",               "<tool>e<arg>84/7</tool><res>12</res><a> It is fast.<end>",       False),
+    ("no result span to match against",       "<a> 12 m/s.<end>",                                              False),
+    ("result present, answer echoes the ARG", "<tool>e<arg>84/7</tool><res>12</res><a> 84 m.<end>",             False),
+]
+for _lbl, _g, _want in _AMR:
+    _got = grade.answer_matches_result(_g)
+    if _got != _want:
+        print(f"FAIL answer_matches_result: {_lbl} -> {_got}, want {_want}"); fail += 1
+print(f"  ok  answer_matches_result: {len(_AMR)} cases, including 4 that must be REJECTED")
+
+print(f"{'FAILED' if fail else 'PASS'}: {len(CASES)} answer/refusal cases + 4 scope assertions "
+      f"+ {len(_AMR)} result-match cases, {fail} failure(s)")
 sys.exit(1 if fail else 0)
