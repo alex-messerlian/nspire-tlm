@@ -46,6 +46,10 @@ for g in lhs_gate lint_leibniz lint_declaration lint_fused_words dim_gate; do
     esac
 done
 $PY tools/eval/test_scope.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_scope" || { printf "  %-20s FAIL\n" "test_scope"; fail=1; }
+# The structural-shape rule (docs/ARCHITECTURE.md s6) validated against all nine known traces,
+# including the two that provenance and dim_gate are both documented as unable to see. Listed here
+# because a rule nothing runs is a rule that will drift from the C that implements it.
+$PY tools/eval/shape_spec.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_spec" || { printf "  %-20s FAIL\n" "shape_spec"; fail=1; }
 ./build/test_loader build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_loader" || { printf "  %-20s FAIL\n" "test_loader"; fail=1; }
 ./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }
 ./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }
