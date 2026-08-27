@@ -131,6 +131,16 @@ _mined = {r["f"]: r for r in json.load(open("corpus/records_raw.json"))}
 # relation names, so prefer it; 45 of the 82 bad names are covered that way, and all 20 eval
 # relations get a proper name with no new work.
 _store = {r["f"]: r for r in json.load(open("corpus/store_clean.json"))}
+
+
+def _condition_field(r):
+    """The record span's condition field, by the SHIPPED assembler's rule (assemble.c:94).
+
+    Reads `req` from the STORE, not from the annotated record the generator iterates -- 0 of 141
+    of those carry it, which is exactly how the two producers came to disagree on 57.4% of records
+    while each looked internally consistent."""
+    req = (_store.get(r.get("f"), {}) or {}).get("req") or r.get("req")
+    return req if req else "standard conditions"
 _BADNAME = re.compile(r"^\(|Example|Using |Calculat|^Find |Determin|Problem|Theorem", re.I)
 
 def _best_name(f, ann):
@@ -468,8 +478,21 @@ def gen(n, seed=0):
             umap = units_field(rec_r)
         docs.append({"q": q, "withhold": drop if withhold else None,
                      "mismatch": (rec_r.get("display") or rec_r.get("name","that quantity")) if mismatch else None,
+                     # A9. THE CONDITION FIELD MUST MATCH THE SHIPPED ASSEMBLER, and it did not
+                     # on 81 of 141 records (57.4%). src/store/assemble.c:94 is the authority:
+                     #     r->req && r->req[0] ? r->req : "standard conditions"
+                     # The generator instead used condition(name), a name-derived lookup, and only
+                     # 2 of 141 store records carry `req` at all -- so the device says "standard
+                     # conditions" where the model trained on "constant acceleration, no air
+                     # resistance". A train/serve skew in the fourth field of every prompt.
+                     #
+                     # The name-derived conditions are arguably more informative, and that is not
+                     # the deciding question: the model must be trained on what the device emits.
+                     # Changing the device instead would be the other fix and it ships in C on
+                     # hardware; if the richer conditions are wanted, they belong in the store's
+                     # `req`, where BOTH producers already read them.
                      "rec": f"{rec_r['f']} | {umap} | missing:{miss} | "
-                            f"{rec_r.get('req', r['cond'])} | fit:{band}", "lhs": lhs,
+                            f"{_condition_field(rec_r)} | fit:{band}", "lhs": lhs,
                      "name": r["name"], "head": r["f"],
                      "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")

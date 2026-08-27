@@ -96,6 +96,11 @@ CONTROLS = {
                         "`chars/token = 2.901`", "`chars/token = 3.5`"),
     # Revert A7: drop the constants back out of the question's givens.
     # Revert A8: give the mismatch branch its private RHS-only copy of the units rule back.
+    # A gate that checks four fields needs a control per field, or it proves one. This reverts
+    # A9 -- the condition field back to the name-derived lookup the device does not use.
+    "format_parity_cond":("corpus/generate.py",
+                        "    req = (_store.get(r.get(\"f\"), {}) or {}).get(\"req\") or r.get(\"req\")",
+                        "    req = r.get(\"cond\")"),
     "fit_cue":         ("corpus/generate.py",
                         "            umap = units_field(rec_r)",
                         "            umap = ' '.join(f\"{v}:{rec_r['units'][v]}\" for v in sorted("
@@ -182,7 +187,8 @@ def gates_in_suite():
 
 # Several controls exercise DIFFERENT clauses of ONE gate. The suffix names the clause; the gate
 # whose verdict is read is the part before the first underscore-suffix in ALIAS.
-ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_scope_rm": "test_scope"}
+ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_scope_rm": "test_scope",
+         "format_parity_cond": "format_parity"}   # one control per FIELD the parity gate checks
 
 def run_gate(name):
     name = ALIAS.get(name, name)

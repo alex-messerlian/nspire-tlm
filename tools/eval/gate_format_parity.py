@@ -64,21 +64,40 @@ def unit_vars(span):
     field = parts[1] if len(parts) == 5 else ""
     return {m.split(":")[0] for m in field.split() if ":" in m}
 
+def five(span):
+    """The five fields, split from the RIGHT for the reason unit_vars documents."""
+    parts = span.rsplit("|", 4)
+    return parts if len(parts) == 5 else None
+
+
+# ALL FIVE FIELDS, not just units. Comparing one field was itself the defect: while this gate
+# checked units and reported clean, the CONDITION field differed on 81 of 141 records (57.4%) --
+# the device applies assemble.c:94, `req ? req : "standard conditions"`, and the generator applied
+# a name-derived lookup. A parity gate that checks one field of five asserts parity and measures
+# a fifth of it.
 bad = []
 for r, prompt in zip(recs, prompts):
     if prompt.startswith("!"): continue
-    dev = unit_vars(prompt.split("<r>", 1)[1])
-    # CALL the generator's own function. The first version re-implemented it here, so mutating
-    # corpus/generate.py did not move this gate and the negative control passed with the fix
-    # reverted -- a gate carrying its own copy of the rule tests the copy.
-    genv = {m.split(":")[0] for m in gen.units_field(r).split() if ":" in m}
-    if dev != genv:
-        bad.append((r["f"], sorted(dev - genv), sorted(genv - dev)))
+    span = prompt.split("<r>", 1)[1]
+    dev = five(span)
+    if dev is None:
+        bad.append((r["f"], "field count", span[:40], "not 5 fields")); continue
+    # CALL the generator's own functions. The first version re-implemented units_field here, so
+    # mutating corpus/generate.py did not move this gate and the negative control passed with the
+    # fix reverted -- a gate carrying its own copy of the rule tests the copy.
+    if unit_vars(span) != {m.split(":")[0] for m in gen.units_field(r).split() if ":" in m}:
+        bad.append((r["f"], "units", dev[1].strip()[:38], gen.units_field(r)[:38]))
+    if dev[3].strip() != gen._condition_field(r).strip():
+        bad.append((r["f"], "condition", dev[3].strip()[:38], gen._condition_field(r)[:38]))
+    if not dev[4].strip().startswith("fit:"):
+        bad.append((r["f"], "fit", dev[4].strip()[:38], "expected fit:*"))
+    if not dev[2].strip().startswith("missing:"):
+        bad.append((r["f"], "missing", dev[2].strip()[:38], "expected missing:*"))
 
-print(f"compared {len(recs)} records: generator record span vs the shipped assembler")
+print(f"compared {len(recs)} records x 4 fields: generator record span vs the shipped assembler")
 if bad:
     print(f"{len(bad)} MISMATCH(ES) -- the model would never see what the device emits:")
-    for f, only_dev, only_gen in bad[:15]:
-        print(f"  {f:32} device-only {only_dev}   generator-only {only_gen}")
+    for f, field, d, g in bad[:15]:
+        print(f"  {f:26} {field:10} device {d!r}   generator {g!r}")
     sys.exit(1)
 print("clean")
