@@ -723,9 +723,25 @@ def gen(n, seed=0):
             except (ValueError, IndexError): _why = None
             if _why:
                 dropped += 1; continue                # A17: drop, do not teach an impossible value
-        try:   res = f"{float(res):.4g}"            # signed off: 4 significant figures
+        # A20. `<res>` IS THE RUNTIME'S STRING, VERBATIM. The 4-significant-figure sign-off was
+        # about the ANSWER's precision and this line applied it to the INJECTED RESULT as well,
+        # rebinding `res` before it reached the <res> span four lines below.
+        #
+        # src/store/toolrun.c:34 writes `<res>%s</res>` straight from the evaluator, and
+        # tools/eval/fmt.c:31 is SIG_DIGITS 10. So 52.88% of answerable documents carried a result
+        # string the shipped runtime does not produce -- `9.541e-32` where the device emits
+        # `9.54144e-32`. The A9 pattern exactly: two producers of one field, one changed, the other
+        # not, and this one is the ARCHITECTURE'S CENTRAL MECHANISM.
+        #
+        # And the answer restated <res> byte-for-byte in 100% of documents, so the corpus never
+        # demonstrated a rounding step. At serve time the model is handed a 10-digit result in a
+        # slot where it has only ever seen 4 -- having learned that the answer is the res span
+        # copied. Rounding in the ANSWER is what the sign-off asked for, and it is now the only
+        # place it happens, which also gives the model the rounding step to learn.
+        a_val = res
+        try:   a_val = f"{float(res):.4g}"          # signed off: 4 significant figures, ANSWER only
         except ValueError: pass
-        a_txt = f"{res} {d['unit']}".strip() if d.get("unit") else res
+        a_txt = f"{a_val} {d['unit']}".strip() if d.get("unit") else a_val
         ans = d["close"].format(v=d["lhs"], a=a_txt, q=d["name"].lower(), why=d["why"])
         built.append({"head": d["head"],
                       "text": f"<q>{d['q']}</q><r>{d['rec']}{c}<res>{res}</res><a>{ans}<end>",

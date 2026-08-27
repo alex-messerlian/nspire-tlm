@@ -69,7 +69,15 @@ def answer_matches_result(generation):
     seg = o.split("<a>", 1)[1] if "<a>" in o else ""
     vals = []
     for tok in NUM.findall(seg):
-        d = sum(1 for ch in tok.split("e")[0] if ch.isdigit())
+        # SIGNIFICANT figures, not digits. Counting every digit reads "0.05977" as SIX and then
+        # demands the reference agree to six -- so a correct 4-sf restatement of 0.05977286312
+        # failed. Leading zeros are placeholders, not significance.
+        #
+        # It never surfaced while the generator rebound <res> to 4 sf, because the answer and the
+        # result span were then byte-identical and no rounding had to be tolerated. A20 made <res>
+        # verbatim (it must match src/store/toolrun.c) and this bug became visible on 145 of 1,199
+        # documents. A latent grader defect uncovered by fixing the corpus, not caused by it.
+        d = sum(1 for ch in tok.split("e")[0].lstrip("-+0.").replace(".", "") if ch.isdigit())
         try: vals.append((float(tok), max(1, d)))
         except ValueError: pass
     refs = []
@@ -78,7 +86,20 @@ def answer_matches_result(generation):
         if mm:
             try: refs.append(float(mm.group()))
             except ValueError: pass
-    return any(_sig_round(rv, sg) == _sig_round(v, sg) for v, sg in vals for rv in refs)
+    # HALF AN ULP AT THE STATED PRECISION, not equality after re-rounding. `245.25` to 4 sf is
+    # `245.2` under round-half-even (Python's %g, which the generator uses) and `245.3` under
+    # round-half-up (_sig_round). BOTH ARE CORRECT ROUNDINGS of a tie, and demanding one made 19
+    # of 1,610 correct answers fail. The property is "the stated value is a correct rounding of the
+    # result to the precision it shows", so the test is distance, not identity.
+    #
+    # It is not a loosening: half an ulp at the shown precision is the widest a correct rounding
+    # can be, and a wrong number is further. test_score pins both directions.
+    def _within(v, rv, sg):
+        if rv == 0: return abs(v) < 1e-12
+        import math
+        ulp = 10.0 ** (math.floor(math.log10(abs(rv))) - sg + 1)
+        return abs(v - rv) <= 0.5 * ulp * (1 + 1e-9)
+    return any(_within(v, rv, sg) for v, sg in vals for rv in refs)
 
 def prov_clean(full_document):
     """FULL DOCUMENT (prompt + generation). Provenance sources numbers to the question and record;
@@ -212,6 +233,18 @@ _G_NOUNIT = "<tool>eval<arg>84/7</arg></tool><res>12</res><a> The speed is 12.<e
 assert is_refusal(_REC),        "record contains 'missing:' -- documents the hazard"
 assert not is_refusal(_G),      "a correct generation must not read as a refusal"
 assert answer_ok(_P, _G),       "a correct answer must pass with prompt/generation split"
+# A20: a correctly ROUNDED restatement of a full-precision result must pass, and a wrong one fail.
+_R_OK  = "<tool>eval<arg>2/33.46</arg></tool><res>0.05977286312</res><a> The speed is 0.05977 m/s.<end>"
+_R_BAD = "<tool>eval<arg>2/33.46</arg></tool><res>0.05977286312</res><a> The speed is 0.06531 m/s.<end>"
+assert answer_matches_result(_R_OK),      "a 4-sf restatement of a 10-digit result must MATCH"
+assert not answer_matches_result(_R_BAD), "a wrong number must not match, rounding or no"
+# A tie may be rounded either way; both must pass, and a number one ulp further must not.
+_T_EVEN = "<tool>eval<arg>25*9.81</arg></tool><res>245.25</res><a> The weight is 245.2 N.<end>"
+_T_UP   = "<tool>eval<arg>25*9.81</arg></tool><res>245.25</res><a> The weight is 245.3 N.<end>"
+_T_BAD  = "<tool>eval<arg>25*9.81</arg></tool><res>245.25</res><a> The weight is 245.4 N.<end>"
+assert answer_matches_result(_T_EVEN),     "round-half-even of a tie must match"
+assert answer_matches_result(_T_UP),       "round-half-up of a tie must match"
+assert not answer_matches_result(_T_BAD),  "a value beyond half an ulp must NOT match"
 # A10 both directions, asserted at import so the check cannot degrade to a constant unnoticed.
 assert not answer_unit_ok(_P + _G_NOUNIT), "an answer omitting the declared unit must FAIL"
 assert answer_unit_ok(_P + _G),            "an answer stating the declared unit must PASS"

@@ -55,6 +55,25 @@ static double round_sig(double v, int sig) {
     return floor(fabs(v) * m + 0.5) / m * (v < 0 ? -1.0 : 1.0);
 }
 
+/* Is `shown` a CORRECT ROUNDING of `src` to the precision `shown` displays?
+ *
+ * WAS round_sig(src)==round_sig(shown), AND THAT FAILS ON A TIE. round_sig is round-half-up, so
+ * 245.25 to 4 s.f. is 245.3 -- while the generator (and every printf %g) rounds half-to-even and
+ * writes 245.2. Both are correct roundings of a tie, and the equality test called the correct one
+ * UNSOURCED: 25 of 2,422 documents, every one of them right.
+ *
+ * The property is distance, not identity: a correct rounding lies within half a unit in the last
+ * displayed place. tools/eval/grade.py's answer_matches_result implements the same rule, and the
+ * two are kept in step deliberately -- they are two producers of one judgement, which is how the
+ * record span drifted four times. Not a loosening: half an ulp is the widest a correct rounding
+ * can be, and test_prov pins the far side. */
+static int rounds_to(double src, double shown, int sig) {
+    if (src == shown) return 1;
+    if (src == 0.0)   return fabs(shown) < 1e-12;
+    double ulp = pow(10.0, floor(log10(fabs(src))) - (double)sig + 1.0);
+    return fabs(shown - src) <= 0.5 * ulp * (1.0 + 1e-9);
+}
+
 /* Every numeric literal in a <tool> ARGUMENT must trace to the question or the record.
  *
  * Checking only the answer verifies the arithmetic and not the PREMISES: a model can invent its
@@ -91,7 +110,7 @@ int prov_call_unsourced(const char *doc, double *first) {
         for (int i = 0; i < na; i++) {
             int ok = 0;
             for (int j = 0; j < ns && !ok; j++)
-                if (round_sig(src[j], asig[i]) == round_sig(a[i], asig[i])) ok = 1;
+                if (rounds_to(src[j], a[i], asig[i])) ok = 1;
             if (!ok) { if (bad == 0 && first) *first = a[i]; bad++; }
         }
         p = e + 7;
@@ -121,7 +140,7 @@ int prov_unsourced(const char *doc, double *first) {
     for (int i = 0; i < na; i++) {
         int ok = 0;
         for (int j = 0; j < ns && !ok; j++)
-            if (round_sig(src[j], asig[i]) == round_sig(a[i], asig[i])) ok = 1;
+            if (rounds_to(src[j], a[i], asig[i])) ok = 1;
         if (!ok) { if (bad == 0 && first) *first = a[i]; bad++; }
     }
     return bad;

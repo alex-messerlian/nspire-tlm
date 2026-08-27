@@ -125,6 +125,10 @@ CONTROLS = {
     "plausible":       ("corpus/generate.py",    # stop dropping impossible results
                         "            if _why:", "            if False:"),
     # Revert the units ORDER to sorted -- the skew gate_format_parity excused as cosmetic.
+    "res_verbatim":    ("corpus/generate.py",     # round <res> again, as it was
+                        "        a_val = res\n", "        a_val = res\n        res = a_val = "
+                        "f\"{float(res):.4g}\" if res.replace('.','').replace('-','')"
+                        ".replace('e','').isdigit() else res\n"),
     "record_bytes":    ("corpus/generate.py",
                         "    seen, vs = set(), []", "    seen, vs = set(), sorted({v for v in "
                         "VAR.findall(r['f'].split('=',1)[1])} - {'pi','e'}); vs = list(vs); vs2 = []\n"

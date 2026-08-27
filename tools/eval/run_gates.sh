@@ -129,6 +129,9 @@ $PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "pla
 # THE SAME DEFECT WAS FOUND FOUR TIMES, ONE FIELD OVER EACH TIME (units, condition, fit,
 # missing). This compares the whole record span BYTE FOR BYTE against build/asmcli, so it
 # cannot be outflanked by a field nobody thought of.
+# <res> is the architecture's central mechanism: toolrun.c writes the evaluator string
+# verbatim at SIG_DIGITS 10, and the generator was rounding it to 4 s.f. -- 52.88% of docs.
+$PY tools/eval/gate_res_verbatim.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "res_verbatim" || { printf "  %-20s FAIL\n" "res_verbatim"; fail=1; }
 $PY tools/eval/gate_record_bytes.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "record_bytes" || { printf "  %-20s FAIL\n" "record_bytes"; fail=1; }
 $PY tools/eval/gate_store_coverage.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_coverage" || { printf "  %-20s FAIL\n" "store_coverage"; fail=1; }
 $PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }
