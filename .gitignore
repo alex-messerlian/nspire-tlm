@@ -14,3 +14,4 @@ corpus/raw/
 
 __pycache__/
 *.pyc
+.venv-tok
