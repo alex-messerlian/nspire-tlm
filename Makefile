@@ -61,7 +61,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli $(BUILD)/asmcli
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli $(BUILD)/asmcli $(BUILD)/tlmui
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -130,6 +130,27 @@ $(BUILD)/test_assemble:  src/store/test_assemble.c  src/store/assemble.c src/sto
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/assemble.c src/store/loader.c -lm
 $(BUILD)/test_tokenizer: src/store/test_tokenizer.c src/store/tokenizer.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/tokenizer.c -lm
+
+# build/tlmui -- the host UI harness that tools/uiserver/server.py drives, and that every
+# localhost UI decision was validated against. It was a COMMITTED BINARY with no rule, and the
+# note in gate_binaries.py claimed NO SOURCE EXISTED for it. That was wrong, and wrong in the
+# repo's own recurring way: absence of a build rule was read as absence of source. The source is
+# right here -- tlm_demo.c has the main, ui_host.c implements ui.h against a terminal instead of
+# nspireio, host_stubs.c replays the 24 device tokens at the measured 373 ms each.
+#
+# The set was recovered by SYMBOL DIFF against the committed artefact, not by guessing: this list
+# is the unique one whose nm output the committed binary's is a subset of. It is a subset and not
+# an equality -- the committed binary is missing ns_tok_special_id, which tokenizer.c exports
+# today. So the artefact every UI claim rested on was already stale by at least one function.
+#
+# It links ui_host.c where the device links ui.c, and host_stubs.c where the device links
+# runq_nspire.c. tlm_demo.c ITSELF is compiled unchanged, which is the whole claim: layout, column
+# budget, truncation and scrolling are the shipped code. The MODEL is not -- see host_stubs.c.
+$(BUILD)/tlmui: src/store/tlm_demo.c src/store/ui_host.c src/store/host_stubs.c \
+                src/store/loader.c src/store/picker.c src/store/assemble.c \
+                src/store/tokenizer.c src/store/ui.h | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/ui_host.c src/store/host_stubs.c src/store/loader.c \
+	      src/store/picker.c src/store/assemble.c src/store/tokenizer.c -lm
 
 # Compiles runq_nspire.c on the HOST, which is the point: the loader that runs on the calculator is
 # the one under test, not a reimplementation of its rules.

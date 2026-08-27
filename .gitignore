@@ -18,3 +18,4 @@ __pycache__/
 vendor
 build/test_*_mut
 *.bak
+.gate_controls.lock

@@ -108,6 +108,16 @@ int main(void) {
       printf("  %s  mutant OR-semantics: 'energy ohm' matches %d (AND says 0)\n",
              ok ? "CAUGHT" : "MISSED", or_hits); }
 
+    /* RANKING, which the ten mirrored cases cannot see. Every one of them expects hits in
+     * ascending index order, so removing the insertion sort in run_search() left all ten passing
+     * -- a negative control survived here and that survival is what found this hole. A title hit
+     * scores 1000 and a body hit 500, so a later session with the term in its TITLE must outrank
+     * an earlier one that only mentions it. */
+    printf("\n  -- ranking: a title hit outranks an earlier body hit --\n");
+    seed("Velocity of a falling stone", "A stone falls for 3 s. Find the speed.",
+         "It reaches 29.4 m/s.");
+    T("title hit sorts above body hit", "velocity", "5,1");
+
     printf("\n  %s: device search, %d failure(s)\n\n", FAILS ? "FAIL" : "PASS", FAILS);
     return FAILS != 0;
 }

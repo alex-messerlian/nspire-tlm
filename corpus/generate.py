@@ -200,6 +200,45 @@ def condition(name):
         if re.search(pat, n): return c
     return "standard conditions"
 
+def quantity_surface(r, rng):
+    """How the QUESTION refers to the quantity being asked for.
+
+    A1. This was `r["name"].lower()` -- the record's canonical name, interpolated verbatim into
+    every question, so a training question named its own record and an eval question never did.
+    docs/UNENFORCED_REVIEW.md A1.
+
+    IT CANNOT SIMPLY BE REMOVED. "Find the ___" is unanswerable; a question has to say what it
+    wants. What was wrong was using ONE surface form, always, and that form being the exact string
+    the retrieval record carries. So: vary it, from material the record already has.
+
+    Four surfaces, and none is invented physics:
+      the canonical name            "the gravitational potential energy"
+      the head noun                 "the potential energy"   (last two words)
+      the bare head                 "the energy"
+      the symbol                    "U"
+    The last two are what a textbook actually writes once the quantity is in play, and they are what
+    the eval set writes. Weighted toward the shorter forms because the corpus was 100% canonical.
+
+    MEASURED, and stated because it is small: this is worth ~2 pp of the separability that
+    distribution_gate reports, not the 34 pp the gate is above its floor. See RESULT_SEPARABILITY.md
+    -- the dominant cause is that the generator's ENTIRE question vocabulary is 249 words."""
+    name = (r.get("name") or "").lower().strip()
+    lhs  = r["f"].split("=", 1)[0].strip()
+    words = name.split()
+    forms, weights = [], []
+    if name:
+        forms.append(name);                       weights.append(2)
+        if len(words) >= 2:
+            forms.append(" ".join(words[-2:]));   weights.append(3)
+        if len(words) >= 3:
+            forms.append(words[-1]);              weights.append(2)
+    if lhs and len(lhs) <= 6:
+        forms.append(lhs);                        weights.append(2)
+    if not forms:
+        return lhs or "the value"
+    return rng.choices(forms, weights=weights, k=1)[0]
+
+
 def units_field(r):
     """The record span's units field, for ONE record. Exported because the parity gate calls it.
 
@@ -276,7 +315,7 @@ def gen(n, seed=0):
             free_w = [v for v in free if v != drop]
             g = ", ".join(f"{v} = {vals[v]:g}" for v in free_w) if free_w else g
         stem = rng.choice(GIVE).format(g=g)
-        ask  = rng.choice(ASK).format(q=r["name"].lower())
+        ask  = rng.choice(ASK).format(q=quantity_surface(r, rng))
         # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
         # real problems, and ordering moves 4-gram diversity more than the verb does.
         if rng.random() < 0.35:

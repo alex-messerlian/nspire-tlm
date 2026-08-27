@@ -105,6 +105,18 @@ int main(void) {
              n == 0 ? "CAUGHT" : "MISSED", n);
       if (n != 0) F++; }
 
+    /* THE PATH GUARD, which nothing asserted. chat_save opens "wb" -- the open IS the destruction --
+     * so is_ours() is checked before it. Deleting that guard left this whole suite passing, which is
+     * how a negative control found the hole: every test here hands chat_save a path it just wrote. */
+    printf("\n  -- chat_save refuses a file that is not ours --\n");
+    { const char *FOREIGN = "/tmp/tlm_not_ours.txt";
+      FILE *f = fopen(FOREIGN, "wb"); fputs("important user data, not a chat store\n", f); fclose(f);
+      T("save refuses a foreign file", chat_save(FOREIGN, C, 2, 0), -1);
+      f = fopen(FOREIGN, "rb"); char back[64] = {0}; size_t got = fread(back, 1, sizeof back - 1, f);
+      fclose(f);
+      T("  and the foreign file is untouched", got > 0 && strncmp(back, "important", 9) == 0, 1);
+      remove(FOREIGN); }
+
     remove(P);
     printf("\n  %s: session persistence, %d failure(s)\n\n", F ? "FAIL" : "PASS", F);
     return F != 0;

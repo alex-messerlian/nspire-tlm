@@ -31,12 +31,6 @@ os.chdir(ROOT)
 EXEMPT = {
     "tools/nspire-cli/nsp": "links libnspire from a sibling checkout; built by tools/nspire-cli/Makefile "
                             "on a machine that has it, and committed so a device pass does not need one",
-    "build/tlmui":          "NO SOURCE FILE EXISTS for it anywhere in the repo -- built once by a "
-                            "hand-typed line and committed. tools/uiserver/server.py drives it and "
-                            "says it is 'the SAME C code that ships', a claim nothing can check. "
-                            "Exempted with that stated, and server.py now REFUSES to run it when it "
-                            "is older than src/store/app.c, which converts the unverifiable claim "
-                            "into a check. Remove this exemption by finding what built it.",
 }
 
 try:

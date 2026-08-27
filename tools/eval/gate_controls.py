@@ -26,6 +26,18 @@ os.chdir(ROOT)
 
 # name -> (file, find, replace) | None if the gate is genuinely uncontrollable, with a reason.
 CONTROLS = {
+    # The five corpus gates all read corpus/store_clean.json. Each control breaks the ONE property
+    # that gate exists to check, in the store, so a gate that has stopped reading its input fails.
+    "dim_gate":        ("corpus/store_clean.json",
+                        '"U": "J"', '"U": "kg"'),
+    "lhs_gate":        ("corpus/store_clean.json",
+                        '"f": "U=m*g*h"', '"f": "m*g*h=U*1"'),
+    "lint_leibniz":    ("corpus/store_clean.json",
+                        '"f": "U=m*g*h"', '"f": "U=(d*V)/(d*t)"'),
+    "lint_declaration":("corpus/store_clean.json",
+                        '"f": "U=m*g*h"', '"f": "U=m*g*h*undeclared_var"'),
+    "lint_fused_words":("corpus/store_clean.json",
+                        '"name": "Hooke\'s law"', '"name": "Hooke\'s law inthe spring"'),
     "shape_spec":      ("tools/eval/shape_spec.py",
                         'if op not in ("Mult", "Add"):', 'if False:'),
     "shape_mutation":  ("src/store/shapecheck.c",
@@ -41,7 +53,59 @@ CONTROLS = {
     "event_producers": ("src/store/device_app.c",
                         "e->kind = IN_CLICK;", "e->kind = IN_MOVE;"),
     "distribution_gate": ("tools/eval/distribution_gate.py",
-                        'BASELINE = {"SELECT": 40.0', 'BASELINE = {"SELECT": 5.0'),
+                        'BASELINE = {"SELECT": 38.5', 'BASELINE = {"SELECT": 5.0'),
+    # ---- the C host suites. Each control breaks the property IN THE CODE UNDER TEST, never in the
+    # suite: a mutation to the assertions would prove only that the assertions run.
+    # ---- the eight app.c suites. app.c is #included by each, so one file carries every control;
+    # each breaks the ONE behaviour named in that suite's header comment.
+    # A CALL SITE, not the helper. Mutating qbubble_textw's constant SURVIVED: the suite calls
+    # qbubble_textw on BOTH sides of its comparison, so it asserts self-consistency and no edit to
+    # the single definition can break it. The original defect was two CALL SITES disagreeing, which
+    # is what this breaks -- and test_bubble now reads app.c to see it.
+    "test_bubble":     ("src/store/app.c",        # the measure pass diverging from the draw pass
+                        "total += gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh0, 0)",
+                        "total += gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, pw - 26, lh0, 0)"),
+    "test_exit":       ("src/store/app.c",        # ESC-as-interrupt: the abort must be consumable
+                        "int app_take_abort(void) { int a = ABORT; ABORT = 0; return a; }",
+                        "int app_take_abort(void) { ABORT = 0; return 0; }"),
+    "test_notation":   ("src/store/app.c",        # sub/superscript rewriting
+                        "const char *g = (in[i] == '_' ? SUB : SUP)[in[i+1] - '0'];",
+                        "const char *g = (in[i] == '_' ? SUP : SUB)[in[i+1] - '0'];"),
+    "test_persist":    ("src/store/app.c",        # sessions are written at all
+                        "if (chat_save(PERSIST, CHATS, NCHATS, CUR) != 0) toast(\"Could not save sessions\");",
+                        "if (0) toast(\"Could not save sessions\");"),
+    "test_search":     ("src/store/app.c",        # ranking: hits must sort by score, best first
+                        "while (at > 0 && score[at - 1] < s) { score[at] = score[at - 1]; SHIT[at] = SHIT[at - 1]; at--; }",
+                        "while (0) { score[at] = score[at - 1]; SHIT[at] = SHIT[at - 1]; at--; }"),
+    "test_select":     ("src/store/app.c",        # the clipboard, which the device does not provide
+                        "    snprintf(CLIP, sizeof CLIP, \"%s\", s);\n    return 1;",
+                        "    CLIP[0] = 0;\n    return 1;"),
+    # NOT span_disp: the first control mutated it and SURVIVED, because this suite drives
+    # span_next directly. The tag-skip below IS the defect the suite's header describes.
+    "test_span":       ("src/store/app.c",        # tag guts must never reach the transcript
+                        "if (!*e || istag(e)) break;", "if (!*e) break;"),
+    "test_theme":      ("src/store/app.c",        # the palette must actually swap
+                        "const uint16_t *src = dark ? PAL_DARK : PAL_LIGHT;",
+                        "const uint16_t *src = PAL_LIGHT;"),
+    "test_ui_errs":    ("tools/webui/index.html",   # a code the evaluator emits, dropped from the map
+                        '"!nosol":"no solution found",\n', ''),
+    "test_loader":     ("src/store/loader.c",     # the truncation check: a short file must not pass
+                        "if (!cnt || atoi(cnt) != declared || i != declared)", "if (0)"),
+    # NOT ns_filter: the first control mutated its scope guard and SURVIVED, because this suite
+    # browses families and never searches. The surviving control was the finding -- ns_filter's
+    # scoping is covered by test_search, not here.
+    "test_picker":     ("src/store/picker.c",     # family membership in ns_records_in_family
+                        "for (int i = 0; i < st->n && n < max; i++) if (ns_family_of(st, i) == fam) out[n++] = i;",
+                        "for (int i = 0; i < st->n && n < max; i++) out[n++] = i;"),
+    "test_tokenizer":  ("src/store/tokenizer.c",
+                        "int ns_tok_encode(const ns_tok *t, const char *text, int *out, int max) {",
+                        "int ns_tok_encode(const ns_tok *t, const char *text, int *out, int max) { "
+                        "if (t && text && out && max > 0) { out[0] = 0; return 1; }"),
+    "test_chatstore":  ("src/store/chatstore.c",  # the path guard that makes \"wb\" safe
+                        "if (!is_ours(path)) return -1;", "if (0) return -1;"),
+    "test_ckpt":       ("src/runq_nspire.c",      # the size formula the loader validates against
+                        "long long bytes = 256 + (2 * L * D + D) * 4;",
+                        "long long bytes = 256 + (2 * L * D + D) * 4 + 8;"),
     "gate_binaries":   ("Makefile",
                         "$(BUILD)/asmcli: src/store/asmcli.c", "$(BUILD)/asmcli_DISABLED:"),
     "test_score":      ("tools/eval/score.py",
@@ -115,6 +179,35 @@ def run_gate(name):
 # replaced by `pass`. The gate suite caught it on the next run, which is the system working -- but a
 # mutation harness that can leave the repo broken is a hazard of its own. Every touched file is
 # registered here and restored by atexit AND by a signal handler, so SIGTERM and SIGINT unwind too.
+# AND AN EXCLUSIVE LOCK, because the handlers above are defeated by CONCURRENCY. Two runs at once
+# is not hypothetical -- it happened: run B read run A's ALREADY-MUTATED file as its "original",
+# and when both were killed, B faithfully restored A's mutation. The tree was left holding
+# `"U": "kg"` in store_clean.json and `return TLM_SHAPE_OK` in shapecheck.c, both of which read as
+# ordinary edits in `git status`, and one `git add -A` away from being committed as the fix.
+#
+# Same shape as committing a mutated genloop.py: a mutation harness whose safety depends on
+# unwinding cleanly needs to also guarantee that nothing else is unwinding at the same time.
+_LOCK = pathlib.Path(__file__).resolve().parents[2] / ".gate_controls.lock"
+try:
+    _lock_fd = os.open(_LOCK, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    os.write(_lock_fd, str(os.getpid()).encode())
+except FileExistsError:
+    try:    _who = _LOCK.read_text().strip()
+    except Exception: _who = "?"
+    _alive = False
+    try:    os.kill(int(_who), 0); _alive = True
+    except Exception: pass
+    if _alive:
+        print(f"REFUSING TO RUN: another gate_controls is mutating this tree (pid {_who}).\n"
+              f"  Two concurrent runs corrupt each other's saved originals and can leave a\n"
+              f"  mutation committed. Wait for it, or remove {_LOCK} if that pid is gone.",
+              file=sys.stderr)
+        sys.exit(2)
+    print(f"  stale lock from dead pid {_who}, taking it", file=sys.stderr)
+    _lock_fd = os.open(_LOCK, os.O_CREAT | os.O_WRONLY | os.O_TRUNC)
+    os.write(_lock_fd, str(os.getpid()).encode())
+atexit.register(lambda: _LOCK.exists() and _LOCK.unlink())
+
 _ORIGINALS = {}
 
 def _restore_all():
@@ -130,7 +223,9 @@ def _restore_all():
 atexit.register(_restore_all)
 for _sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
     try:
-        signal.signal(_sig, lambda *_a: (_restore_all(), sys.exit(130)))
+        signal.signal(_sig, lambda *_a: (_restore_all(),
+                                         _LOCK.exists() and _LOCK.unlink(),
+                                         sys.exit(130)))
     except Exception:
         pass
 

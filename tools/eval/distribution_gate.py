@@ -15,7 +15,7 @@ eval-vs-train accuracy against that control, not against 50%.
 Does NOT verify: that a split which passes is usable, that the items are correct, or that the model
 can answer them. It verifies only that a cheap bag-of-words model cannot tell the two sources
 apart -- which is necessary for an in-distribution claim, not sufficient."""
-import json, math, random, re, sys, collections
+import random, json, math, re, sys, collections
 
 LAST_EXCESS = {}   # label -> excess pp, filled by gate(); the ratchet below reads it
 
@@ -63,11 +63,34 @@ def evaluate(train_qs, eval_qs, seed=0, folds=5):
         ctrl.append(acc(m, a_tr[cut:], b_tr[cut:]))
     return sum(real) / folds, sum(ctrl) / folds, n
 
-def gate(train_qs, eval_qs, label, margin=0.10, seed=0):
+def real_vs_real_floor(eval_qs, seed=0):
+    """The floor, MEASURED IN-RUN at the caller's sample size rather than hardcoded.
+
+    A fixed margin is wrong here because separability depends on sample size, and the first
+    version of this gate hardcoded 0.292 from a run whose two sides were NOT size-matched. At
+    n=200 a side the same measurement gives 23.7 pp. A constant that is only valid at one sample
+    size is a proxy for the property, not the property -- so the floor is now computed from two
+    samples of genuine OpenStax prose, at whatever size the split under test happens to be.
+
+    Returns None when corpus/clean_surface.json is absent, and the caller must then FAIL rather
+    than fall back to a constant: "cannot check" and "checked and clean" must not share a result.
+    """
+    try:
+        real = [x["stem"] for x in json.load(open("corpus/clean_surface.json"))["items"]]
+        mined = [str(x) for x in json.load(open("corpus/stems_all.json"))]
+    except (FileNotFoundError, KeyError):
+        return None
+    n = min(len(eval_qs), len(real), len(mined))
+    rng = random.Random(seed); rng.shuffle(mined)
+    r, c, _ = evaluate(mined[:n], real[:n], seed=seed)
+    return r - c
+
+
+def gate(train_qs, eval_qs, label, margin, seed=0):
     r, c, n = evaluate(train_qs, eval_qs, seed=seed)
     ok = (r - c) <= margin
     print(f"  {label:22} eval-vs-train {r:6.1%}   noise control {c:6.1%}   "
-          f"excess {r-c:+6.1%}   n={n}   {'PASS' if ok else 'FAIL'}")
+          f"excess {r-c:+6.1%}   n={n}   floor {margin:+5.1%}   {'PASS' if ok else 'FAIL'}")
     LAST_EXCESS[label] = (r - c) * 100.0
     return ok
 
@@ -79,13 +102,26 @@ if __name__ == "__main__":
         if len(tq) >= 20000: break
     print(f"  training questions sampled: {len(tq)}")
     ok = True
+    splits = []
     for path, label in [("corpus/split_select.json", "SELECT"),
                         ("corpus/split_report.json", "REPORT"),
                         ("tools/eval/items.json",    "eval items.json")]:
         try: items = json.load(open(path))
         except FileNotFoundError: continue
-        ok &= gate(tq, [i["q"] for i in items], label)
-    print(f"  margin: excess over the noise control must be <= 10.0 pp")
+        splits.append((label, [i["q"] for i in items]))
+
+    # PER SPLIT, because the floor moves with n and the splits differ in size: SELECT is 80 items
+    # and items.json is 200. One floor applied to both would be the hardcoded-constant bug again,
+    # one level up.
+    print("  floor: two samples of genuine OpenStax prose, measured in-run at EACH split's own")
+    print("    sample size -- separability depends on n, so a single constant cannot serve both.")
+    for label, qs in splits:
+        floor = real_vs_real_floor(qs)
+        if floor is None:
+            print("  CANNOT CHECK: corpus/clean_surface.json or corpus/stems_all.json is missing,")
+            print("    so the floor cannot be measured. Refusing to substitute a constant.")
+            sys.exit(2)
+        ok &= gate(tq, qs, label, margin=floor)
 
     # A RATCHET AGAINST A RECORDED BASELINE, because the target is not reachable before the retrain.
     #
@@ -99,7 +135,8 @@ if __name__ == "__main__":
     # So the gate cannot pass today and must not therefore be ignored. It ratchets: the excess may
     # not get WORSE than the baseline below, and the baseline may only be lowered. That makes it
     # meaningful now, and it becomes a real pass/fail the moment the retrain lands.
-    BASELINE = {"SELECT": 40.0, "REPORT": 40.0, "eval items.json": 48.0}   # pp, measured 2026-08-26
+    BASELINE = {"SELECT": 38.5, "REPORT": 38.0, "eval items.json": 45.5}   # pp, measured 2026-08-26
+    #                                                                 target for all three: 29.2
     print()
     print("  BASELINE RATCHET (this gate cannot pass before the corpus restart -- see the note in")
     print("  the source). Excess may not exceed these; lower them when the retrain improves matters:")

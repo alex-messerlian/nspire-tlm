@@ -69,6 +69,35 @@ int main(void) {
                caught ? "CAUGHT" : "MISSED", overflow, total, worst, worst == 1 ? "" : "s");
         printf("  PASS  the fix overflows at 0 of %d lengths\n", total); }
 
+    /* THE CALL SITES, which nothing here could see. Every assertion above calls qbubble_textw()
+     * on BOTH sides of its comparison, so it proves the helper is self-consistent -- and the
+     * ORIGINAL DEFECT was not in the helper, it was two call sites in draw_main() passing
+     * different widths. Reverting the helper's constant left this whole suite passing. Reading
+     * the source is the only way a host test can assert that both passes go through one function.
+     *
+     * A source-shaped check, and it is narrow on purpose: it does not parse C, it asserts that no
+     * line drawing question text into a bubble computes its own width. */
+    printf("\n  -- both passes go through one width function --\n");
+    { FILE *f = fopen("src/store/app.c", "rb");
+      if (!f) { printf("  FAIL  cannot read src/store/app.c (run from the repo root)\n"); F++; }
+      else {
+        char line[1024]; int nsite = 0, bare = 0;
+        while (fgets(line, sizeof line, f)) {
+            if (!strstr(line, "C_BUBBLE")) continue;
+            if (!strstr(line, "gfx_text_wrap")) continue;
+            nsite++;
+            /* maxtw is assigned from qbubble_textw(pw) three lines up; both are the one function. */
+            if (!strstr(line, "qbubble_textw") && !strstr(line, "maxtw")) {
+                bare++; printf("  FAIL  bubble width computed inline: %s", line);
+            }
+        }
+        fclose(f);
+        if (nsite < 2) { printf("  FAIL  expected >=2 bubble draw sites, found %d -- this check has "
+                                "gone blind\n", nsite); F++; }
+        else if (bare) F++;
+        else printf("  PASS  all %d bubble text calls use qbubble_textw\n", nsite);
+      } }
+
     printf("\n  %s: question bubble, %d failure(s)\n\n", F ? "FAIL" : "PASS", F);
     gfx_free();
     return F != 0;
