@@ -63,6 +63,11 @@ $PY tools/eval/test_genloop.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_
 # deleted 34 records for documented reasons and units_train.json was never re-cleaned; a change that
 # made units_train the iterated set silently re-admitted 24 of them, three named "Strategy".
 $PY tools/eval/gate_store_authority.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_authority" || { printf "  %-20s FAIL\n" "store_authority"; fail=1; }
+# The record span the generator writes must match the one the device assembles. Three producers of
+# one format disagreed: 0 of 197,428 training documents carried the LHS unit that assemble.c emits
+# on every prompt. EXPERIMENT_PLAN records this skew as fixed -- the five-field skeleton was
+# unified, the units field was not, and nothing compared them afterwards.
+$PY tools/eval/gate_format_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "format_parity" || { printf "  %-20s FAIL\n" "format_parity"; fail=1; }
 # tools/eval/prov_mutation.py is deliberately NOT listed here. It rebuilds and re-runs THIS SCRIPT
 # once per mutation, so listing it makes the suite call itself -- which is what happened on the
 # first attempt: infinite recursion, killed at the two-minute timeout. It is a meta-check and runs

@@ -223,9 +223,23 @@ int tlm_shape_check_doc(const char *doc, char *why, int cap) {
     const char *r = strstr(doc, "<r>");
     if (!r) { snprintf(why, (size_t)cap, "no <r> span in the document"); return TLM_SHAPE_UNCHECKED; }
     r += 3;
+    /* THE FORMULA MAY CONTAIN '|'. `f_beat=|f_2-f_1|` is a store record, and reading up to the FIRST
+     * '|' extracted "f_beat=" and made every absolute-value relation permanently UNCHECKED. The span
+     * has four fixed trailing fields -- units | missing: | condition | fit: -- so find the fourth
+     * '|' from the END of the span and take everything before it as the formula.
+     *
+     * The three-valued result is what kept this from being a wrong answer rather than a gap: it
+     * returned UNCHECKED, not OK. Found by a parity gate whose OWN oracle had the identical bug,
+     * which is the third time in this repo that an assertion's failure was the oracle's. */
+    const char *rend = strstr(r, "<tool>");
+    if (!rend) rend = strstr(r, "<a>");
+    if (!rend) rend = r + strlen(r);
+    const char *bar = 0; int nbar = 0;
+    for (const char *q = rend - 1; q >= r && nbar < 4; q--)
+        if (*q == '|') { bar = q; nbar++; }
     char formula[160]; int fo = 0;
-    for (const char *p = r; *p && *p != '|' && *p != '\n' && fo < (int)sizeof formula - 1; p++)
-        if (*p != ' ') formula[fo++] = *p;
+    for (const char *p = r; p < (nbar == 4 ? bar : rend) && fo < (int)sizeof formula - 1; p++)
+        if (*p != ' ' && *p != '\n') formula[fo++] = *p;
     formula[fo] = 0;
     if (!formula[0] || !strchr(formula, '=')) {
         /* A refusal document carries `none` here. Not a clean call -- a document the check does

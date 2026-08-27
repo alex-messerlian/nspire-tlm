@@ -199,6 +199,30 @@ def condition(name):
     for pat, c in COND:
         if re.search(pat, n): return c
     return "standard conditions"
+
+def units_field(r):
+    """The record span's units field, for ONE record. Exported because the parity gate calls it.
+
+    An earlier version of tools/eval/gate_format_parity.py RE-IMPLEMENTED this rule instead of
+    calling it, so mutating the generator did not move the gate and the negative control passed
+    while the fix was reverted. A gate that carries its own copy of the rule tests the copy. Same
+    lesson as tools/eval/genloop.py: when two places need one behaviour, the second one must call
+    the first.
+
+    THE LHS UNIT IS PART OF THE SPAN. `vs` comes from the RIGHT-hand side only, so the variable being
+    solved for never got a unit here -- 0 of 197,428 shipped training documents carried it, while
+    src/store/assemble.c has emitted it on EVERY device prompt since it was written ("units for
+    every variable, LHS included -- the answer needs a unit to state") and test_assemble.c asserts
+    it. So every prompt the device produced differed from every document the model trained on, in
+    the first field after the formula. docs/EXPERIMENT_PLAN.md:295-313 records this exact skew as
+    found and fixed -- "the five-field skeleton was unified". The skeleton was; the units were not.
+    """
+    u = r.get("units") or {}
+    lhs = r["f"].split("=", 1)[0].strip()
+    vs = sorted({v for v in VAR.findall(r["f"].split("=", 1)[1])} - {"pi", "e"})
+    order = ([lhs] if lhs in u else []) + [v for v in vs if v != lhs]
+    return " ".join(f"{v}:{u[v]}" for v in order if v in u)
+
 for r in recs: r["cond"] = condition(r["name"])
 print(f"records usable as physics relations: {len(recs)} of {len(_ann)} annotated "
       f"({len(_unnamed)} skipped for want of a relation name, "
@@ -260,7 +284,7 @@ def gen(n, seed=0):
                 stem.strip().rstrip(",").rstrip(".") + "."
         else:
             q = stem + (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask)
-        umap = " ".join(f"{v}:{r['units'][v]}" for v in vs if v in r["units"])
+        umap = units_field(r)
         # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
         # becomes a token lookup, the same move as fit for D2 and the tool call for arithmetic.
         miss = drop if withhold else "none"

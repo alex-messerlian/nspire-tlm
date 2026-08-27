@@ -147,6 +147,25 @@ int main(void) {
           "<tool>eval<arg>(2.0)*(9.81)*(5.0)</tool>", TLM_SHAPE_OK, 0);
     }
 
+    /* A FORMULA CONTAINING '|'. `f_beat=|f_2-f_1|` is a real store record. tlm_shape_check_doc read
+     * the record span up to the FIRST '|' and extracted "f_beat=", making every absolute-value
+     * relation permanently UNCHECKED. The three-valued result is what kept that from being a wrong
+     * answer instead of a gap. These go through the DOCUMENT entry point, because the defect was in
+     * the span parsing rather than in the rule. */
+    {   const char *P = "<q>Two waves. f_2 = 300, f_1 = 260.</q><r>f_beat=|f_2-f_1| | "
+                        "f_beat:Hz f_2:Hz f_1:Hz | missing:none | standard conditions | fit:high";
+        char why[256];
+        char d1[600], d2[600];
+        snprintf(d1, sizeof d1, "%s<tool>eval<arg>|(300)-(260)|</tool><res>40</res><a> 40 Hz.<end>", P);
+        snprintf(d2, sizeof d2, "%s<tool>eval<arg>(300)*(260)</tool><res>78000</res><a> 78000.<end>", P);
+        int a = tlm_shape_check_doc(d1, why, sizeof why); ran++;
+        if (a != TLM_SHAPE_OK) { fails++; printf("  FAIL  pipe in formula, correct call -> %s (%s)\n", S(a), why); }
+        else printf("  PASS  %-52s %-9s\n", "pipe in formula, correct call", "OK");
+        int b = tlm_shape_check_doc(d2, why, sizeof why); ran++;
+        if (b != TLM_SHAPE_MISMATCH) { fails++; printf("  FAIL  pipe in formula, wrong call -> %s (%s)\n", S(b), why); }
+        else printf("  PASS  %-52s %-9s %s\n", "pipe in formula, wrong call", "MISMATCH", why);
+    }
+
     printf("test_shapecheck %s  (%d cases, %d failures)\n", fails ? "FAIL" : "PASS", ran, fails);
     return fails ? 1 : 0;
 }
