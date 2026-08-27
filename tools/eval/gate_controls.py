@@ -124,6 +124,11 @@ CONTROLS = {
                         '"T_h": "K"', '"T_h": "s"'),
     "plausible":       ("corpus/generate.py",    # stop dropping impossible results
                         "            if _why:", "            if False:"),
+    # Revert the units ORDER to sorted -- the skew gate_format_parity excused as cosmetic.
+    "record_bytes":    ("corpus/generate.py",
+                        "    seen, vs = set(), []", "    seen, vs = set(), sorted({v for v in "
+                        "VAR.findall(r['f'].split('=',1)[1])} - {'pi','e'}); vs = list(vs); vs2 = []\n"
+                        "    for _ in []: pass\n    _unused = []"),
     "store_coverage":  ("corpus/generate.py",
                         "_keys = list(_ann) + [f for f in _store if f not in _ann]",
                         "_keys = list(_ann)"),

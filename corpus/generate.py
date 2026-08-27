@@ -408,7 +408,15 @@ def units_field(r):
     """
     u = r.get("units") or {}
     lhs = r["f"].split("=", 1)[0].strip()
-    vs = sorted({v for v in VAR.findall(r["f"].split("=", 1)[1])} - {"pi", "e"})
+    # FIRST-APPEARANCE ORDER, NOT SORTED. src/store/assemble.c walks r->var[] in declaration order,
+    # which store_pack.py writes as the LHS then the RHS variables in the order they occur in the
+    # formula. Sorting produced `v:m/s T:s lambda:m` where the device emits `v:m/s lambda:m T:s` --
+    # a difference on 53.6% of records that gate_format_parity compared as a SET and excused as
+    # cosmetic. It is not cosmetic: it is a token sequence the model never sees at inference.
+    seen, vs = set(), []
+    for v in VAR.findall(r["f"].split("=", 1)[1]):
+        if v in ("pi", "e") or v in seen: continue
+        seen.add(v); vs.append(v)
     order = ([lhs] if lhs in u else []) + [v for v in vs if v != lhs]
     return " ".join(f"{v}:{u[v]}" for v in order if v in u)
 
@@ -604,7 +612,34 @@ def gen(n, seed=0):
         umap = units_field(r)
         # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
         # becomes a token lookup, the same move as fit for D2 and the tool call for arithmetic.
-        miss = drop if withhold else "none"
+        # A19. COMPUTE `missing:` THE WAY THE DEVICE DOES -- src/store/assemble.c:82-89: the first
+        # record variable, excluding the LHS and any supplied constant, that has no entered value.
+        #
+        # THE A11 FIX MOVED THE LEAK, IT DID NOT CLOSE IT. D2 hardcoded "none" while the record it
+        # shows is a DIFFERENT record whose variables the question never binds, so `missing:none`
+        # with unbound variables was a PERFECT classifier for D2: 166 of 166 against 0 of 2,424
+        # answerable documents. The model could refuse every mismatch by checking whether the
+        # record's variables appear in the question -- never reading what the record MEANS.
+        #
+        # Second time the same leak has been found one field over: A8 was the units field, A11 the
+        # fit token, this is `missing:`. The lesson is not "fix this field" but that a refusal class
+        # must be derived by the RUNTIME'S OWN RULE, so that any tell it leaves is one the device
+        # leaves too. Computing it here means D1 and D2 both emit `missing:<var>` and differ only in
+        # whether the record relates to the question -- which is the judgement.
+        def _device_missing(rec, given_names):
+            # FIRST-APPEARANCE ORDER, like units_field() and for the same reason: assemble.c walks
+            # r->var[] in declaration order and returns the FIRST unbound one, so sorting picks a
+            # different variable. `tau=R*C` gave missing:C where the device says missing:R.
+            lhs_ = rec["f"].split("=", 1)[0].strip()
+            _seen, _vs = set(), []
+            for x in VAR.findall(rec["f"].split("=", 1)[1]):
+                if x in ("pi", "e") or x in _seen: continue
+                _seen.add(x); _vs.append(x)
+            for v in _vs:
+                if v == lhs_: continue
+                if _const_for(rec, v) is not None: continue     # supplied constant, not asked for
+                if v not in given_names: return v
+            return "none"
         band = "high"          # A11: assemble.c:99 -- a real record is ALWAYS fit:high
         # A18. THE MISMATCH RECORD MUST ACTUALLY NOT FIT. `rng.choice(recs)` can draw a record
         # that computes the very quantity asked for -- 2 of 11,975 documents refused while showing
@@ -616,6 +651,10 @@ def gen(n, seed=0):
             _lhs = r["f"].split("=", 1)[0].strip()
             _alt = [x for x in recs if x["f"].split("=", 1)[0].strip() != _lhs]
             rec_r = rng.choice(_alt) if _alt else rng.choice(recs)
+        _given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", g))
+        # ONE PATH FOR EVERY CASE. D1 previously set this to `drop` directly; that happened to
+        # agree, and "happens to agree" is how the other three fields drifted.
+        miss = _device_missing(rec_r, _given)
         if mismatch:
             # A8. CALL units_field(), do not re-derive it. This branch carried its own copy that
             # read the RHS only, so the LHS symbol never got a unit -- and units_field()'s own

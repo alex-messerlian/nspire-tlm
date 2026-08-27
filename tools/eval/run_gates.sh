@@ -126,6 +126,10 @@ $PY tools/eval/gate_units_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "
 # Physically impossible RESULTS -- the class nothing owned, because distribution_gate cannot
 # see digits and dim_gate finds -28.75 a dimensionally fine efficiency.
 $PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "plausible" || { printf "  %-20s FAIL\n" "plausible"; fail=1; }
+# THE SAME DEFECT WAS FOUND FOUR TIMES, ONE FIELD OVER EACH TIME (units, condition, fit,
+# missing). This compares the whole record span BYTE FOR BYTE against build/asmcli, so it
+# cannot be outflanked by a field nobody thought of.
+$PY tools/eval/gate_record_bytes.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "record_bytes" || { printf "  %-20s FAIL\n" "record_bytes"; fail=1; }
 $PY tools/eval/gate_store_coverage.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_coverage" || { printf "  %-20s FAIL\n" "store_coverage"; fail=1; }
 $PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }
 $PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }
