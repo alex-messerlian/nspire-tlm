@@ -5,6 +5,7 @@ Token count is the wrong instrument: 310k documents from 27 record heads is 27 p
 and the token count looks identical to a genuinely varied corpus. Everything here is reported
 alongside three diversity measures, never alone."""
 import json
+import math
 import sys as _sys, pathlib as _pl
 _sys.path.insert(0, str(_pl.Path(__file__).parent))
 from atomic import write_json as _wj, write_text as _wt
@@ -151,6 +152,73 @@ def _is_angle(rec, var):
     return any(re.search(rf"(?<![A-Za-z0-9_]){re.escape(var)}(?![A-Za-z0-9_])", a)
                for a in _TRIG_ARG.findall(rec["f"]))
 
+
+# A23. THE SCALE OF A QUANTITY IS PHYSICS, AND NO FORMULA IMPLIES IT. A22 supplied six microscopic
+# constants and left the rest of the class standing: the mined pool spans [0.001, 9800] and for
+# ELEVEN of thirteen physical windows it contains NO admissible value at all -- a photon frequency,
+# an atomic level difference, an optical wavelength, a nuclear mass defect. Eighteen records
+# measured at EXACTLY 100.0% wrong, which is the signature of an inability.
+#
+# A22 was per-(record, variable) whack-a-mole. This is the class: every record carrying a quantum
+# or electromagnetic constant has FREE VARIABLES THAT MUST LIVE AT THAT CONSTANT'S SCALE, and the
+# scale cannot be derived -- that a photon energy is ~1e-19 J is knowledge about the world, not a
+# consequence of E = h*f.
+#
+# So it is declared, per record, with the justification attached. Only RHS variables are sampled,
+# so this is one or two entries per record rather than one per variable. It belongs in the store
+# beside `cval` eventually; it is here because that is where quantity_range already reads.
+#
+# EVERY ENTRY IS A CLAIM ABOUT PHYSICS AND IS WRITTEN TO BE CHECKED. A range that is wrong is a
+# defect of exactly the kind this table exists to remove -- see the Fahrenheit repair, which was a
+# fix that asserted something false.
+_SCALE = {
+  # --- photons and atomic transitions -------------------------------------------------------
+  ("E_f=h*f", "f"):                 (1e12, 1e19, "IR through X-ray photon frequency"),
+  ("E=h*f", "f"):                   (1e12, 1e19, "IR through X-ray photon frequency"),
+  ("Delta_E=h*f", "f"):             (1e12, 1e19, "IR through X-ray photon frequency"),
+  ("E=n*h*f", "f"):                 (1e12, 1e19, "IR through X-ray photon frequency"),
+  ("Delta_E=h*Delta_f", "Delta_f"): (1e6,  1e15, "a spectroscopic frequency difference"),
+  ("E_b=h*f_O", "f_O"):             (1e14, 1e16, "photoelectric threshold, 0.4-40 eV"),
+  ("f=(Delta_E_LK)/h", "Delta_E_LK"): (1.6e-19, 1.6e-15, "atomic level difference, 1 eV - 10 keV"),
+  ("Delta_t=((h)/(E))", "E"):       (1e-19, 1e-12, "virtual-particle energy, sub-MeV"),
+  ("T_F=((E_F)/(k_B))", "E_F"):     (1.6e-19, 1.6e-17, "Fermi energy, 1-100 eV"),
+  ("lambda=((h*c)/(E))", "E"):      (1.6e-19, 1.6e-14, "photon energy, 1 eV - 100 keV"),
+  ("E=((h*c)/(lambda))", "lambda"): (1e-12, 1e-6,  "X-ray through infrared wavelength"),
+  ("p=((h)/(lambda))", "lambda"):   (1e-12, 1e-6,  "X-ray through infrared wavelength"),
+  ("lambda=((h)/(p))", "p"):        (1e-27, 1e-20, "momentum of an atomic-scale particle"),
+  ("m=Delta_E/(c)^(2)", "Delta_E"): (1e-15, 1e-10, "nuclear binding energy, keV - MeV"),
+  ("E=(Delta_m)(c)^(2)", "Delta_m"): (1e-30, 1e-26, "nuclear mass defect"),
+  ("lambda=((h)/(m*v))", "m"):      (1e-31, 1e-25, "electron through heavy-ion mass"),
+  ("lambda=((h)/(m*v))", "v"):      (1e2,  1e7,   "non-relativistic particle speed"),
+  # --- light and optics ---------------------------------------------------------------------
+  ("f=((c)/(lambda))", "lambda"):   (1e-12, 1e-1,  "X-ray through radio wavelength"),
+  ("lambda=((c)/(f))", "f"):        (1e6,  1e18,  "radio through X-ray frequency"),
+  ("n=((c)/(v))", "v"):             (1e8,  2.998e8, "light in a medium: n in [1, 3]"),
+  ("Delta_y=x*lambda/d", "lambda"): (1e-9, 1e-5,  "optical wavelength"),
+  ("Delta_y=x*lambda/d", "d"):      (1e-6, 1e-2,  "slit separation, sub-centimetre"),
+  ("Delta_y=x*lambda/d", "x"):      (0.1,  10.0,  "screen distance, laboratory scale"),
+  ("Delta_l=d*sin(theta)", "d"):    (1e-6, 1e-2,  "slit separation, sub-centimetre"),
+  # --- electromagnetism ----------------------------------------------------------------------
+  ("V=((k_e*q)/(r))", "q"):         (1e-9, 1e-3,  "a laboratory charge, nC to mC"),
+  ("V=((k_e*q)/(r))", "r"):         (1e-3, 10.0,  "laboratory distance"),
+  ("E=((sigma)/(epsilon_0))", "sigma"): (1e-9, 1e-3, "surface charge density, nC/m^2 to mC/m^2"),
+  ("C=epsilon_0*((A)/(d))", "A"):   (1e-4, 1.0,   "plate area, cm^2 to m^2"),
+  ("C=epsilon_0*((A)/(d))", "d"):   (1e-6, 1e-3,  "plate gap, micrometres to a millimetre"),
+  ("B=((mu_0*I)/(2*pi*R))", "I"):   (1e-2, 1e3,   "a laboratory current"),
+  ("B=((mu_0*I)/(2*pi*R))", "R"):   (1e-3, 1.0,   "distance from a wire, laboratory scale"),
+  ("v_d=((I)/(n*q*A))", "A"):       (1e-8, 1e-4,  "wire cross-section, 0.1-10 mm^2"),
+  # --- gravitation, astronomical by convention in this relation -------------------------------
+  ("F=G*m1*m2/(r)^(2)", "m1"):      (1e20, 1e30,  "planetary or stellar mass"),
+  ("F=G*m1*m2/(r)^(2)", "m2"):      (1e20, 1e30,  "planetary or stellar mass"),
+  ("F=G*m1*m2/(r)^(2)", "r"):       (1e6,  1e12,  "orbital separation"),
+  # --- relativistic Doppler --------------------------------------------------------------------
+  ("f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))", "v"): (1e3, 2.9e8, "sub-luminal source speed"),
+  # --- thermal ---------------------------------------------------------------------------------
+  ("Q=m*c*dT", "c"):                (100.0, 15000.0, "specific heat, lead to water"),
+  # --- acoustics -------------------------------------------------------------------------------
+  ("I=((((Delta_p_max))^(2))/(2*rho*v))", "v"): (100.0, 6000.0, "speed of sound in a real medium"),
+}
+
 def quantity_range(rec, var):
     """(lo, hi, integral, why) for a SAMPLED given, or None if this variable is not in the table.
 
@@ -160,6 +228,9 @@ def quantity_range(rec, var):
     that came from _const_for has its own justification and is not being drawn.
     """
     if _const_for(rec, var) is not None: return None
+    scale = _SCALE.get((rec.get("f"), var))
+    if scale is not None:
+        return (scale[0], scale[1], False, scale[2])
     unit = ((rec.get("units") or {}).get(var) or "").strip()
     name = (rec.get("name") or "").lower()
     f = rec["f"]
@@ -229,7 +300,17 @@ def sample_in_range(rng, lo, hi, integral):
     pool = [v for v in _POOL if lo <= v <= hi and (not integral or float(v).is_integer())]
     if pool: return rng.choice(pool)
     if integral: return float(rng.randint(int(lo), max(int(lo), int(hi))))
-    return round(rng.uniform(lo, hi), 4)
+    # LOG-UNIFORM, AND SIGNIFICANT FIGURES RATHER THAN DECIMAL PLACES.
+    #
+    # `round(x, 4)` counts DECIMAL PLACES: round(3e-9, 4) is 0.0. It turned every optical
+    # wavelength into ZERO -- the fallback that exists to reach small values was annihilating them,
+    # and the range check then flagged its own sampler. The same shape as the significant-figures
+    # bug in answer_matches_result, in the other direction.
+    #
+    # Log-uniform because these windows span orders of magnitude; a linear draw over [1e-9, 1e-5]
+    # is 1e-5 with probability 0.9999.
+    if lo <= 0: return float(f"{rng.uniform(lo, hi):.3g}")
+    return float(f"{math.exp(rng.uniform(math.log(lo), math.log(hi))):.3g}")
 
 VAR = re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
 RES = {"pi","e","sin","cos","tan","ln","log","sqrt","exp","d","f","x","t"}
@@ -576,6 +657,14 @@ def units_field(r):
     return " ".join(f"{v}:{u[v]}" for v in order if v in u)
 
 for r in recs: r["cond"] = condition(r["name"])
+
+_SCALE_STALE = sorted({f for (f, _v) in _SCALE} - {r["f"] for r in recs})
+assert not _SCALE_STALE, (
+    "A23: these _SCALE keys match no record, so the declaration is a silent no-op:\n  "
+    + "\n  ".join(_SCALE_STALE)
+    + "\nFix the spelling against corpus/store_clean.json. A range that never fires reads as "
+      "coverage and is not.")
+
 print(f"records usable as physics relations: {len(recs)} of {len(_ann)} annotated "
       f"({len(_unnamed)} skipped for want of a relation name, "
       f"{len(_ann)-len(recs)-len(_unnamed)} by usable(), which exempts hand-curated records)")
