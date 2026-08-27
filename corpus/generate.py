@@ -150,6 +150,51 @@ def lhs_unit(r):
     return "" if un in ("", "1") else un
 
 
+# A17. A PHYSICALLY IMPOSSIBLE RESULT IS NOT A TRAINING EXAMPLE, and nothing owned this.
+# distribution_gate's tokenizer is `[a-z]+`, so it cannot see digits at all; provenance checks that
+# a number was SOURCED, not that it is possible; the shape check compares structure; dim_gate
+# checks dimensions, and -28.75 is dimensionally a fine efficiency. Measured 94 of 4,957 documents
+# (1.90%): negative times of flight, a refractive index of 3.06e+07, a Carnot efficiency of -28.75,
+# g = 4352 m/s^2.
+#
+# The mechanism is sample_value() drawing each variable independently, so nothing stops T_c > T_h
+# or an angle past 90 degrees. Filtering the RESULT rather than constraining every input is the
+# narrow fix: it needs one rule per quantity CLASS instead of per relation, and it cannot miss a
+# combination nobody thought of.
+#
+# NARROW BY CONSTRUCTION, and the limit is the honest part: it covers quantity classes that have a
+# NAMED physical range. A quantity outside this table is unchecked, not blessed -- most results are,
+# and "not in the table" must not read as "verified plausible".
+def implausible(r, value):
+    """Why this result cannot occur physically, or None. `r` is the record, `value` the number."""
+    lhs = r["f"].split("=", 1)[0].strip()
+    unit = ((r.get("units") or {}).get(lhs) or "").strip()
+    name = (r.get("name") or "").lower()
+    if unit == "s" and value <= 0:                    return "a duration must be positive"
+    if unit == "kg" and value <= 0:                   return "a mass must be positive"
+    # A CHANGE in temperature may be negative; an ABSOLUTE one may not.
+    if unit == "K" and not lhs.startswith(("Delta", "delta")) and value <= 0:
+        return "an absolute temperature must be positive"
+    if "efficiency" in name and not 0.0 <= value <= 1.0:
+        return "an efficiency must lie in [0, 1]"
+    if "index of refraction" in name and not 1.0 <= value <= 100.0:
+        return "a refractive index must lie in [1, 100]"
+    if "gravitational acceleration" in name and not 0.0 < value < 100.0:
+        return "g must lie in (0, 100) m/s^2"
+    return None
+
+
+def _num(x):
+    """Render a given so the tool call's literal is byte-findable in the question.
+
+    `{:g}` is a DISPLAY format: it rounds 1054.804 to "1054.8", and the call then carries the full
+    float, so provenance correctly reports a literal the model never saw. repr() round-trips, and
+    trailing ".0" is trimmed because "m = 2.0" reads wrong where "m = 2" reads right -- and 2.0 and
+    2 are the same float, so the call still matches."""
+    r = repr(float(x))
+    return r[:-2] if r.endswith(".0") else r
+
+
 def _condition_field(r):
     """The record span's condition field, by the SHIPPED assembler's rule (assemble.c:94).
 
@@ -267,8 +312,21 @@ _NOT_A_HEAD = {"of", "in", "on", "for", "to", "a", "an", "the", "and", "or", "wi
 # "Compute law of reflection." is asking for the wrong kind of thing. For these the only honest
 # surface is the LHS symbol. Found by hand-reading 30 questions after the frame fix: 4 of 30 were
 # of exactly this shape and nothing else explained them.
+# A14. Extended: a name denoting a PROCESS, FUNCTION or EFFECT is no more a name for a quantity
+# than a law is. "energy-mass conversion", "Potential-energy function of a harmonic oscillator" and
+# "Relativistic Doppler effect for frequency" all produced asks for the wrong kind of thing --
+# 128 of 11,975 documents. Same rule as the law/theorem case: send them to the LHS symbol.
 _RELATION_NAME = re.compile(r"\b(law|equation|expression|relationship|relation|theorem|"
-                            r"principle|rule|formula|identity|definition)\b", re.I)
+                            r"principle|rule|formula|identity|definition|"
+                            r"conversion|function|effect|process)\b", re.I)
+
+# A15. A BARE PROPERTY NOUN IS NOT A QUANTITY. Head extraction turned "Index of refraction" into
+# "index", "Magnitude of magnetic force" into "magnitude" and "change in Fahrenheit temperature"
+# into "change", giving "Find index." and "Determine magnitude." -- 191 of 11,975 documents asking
+# for nothing identifiable. These words are the PROPERTY, and the thing they are a property OF is
+# what got dropped. When the head reduces to one of them, keep the full name instead.
+_NOT_A_QUANTITY = {"magnitude", "index", "change", "difference", "value", "component",
+                   "ratio", "number", "amount", "factor", "rate", "size", "amount"}
 
 def quantity_surface(r, rng):
     """How the QUESTION refers to the quantity being asked for.
@@ -306,6 +364,8 @@ def quantity_surface(r, rng):
         head-noun extraction rather than the thing itself."""
         form = form.strip()
         if not form or form.split()[0] in _NOT_A_HEAD:
+            return
+        if form.lower() in _NOT_A_QUANTITY:      # A15: names the property, not the quantity
             return
         forms.append(form); weights.append(w)
 
@@ -441,7 +501,13 @@ GIVE = ["Given {g}, ", "With {g}, ", "If {g}, ", "For {g}, ", "Where {g}, ",
         "Suppose {g}. ", "Take {g}. ", "A system has {g}. ", "Assume {g}. ",
         "Consider a case where {g}. ", "In a setup with {g}, ", "Measurements give {g}. ",
         "You are told {g}. ", "The values are {g}. ", "Starting from {g}, ", "Using {g}, "]
-CLOSE = ["{v} = {a}. {why}", "The {q} is {a}. {why}", "{a}. {why}", "That gives {a}. {why}"]
+# A16. `The {q} is ...` interpolates the record's NAME as the computed quantity, so a record named
+# for a law produced "The law of reflection is 0.5 rad." -- 232 of 11,975 answers naming a law,
+# effect or function as though it were the value. quantity_surface() already refuses those for the
+# QUESTION (A6f/A14); the answer side had no such guard, which is the two-implementations pattern
+# again. CLOSE_Q is used only when the record's name really denotes a quantity.
+CLOSE_ANY = ["{v} = {a}. {why}", "{a}. {why}", "That gives {a}. {why}"]
+CLOSE_Q   = CLOSE_ANY + ["The {q} is {a}. {why}"]
 WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}.",
        "This follows from {f}.", "{f} gives it."]
 
@@ -482,19 +548,50 @@ def gen(n, seed=0):
         # corpus disagreed with the runtime that consumes it.
         consts = [v for v in vs if _const_for(r, v) is not None]
         shown  = free + consts
-        g = ", ".join(f"{v} = {vals[v]:g}" for v in shown)
-        # Decide AFTER the question exists, not before. Two refusal kinds, both from this path:
-        #   withhold -> a required given is absent      (D1, missing:X, fit:high)
-        #   mismatch -> the record does not fit         (D2, missing:none, fit:low)
-        # D2 was silently lost when the separate refusal.py path was disabled for one-path, and the
-        # checkpoint that produced a 50% zero-shot refusal on fit:low had never seen the token.
+        # A13. FULL PRECISION IN THE GIVENS. `{:g}` renders 1054.804 as "1054.8" while the call
+        # uses the full float, so the literal in <arg> appeared nowhere in the model's context --
+        # the A7 defect again, 2 of 10,266 calls, arriving through DISPLAY ROUNDING rather than
+        # through an omitted constant. repr() round-trips.
+        g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown)
+        # Decide AFTER the question exists, not before. Three refusal kinds from this path:
+        #   withhold -> a required given is absent   (D1)  missing:X | ... | fit:high
+        #   mismatch -> the record does not fit      (D2)  missing:none | ... | fit:high
+        #   nomatch  -> the picker found nothing     (D3)  none | missing:none | ... | fit:low
+        #
+        # A11. THE FIT LABELS NOW MATCH THE DEVICE, AND D2's DID NOT.
+        #
+        # src/store/assemble.c has exactly two shapes and no others:
+        #     line  99   a real record   -> ALWAYS " | fit:high"
+        #     line 109   no match        -> "none | missing:none | no matching relation | fit:low"
+        #
+        # D2 emitted a REAL RECORD with fit:low -- a shape the runtime can never produce. 616 of
+        # 11,975 documents (5.14%) were in it, and ZERO were in the shape the device actually emits
+        # when the picker finds nothing. So the corpus taught a prompt the model will never see and
+        # never taught the one it will.
+        #
+        # And the fix is not cosmetic. On the device a BAD match still arrives as fit:high with a
+        # real record, because ns_assemble does not judge fit -- the picker just returns its best
+        # candidate. So D2 must be fit:high: the model has to refuse from the record's CONTENT not
+        # matching the question, which is the judgement, rather than from a label. That is the A8
+        # lesson one level deeper -- there the leak was a formatting bit, here it was the fit token
+        # itself, and a model trained on the old labels could refuse correctly on every D2 case
+        # while having learned nothing about fit.
+        #
+        # gate_format_parity could not see this: it compares the generator's record span against
+        # asmcli FOR A GIVEN RECORD, and the no-match case has no record to compare.
         roll = rng.random()
         withhold = roll < 0.10 and len(vs) >= 2
         mismatch = 0.10 <= roll < 0.15
+        nomatch  = 0.15 <= roll < 0.18
         if withhold:
-            drop = rng.choice(vs)
+            # A12. WITHHOLD A FREE VARIABLE, NEVER A CONSTANT. `rng.choice(vs)` could pick g, c, h
+            # or G -- values the device ALWAYS inlines (A7) -- so 111 of 11,975 documents refused
+            # for want of a number the runtime would have supplied. A refusal that fires on a
+            # satisfied precondition is wrong supervision: it teaches the model to refuse a
+            # question it can answer.
+            drop = rng.choice(free) if free else rng.choice(vs)
             shown_w = [v for v in shown if v != drop]
-            g = ", ".join(f"{v} = {vals[v]:g}" for v in shown_w) if shown_w else g
+            g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown_w) if shown_w else g
         stem = rng.choice(GIVE).format(g=g)
         ask  = ask_for(r, quantity_surface(r, rng), rng)
         # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
@@ -508,8 +605,17 @@ def gen(n, seed=0):
         # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
         # becomes a token lookup, the same move as fit for D2 and the tool call for arithmetic.
         miss = drop if withhold else "none"
-        band = "low" if mismatch else "high"
-        rec_r = rng.choice(recs) if mismatch else r
+        band = "high"          # A11: assemble.c:99 -- a real record is ALWAYS fit:high
+        # A18. THE MISMATCH RECORD MUST ACTUALLY NOT FIT. `rng.choice(recs)` can draw a record
+        # that computes the very quantity asked for -- 2 of 11,975 documents refused while showing
+        # a record that answers the question, which is wrong supervision in the direction that
+        # teaches over-refusal. Reject any candidate sharing the true record's LHS, and fall back
+        # to the unfiltered draw only if the store somehow offers no alternative.
+        rec_r = r
+        if mismatch:
+            _lhs = r["f"].split("=", 1)[0].strip()
+            _alt = [x for x in recs if x["f"].split("=", 1)[0].strip() != _lhs]
+            rec_r = rng.choice(_alt) if _alt else rng.choice(recs)
         if mismatch:
             # A8. CALL units_field(), do not re-derive it. This branch carried its own copy that
             # read the RHS only, so the LHS symbol never got a unit -- and units_field()'s own
@@ -524,7 +630,7 @@ def gen(n, seed=0):
             # the cue rather than the judgement. Same shape as the topic-scoping artefact: a number
             # that looks like a capability and is a property of the format.
             umap = units_field(rec_r)
-        docs.append({"q": q, "withhold": drop if withhold else None,
+        docs.append({"q": q, "withhold": drop if withhold else None, "nomatch": nomatch,
                      "mismatch": (rec_r.get("display") or rec_r.get("name","that quantity")) if mismatch else None,
                      # A9. THE CONDITION FIELD MUST MATCH THE SHIPPED ASSEMBLER, and it did not
                      # on 81 of 141 records (57.4%). src/store/assemble.c:94 is the authority:
@@ -542,13 +648,24 @@ def gen(n, seed=0):
                      "rec": f"{rec_r['f']} | {umap} | missing:{miss} | "
                             f"{_condition_field(rec_r)} | fit:{band}", "lhs": lhs,
                      "name": r["name"], "head": r["f"], "unit": lhs_unit(r),
-                     "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
+                     "close": rng.choice(CLOSE_Q if not _RELATION_NAME.search(r.get("name") or "") else CLOSE_ANY), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
     out = re.findall(r"<res>(.*?)</res>",
           subprocess.run(["tools/eval/evalcli","-"], input="\n".join(calls)+"\n",
                          capture_output=True, text=True).stdout, re.S)
     built, dropped = [], 0
     for d, c, res in zip(docs, calls, out):
+        if d.get("nomatch"):
+            # D3 -- THE SHAPE THE DEVICE EMITS WHEN THE PICKER FINDS NOTHING, and the corpus had
+            # ZERO of them. Byte-identical to ns_assemble_none (src/store/assemble.c:109), which is
+            # why the literal is written out here rather than composed from the five-field builder:
+            # this prompt has no record, so it has no units, no condition and no formula, and
+            # composing it would invite the fields back in.
+            ans = "I cannot answer that — no record matches this question."
+            built.append({"head": d["head"], "kind": "D3", "ans": ans,
+                          "text": f"<q>{d['q']}</q><r>none | missing:none | "
+                                  f"no matching relation | fit:low<a>{ans}<end>"})
+            continue
         if d.get("mismatch"):
             ans=f"I cannot answer that — the record gives {d['mismatch'].lower()}, which does not apply."
             built.append({"head": d["head"], "kind": "D2",
@@ -561,6 +678,12 @@ def gen(n, seed=0):
                           "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>", "ans": ans})
             continue
         if res.startswith("!"): dropped += 1; continue        # TOOL_SPEC 8.1: drop, never guess
+        _rec = next((x for x in recs if x["f"] == d["head"]), None)
+        if _rec is not None:
+            try:    _why = implausible(_rec, float(str(res).split()[0]))
+            except (ValueError, IndexError): _why = None
+            if _why:
+                dropped += 1; continue                # A17: drop, do not teach an impossible value
         try:   res = f"{float(res):.4g}"            # signed off: 4 significant figures
         except ValueError: pass
         a_txt = f"{res} {d['unit']}".strip() if d.get("unit") else res

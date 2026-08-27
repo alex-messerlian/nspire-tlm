@@ -175,8 +175,8 @@
   "name": "Carnot efficiency",
   "units": {
    "Eff_C": "1",
-   "T_c": "s",
-   "T_h": "s"
+   "T_c": "K",
+   "T_h": "K"
   },
   "scope": "m42235",
   "source": "worked-example",
@@ -308,9 +308,9 @@
   "f": "Delta_T_F=T_F2-T_F1",
   "name": "change in Fahrenheit temperature",
   "units": {
-   "Delta_T_F": "s",
-   "T_F1": "s",
-   "T_F2": "s"
+   "Delta_T_F": "K",
+   "T_F1": "K",
+   "T_F2": "K"
   },
   "scope": "m58385",
   "source": "worked-example",
@@ -578,7 +578,7 @@
  },
  {
   "f": "I_2=I_1*((((r_1)/(r_2))))^(2)",
-  "name": "Decrease in intensity as a spherical wave expands",
+  "name": "Intensity at a second distance as a spherical wave expands",
   "units": {
    "I_2": "W/m^2",
    "I_1": "W/m^2",
@@ -980,7 +980,7 @@
  },
  {
   "f": "Delta_S=((Q)/(T))",
-  "name": "Entropy of a system undergoing a reversible process at a constant temperature",
+  "name": "Entropy change of a system in a reversible isothermal process",
   "units": {
    "Delta_S": "J/K",
    "Q": "J",
@@ -1120,7 +1120,7 @@
  },
  {
   "f": "lambda_n=((lambda)/(n))",
-  "name": "change of wavelength with index of refraction",
+  "name": "Wavelength in a medium of refractive index n",
   "units": {
    "lambda_n": "m",
    "lambda": "m",
@@ -1189,9 +1189,9 @@
   "f": "Delta_T_F=((9)/(5))*(T_C2-T_C1)",
   "name": "Fahrenheit change from a Celsius change",
   "units": {
-   "Delta_T_F": "s",
-   "T_C1": "s",
-   "T_C2": "s"
+   "Delta_T_F": "K",
+   "T_C1": "K",
+   "T_C2": "K"
   },
   "scope": "m58385",
   "source": "worked-example",

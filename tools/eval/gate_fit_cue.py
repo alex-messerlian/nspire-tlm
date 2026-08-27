@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
-"""PERMANENT GATE: no STRUCTURAL bit of the record span may predict the refusal class.
+"""PERMANENT GATE: a D2 refusal must be structurally indistinguishable from an answerable document.
+
+REWRITTEN AFTER A11 CHANGED WHAT THE CLASSES ARE. The original property -- "no structural bit may
+predict fit:low" -- became FALSE BY DESIGN and this gate correctly failed. src/store/assemble.c
+emits exactly two shapes: a real record always carries `fit:high` (line 99), and a no-match carries
+`none | missing:none | no matching relation | fit:low` (line 109) with NO RECORD AT ALL. So fit:low
+IS structurally distinct on the device, and the model is meant to read that -- it is the signal,
+not a leak.
+
+The leak concern moved with it. The hard case is now **D2**: the retrieved record does not answer
+the question, and the device labels it `fit:high` with `missing:none`, exactly like an answerable
+document. The model must refuse on the record's CONTENT, and there must be no format tell. That is
+what this checks.
+
+  1. fit:low <=> the no-record span, byte-identical to ns_assemble_none. Either without the other
+     is a shape the runtime cannot produce.
+  2. Among documents WITH a record, no structural bit distinguishes a D2 refusal from an
+     answerable document.
 
 THE PROPERTY. `fit:low` means "this record does not answer this question" -- a judgement about
 content. If a model can read the class off the record's FORMAT instead, it can score perfectly on
@@ -54,38 +71,57 @@ if __name__ == "__main__":
     out = m.gen(N, seed=SEED)
     docs = [d["text"] if isinstance(d, dict) else d for d in (out[0] if isinstance(out, tuple) else out)]
 
-    low = [s for s in (record_span(d) for d in docs if "fit:low" in d) if s]
-    high = [s for s in (record_span(d) for d in docs if "fit:high" in d) if s]
-    if not low or not high:
-        # ABSENCE IS FAILURE. A generator that stopped emitting one class would otherwise report a
-        # gap of zero on every bit and pass -- "cannot check" scoring as "checked and clean".
-        print(f"CANNOT CHECK: fit:low n={len(low)}, fit:high n={len(high)}; both must be non-empty")
+    NONE_SPAN = "none | missing:none | no matching relation | fit:low"
+
+    # --- 1. fit:low <=> the device's no-record span -------------------------------------------
+    wrong_shape = []
+    for t in docs:
+        span = record_span(t)
+        if span is None: continue
+        low = "fit:low" in span
+        norec = span.strip().startswith(NONE_SPAN)
+        if low != norec:
+            wrong_shape.append(span.strip()[:70])
+    print(f"  documents                     {len(docs):,}")
+    print(f"  fit:low WITHOUT the no-record span, or vice versa   {len(wrong_shape)}")
+    for w in wrong_shape[:4]: print(f"      {w}")
+
+    # --- 2. a D2 refusal must look like an answerable document ---------------------------------
+    d2 = [t for t in docs if "<tool>" not in t and "fit:high" in t
+          and "which does not apply" in t]
+    ans = [t for t in docs if "<tool>" in t]
+    if not d2 or not ans:
+        # ABSENCE IS FAILURE: a generator emitting no D2 refusals would report a perfect zero gap.
+        print(f"CANNOT CHECK: D2 refusals={len(d2)}, answerable={len(ans)}; both must be non-empty")
         sys.exit(2)
-
-    print(f"  fit:low {len(low)}   fit:high {len(high)}   max allowed gap {MAX_GAP:.0%}")
-    worst, bad = 0.0, []
-    for name in bits(low[0]):
-        pl = sum(bits(s)[name] for s in low) / len(low)
-        ph = sum(bits(s)[name] for s in high) / len(high)
-        gap = abs(pl - ph)
-        worst = max(worst, gap)
+    worst, leaks = 0.0, []
+    for name in bits(record_span(d2[0])):
+        pl = sum(bits(record_span(t))[name] for t in d2) / len(d2)
+        ph = sum(bits(record_span(t))[name] for t in ans) / len(ans)
+        gap = abs(pl - ph); worst = max(worst, gap)
         flag = "LEAK" if gap > MAX_GAP else "ok  "
-        print(f"    {flag}  {name:34} low {pl:6.1%}   high {ph:6.1%}   gap {gap:6.1%}")
-        if gap > MAX_GAP: bad.append(name)
+        print(f"    {flag}  {name:34} D2 {pl:6.1%}   answerable {ph:6.1%}   gap {gap:6.1%}")
+        if gap > MAX_GAP: leaks.append(name)
 
-    # POSITIVE CONTROL in-run: the check must be able to see a leak at all.
-    planted_low = ["x=a*b | a:m b:s | missing:none | c | fit:low"] * 50
-    planted_high = ["x=a*b | x:m a:m b:s | missing:none | c | fit:high"] * 50
-    ctl = abs(sum(bits(s)["units field omits the LHS symbol"] for s in planted_low) / 50
-              - sum(bits(s)["units field omits the LHS symbol"] for s in planted_high) / 50)
+    # POSITIVE CONTROL: the bit-comparison must be able to see a leak.
+    ctl = abs(sum(bits("x=a*b | a:m b:s | missing:none | c | fit:high")["units field omits the LHS symbol"]
+                  for _ in range(1))
+              - sum(bits("x=a*b | x:m a:m b:s | missing:none | c | fit:high")["units field omits the LHS symbol"]
+                    for _ in range(1)))
     if ctl <= MAX_GAP:
         print("\n  FAIL: the positive control did not register a leak -- this check is not working.")
         sys.exit(1)
-    print(f"  positive control  a planted LHS-unit leak reads {ctl:.0%}, above the {MAX_GAP:.0%} bar")
+    print(f"  positive control              a planted LHS-unit leak reads {ctl:.0%}")
 
-    if bad:
-        print(f"\n  FAIL: {len(bad)} structural bit(s) predict the refusal class: {bad}")
-        print( "  A model can read the label off the format and score on every D2 refusal metric")
-        print( "  without weighing fit. The metric would be measuring the cue.")
+    if wrong_shape:
+        print(f"\n  FAIL: {len(wrong_shape)} document(s) pair fit:low with a real record, or a record")
+        print( "  with fit:low. assemble.c emits neither -- the model would train on a prompt the")
+        print( "  runtime never produces, and never on the one it does.")
         sys.exit(1)
-    print(f"\n  PASS: no structural bit predicts the refusal class (worst gap {worst:.1%})")
+    if leaks:
+        print(f"\n  FAIL: {len(leaks)} structural bit(s) distinguish a D2 refusal from an answerable")
+        print( "  document: " + str(leaks))
+        print( "  The model could refuse from the format instead of judging whether the record fits.")
+        sys.exit(1)
+    print(f"\n  PASS: fit:low is exactly the no-record span; D2 is structurally indistinguishable "
+          f"from answerable (worst gap {worst:.1%})")

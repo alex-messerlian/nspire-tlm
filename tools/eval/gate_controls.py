@@ -107,7 +107,12 @@ CONTROLS = {
     "format_parity_cond":("corpus/generate.py",
                         "    req = (_store.get(r.get(\"f\"), {}) or {}).get(\"req\") or r.get(\"req\")",
                         "    req = r.get(\"cond\")"),
+    # A11 rewrote this gate: the control now reverts the FIT LABEL, which is the property it
+    # checks today. Pairing a real record with fit:low is the shape assemble.c cannot emit.
     "fit_cue":         ("corpus/generate.py",
+                        '        band = "high"          # A11: assemble.c:99',
+                        '        band = "low" if mismatch else "high"    # A11'),
+    "fit_cue_units":   ("corpus/generate.py",
                         "            umap = units_field(rec_r)",
                         "            umap = ' '.join(f\"{v}:{rec_r['units'][v]}\" for v in sorted("
                         "{x for x in VAR.findall(rec_r['f'].split('=',1)[1])}) "
@@ -115,6 +120,10 @@ CONTROLS = {
     "no_orphan_values":("corpus/generate.py",
                         "        shown  = free + consts", "        shown  = free"),
     # Revert the union: iterate the annotated set alone, and the 25 fall back out.
+    "units_parity":    ("corpus/units_train.json",   # put the seconds back in one file only
+                        '"T_h": "K"', '"T_h": "s"'),
+    "plausible":       ("corpus/generate.py",    # stop dropping impossible results
+                        "            if _why:", "            if False:"),
     "store_coverage":  ("corpus/generate.py",
                         "_keys = list(_ann) + [f for f in _store if f not in _ann]",
                         "_keys = list(_ann)"),
@@ -208,7 +217,8 @@ def gates_in_suite():
 # whose verdict is read is the part before the first underscore-suffix in ALIAS.
 ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_scope_rm": "test_scope",
          "format_parity_cond": "format_parity",
-         "test_score_unit": "test_score"}   # one control per FIELD the parity gate checks
+         "test_score_unit": "test_score",
+         "fit_cue_units": "fit_cue"}   # one control per FIELD the parity gate checks
 
 
 def _write_and_stamp(f, text):

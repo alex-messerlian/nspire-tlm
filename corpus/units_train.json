@@ -23,7 +23,7 @@
  },
  {
   "f": "F=-k*x",
-  "name": "Hooke\u2019s law",
+  "name": "Hooke’s law",
   "units": {
    "F": "N",
    "k": "N/m",
@@ -64,7 +64,7 @@
  },
  {
   "f": "I_0=((V_0)/(Z))",
-  "name": "AC version of Ohm\u2019s law",
+  "name": "AC version of Ohm’s law",
   "units": {
    "I_0": "A",
    "V_0": "V",
@@ -124,7 +124,7 @@
  },
  {
   "f": "E=m*(c)^(2)",
-  "name": "energy\u2013mass conversion",
+  "name": "energy–mass conversion",
   "units": {
    "E": "J",
    "c": "m/s",
@@ -169,8 +169,8 @@
   "name": "Maximum Theoretical Efficiency for a Nuclear Reactor",
   "units": {
    "Eff_C": "1",
-   "T_c": "s",
-   "T_h": "s"
+   "T_c": "K",
+   "T_h": "K"
   },
   "scope": "m42235",
   "source": "worked-example"
@@ -229,7 +229,7 @@
  },
  {
   "f": "E_n=-E_0*((1)/((n)^(2)))",
-  "name": "Electron\u2019s energy inthe nth orbit",
+  "name": "Electron’s energy inthe nth orbit",
   "units": {
    "E_n": "J",
    "E_0": "J",
@@ -333,9 +333,9 @@
   "f": "Delta_T_F=T_F2-T_F1",
   "name": "(from worked example)",
   "units": {
-   "Delta_T_F": "s",
-   "T_F1": "s",
-   "T_F2": "s"
+   "Delta_T_F": "K",
+   "T_F1": "K",
+   "T_F2": "K"
   },
   "scope": "m58385",
   "source": "worked-example"
@@ -458,7 +458,7 @@
  },
  {
   "f": "lambda=((h*c)/(E))",
-  "name": "Calculating the Energy and Wavelength of Electron Transitions in a One\u2013electron (Bohr) System",
+  "name": "Calculating the Energy and Wavelength of Electron Transitions in a One–electron (Bohr) System",
   "units": {
    "lambda": "m",
    "E": "J",
@@ -511,7 +511,7 @@
  },
  {
   "f": "F_net=m*a",
-  "name": "Newton\u2019s second law, scalar form",
+  "name": "Newton’s second law, scalar form",
   "units": {
    "F_net": "N",
    "a": "m/s^2",
@@ -884,7 +884,7 @@
  },
  {
   "f": "n_1*sin(theta_1)=n_2*sin(theta_2)",
-  "name": "Law of refraction (Snell\u2019s law)",
+  "name": "Law of refraction (Snell’s law)",
   "units": {
    "n_1*sin(theta_1)": "1",
    "n_1": "1",
@@ -1165,7 +1165,7 @@
  },
  {
   "f": "F=((Delta_p)/(Delta_t))",
-  "name": "Calculating Force: Venus Williams\u2019 Tennis Serve",
+  "name": "Calculating Force: Venus Williams’ Tennis Serve",
   "units": {
    "F": "N",
    "Delta_p": "kg*m/s",
@@ -1283,7 +1283,7 @@
  },
  {
   "f": "p_f=((h)/(lambda))",
-  "name": "Magnitude of photon\u2019s momentum",
+  "name": "Magnitude of photon’s momentum",
   "units": {
    "p_f": "kg*m/s",
    "h": "J*s",
@@ -1378,7 +1378,7 @@
  },
  {
   "f": "T=((2*pi*m)/(q*B))",
-  "name": "Period of a particle\u2019s motion in a magnetic field",
+  "name": "Period of a particle’s motion in a magnetic field",
   "units": {
    "T": "s",
    "B": "T",
@@ -1391,9 +1391,9 @@
   "f": "Delta_T_F=((9)/(5))*(T_C2-T_C1)",
   "name": "(from worked example)",
   "units": {
-   "Delta_T_F": "s",
-   "T_C1": "s",
-   "T_C2": "s"
+   "Delta_T_F": "K",
+   "T_C1": "K",
+   "T_C2": "K"
   },
   "scope": "m58385",
   "source": "worked-example"
@@ -1506,7 +1506,7 @@
  },
  {
   "f": "F_net=((Delta_p)/(Delta_t))",
-  "name": "Calculating Force: Venus Williams\u2019 Racquet",
+  "name": "Calculating Force: Venus Williams’ Racquet",
   "units": {
    "F_net": "N",
    "Delta_p": "kg*m/s",
@@ -1594,7 +1594,7 @@
  },
  {
   "f": "Delta_p=F_net*Delta_t",
-  "name": "impulse\u2013momentum theorem",
+  "name": "impulse–momentum theorem",
   "units": {
    "Delta_p": "kg*m/s",
    "Delta_t": "s",
@@ -1636,7 +1636,7 @@
  },
  {
   "f": "r=2*s*theta",
-  "name": "Graficar una ecuaci\u00f3n polar al convertirla en una ecuaci\u00f3n rectangular",
+  "name": "Graficar una ecuación polar al convertirla en una ecuación rectangular",
   "units": {
    "r": "m",
    "s": "m",
@@ -1700,7 +1700,7 @@
  },
  {
   "f": "I_1=I_2+I_3",
-  "name": "Calculating Current: Using Kirchhoff\u2019s Rules",
+  "name": "Calculating Current: Using Kirchhoff’s Rules",
   "units": {
    "I_1": "A",
    "I_2": "A",
@@ -1855,7 +1855,7 @@
  },
  {
   "f": "V=I*R",
-  "name": "Common expression of Ohm\u2019s law",
+  "name": "Common expression of Ohm’s law",
   "units": {
    "V": "V",
    "I": "A",

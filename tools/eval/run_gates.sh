@@ -120,6 +120,12 @@ $PY tools/eval/gate_fit_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "fit_c
 $PY tools/eval/gate_no_orphan_values.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_orphan_values" || { printf "  %-20s FAIL\n" "no_orphan_values"; fail=1; }
 # R_train superseteq R_store: 25 of 166 records were retrievable and never trained, worth
 # 12.2% vs 41.0% correct. The only property with a measured effect on correctness.
+# store_clean and units_train both carry units; the generator prefers units_train, so a fix
+# applied to only one silently does not propagate. The temperature-in-seconds fix did exactly that.
+$PY tools/eval/gate_units_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "units_parity" || { printf "  %-20s FAIL\n" "units_parity"; fail=1; }
+# Physically impossible RESULTS -- the class nothing owned, because distribution_gate cannot
+# see digits and dim_gate finds -28.75 a dimensionally fine efficiency.
+$PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "plausible" || { printf "  %-20s FAIL\n" "plausible"; fail=1; }
 $PY tools/eval/gate_store_coverage.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_coverage" || { printf "  %-20s FAIL\n" "store_coverage"; fail=1; }
 $PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }
 $PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }
