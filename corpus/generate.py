@@ -200,6 +200,18 @@ def condition(name):
         if re.search(pat, n): return c
     return "standard conditions"
 
+_NOT_A_HEAD = {"of", "in", "on", "for", "to", "a", "an", "the", "and", "or", "with",
+               "from", "by", "at", "per", "into", "under", "over", "as", "its"}
+
+# A NAME THAT DENOTES A RELATION IS NOT A NAME FOR ITS OUTPUT. 24 of 141 records are named after
+# the equation rather than the quantity it produces -- "law of reflection", "transformer equation",
+# "common expression of ohm's law", "relationship between frequency and period" -- and asking
+# "Compute law of reflection." is asking for the wrong kind of thing. For these the only honest
+# surface is the LHS symbol. Found by hand-reading 30 questions after the frame fix: 4 of 30 were
+# of exactly this shape and nothing else explained them.
+_RELATION_NAME = re.compile(r"\b(law|equation|expression|relationship|relation|theorem|"
+                            r"principle|rule|formula|identity|definition)\b", re.I)
+
 def quantity_surface(r, rng):
     """How the QUESTION refers to the quantity being asked for.
 
@@ -226,16 +238,36 @@ def quantity_surface(r, rng):
     lhs  = r["f"].split("=", 1)[0].strip()
     words = name.split()
     forms, weights = [], []
+
+    def _add(form, w):
+        """A truncation is only a noun phrase if it BEGINS like one.
+
+        The first version of this took the last two words unconditionally, which turned
+        "index of refraction" into "of refraction" and produced "Calculate of refraction."
+        A suffix of a noun phrase is not itself a noun phrase, and taking one is a proxy for
+        head-noun extraction rather than the thing itself."""
+        form = form.strip()
+        if not form or form.split()[0] in _NOT_A_HEAD:
+            return
+        forms.append(form); weights.append(w)
+
+    if name and _RELATION_NAME.search(name):
+        # The name describes the equation, not its output. Only the symbol is usable.
+        return lhs or name
     if name:
-        forms.append(name);                       weights.append(2)
-        if len(words) >= 2:
-            forms.append(" ".join(words[-2:]));   weights.append(3)
-        if len(words) >= 3:
-            forms.append(words[-1]);              weights.append(2)
+        _add(name, 2)
+        # THE HEAD IS ON THE LEFT OF A PREPOSITION, NOT AT THE END. "acceleration of two blocks
+        # connected over a pulley" has head "acceleration"; the last word is "pulley", and taking
+        # it produced "what was pulley?". Likewise "speed of sound" -> "sound", "distance to
+        # screen" -> "screen", "heat capacity at constant pressure" -> "constant pressure".
+        # Position was a proxy for headedness and it is wrong for every "X of Y" name, which is
+        # most of them.
+        head = re.split(r"\s+(?:of|from|in|on|at|for|to|over|due|between|with|per)\s+", name)[0]
+        if head and head != name: _add(head, 3)
     if lhs and len(lhs) <= 6:
-        forms.append(lhs);                        weights.append(2)
+        _add(lhs, 2)
     if not forms:
-        return lhs or "the value"
+        return name or lhs or "the value"
     return rng.choices(forms, weights=weights, k=1)[0]
 
 
@@ -282,6 +314,71 @@ if _unnamed:
 # distribution we have, and tuning against it would destroy the honest read on whether variety
 # closes the 25pp generator-vs-eval gap.
 ASK = json.load(open("corpus/asks_dev.json"))
+
+# A6. THE MINED ASK TEMPLATES ARE 8 USABLE FRAMES AND 36 FRAGMENTS, and {q} was substituted into
+# all 44 blind. Two defects, one cause, both measured on output rather than argued:
+#
+#   1. WRONG QUANTITY. 16 templates name a quantity of their own, so the question asked for one
+#      thing and the answer span supplied another. 4,507 of 20,000 shipped questions -- 22.5%.
+#          "How much heat did velocity?"              record v=v_0+a*t
+#          "How much work does tangential speed?"     record v=r*omega
+#      That is wrong supervision: a quarter of the corpus taught that the quantity named in the
+#      question is not the one to answer with.
+#
+#   2. WRONG FRAME. 36 of 44 templates are sentence fragments mined mid-question, whose complement
+#      must be something other than a bare noun phrase. Hand-read of 30 generated questions:
+#      19 ill-posed, 63% [Wilson 95% CI 46-78].
+#          "Determine whether v_t."          needs a proposition
+#          "How long will it take centripetal acceleration?"   needs a duration
+#          "Calculate be/ F_net."            mining garbage, literally "be/"
+#          "What is his displacement vector d -> k?"           mining garbage
+#          "Determine (a) mass."             "(a)" leaked from multi-part exercise numbering
+#
+# WHAT MISSED BOTH. Every automated check passed these documents -- well-formed, call executes,
+# result matches, provenance clean, shape OK, dimensional gate clean, diversity fine. Nothing
+# compared the question's subject to the answer's, and nothing read a question. They were found by
+# READING ONE, then thirty.
+#
+# THE FIX IS A HAND-REVIEWED ALLOWLIST, NOT A REGEX. A predicate like "does the template end in
+# {q}?" would be a proxy for "does this frame accept a bare noun phrase", and this repo has been
+# bitten six times by exactly that substitution. 44 items is small enough to read, so they were
+# read, and the eight that survive are named here with the reviewer's claim attached.
+#
+# THE UNCOMFORTABLE PART, and it belongs in the plan rather than in a comment: mining question
+# surfaces yielded EIGHT generic verbs that could have been hand-written in a minute. The template
+# "variety" the corpus was credited with was 36 broken frames. This is independent evidence for the
+# same conclusion the stem work reached -- mined OpenStax question surface does not transfer.
+ASK_REVIEWED = [                      # every frame below takes a bare noun phrase as its object
+    "What is {q}?", "Find {q}.", "Calculate {q}.", "Determine {q}.",
+    "What was {q}?", "Estimate {q}.", "Compute {q}.",
+    # "What are {q}?" is REJECTED despite being a clean frame: quantity_surface() yields singular
+    # noun phrases, so it produced "what are spherical mirror?" and "what are motionally induced
+    # emf?". A frame is only usable with the surfaces this generator actually emits.
+]
+_ASK_SHA = "2d0d3b8f"                 # guard: see tools/eval/gate_ask_quantity.py
+
+ASK_ALL = json.load(open("corpus/asks_dev.json"))
+ASK = [t for t in ASK_REVIEWED if t in ASK_ALL]
+assert len(ASK) == len(ASK_REVIEWED), (
+    "a reviewed ASK frame is no longer in corpus/asks_dev.json. The allowlist is a claim about "
+    "text that has been READ; it cannot survive that text changing underneath it. Re-read the "
+    "file and update ASK_REVIEWED deliberately.")
+
+QUANTITY = re.compile(r"\b(work|heat|speed|velocity|displacement|force|power|energy|time|charge|"
+                      r"current|mass|distance|pressure|temperature|acceleration|momentum)\b", re.I)
+
+def _named_quantities(text):
+    return {w.lower() for w in QUANTITY.findall(text or "")}
+
+# Retained so the gate can assert the REJECTED frames stay rejected: a gate that only checks the
+# survivors cannot notice the fragments coming back.
+ASK_REJECTED = [t for t in ASK_ALL if t not in ASK_REVIEWED]
+
+def ask_for(r, surface, rng):
+    """Choose a question frame. Only reviewed frames are eligible, so a frame cannot contradict
+    the quantity being asked for -- none of them names a quantity at all."""
+    return rng.choice(ASK).format(q=surface)
+
 GIVE = ["Given {g}, ", "With {g}, ", "If {g}, ", "For {g}, ", "Where {g}, ",
         "Suppose {g}. ", "Take {g}. ", "A system has {g}. ", "Assume {g}. ",
         "Consider a case where {g}. ", "In a setup with {g}, ", "Measurements give {g}. ",
@@ -315,7 +412,7 @@ def gen(n, seed=0):
             free_w = [v for v in free if v != drop]
             g = ", ".join(f"{v} = {vals[v]:g}" for v in free_w) if free_w else g
         stem = rng.choice(GIVE).format(g=g)
-        ask  = rng.choice(ASK).format(q=quantity_surface(r, rng))
+        ask  = ask_for(r, quantity_surface(r, rng), rng)
         # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
         # real problems, and ordering moves 4-gram diversity more than the verb does.
         if rng.random() < 0.35:

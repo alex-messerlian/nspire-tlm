@@ -74,6 +74,9 @@ $PY tools/eval/gate_event_producers.py >/dev/null 2>&1 && printf "  %-20s PASS\n
 # ITEM 15: distribution_gate.py was written with a __main__ and an exit code and wired to NOTHING.
 # Its first run says the eval set is 91-95% separable from training against a ~52% noise control.
 # Unreachable before the corpus restart, so it ratchets against a recorded baseline.
+# A6: 22.5% of the shipped corpus asked for a quantity the record does not compute.
+# Found by reading one generated question; every other gate passed those documents.
+$PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }
 $PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }
 # The generator may only emit relations the CLEANED store contains. docs/RESULT_STORE_CLEANING.md
 # deleted 34 records for documented reasons and units_train.json was never re-cleaned; a change that

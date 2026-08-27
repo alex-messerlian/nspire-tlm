@@ -80,10 +80,37 @@ def real_vs_real_floor(eval_qs, seed=0):
         mined = [str(x) for x in json.load(open("corpus/stems_all.json"))]
     except (FileNotFoundError, KeyError):
         return None
-    n = min(len(eval_qs), len(real), len(mined))
-    rng = random.Random(seed); rng.shuffle(mined)
-    r, c, _ = evaluate(mined[:n], real[:n], seed=seed)
+    # D1. evaluate() ITSELF halves: `n = min(len(eval_qs), len(train_qs)//2)`. Passing real[:n]
+    # and mined[:n] therefore measured the floor at n/2 while the gate ran at n -- the mismatched
+    # sample-size defect this function's docstring announces as fixed, reproduced inside the fix.
+    # Give the train side 2n so evaluate's own n lands on the caller's n, and ASSERT it did.
+    n = min(len(eval_qs), len(real), len(mined) // 2)
+    rng = random.Random(seed)
+    # D3. Both sides are shuffled. Only `mined` was, so for the 80-item splits the floor saw the
+    # first 80 of clean_surface.json forever, on every seed -- invisible while that file happens
+    # to be in random order, and silently topic-specific the moment it is not.
+    rng.shuffle(mined); rng.shuffle(real)
+    r, c, got = evaluate(mined[:2 * n], real[:n], seed=seed)
+    assert got == n, f"floor measured at n={got}, caller runs at n={n}"
     return r - c
+
+
+def real_vs_real_floor_mean(eval_qs, seeds=5):
+    """D2. A ONE-SEED THRESHOLD IS A COIN FLIP, and the noise is on the MARGIN, so no amount of
+    averaging the measurement fixes it. Over 20 seeds the 80-item floor ranges +9.0 to +28.5 with
+    sd 5.13 -- and seed 0, which the gate used, draws the maximum of the 20. A corpus that had
+    genuinely improved by 8 pp would still have failed at seed 3.
+
+    Returns (mean, sd, n_seeds), or (None, None, 0) when the inputs are absent.
+    """
+    xs = []
+    for s in range(seeds):
+        f = real_vs_real_floor(eval_qs, seed=s)
+        if f is None: return None, None, 0
+        xs.append(f)
+    mean = sum(xs) / len(xs)
+    sd = (sum((x - mean) ** 2 for x in xs) / max(1, len(xs) - 1)) ** 0.5
+    return mean, sd, len(xs)
 
 
 def gate(train_qs, eval_qs, label, margin, seed=0):
@@ -116,7 +143,9 @@ if __name__ == "__main__":
     print("  floor: two samples of genuine OpenStax prose, measured in-run at EACH split's own")
     print("    sample size -- separability depends on n, so a single constant cannot serve both.")
     for label, qs in splits:
-        floor = real_vs_real_floor(qs)
+        floor, floor_sd, nseeds = real_vs_real_floor_mean(qs)
+        if floor is not None:
+            print(f"    {label:22} floor {floor:+6.1%} +- {floor_sd:.1%} over {nseeds} seeds")
         if floor is None:
             print("  CANNOT CHECK: corpus/clean_surface.json or corpus/stems_all.json is missing,")
             print("    so the floor cannot be measured. Refusing to substitute a constant.")
@@ -128,15 +157,25 @@ if __name__ == "__main__":
     # This gate was written with a __main__ and an exit code and was WIRED TO NOTHING -- the audit
     # found it PROSE_ONLY. Running it for the first time: the eval set is 91-95% separable from the
     # training corpus against a ~52% noise control, an excess of +37 to +45 pp against a 10 pp
-    # margin. That is a real and large finding, and it is not fixable by anything short of the
-    # corpus restart: the generator interpolates the record's NAME into the question, so training
-    # questions name their record ~95% of the time and eval questions never do.
+    # margin. The name-interpolation hypothesis in the first version of this note was WRONG as a
+    # sole cause: fixing it (A1) moved 1.31 pp of 45, and the corrected generator-vs-eval figure is
+    # +43.5 (the +47.9 first published compared whole documents against bare question stems -- a
+    # scope break worth 3.9 pp). See docs/CORPUS_PLAN.md sections 3, 4 and 8.
+    #
+    # AND THE GATE CANNOT SEE DIGITS. TOK is r"[a-z]+", so a corpus whose every number was rebound
+    # to an absurd value scores IDENTICALLY here: measured across 448 digit-only rebinds, 448/448
+    # strings changed and 0/448 feature streams did. Numeric plausibility is out of scope for this
+    # instrument and currently has no owner.
     #
     # So the gate cannot pass today and must not therefore be ignored. It ratchets: the excess may
     # not get WORSE than the baseline below, and the baseline may only be lowered. That makes it
     # meaningful now, and it becomes a real pass/fail the moment the retrain lands.
-    BASELINE = {"SELECT": 38.5, "REPORT": 38.0, "eval items.json": 45.5}   # pp, measured 2026-08-26
-    #                                                                 target for all three: 29.2
+    # Re-baselined 2026-08-27 after A6. These are 5-seed means, not the seed-0 draws the first
+    # set were: a hardcoded seed-0 constant guarding a seed-dependent measurement fires "REGRESSION"
+    # on a re-seed with no corpus change, which trains everyone to ignore the gate.
+    # The TARGET is not a constant either -- it is the in-run floor printed above each row
+    # (+22.3 at n=80, +24.2 at n=200, 5-seed). The retracted "29.2" is gone.
+    BASELINE = {"SELECT": 38.5, "REPORT": 38.0, "eval items.json": 45.5}   # pp; only ever LOWER
     print()
     print("  BASELINE RATCHET (this gate cannot pass before the corpus restart -- see the note in")
     print("  the source). Excess may not exceed these; lower them when the retrain improves matters:")

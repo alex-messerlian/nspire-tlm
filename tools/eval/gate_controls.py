@@ -87,6 +87,12 @@ CONTROLS = {
     "test_theme":      ("src/store/app.c",        # the palette must actually swap
                         "const uint16_t *src = dark ? PAL_DARK : PAL_LIGHT;",
                         "const uint16_t *src = PAL_LIGHT;"),
+    # Revert A6 to what shipped: substitute the asked-for quantity into ANY of the 44 mined
+    # frames, including the 36 sentence fragments. ASK_ALL, not ASK -- reverting to the reviewed
+    # list would not reintroduce the fragments and the control would prove nothing.
+    "ask_quantity":    ("corpus/generate.py",
+                        "        ask  = ask_for(r, quantity_surface(r, rng), rng)",
+                        "        ask  = rng.choice(ASK_ALL).format(q=quantity_surface(r, rng))"),
     "test_ui_errs":    ("tools/webui/index.html",   # a code the evaluator emits, dropped from the map
                         '"!nosol":"no solution found",\n', ''),
     "test_loader":     ("src/store/loader.c",     # the truncation check: a short file must not pass
