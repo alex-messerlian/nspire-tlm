@@ -41,6 +41,11 @@ if __name__ == "__main__":
         if not (f and q): continue
         rec = by_f.get(f.group(1).strip())
         if rec is None: continue
+        # SKIP D2. In a mismatch document the shown record is DELIBERATELY not the one the givens
+        # came from -- that is the whole point of the class -- so checking those givens against it
+        # is wrong by construction. It flagged a correct electron mass against a record about
+        # gravitational potential energy. The check's scope is documents whose record IS the source.
+        if "does not apply" in t: continue
         for var, val in NUM.findall(q.group(1)):
             rr = m.quantity_range(rec, var)
             if rr is None: continue

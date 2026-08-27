@@ -58,6 +58,13 @@ def _const_for(rec, v):
     key = (rec.get("f"), v)
     if key in _CONST_CACHE: return _CONST_CACHE[key]
     out = None
+    # A22b: a microscopic constant of the named particle or material. Declared in _MICRO_CVAL below
+    # rather than sampled, because the empirical pool cannot reach 1.6e-19 at all. Resolved here so
+    # A7 inlines it into the question -- the model must READ the value, not recall it.
+    micro = globals().get("_MICRO_CVAL", {}).get((rec.get("f"), v))
+    if micro is not None:
+        _CONST_CACHE[key] = micro[0]
+        return micro[0]
     cv = (_store.get(rec.get("f"), {}) or {}).get("cval") or {}
     if v in cv:
         try: out = float(cv[v])
@@ -69,12 +76,47 @@ def _const_for(rec, v):
     return out
 
 _EMP = json.load(open("corpus/empirical_values.json"))
-_POOL = sorted(v for vs in _EMP.values() for v in vs)
 
-def sample_value(rng):
+# A22a. THE POOL IS KEYED BY UNIT AND THE FLATTEN THREW THE KEY AWAY.
+# `sorted(v for vs in _EMP.values() for v in vs)` merged 29 unit-keyed lists into one, so a mass
+# could be drawn from the charge list and a length from the frequency list. Keeping the key is
+# strictly better and costs nothing -- the data was always shaped for it.
+_POOL_BY_UNIT = {k: sorted(float(v) for v in vs) for k, vs in _EMP.items()}
+_POOL = sorted(v for vs in _POOL_BY_UNIT.values() for v in vs)
+
+# A22b. AND THE POOL CANNOT REACH A MICROSCOPIC VALUE AT ALL. Every list is mined from OpenStax
+# PROBLEM VALUES, so the whole pool spans [0.001, 9800] with median 8. For any quantity whose
+# physical scale lies outside that window there is NO admissible draw -- not a bad tail, an
+# inability. Measured consequences, each 100% of the documents on those records:
+#
+#   v_d=I/(n*q*A)   carrier density 4,186 /m^3   (copper: 8.5e28)      -- wrong by 25 orders
+#                   carrier charge 2 C           (elementary: 1.6e-19) -- wrong by 19 orders
+#   r=(m*v)/(q*B)   "a particle" of 500 kg carrying 12 C
+#   Delta_y=x*lambda/d   a 6,000 m wavelength through slits 1 m apart
+#
+# These variables are not free parameters, they are PHYSICAL CONSTANTS of the named particle or
+# material. The store already has the mechanism -- `cval`, which _const_for() resolves and A7
+# inlines into the question so the model reads the value rather than recalling it. Supplying them
+# here is what the mechanism is for.
+_MICRO_CVAL = {
+    # (formula, variable) -> (value, unit, what it is)
+    ("v_d=((I)/(n*q*A))", "q"): (1.602e-19, "C",     "elementary charge"),
+    ("v_d=((I)/(n*q*A))", "n"): (8.5e28,    "1/m^3", "conduction-electron density in copper"),
+    ("T=((2*pi*m)/(q*B))", "q"): (1.602e-19, "C",    "elementary charge"),
+    ("T=((2*pi*m)/(q*B))", "m"): (9.109e-31, "kg",   "electron mass"),
+    ("r=((m*v)/(q*B))",   "q"): (1.602e-19, "C",     "elementary charge"),
+    ("r=((m*v)/(q*B))",   "m"): (9.109e-31, "kg",    "electron mass"),
+}
+
+def sample_value(rng, unit=None):
     """Draw from the empirical OpenStax distribution: median ~5, 60-90% round numbers.
-    uniform(1.5, 95) produced m = 92.6 kg and r = 70.25 m, which no textbook contains."""
-    return rng.choice(_POOL)
+    uniform(1.5, 95) produced m = 92.6 kg and r = 70.25 m, which no textbook contains.
+
+    KEYED BY UNIT where the data has that unit -- see A22a. Falls back to the merged pool for a
+    unit the mining never saw, which is the pre-existing behaviour and is stated rather than
+    hidden: a fallback that looks like a choice is how the flatten went unnoticed."""
+    pool = _POOL_BY_UNIT.get(unit) if unit else None
+    return rng.choice(pool if pool else _POOL)
 
 
 # A21. THE GIVENS WERE UNCHECKED. A17 filters RESULTS, and every input was drawn from one pool
@@ -95,15 +137,29 @@ def sample_value(rng):
 # formula says so directly: it is the argument of a trig function, or its unit is rad.
 _TRIG_ARG = re.compile(r"\b(?:sin|cos|tan|asin|acos|atan)\s*\(\s*([^)]*)\)")
 
+# theta and phi ARE angle symbols by universal convention; alpha/beta/gamma are not, which is why
+# a symbol list failed before -- `alpha` is angular acceleration as often as an angle. Restricting
+# the symbolic rule to theta/phi and keeping the positional rule for everything else catches the
+# sector angle in `A=(1/2)*theta*r^2`, which is an angle in radians and is NOT a trig argument.
+_ANGLE_SYMS = {"theta", "phi", "Delta_theta", "Delta_phi"}
+
 def _is_angle(rec, var):
     unit = ((rec.get("units") or {}).get(var) or "").strip()
     if unit == "rad": return True
     if unit not in ("1", ""): return False
+    if var in _ANGLE_SYMS or re.fullmatch(r"(theta|phi)_[A-Za-z0-9]+", var): return True
     return any(re.search(rf"(?<![A-Za-z0-9_]){re.escape(var)}(?![A-Za-z0-9_])", a)
                for a in _TRIG_ARG.findall(rec["f"]))
 
 def quantity_range(rec, var):
-    """(lo, hi, integral, why) for a given, or None if this variable is not in the table."""
+    """(lo, hi, integral, why) for a SAMPLED given, or None if this variable is not in the table.
+
+    A SUPPLIED CONSTANT IS NOT A SAMPLED GIVEN and is out of scope here. The electron mass
+    9.109e-31 kg is correct and fails the "laboratory mass" window by 25 orders of magnitude --
+    my own range table contradicting my own constant. The table exists to bound a DRAW; a value
+    that came from _const_for has its own justification and is not being drawn.
+    """
+    if _const_for(rec, var) is not None: return None
     unit = ((rec.get("units") or {}).get(var) or "").strip()
     name = (rec.get("name") or "").lower()
     f = rec["f"]
@@ -130,9 +186,41 @@ def quantity_range(rec, var):
         return (1.0e-3, 2.9979e8, False, "a material speed cannot exceed c")
     if unit == "kg":
         return (1.0e-6, 1.0e6, False, "a laboratory mass")
+    if unit == "T":
+        # 45 T is the strongest continuous laboratory field ever attained; 100 T is generous.
+        return (1.0e-5, 100.0, False, "a magnetic field beyond 100 T has never been produced")
+    if var in ("C", "C_d") and "drag" in name:
+        return (0.04, 2.0, False, "a drag coefficient lies between a streamlined body and a plate")
     if var in ("p_0", "p_a", "p_atm") and unit in ("Pa",):
         return (5.0e4, 1.5e5, False, "atmospheric pressure is ~1e5 Pa, not an arbitrary draw")
     return None
+
+
+# A22c. SOME PRECONDITIONS ARE RELATIONS BETWEEN GIVENS and no per-variable range can express them.
+# Measured by the Step 0 adversary: lambda >= d on 45.13% of double-slit documents (no interference
+# maximum exists, the derivation is void); W_f > W_in on 47.62% of friction documents (friction
+# dissipates more than was supplied, and the answer states a NEGATIVE output work). Both produce
+# arithmetic that is correct and a scenario that cannot happen.
+#
+# Stated as predicates over the drawn values, checked after sampling and redrawn on failure. The
+# list is short and explicit; a record not in it has no cross-variable precondition CHECKED, which
+# is not the same as having none.
+_PRECONDITION = {
+    "Delta_y=x*lambda/d":        (lambda v: v["lambda"] < v["d"],
+                                  "an interference maximum needs lambda < d"),
+    "W_out=W_in-W_f":            (lambda v: v["W_f"] < v["W_in"],
+                                  "friction cannot dissipate more than was supplied"),
+    "Eff_C=1-((T_c)/(T_h))":     (lambda v: v["T_c"] < v["T_h"],
+                                  "the cold reservoir must be colder than the hot one"),
+}
+
+def preconditions_hold(rec, vals):
+    """True if the drawn values satisfy the record's cross-variable precondition, or it has none."""
+    pred = _PRECONDITION.get(rec.get("f"))
+    if pred is None: return True
+    try:    return bool(pred[0](vals))
+    except (KeyError, TypeError, ZeroDivisionError):
+        return True            # the record does not have those variables; not this check's call
 
 
 def sample_in_range(rng, lo, hi, integral):
@@ -599,6 +687,11 @@ def gen(n, seed=0):
             rr = quantity_range(r, v)
             return sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else sample_value(rng)
         vals = {v: _draw(v) for v in vs}
+        for _try in range(24):                     # bounded: a precondition that can never hold
+            if preconditions_hold(r, vals): break  # must not spin, and the doc is dropped below
+            vals = {v: _draw(v) for v in vs}
+        if not preconditions_hold(r, vals):
+            continue                               # cannot satisfy it -- drop, never teach it
         expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
         free = [v for v in vs if _const_for(r, v) is None]
         if not free: continue                          # nothing left to ask about
