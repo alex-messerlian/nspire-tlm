@@ -114,6 +114,10 @@ CONTROLS = {
                         "if v in rec_r.get('units',{}))"),
     "no_orphan_values":("corpus/generate.py",
                         "        shown  = free + consts", "        shown  = free"),
+    # Revert the union: iterate the annotated set alone, and the 25 fall back out.
+    "store_coverage":  ("corpus/generate.py",
+                        "_keys = list(_ann) + [f for f in _store if f not in _ann]",
+                        "_keys = list(_ann)"),
     "ask_quantity":    ("corpus/generate.py",
                         "        ask  = ask_for(r, quantity_surface(r, rng), rng)",
                         "        ask  = rng.choice(ASK_ALL).format(q=quantity_surface(r, rng))"),

@@ -158,17 +158,48 @@ def _condition_field(r):
     while each looked internally consistent."""
     req = (_store.get(r.get("f"), {}) or {}).get("req") or r.get("req")
     return req if req else "standard conditions"
-_BADNAME = re.compile(r"^\(|Example|Using |Calculat|^Find |Determin|Problem|Theorem", re.I)
+# Rejects a WORKED-EXAMPLE TITLE used as a relation name ("Using the Monotone Convergence Theorem",
+# "Calculating Displacement: A Subway Train"). Every marker names a thing a TITLE does.
+#
+# Bare `Theorem` was in this list and is not such a marker: it rejected "Work-energy theorem" and
+# "impulse-momentum theorem", two legitimate relation names, leaving both records shipped-but-
+# untrained. "Contains the word Theorem" was a proxy for "is a worked-example title", and the
+# titles it was meant to catch all carry a leading verb -- `Using ` catches the Monotone
+# Convergence one on its own.
+#
+# A name that denotes a RELATION rather than a quantity is handled downstream, not here:
+# quantity_surface() sends those to the LHS symbol (A6f), so "Work-energy theorem" produces
+# "Calculate W_net", never "Calculate work-energy theorem".
+_BADNAME = re.compile(r"^\(|Example|Using |Calculat|^Find |Determin|Problem", re.I)
 
 def _best_name(f, ann):
     for cand in (_store.get(f, {}).get("name"), ann.get("name"), _mined.get(f, {}).get("name")):
         if cand and not _BADNAME.search(cand): return cand
     return None
 
+# R_train SUPSETEQ R_store. THE ITERATION SET IS THE UNION, and it used to be units_train alone --
+# so 25 records the device can RETRIEVE were never taught. A record the model has never seen
+# produces a well-formed document with the wrong structure at 12.2% against 41.0% for one it has,
+# and the picker can return any of the 166. Shipping a relation you did not train on is shipping a
+# confident wrong answer with a retrieval path to it.
+#
+# All 25 carried COMPLETE units and a name in store_clean.json already; nothing had to be annotated,
+# the iteration simply never reached them. units_train stays the authority on units WHERE IT HAS
+# THEM -- it is the hand-annotated set -- and the store supplies them otherwise.
+#
+# This closes the rule and stops. Breadth beyond the store (the 377 Gate-A survivors) is a separate
+# decision with its own control: it has no measured effect on correctness, and coverage of what
+# SHIPS is what 41.0/12.2 measures.
 recs, _unnamed, _uncleaned = [], [], []
-for f, ann in _ann.items():
+_keys = list(_ann) + [f for f in _store if f not in _ann]
+for f in _keys:
+    ann = _ann.get(f) or {}
     src = _mined.get(f) or _store.get(f) or dict(ann)
-    r = dict(src); r["f"] = f; r["units"] = ann["units"]
+    r = dict(src); r["f"] = f
+    r["units"] = ann.get("units") or (_store.get(f, {}) or {}).get("units") or {}
+    if not r["units"]:
+        _unnamed.append(f)                     # no units anywhere: cannot state an answer's unit
+        continue
     # usable() IS A MINING FILTER. Its two clauses catch converter artefacts -- `f(x)=` definition
     # shapes and MathML fusion like `K*E` where `KE` was meant -- which can only occur in text that
     # came through extract_records.py. Applying it to a HAND-CURATED record is a category error, and
