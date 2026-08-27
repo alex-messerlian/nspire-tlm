@@ -18,6 +18,56 @@ CONST = {
  "epsilon_0":8.854e-12, "mu_0":1.257e-6, "a_0":5.292e-11, "N_A":6.022e23, "R":8.314,
  "sigma":5.670e-8, "g":9.81, "e":1.602e-19, "m_e":9.109e-31, "m_p":1.673e-27,
 }
+
+# ---- CONSTANTS RESOLVE PER RECORD, NOT PER NAME -------------------------------------------------
+#
+# `CONST[v]` is a global name->meaning table with no scope argument -- the SEVENTH instance of the
+# pattern docs/IDENTIFIER_COLLISION.md documents, in the file that produces every training document,
+# against a rule that document already states as enforceable: "any function mapping a name to a
+# meaning must take a scope argument."
+#
+# Measured, by replaying this substitution over the record set: 9 of 77 productive heads got a
+# DIFFERENT PHYSICAL QUANTITY. h := Planck's constant where the record declares metres of depth.
+# R := the molar gas constant where the record declares ohms, and again where it declares a radius.
+# c := the speed of light where the record declares J/(kg*K). That is every DC-circuit relation in
+# the corpus, all of rolling motion, hydrostatics and calorimetry.
+#
+# The scope is the RECORD, and it has been carrying the answer all along: store_clean.json's `cval`
+# field says which of a relation's symbols are supplied constants and what they are worth. Two rules:
+#   1. If the record names the constant in its own cval, use THAT.
+#   2. Otherwise fall back to CONST only when the record's DECLARED UNIT is dimensionally the
+#      constant's unit. A mismatch means the symbol is a variable that happens to share a name.
+# A record with no unit for the symbol gets no substitution -- absence is not permission.
+_CUNIT = {"h":"J*s","hbar":"J*s","c":"m/s","G":"N*m^2/kg^2","k_e":"N*m^2/C^2","k":"N*m^2/C^2",
+          "epsilon_0":"F/m","mu_0":"T*m/A","a_0":"m","N_A":"1/mol","R":"J/(mol*K)",
+          "sigma":"W/(m^2*K^4)","g":"m/s^2","e":"C","m_e":"kg","m_p":"kg"}
+
+def _dim_same(u1, u2):
+    """Dimensional equality decided by the SHIPPED evaluator, not by string comparison -- `F/m` and
+    `C^2/(N*m^2)` are the same dimension written two ways, and a string rule would reject the
+    legitimate epsilon_0 records along with the illegitimate R ones."""
+    if not u1 or not u2: return False
+    if u1.replace(" ","") == u2.replace(" ",""): return True
+    p = subprocess.run(["tools/eval/evalcli", f"<tool>conv<arg>1 {u1}<arg>{u2}</tool>"],
+                       capture_output=True, text=True)
+    return "!" not in p.stdout
+
+_CONST_CACHE = {}
+def _const_for(rec, v):
+    """The value of `v` in `rec` if it is a supplied constant there, else None."""
+    key = (rec.get("f"), v)
+    if key in _CONST_CACHE: return _CONST_CACHE[key]
+    out = None
+    cv = (_store.get(rec.get("f"), {}) or {}).get("cval") or {}
+    if v in cv:
+        try: out = float(cv[v])
+        except (TypeError, ValueError): out = None
+    elif v in CONST:
+        u = (rec.get("units") or {}).get(v)
+        out = CONST[v] if (u and _dim_same(u, _CUNIT[v])) else None
+    _CONST_CACHE[key] = out
+    return out
+
 _EMP = json.load(open("corpus/empirical_values.json"))
 _POOL = sorted(v for vs in _EMP.values() for v in vs)
 
@@ -58,10 +108,62 @@ def usable(r):
 # training at all.
 # TRAINING formulas only. The held-out set is reserved strictly for measuring generalisation
 # across unseen formulas and must never reach the corpus.
-_ann = {r["f"]: r for r in json.load(open("corpus/units_train.json"))}
-recs = [r for r in json.load(open("corpus/records_raw.json"))
-        if usable(r) and r["f"] in _ann and not r.get("drop")]
-for r in recs: r["units"] = _ann[r["f"]]["units"]
+# ITERATE THE ANNOTATED SET, NOT THE MINED ONE.
+#
+# This used to read `for r in records_raw if usable(r) and r["f"] in units_train`, which iterates the
+# MINED set and merely filters by the annotation store. records_raw holds 377 relations extracted
+# from OpenStax "Key Equations" tables; units_train holds 200 hand-annotated with units. The
+# intersection is 78, and the 122 relations that were annotated but never mined were unreachable --
+# including FIFTEEN OF THE TWENTY the eval set tests. `v=d/t` carries 19 of the 200 eval items and
+# had never appeared in a single training document. Measured: 5 of 20 eval heads covered, 21.6% of
+# eval items. See docs/RELATION_COVERAGE.md.
+#
+# The reason mining cannot supply them is structural: Key Equations tables list what a chapter
+# DERIVES, and the foundational relations -- F=m*a, v=d/t, K=0.5*m*v^2 -- are assumed and stated
+# inline in prose. Re-running the miner over all twelve books yields 0 new relations. Breadth comes
+# from mining; the core comes from hand-authoring, and iterating the mined set makes the core
+# unreachable by construction.
+_ann  = {r["f"]: r for r in json.load(open("corpus/units_train.json"))}
+_mined = {r["f"]: r for r in json.load(open("corpus/records_raw.json"))}
+# NAMES. units_train's `name` is often the WORKED EXAMPLE'S TITLE rather than the quantity's --
+# "Curiosity Rover", "X-Rays from Aluminum", "(from worked example)" -- and generate.py puts that
+# straight into the question as "find the {name}". store_clean.json was hand-curated with real
+# relation names, so prefer it; 45 of the 82 bad names are covered that way, and all 20 eval
+# relations get a proper name with no new work.
+_store = {r["f"]: r for r in json.load(open("corpus/store_clean.json"))}
+_BADNAME = re.compile(r"^\(|Example|Using |Calculat|^Find |Determin|Problem|Theorem", re.I)
+
+def _best_name(f, ann):
+    for cand in (_store.get(f, {}).get("name"), ann.get("name"), _mined.get(f, {}).get("name")):
+        if cand and not _BADNAME.search(cand): return cand
+    return None
+
+recs, _unnamed = [], []
+for f, ann in _ann.items():
+    src = _mined.get(f) or _store.get(f) or dict(ann)
+    r = dict(src); r["f"] = f; r["units"] = ann["units"]
+    # usable() IS A MINING FILTER. Its two clauses catch converter artefacts -- `f(x)=` definition
+    # shapes and MathML fusion like `K*E` where `KE` was meant -- which can only occur in text that
+    # came through extract_records.py. Applying it to a HAND-CURATED record is a category error, and
+    # an expensive one: it dropped 23 hand-verified store records including E=m*c^2, kinetic energy,
+    # drag force, the law of reflection and rms voltage. Its function-application regex,
+    # `[A-Za-z_]\d*\s*\*?\(`, matches `m*(v)^(2)` -- an ordinary product -- and `K=0.5*m*(v)^(2)`
+    # carries 12 of the 200 eval items.
+    #
+    # So: a record that appears in store_clean.json has been read by a human and is exempt. A
+    # mined-only record is not, and the filter still earns its place there -- of the 4 mined-only
+    # drops, one is `K*E=...` (fusion) and one is `U(x)=...` (definition shape).
+    if r.get("drop"): continue
+    if f not in _store and not usable(r): continue
+    nm = _best_name(f, ann)
+    if not nm:
+        # REPORTED, NOT SILENT. usable() already drops 31 records with no output at all, and simple
+        # harmonic motion is absent from the corpus because of it. A relation skipped for want of a
+        # name is a relation someone can supply a name for in one line, and they can only do that if
+        # the generator says which.
+        _unnamed.append(f); continue
+    r["name"] = nm
+    recs.append(r)
 
 # Applicability conditions, drafted per subject. THIN by design and flagged as such: these are the
 # weakest annotation in the pipeline and the one the refusal metrics lean on hardest.
@@ -83,8 +185,13 @@ def condition(name):
         if re.search(pat, n): return c
     return "standard conditions"
 for r in recs: r["cond"] = condition(r["name"])
-print(f"records usable as physics relations: {len(recs)} of 379 gated  "
-      f"(vs 27 heads in the eval set = {len(recs)/27:.1f}x)")
+print(f"records usable as physics relations: {len(recs)} of {len(_ann)} annotated "
+      f"({len(_unnamed)} skipped for want of a relation name, "
+      f"{len(_ann)-len(recs)-len(_unnamed)} by usable(), which exempts hand-curated records)")
+if _unnamed:
+    print("  SKIPPED FOR WANT OF A NAME -- add one to corpus/store_clean.json to enable:")
+    for _f in _unnamed[:12]: print(f"    {_f}")
+    if len(_unnamed) > 12: print(f"    ... and {len(_unnamed)-12} more")
 
 # ---- phrasing templates. Style varies, facts do not. -------------------------
 # ASK templates come from the DEVELOPMENT population -- real OpenStax question openings, mined in
@@ -107,9 +214,9 @@ def gen(n, seed=0):
         r = rng.choice(recs)
         lhs, rhs = r["f"].split("=", 1)
         vs = sorted({v for v in VAR.findall(rhs)} - {"pi", "e"})
-        vals = {v: (CONST[v] if v in CONST else sample_value(rng)) for v in vs}
+        vals = {v: (_const_for(r, v) if _const_for(r, v) is not None else sample_value(rng)) for v in vs}
         expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
-        free = [v for v in vs if v not in CONST]
+        free = [v for v in vs if _const_for(r, v) is None]
         if not free: continue                          # nothing left to ask about
         g = ", ".join(f"{v} = {vals[v]:g}" for v in free)
         # Decide AFTER the question exists, not before. Two refusal kinds, both from this path:
