@@ -141,6 +141,53 @@ int main(void) {
         T("releasing the drag keeps it", sel_active(), "");
     }
 
+    printf("\n  -- ctrl+a selects the whole conversation --\n");
+    {   seed();
+        in_event k = {0}; k.kind = IN_KEY; k.key = K_SELALL;
+        app_event(&k);
+        T("select-all is live", sel_active() && SEL_ALL, "");
+        const char *s = sel_text();
+        snprintf(d, sizeof d, "%d chars", s ? (int)strlen(s) : -1);
+        T("it yields text", s && *s, d);
+        /* BOTH sides, or it is not the conversation. A transcript that copies only the answers
+         * loses what was asked, which is the half you cannot reconstruct. */
+        T("the question is in it", s && strstr(s, "A 2 kg mass is raised 5 m.") != 0, "");
+        T("the answer is in it",   s && strstr(s, "98 J from U = mgh.") != 0, "");
+        T("and they are labelled", s && strstr(s, "You:") && strstr(s, "TLM:"), "");
+        /* It must survive the round trip a reader would actually make. */
+        clip_set(s); COMPOSE[0] = 0; COMPOSE_N = 0;
+        clip_paste();
+        T("it can be pasted into the box", COMPOSE_N > 0, COMPOSE);
+        /* A tap ends it, like any other selection. */
+        in_event c = {0}; c.kind = IN_CLICK; c.x = 200; c.y = 100;
+        app_event(&c);
+        T("a tap clears select-all", !SEL_ALL && !sel_active(), "");
+    }
+
+    printf("\n  -- ctrl+a with nothing to select SAYS SO --\n");
+    {   app_init(); CUR = -1; TOAST[0] = 0;
+        in_event k = {0}; k.kind = IN_KEY; k.key = K_SELALL;
+        app_event(&k);
+        T("it does not claim a selection", !sel_active(), "");
+        /* Silence here would read as the shortcut being broken, which is how this whole session
+         * started. */
+        T("and it explains why", TOAST[0] != 0, TOAST); }
+
+    printf("\n  -- your OWN text has a copy control --\n");
+    {   seed();
+        snprintf(d, sizeof d, "x=%d y=%d w=%d", R_QACT[0].x, R_QACT[0].y, R_QACT[0].w);
+        T("the question copy rect is laid out", R_QACT[0].w > 0 && R_QACT[0].h > 0, d);
+        /* Under the bubble, not over it, and following the BUBBLE's right edge rather than the
+         * pane's -- the bubble no longer spans the pane. */
+        T("it sits below the bubble", R_QACT[0].y > 0, d);
+        CLIP[0] = 0;
+        in_event c = {0}; c.kind = IN_CLICK;
+        c.x = R_QACT[0].x + 3; c.y = R_QACT[0].y + 3;
+        app_event(&c);
+        T("clicking it copies the QUESTION", strcmp(CLIP, "A 2 kg mass is raised 5 m.") == 0, CLIP);
+        /* And not the answer, which is the neighbouring control's job. */
+        T("not the answer", strstr(CLIP, "98 J") == 0, CLIP); }
+
     printf("\n  -- app_init clears selection state --\n");
     {   seed();
         sel_begin(R_ANS[0].x + 1, R_ANS[0].y + 3);

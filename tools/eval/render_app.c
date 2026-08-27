@@ -106,6 +106,14 @@ int main(int argc, char **argv) {
         CUR = 2; HOVER = 1; MX = 300; MY = 220;
         app_draw();
         MX = R_ANS[0].x + 20; MY = R_ANS[0].y + 6;
+    } else if (!strcmp(screen, "qcopy")) {
+        /* Pointer on the QUESTION bubble, which is what reveals its copy control. */
+        CUR = 2; HOVER = 1; MX = 300; MY = 220;
+        app_draw();
+        MX = R_QACT[0].x - 30; MY = R_QACT[0].y - 8;
+    } else if (!strcmp(screen, "selall")) {
+        CUR = 2; HOVER = 1; MX = 300; MY = 220;
+        SEL_ALL = 1;
     } else if (!strcmp(screen, "selected")) {
         /* A live selection, made the way a drag makes one: probe the text, then extend. */
         CUR = 2; HOVER = 1; MX = 300; MY = 220;

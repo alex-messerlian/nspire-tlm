@@ -114,13 +114,28 @@ void app_set_theme(int mode) {
 /* Deliberately phrased as a person would ask, not as the store phrases a relation -- these are
  * examples of USE, and they have to still make sense once the relation flow is gone. */
 
+/* THE PATHS ARE COPIED, NOT POINTED AT. This is not defensive style, it is a repair.
+ *
+ * device_app.c builds paths with dpath(), which returns a SHARED static buffer. Storing that
+ * pointer meant PERSIST named whichever path was built most recently -- and rq_build() rebuilds it
+ * with the MODEL path on the first send. From that moment persist() opened the model with "wb" and
+ * wrote the chat store over it.
+ *
+ * Measured on the device: model4096.bin.tns was 21 bytes, and an empty chat store is exactly 21
+ * bytes. The 96-byte version found earlier was a chat store holding one chat. It was never a USB
+ * truncation. A sink that outlives its caller's buffer must own its own copy. */
+static char PERSIST_BUF[96];
 static const char *PERSIST;          /* NULL = do not persist (host harness) */
 
 /* Called after EVERY change that could lose a conversation. Deliberately not called per token:
  * writing 141 KB at 2.68 tok/s would dominate generation, and a turn in progress is not worth
  * saving anyway -- it is the finished ones that matter. */
+static void toast(const char *msg);
 static void persist(void) {
-    if (PERSIST) chat_save(PERSIST, CHATS, NCHATS, CUR);
+    if (!PERSIST) return;
+    /* A failed save is REPORTED. It used to be discarded, so a delete that could not be written
+     * looked exactly like a delete that was -- until the next launch brought the session back. */
+    if (chat_save(PERSIST, CHATS, NCHATS, CUR) != 0) toast("Could not save sessions");
 }
 static unsigned NOW_MS;            /* wall clock the UI ticks on; set by app_set_now */
 
@@ -129,9 +144,18 @@ static unsigned NOW_MS;            /* wall clock the UI ticks on; set by app_set
  * 512 bytes rather than the composer's 160, because copy has to be able to hold an answer that the
  * composer could never accept. Paste truncates at the composer's own limit instead of refusing,
  * since a paste that silently does nothing is the failure this project keeps writing rules about. */
-static char CLIP[512];
+/* 2048, not 512: select-all copies a whole conversation and the old size could not hold one. It
+ * still truncates rather than refusing, and says so. */
+static char CLIP[2048];
+static char FEEDBACK_BUF[96];
 static const char *FEEDBACK;        /* append-only rating log; 0 on the host */
-void app_set_feedback(const char *path) { FEEDBACK = path; }
+/* Copied for the same reason as PERSIST above: dpath()'s buffer is shared, and this call site sits
+ * one line after app_set_persist(), which is precisely how it clobbered it. */
+void app_set_feedback(const char *path) {
+    if (!path) { FEEDBACK = 0; return; }
+    snprintf(FEEDBACK_BUF, sizeof FEEDBACK_BUF, "%s", path);
+    FEEDBACK = FEEDBACK_BUF;
+}
 
 /* A short confirmation for actions that leave no visible trace. Copy is the case that needs it:
  * without a receipt, pressing it looks exactly like pressing nothing. */
@@ -164,8 +188,10 @@ static int clip_set(const char *s) {
 }
 
 void app_set_persist(const char *path) {
-    PERSIST = path;
-    if (!path) return;
+    if (!path) { PERSIST = 0; return; }
+    snprintf(PERSIST_BUF, sizeof PERSIST_BUF, "%s", path);
+    PERSIST = PERSIST_BUF;
+    path = PERSIST_BUF;
     int cur = -1;
     int n = chat_load(path, CHATS, MAX_CHATS, &cur);
     if (n > 0) { NCHATS = n; CUR = cur; }
@@ -198,13 +224,21 @@ static gfx_rect R_EXIT;
 /* Copy / thumb-up / thumb-down, per turn. Recorded every frame, like every other rect here, so
  * hover testing and click handling cannot disagree about what exists. */
 static int SEL_TURN = -1, SEL_SPAN = -1, SEL_A, SEL_B, SEL_ANCHOR, DRAGGING;
+/* SELECT ALL is a MODE, not a very long range. A range lives inside one wrapped block, and the
+ * whole conversation is many of them -- questions and answers interleaved, each laid out
+ * separately. Expressing "everything" as offsets would mean inventing a coordinate space that
+ * nothing draws in. As a mode, every block simply renders fully highlighted and the copy walks the
+ * turns in order. */
+static int SEL_ALL;
 static gfx_rect R_ANS[MAX_TURNS];      /* each answer's drawn block, for probing and for ctrl+c */
 static gfx_rect R_ACT[MAX_TURNS][3];
+static gfx_rect R_QACT[MAX_TURNS];     /* copy, under each question bubble */
 static int NACT_ROWS;
 /* Reserved under EVERY answer, painted only on hover. Reserving it unconditionally is the point:
  * revealing a control that also takes space would reflow the transcript under the pointer, so the
  * thing you were reaching for moves as you reach for it. */
 #define ACT_H  16
+#define QACT_H 16              /* reserved under every question bubble, same reason */
 #define ACT_SZ 14
 /* Declared up here with the other controls rather than beside the search sheet's state, because
  * hit testing has to see every control that competes for a click in one place. */
@@ -411,7 +445,7 @@ void app_init(void) {
     /* Selection is per-transcript, so it cannot survive a reset. Three separate defects in this
      * file have been state that app_init forgot -- the sidebar, the marquee clock, and the modal
      * settings flag, which ate the next test's clicks. */
-    SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; DRAGGING = 0;
+    SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; DRAGGING = 0; SEL_ALL = 0;
 }
 int app_should_quit(void) { return QUIT; }
 
@@ -676,8 +710,14 @@ static int draw_answer_ex(int x, int y, int w, const char *raw, int draw,
                 static char disp[640];
                 to_display(s, disp, sizeof disp);
                 int n;
-                if (draw && si == sel_span && sel_b > sel_a)
-                    n = gfx_text_wrap_sel(x, cy, disp, F_UI, C_INK, C_BG, w, lh, sel_a, sel_b, C_SELTEXT);
+                /* -2 is select-all: every span, whole. A sentinel rather than a range because
+                 * "all" has no meaningful start and end in a coordinate space that only exists
+                 * inside one block. */
+                int all = (sel_span == -2);
+                if (draw && (all || (si == sel_span && sel_b > sel_a)))
+                    n = gfx_text_wrap_sel(x, cy, disp, F_UI, C_INK, C_BG, w, lh,
+                                          all ? 0 : sel_a, all ? (int)strlen(disp) : sel_b,
+                                          C_SELTEXT);
                 else
                     n = gfx_text_wrap(x, cy, disp, F_UI, C_INK, C_BG, w, lh, draw);
                 if (out_span && probe_y >= cy && probe_y < cy + n * lh) {
@@ -712,10 +752,12 @@ static const char *span_disp(const char *raw, int idx) {
     }
     return 0;
 }
-static int sel_active(void) { return SEL_TURN >= 0 && SEL_B > SEL_A; }
-static void sel_clear(void) { SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; }
+static int sel_active(void) { return SEL_ALL || (SEL_TURN >= 0 && SEL_B > SEL_A); }
+static void sel_clear(void) { SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; SEL_ALL = 0; }
+static const char *sel_all_text(void);
 static const char *sel_text(void) {
     static char out[512];
+    if (SEL_ALL) return sel_all_text();
     if (!sel_active() || CUR < 0 || SEL_TURN >= CHATS[CUR].nturns) return 0;
     const char *d = span_disp(CHATS[CUR].turn[SEL_TURN].a, SEL_SPAN);
     if (!d) return 0;
@@ -728,6 +770,24 @@ static const char *sel_text(void) {
     if (n > (int)sizeof out - 1) n = (int)sizeof out - 1;
     memcpy(out, d + a, (size_t)n); out[n] = 0;
     return out;
+}
+/* The whole conversation as text, in the order it is on screen.
+ *
+ * Labelled, because a transcript pasted into a new session without them is one wall of prose in
+ * which nobody can tell the question from the answer. Truncation is reported by the caller. */
+static const char *sel_all_text(void) {
+    static char out[sizeof CLIP];
+    if (CUR < 0) return 0;
+    int n = 0;
+    app_chat *c = &CHATS[CUR];
+    for (int i = 0; i < c->nturns && n < (int)sizeof out - 1; i++) {
+        n += snprintf(out + n, sizeof out - (size_t)n, "You: %s\n", c->turn[i].q);
+        if (n >= (int)sizeof out - 1) break;
+        if (c->turn[i].a[0])
+            n += snprintf(out + n, sizeof out - (size_t)n, "TLM: %s\n\n", c->turn[i].a);
+    }
+    out[sizeof out - 1] = 0;
+    return n > 0 ? out : 0;
 }
 static const char *answer_under_pointer(void) {
     if (CUR < 0) return 0;
@@ -1350,7 +1410,7 @@ static void draw_main(void) {
         int lh0 = gfx_font_h(F_UI) + 2, total = 6;
         for (int i = 0; i < c->nturns; i++) {
             app_turn *t = &c->turn[i];
-            total += gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh0, 0) * lh0 + 8 + 8;
+            total += gfx_text_wrap(0, 0, t->q, F_UI, C_INK, C_BUBBLE, qbubble_textw(pw), lh0, 0) * lh0 + 8 + QACT_H;
             if (BUSY && i == c->nturns - 1 && STATUS[0])
                 total += draw_status(0, 0, pw, STATUS, STATUS_MONO, 1, 0);
             else if (t->done && t->sum[0])
@@ -1382,8 +1442,26 @@ static void draw_main(void) {
             int bw = tw + 16;                            /* 8px of padding on each side */
             int bx = px0 + pw - bw;                      /* flush against the pane's right edge */
             gfx_rrect(bx, y, bw, bh, 7, C_BUBBLE);
-            gfx_text_wrap(bx + 8, y + 4, t->q, F_UI, C_INK, C_BUBBLE, maxtw, lh, 1);
-            y += bh + 8;
+            if (SEL_ALL)
+                gfx_text_wrap_sel(bx + 8, y + 4, t->q, F_UI, C_INK, C_BUBBLE, maxtw, lh,
+                                  0, (int)strlen(t->q), C_SELTEXT);
+            else
+                gfx_text_wrap(bx + 8, y + 4, t->q, F_UI, C_INK, C_BUBBLE, maxtw, lh, 1);
+            /* YOUR OWN TEXT GETS A COPY CONTROL TOO. The action row only ever appeared under
+             * answers, so the one message you might want to reuse verbatim -- a question worth
+             * asking again in another session -- was the one you could not lift. Right-aligned
+             * under the bubble, following its edge rather than the pane's, because the bubble no
+             * longer spans the pane. */
+            R_QACT[i] = (gfx_rect){ bx + bw - ACT_SZ, y + bh + 1, ACT_SZ, ACT_SZ };
+            {   gfx_rect qb = { bx, y, bw, bh + QACT_H };
+                if (HOVER && inside(qb, MX, MY)) {
+                    int on = inside(R_QACT[i], MX, MY);
+                    if (on) gfx_rrect(R_QACT[i].x, R_QACT[i].y, ACT_SZ, ACT_SZ, 3, C_TRASH_HOT);
+                    blit(R_QACT[i].x + 2, R_QACT[i].y + 2, IC_COPY, 10,
+                         on ? C_INK : C_INK3, C_BG);
+                }
+            }
+            y += bh + QACT_H;
             /* The status line sits between the question and the answer: live while this turn is
              * generating, and the permanent one-line summary once it is done. */
             if (BUSY && i == c->nturns - 1 && STATUS[0])
@@ -1395,8 +1473,8 @@ static void draw_main(void) {
                 /* The selected span is highlighted by the SAME call that draws the rest, so a
                  * highlight can never land on text that is not there. */
                 int ah = draw_answer_ex(px0, y, pw, t->a, 1,
-                                        i == SEL_TURN ? SEL_SPAN : -1, SEL_A, SEL_B,
-                                        0, -1, 0, 0);
+                                        SEL_ALL ? -2 : (i == SEL_TURN ? SEL_SPAN : -1),
+                                        SEL_A, SEL_B, 0, -1, 0, 0);
                 /* Recorded for the drag probe and for ctrl+c with no selection. */
                 R_ANS[i] = (gfx_rect){ px0, y, pw, ah };
                 int ay = y + ah + 1;
@@ -1506,7 +1584,10 @@ static const char *CURSOR[] = {
  * permanent row on a decision made on first run. */
 /* One number, used by the table below AND by the height that has to contain it. Two places knowing
  * the row count is how the sheet overflowed three times. */
-#define SHORTCUT_N 7
+#define SHORTCUT_N 8
+#define SHORTCUT_COLS 2
+/* Rounded UP, so an odd count still reserves the line its last entry sits on. */
+#define SHORTCUT_ROWS ((SHORTCUT_N + SHORTCUT_COLS - 1) / SHORTCUT_COLS)
 
 static void draw_settings(void) {
     /* THE HEIGHT IS COMPUTED, not written down. It was hardcoded at 132, then 150, then 174, and
@@ -1523,7 +1604,7 @@ static void draw_settings(void) {
                + lh_sm + 3 + 16 + 8          /* Appearance label, chips, gap     */
                + lh_sm + 8                   /* time zone row                    */
                + lh_sm + 2                   /* Shortcuts label                  */
-               + SHORTCUT_N * (lh_sm + 2)    /* the key rows                     */
+               + SHORTCUT_ROWS * (lh_sm + 2) /* the key rows, two to a line      */
                + 8;                          /* bottom inset                     */
     /* Y follows the height rather than leading it. 30 is where it belongs -- just under the top
      * bar -- but a computed height can now exceed what is left below that line, and at exactly
@@ -1596,15 +1677,20 @@ static void draw_settings(void) {
          * a reference somebody is squinting at to learn the app. */
         static const char *K[SHORTCUT_N][2] = {
             { "ctrl n", "New chat" },   { "ctrl s", "Search" },
-            { "ctrl b", "Side panel" }, { "ctrl c", "Copy" },
-            { "ctrl v", "Paste" },      { "ctrl esc", "Quit" },
-            { "esc",    "Back" },
+            { "ctrl b", "Side panel" }, { "ctrl a", "Select all" },
+            { "ctrl c", "Copy" },       { "ctrl v", "Paste" },
+            { "ctrl esc", "Quit" },     { "esc", "Back" },
         };
+        /* TWO COLUMNS. Eight rows in one column made the sheet 232px tall on a 240px screen: it
+         * hit its own top clamp and sat squeezed against both edges. The pairs are narrow and the
+         * sheet is 232 wide, so the width was there all along. */
         for (int i = 0; i < SHORTCUT_N; i++) {
-            gfx_text(X + 10, y, K[i][0], F_SM, C_INK2, C_SHEET);
-            gfx_text(X + 76, y, K[i][1], F_SM, C_INK3, C_SHEET);
-            y += gfx_font_h(F_SM) + 2;
+            int cx = X + 10 + (i % SHORTCUT_COLS) * ((W - 20) / SHORTCUT_COLS);
+            gfx_text(cx,      y, K[i][0], F_SM, C_INK2, C_SHEET);
+            gfx_text(cx + 46, y, K[i][1], F_SM, C_INK3, C_SHEET);
+            if (i % SHORTCUT_COLS == SHORTCUT_COLS - 1) y += gfx_font_h(F_SM) + 2;
         }
+        if (SHORTCUT_N % SHORTCUT_COLS) y += gfx_font_h(F_SM) + 2;
     }
 
     /* NO QUIT BUTTON. It sat inside a sheet people open to read the shortcut key, one slip from
@@ -1835,6 +1921,11 @@ void app_event(const in_event *e) {
          * to whichever is nearer -- fine for a lone button in a corner, wrong for a cluster where
          * the neighbour is thumbs-DOWN. */
         if (CUR >= 0) {
+            for (int i = 0; i < CHATS[CUR].nturns && i < MAX_TURNS; i++)
+                if (R_QACT[i].w > 0 && inside(R_QACT[i], MX, MY)) {
+                    toast(clip_set(CHATS[CUR].turn[i].q) ? "Copied" : "Nothing to copy");
+                    return;
+                }
             for (int i = 0; i < NACT_ROWS && i < CHATS[CUR].nturns; i++) {
                 app_turn *t = &CHATS[CUR].turn[i];
                 if (inside(R_ACT[i][0], MX, MY)) {
@@ -1913,10 +2004,25 @@ void app_event(const in_event *e) {
         if (k == K_SEARCH) { open_search(); return; }
         if (k == K_PANEL)  { SIDEBAR = !SIDEBAR; return; }
         if (k == K_PASTE)  { clip_paste(); return; }
+        if (k == K_SELALL) {
+            /* Only meaningful inside a session; on the new-chat screen there is nothing to select
+             * and silently doing nothing would read as the shortcut being broken. */
+            if (CUR < 0 || CHATS[CUR].nturns == 0) { toast("Nothing to select"); return; }
+            SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0;
+            SEL_ALL = 1;
+            return;
+        }
         if (k == K_COPY)   {
             /* Selection first, since that is what the reader just made. Failing that, the answer
              * under the pointer, so ctrl+c does the obvious thing without a drag. */
-            if (sel_active()) { toast(clip_set(sel_text()) ? "Copied" : "Nothing to copy"); return; }
+            if (sel_active()) {
+                const char *s = sel_text();
+                if (!s || !clip_set(s)) { toast("Nothing to copy"); return; }
+                /* A conversation can outgrow the clipboard. Saying "Copied" for a copy that lost
+                 * its tail is the same silence as a paste that trims without a word. */
+                toast((int)strlen(s) > (int)sizeof CLIP - 1 ? "Copied, trimmed to fit" : "Copied");
+                return;
+            }
             const char *a = answer_under_pointer();
             toast(a && clip_set(a) ? "Copied" : "Select some text first");
             return;

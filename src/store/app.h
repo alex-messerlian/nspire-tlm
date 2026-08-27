@@ -141,6 +141,7 @@ typedef struct {
 #define K_QUIT   0x113      /* ctrl+Q: leave, since ESC no longer does */
 #define K_COPY   0x114
 #define K_PASTE  0x115
+#define K_SELALL 0x116
 
 typedef struct {
     char  q[160];      /* the question as typed */

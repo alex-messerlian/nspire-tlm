@@ -23,7 +23,30 @@ static int get(FILE *f, char *out, int cap) {
     return n;
 }
 
+/* Is the file at `path` one of OURS to overwrite?
+ *
+ * fopen(path, "wb") truncates before a single byte is checked, so by the time a wrong path is
+ * noticed the file it named is already gone. This session that path was the MODEL: a stale pointer
+ * left PERSIST naming model4096.bin.tns, and a 7,464,832-byte checkpoint became a 21-byte chat
+ * store. The pointer bug is fixed at its source, but a save that can destroy an unrelated file when
+ * handed the wrong name is a hazard independent of how it got the wrong name.
+ *
+ * A missing file is ours to create. An empty one is ours -- a previous write that failed leaves
+ * nothing to lose. Anything else must begin with our magic or we do not touch it. */
+static int is_ours(const char *path) {
+    FILE *f = fopen(path, "rb");
+    if (!f) return 1;                                   /* does not exist yet */
+    char head[sizeof MAGIC - 1];
+    size_t got = fread(head, 1, sizeof head, f);
+    fclose(f);
+    if (got == 0) return 1;                             /* empty: nothing to destroy */
+    if (got != sizeof head) return 0;                   /* too short to be a store */
+    return memcmp(head, MAGIC, sizeof head) == 0;
+}
+
 int chat_save(const char *path, const app_chat *chats, int n, int cur) {
+    /* CHECKED BEFORE THE OPEN, because "wb" is itself the destructive act. */
+    if (!is_ours(path)) return -1;
     FILE *f = fopen(path, "wb");
     if (!f) return -1;
     int bad = 0;

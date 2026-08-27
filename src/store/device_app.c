@@ -274,6 +274,7 @@ static int keypad_poll(void) {
             /* Both chord styles come free: the sticky-ctrl logic above already accepts ctrl held
              * with the letter, or ctrl tapped and released and then the letter. */
             { &KEY_NSPIRE_C, K_COPY }, { &KEY_NSPIRE_V, K_PASTE },
+            { &KEY_NSPIRE_A, K_SELALL },
         };
         for (unsigned i = 0; i < sizeof CH / sizeof CH[0]; i++) {
             if (isKeyPressed(*CH[i].k)) {
