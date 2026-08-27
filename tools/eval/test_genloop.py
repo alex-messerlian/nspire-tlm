@@ -58,6 +58,43 @@ def well_formed(o):
     return o.count("<tool>") == o.count("</tool>")
 
 print("\n  -- the loop injects --")
+# ---- TOOL_SPEC section 8.3: THE MODEL MAY NOT AUTHOR A RESULT SPAN -----------------------------
+#
+# genloop applies `lg[res_id] = -1e30` before every choice, and NOTHING ASSERTED IT: deleting that
+# line left this suite passing. It is the runtime twin of the loss mask -- the mask stops the model
+# LEARNING to produce result content, this stops it PRODUCING one at decode time -- and it had the
+# same shape of hole, an unguarded line copied into eighteen files.
+#
+# The model here wants `<res>` above everything else at every step. If the ban works it can never
+# have it, and the loop must terminate on <end> rather than emitting a result span the runtime did
+# not put there.
+def _res_greedy_model(res_id, end_id, n_vocab=12):
+    import array
+    state = {"n": 0}
+    def step(window):
+        lg = array.array("f", [-1e9] * n_vocab)
+        lg[res_id] = 100.0                    # <res> is what it wants, at every single step
+        lg[end_id] = 50.0                     # and <end> is its second choice
+        state["n"] += 1
+        class L(list):
+            def argmax(self): return max(range(len(self)), key=lambda i: self[i])
+        return L(lg)
+    return step
+
+def _ban_holds():
+    res_id, end_id = 6, 11
+    got = generate_text(_res_greedy_model(res_id, end_id), enc, dec, [1],
+                        res_id=res_id, end_id=end_id, toolc_id=5,
+                        run_tool=lambda c: ("2", 0.0), max_tokens=6)
+    return "<res>" not in got, got
+
+_ok, _got = _ban_holds()
+check(f"8.3: a model that wants <res> at every step cannot emit one  (got {_got!r})", _ok)
+
+# And the ban must not be achieved by breaking generation: the same model still reaches <end>.
+check("8.3: the ban does not stop the loop from terminating", _got == "<end>")
+
+
 out = generate_text(Toy(), enc, dec, enc("<tool>"), res_id=6, end_id=11, toolc_id=5,
                     run_tool=lambda c: ("2", 0.0), max_tokens=20, ctx=64)
 check(f"result was injected  ({out!r})", "<res>2</res>" in out)
@@ -86,7 +123,13 @@ for p in list((ROOT/"train").glob("*.py")) + list((ROOT/"tools").rglob("*.py")):
     # worse instrument than the thing it measures.
     selects = ("argmax" in s) or ("multinomial" in s)
     reimplements = selects and "</tool>" in s and "<res>" in s
-    if reimplements and "genloop" not in s:
+    # AN IMPORT, NOT A SUBSTRING. This read `"genloop" not in s`, which any mention of the word
+    # satisfies -- and train/remeasure.py escaped it by NAMING ITS OWN REIMPLEMENTATION `genloop()`.
+    # The escape hatch for "this file uses the shared loop" was "this file contains the string", so
+    # the guard exempted the exact thing it exists to catch. It is the fourth instance in this repo
+    # of a check whose predicate was a proxy for the property rather than the property.
+    imports = re.search(r"^\s*(from\s+genloop\s+import|import\s+genloop)", s, re.M)
+    if reimplements and not imports:
         offenders.append(str(p.relative_to(ROOT)))
 check(f"no un-allowlisted reimplementation  {offenders if offenders else ''}", not offenders)
 

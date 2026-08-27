@@ -54,7 +54,8 @@ CONTROLS = {
     "test_scope":      ("tools/eval/grade.py",
                         "            and answer_matches_result(generation) and prov_clean(prompt + generation)",
                         "            and answer_matches_result(generation)"),
-    "test_genloop":    ("tools/eval/genloop.py", None),   # filled below if the file has an injection line
+    "test_genloop":    ("tools/eval/genloop.py",
+                        "        lg[res_id] = -1e30", "        pass"),
 }
 
 # Gates with no control yet. Listed EXPLICITLY so the count is visible rather than absent.

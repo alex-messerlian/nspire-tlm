@@ -65,7 +65,17 @@ for s in range(STEPS):
     torch.nn.utils.clip_grad_norm_(m.parameters(),1.0); opt.step()
     win.append(l.item())
     if s and s%500==0: curve.append(sum(win)/len(win)); win.clear()
-torch.save({"model":m.state_dict(),"args":args.__dict__,"seed":SEED,"steps":STEPS},
+# THE CHECKPOINT RECORDS THE CORPUS IT SAW. Without this, a harness has to guess -- and
+# train/remeasure.py guessed by importing corpus/generate.py, so when the generator went from 78
+# relations to 141 the stratification silently began labelling relations TRAINED that this
+# checkpoint never saw. A metric whose ground truth drifts from the artefact reports a different
+# quantity under the same name.
+import hashlib as _hl
+_corpus_sha = _hl.sha256(open("corpus/synth_sample.jsonl","rb").read()).hexdigest()[:16]
+_heads = {__import__("json").loads(l).get("head") for l in open("corpus/synth_sample.jsonl")}
+_heads.discard(None)
+torch.save({"model":m.state_dict(),"args":args.__dict__,"seed":SEED,"steps":STEPS,
+            "corpus_sha":_corpus_sha,"corpus_heads":sorted(_heads),},
            f"train/sel_s{SEED}.pt")
 
 # ---- divergence gate, BEFORE metrics ----------------------------------------------------
