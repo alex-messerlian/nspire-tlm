@@ -107,10 +107,19 @@ check(f"produces the </tool> loop  ({noinj[:48]!r})", noinj.count("</tool>") > 3
 check("and that output FAILS well_formed", not well_formed(noinj))
 
 print("\n  -- no second implementation --")
+# A RATCHET, NOT AN EXEMPTION. This list held 17 files and reported PASS, so the guard protected
+# only hypothetical new ones -- an allowlist that never shrinks is a permanent hole with a comment
+# on it. ALLOW_MAX below must only ever DECREASE: a migration lowers it, and nothing can raise it
+# without editing a number that says what it is. Adding a file therefore costs a visible increment
+# rather than one quiet line.
+#
+# DEADLINE: every remaining name migrates or is deleted. The ones producing figures we quote go
+# first; see docs/RESULT_STRATUM_DRIFT.md for the ranking.
+ALLOW_MAX = 19
 ALLOW = {  # legacy training scripts, grandfathered. Adding to this list is a deliberate act.
  "attempt_policy.py","capability.py","e2e.py","fit_catch.py","eval_noise.py","name_cue.py",
  "inline_test.py","l2.py","retry_test.py","no_record.py","rescore.py","reprobe.py",
- "seed_population.py","shippability.py","refusal_run.py","select_run.py","verbatim_retest.py",
+ "seed_population.py","shippability.py","refusal_run.py","verbatim_retest.py",
  "prepare.py","genloop.py","test_genloop.py",
 }
 offenders = []
@@ -132,6 +141,10 @@ for p in list((ROOT/"train").glob("*.py")) + list((ROOT/"tools").rglob("*.py")):
     if reimplements and not imports:
         offenders.append(str(p.relative_to(ROOT)))
 check(f"no un-allowlisted reimplementation  {offenders if offenders else ''}", not offenders)
+check(f"the allowlist has not grown  ({len(ALLOW)} <= {ALLOW_MAX})", len(ALLOW) <= ALLOW_MAX)
+check(f"every allowlisted file still exists  (a deleted one must leave the list)",
+      all((ROOT/"train"/n).exists() or (ROOT/"tools/eval"/n).exists() or (ROOT/"corpus"/n).exists()
+          for n in ALLOW))
 
 # MUTATION: a guard that cannot fire is not a guard. Synthesise a file that reimplements the loop
 # and confirm the pattern catches it; and confirm a file that merely mentions the protocol does not.

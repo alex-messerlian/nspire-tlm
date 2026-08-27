@@ -9,7 +9,8 @@ divergence gate and an undefined name, all three caught by a 600-step smoke test
 against 8 x 20 minutes of seeds."""
 import os, sys, json, re, subprocess, time, statistics as st
 import numpy as np, torch, pathlib as _pl
-sys.path.insert(0,"vendor/llama2.c"); sys.path.insert(0,"corpus")
+sys.path.insert(0,"vendor/llama2.c"); sys.path.insert(0,"corpus"); sys.path.insert(0,"tools/eval")
+import genloop                       # THE generation loop; never reimplement it
 from model import Transformer, ModelArgs
 from tokenizers import Tokenizer
 
@@ -101,21 +102,25 @@ assert not well_formed("<tool> e<arg> 1</tool><res> 1</res> 1.<end>")
 def run_call(t):
     p=subprocess.run(["tools/eval/evalcli",t],capture_output=True,text=True)
     mm=re.search(r"<res>(.*?)</res>",p.stdout,re.S); return mm.group(1) if mm else "!give"
-@torch.no_grad()
+# THE SHARED LOOP, imported. This file carried its own copy, and the copy is where the <res> ban,
+# the injection and the halt condition each had to be right independently. genloop.py is the one
+# implementation; tools/eval/test_genloop.py asserts the ban and refuses a reimplementation.
+def _step(ids):
+    with torch.no_grad():
+        return m(torch.tensor([ids]).to(dev))[:, -1, :][0]
+
+def _sample(lg):
+    return int(torch.multinomial(torch.softmax(lg/0.8, -1), 1))
+
 def gen(it):
-    ids=tk.encode(f"<q>{it['q']}</q><r>{it['record']}").ids
-    x=torch.tensor([ids]).to(dev); g=[]
+    pre = f"<q>{it['q']}</q><r>{it['record']}"
     m.eval()
-    for _ in range(160):
-        lg=m(x[:,-SEQ:])[:,-1,:]; lg[0,RES_O]=-1e30
-        n=int(torch.multinomial(torch.softmax(lg/0.8,-1),1))
-        x=torch.cat([x,torch.tensor([[n]]).to(dev)],1); g.append(n)
-        if n==ENDT: break
-        if n==TOOLC:
-            c=re.search(r"<tool>.*?</tool>",tk.decode(g,skip_special_tokens=False),re.S)
-            rr=run_call(c.group(0).replace(" ","")) if c else "!give"
-            inj=tk.encode(f"<res>{rr}</res>").ids
-            x=torch.cat([x,torch.tensor([inj]).to(dev)],1); g+=inj
+    g = genloop.generate_text(_step, lambda t: tk.encode(t).ids,
+                              lambda i: tk.decode(i, skip_special_tokens=False),
+                              tk.encode(pre).ids,
+                              res_id=RES_O, end_id=ENDT, toolc_id=TOOLC,
+                              run_tool=lambda c: (run_call(c.replace(" ", "")), 0.0),
+                              max_tokens=160, sample=_sample, ctx=SEQ)
     m.train()
     # RETURNS BOTH SPANS. It used to return the generation alone, and _prov_clean was handed that
     # -- so provcli found no </q>, returned its cannot-check sentinel -1, and EVERY answer scored
@@ -125,7 +130,7 @@ def gen(it):
     # reported exactly 50.0% on SELECT ... it was a grader scope bug" -- so the diagnosis landed and
     # the fix did not. Scope is part of the contract: is_refusal wants the GENERATION, provenance
     # and shape want the FULL DOCUMENT, and no single string satisfies both.
-    return f"<q>{it['q']}</q><r>{it['record']}", tk.decode(g,skip_special_tokens=False)
+    return pre, g
 # A REFUSAL is correct only if it is well-formed and refuses -- same standard both sides.
 def _ref_ok(i):
     _,o=gen(i); return well_formed(o) and bool(REF.search(o))
