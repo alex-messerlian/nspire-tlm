@@ -106,6 +106,13 @@ int main(int argc, char **argv) {
         CUR = 2; HOVER = 1; MX = 300; MY = 220;
         app_draw();
         MX = R_ANS[0].x + 20; MY = R_ANS[0].y + 6;
+    } else if (!strcmp(screen, "draftsel")) {
+        /* ctrl+a with a draft in the box: the field's own select-all. */
+        CUR = 2; HOVER = 1; MX = 300; MY = 220; FIELD_FOCUS = 1;
+        snprintf(COMPOSE, sizeof COMPOSE, "%s",
+                 "A 4 kg cart moves at 3 m/s. Find the kinetic energy.");
+        COMPOSE_N = (int)strlen(COMPOSE);
+        COMPOSE_SEL = 1;
     } else if (!strcmp(screen, "qcopy")) {
         /* Pointer on the QUESTION bubble, which is what reveals its copy control. */
         CUR = 2; HOVER = 1; MX = 300; MY = 220;

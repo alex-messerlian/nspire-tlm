@@ -188,6 +188,92 @@ int main(void) {
         /* And not the answer, which is the neighbouring control's job. */
         T("not the answer", strstr(CLIP, "98 J") == 0, CLIP); }
 
+    printf("\n  -- ctrl+a selects THE DRAFT when there is one --\n");
+    {   seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "a half written question");
+        COMPOSE_N = (int)strlen(COMPOSE);
+        in_event k = {0}; k.kind = IN_KEY; k.key = K_SELALL;
+        app_event(&k);
+        T("the composer is selected", COMPOSE_SEL, "");
+        /* And NOT the transcript. Selecting both would highlight the whole screen and leave the
+         * next keystroke ambiguous. */
+        T("the transcript is not", !SEL_ALL, "");
+
+        CLIP[0] = 0;
+        in_event c = {0}; c.kind = IN_KEY; c.key = K_COPY;
+        app_event(&c);
+        T("ctrl+c copies the draft", strcmp(CLIP, "a half written question") == 0, CLIP);
+
+        /* Backspace deletes the WHOLE selection, not one character off the end. */
+        in_event b = {0}; b.kind = IN_KEY; b.key = K_BACK;
+        app_event(&b);
+        snprintf(d, sizeof d, "n=%d sel=%d \"%s\"", COMPOSE_N, COMPOSE_SEL, COMPOSE);
+        T("backspace wipes it whole", COMPOSE_N == 0 && !COMPOSE_SEL, d);
+    }
+
+    printf("\n  -- a keystroke REPLACES the selection --\n");
+    {   seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "old text");
+        COMPOSE_N = (int)strlen(COMPOSE);
+        in_event k = {0}; k.kind = IN_KEY; k.key = K_SELALL; app_event(&k);
+        in_event ch = {0}; ch.kind = IN_KEY; ch.key = 'x'; app_event(&ch);
+        snprintf(d, sizeof d, "\"%s\"", COMPOSE);
+        T("typing replaces, does not append", strcmp(COMPOSE, "x") == 0, d);
+        T("and the selection is gone", !COMPOSE_SEL, "");
+    }
+
+    printf("\n  -- pasting over a selection replaces it too --\n");
+    {   seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "old text");
+        COMPOSE_N = (int)strlen(COMPOSE);
+        clip_set("new text");
+        in_event k = {0}; k.kind = IN_KEY; k.key = K_SELALL; app_event(&k);
+        clip_paste();
+        snprintf(d, sizeof d, "\"%s\"", COMPOSE);
+        T("paste replaces the draft", strcmp(COMPOSE, "new text") == 0, d);
+    }
+
+    printf("\n  -- an EMPTY box falls through to the transcript --\n");
+    {   seed();
+        compose_clear();
+        in_event k = {0}; k.kind = IN_KEY; k.key = K_SELALL; app_event(&k);
+        T("the transcript is selected instead", SEL_ALL, "");
+        T("and the composer is not", !COMPOSE_SEL, ""); }
+
+    printf("\n  -- NO SELECTION MAY OUTLIVE THE TEXT IT SELECTED --\n");
+    {   /* Seven sites emptied the box by clearing the count and the string but not the flag, which
+         * would leave a highlight over an empty field and make the next keystroke "replace" text
+         * that is not there. Each exit is checked. */
+        seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "draft"); COMPOSE_N = 5;
+        in_event k = {0}; k.kind = IN_KEY; k.key = K_SELALL; app_event(&k);
+        in_event e = {0}; e.kind = IN_KEY; e.key = K_ENTER; app_event(&e);
+        T("sending clears it", !COMPOSE_SEL, "");
+
+        seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "draft"); COMPOSE_N = 5;
+        app_event(&k);
+        in_event esc = {0}; esc.kind = IN_KEY; esc.key = K_ESC; app_event(&esc);
+        T("escape clears it", !COMPOSE_SEL, "");
+
+        seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "draft"); COMPOSE_N = 5;
+        app_event(&k);
+        in_event nw = {0}; nw.kind = IN_KEY; nw.key = K_NEW; app_event(&nw);
+        T("a new chat clears it", !COMPOSE_SEL, "");
+
+        seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "draft"); COMPOSE_N = 5;
+        app_event(&k);
+        in_event cl = {0}; cl.kind = IN_CLICK; cl.x = 200; cl.y = 100; app_event(&cl);
+        T("a tap clears it", !COMPOSE_SEL, "");
+
+        seed();
+        snprintf(COMPOSE, sizeof COMPOSE, "%s", "draft"); COMPOSE_N = 5;
+        app_event(&k);
+        app_init();
+        T("a reset clears it", !COMPOSE_SEL, ""); }
+
     printf("\n  -- app_init clears selection state --\n");
     {   seed();
         sel_begin(R_ANS[0].x + 1, R_ANS[0].y + 3);

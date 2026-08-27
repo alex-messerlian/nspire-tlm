@@ -198,8 +198,23 @@ void app_set_persist(const char *path) {
 }
 static char COMPOSE[160];          /* what is being typed */
 static int  COMPOSE_N;
+/* The composer's own select-all. A TEXT FIELD's select-all, which is a different thing from the
+ * transcript's: it is what you press before retyping or deleting a draft, and the next keystroke
+ * is expected to REPLACE what is highlighted rather than append to it. */
+static int COMPOSE_SEL;
+/* ONE way to empty the box.
+ *
+ * COMPOSE_N, the string, and the selection flag are three pieces of ONE state, and seven separate
+ * places emptied the field by clearing two of them. Each would have left a highlight standing over
+ * an empty box, and after that the next keystroke would "replace a selection" that no longer had
+ * any text in it. Three earlier defects in this file were state a reset forgot; this removes the
+ * chance rather than adding a fourth careful call site. */
+static void compose_clear(void) { COMPOSE_N = 0; COMPOSE[0] = 0; COMPOSE_SEL = 0; }
+
 static void clip_paste(void) {
     if (!CLIP[0]) { toast("Clipboard is empty"); return; }
+    /* Pasting over a selection replaces it, like typing does. */
+    if (COMPOSE_SEL) compose_clear();
     int room = (int)sizeof COMPOSE - 1 - COMPOSE_N;
     if (room <= 0) { toast("Message box is full"); return; }
     int n = (int)strlen(CLIP);
@@ -230,6 +245,7 @@ static int SEL_TURN = -1, SEL_SPAN = -1, SEL_A, SEL_B, SEL_ANCHOR, DRAGGING;
  * nothing draws in. As a mode, every block simply renders fully highlighted and the copy walks the
  * turns in order. */
 static int SEL_ALL;
+
 static gfx_rect R_ANS[MAX_TURNS];      /* each answer's drawn block, for probing and for ctrl+c */
 static gfx_rect R_ACT[MAX_TURNS][3];
 static gfx_rect R_QACT[MAX_TURNS];     /* copy, under each question bubble */
@@ -441,11 +457,11 @@ static int inside(gfx_rect r, int x, int y) {
 void app_init(void) {
     SEL_ROW = 0;
     app_set_theme(THEME_MODE);   /* fill the palette before anything draws */
-    NCHATS = 0; CUR = -1; SCROLL = 0; COMPOSE[0] = 0; COMPOSE_N = 0;
+    NCHATS = 0; CUR = -1; SCROLL = 0; compose_clear();
     /* Selection is per-transcript, so it cannot survive a reset. Three separate defects in this
      * file have been state that app_init forgot -- the sidebar, the marquee clock, and the modal
      * settings flag, which ate the next test's clicks. */
-    SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; DRAGGING = 0; SEL_ALL = 0;
+    SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0; DRAGGING = 0; SEL_ALL = 0; COMPOSE_SEL = 0;
 }
 int app_should_quit(void) { return QUIT; }
 
@@ -1738,14 +1754,23 @@ static void draw_composer(int x0, int w, int cy) {
          * of the line above the first visible one showing -- a row of glyph-tops with no line
          * under them, which reads as a rendering fault rather than as scrolled text. */
         gfx_clip(R_FIELD.x, cy + 5, R_FIELD.w, shown * COMPOSE_LH);
-        gfx_text_wrap_ex(R_FIELD.x + 9, cy + 5 - skip * COMPOSE_LH, COMPOSE, F_UI, C_INK, C_FIELD,
-                         tw, COMPOSE_LH, 1, &last_w);
+        if (COMPOSE_SEL) {
+            gfx_text_wrap_sel(R_FIELD.x + 9, cy + 5 - skip * COMPOSE_LH, COMPOSE, F_UI, C_INK,
+                              C_FIELD, tw, COMPOSE_LH, 0, COMPOSE_N, C_SELTEXT);
+            last_w = 0;
+        } else {
+            gfx_text_wrap_ex(R_FIELD.x + 9, cy + 5 - skip * COMPOSE_LH, COMPOSE, F_UI, C_INK,
+                             C_FIELD, tw, COMPOSE_LH, 1, &last_w);
+        }
         gfx_clip_reset();
         /* the caret follows the text, on the last visible line */
         int cxx = R_FIELD.x + 9 + last_w + 1, cyy = cy + 6 + (shown - 1) * COMPOSE_LH;
         /* Blinks on the app clock, half a second on and half off. A steady bar reads as a piece
          * of the layout; a blinking one reads as the insertion point. */
-        if (last_w < tw - 2 && (NOW_MS / 500u) % 2u == 0u) gfx_vline(cxx, cyy, 12, C_INK);
+        /* No caret while everything is selected. A blinking insertion point next to a full
+         * highlight says two contradictory things about where the next keystroke lands. */
+        if (!COMPOSE_SEL && last_w < tw - 2 && (NOW_MS / 500u) % 2u == 0u)
+            gfx_vline(cxx, cyy, 12, C_INK);
     } else if (FIELD_FOCUS) {
         /* Focused and empty: a blinking caret and no placeholder. The caret is the thing that says
          * "type here", so the hint beside it would be saying the same thing twice, and the two
@@ -1859,7 +1884,7 @@ void app_draw(void) {
  * the first send -- it returns to the empty screen and clears the box. Named because the button
  * and the chord were about to hold two copies of that, and the chord's copy called new_chat(),
  * which would have left an untitled empty session in the list on every press. */
-static void start_new_chat(void) { CUR = -1; SCROLL = 0; COMPOSE_N = 0; COMPOSE[0] = 0; }
+static void start_new_chat(void) { CUR = -1; SCROLL = 0; compose_clear(); }
 static void open_search(void)    { SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); }
 
 void app_event(const in_event *e) {
@@ -1888,6 +1913,7 @@ void app_event(const in_event *e) {
          * here: the pointer layer reports its release as a move, precisely so the gesture that
          * makes a selection cannot also be the gesture that clears it. */
         sel_clear();
+        COMPOSE_SEL = 0;
         if (SETTINGS_ON) {
             /* Modal: it consumes clicks under it, and a click outside closes it. */
             if (inside(R_SET_TZM, MX, MY)) { app_set_tz_index(app_tz_index() - 1); return; }
@@ -1957,7 +1983,7 @@ void app_event(const in_event *e) {
          * message was never sent -- a containment bug, not a hit-testing one, introduced the
          * moment the field became clickable at all. */
         if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) {
-            app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return;
+            app_request(COMPOSE, 0); compose_clear(); return;
         }
         /* Clicking the box makes it the typing target. Typing already went there, but nothing on
          * screen said so, so the bar looked inert until a character appeared in it. */
@@ -1990,7 +2016,7 @@ void app_event(const in_event *e) {
              * someone stepped back from the box is destroying work to undo a focus change. A
              * second press, once the box is no longer the target, clears it. */
             else if (FIELD_FOCUS)  { FIELD_FOCUS = 0; return; }
-            else if (COMPOSE_N)   { COMPOSE_N = 0; COMPOSE[0] = 0; return; }
+            else if (COMPOSE_N)   { compose_clear(); return; }
             else if (CUR >= 0)    { CUR = -1; return; }
             return;
         }
@@ -2005,8 +2031,14 @@ void app_event(const in_event *e) {
         if (k == K_PANEL)  { SIDEBAR = !SIDEBAR; return; }
         if (k == K_PASTE)  { clip_paste(); return; }
         if (k == K_SELALL) {
-            /* Only meaningful inside a session; on the new-chat screen there is nothing to select
-             * and silently doing nothing would read as the shortcut being broken. */
+            /* THE DRAFT FIRST. If there is text in the box, that is what you are working on and
+             * that is what select-all means -- pick it up, or wipe it and start again. Keyed on
+             * the text rather than on FIELD_FOCUS because typing on the keypad fills the box
+             * without ever clicking it, and that is exactly the case this is for.
+             *
+             * With an empty box it falls through to the transcript, which is the only other thing
+             * on screen that could be meant. */
+            if (COMPOSE_N) { COMPOSE_SEL = 1; return; }
             if (CUR < 0 || CHATS[CUR].nturns == 0) { toast("Nothing to select"); return; }
             SEL_TURN = SEL_SPAN = -1; SEL_A = SEL_B = 0;
             SEL_ALL = 1;
@@ -2015,6 +2047,9 @@ void app_event(const in_event *e) {
         if (k == K_COPY)   {
             /* Selection first, since that is what the reader just made. Failing that, the answer
              * under the pointer, so ctrl+c does the obvious thing without a drag. */
+            if (COMPOSE_SEL && COMPOSE_N) {
+                toast(clip_set(COMPOSE) ? "Copied" : "Nothing to copy"); return;
+            }
             if (sel_active()) {
                 const char *s = sel_text();
                 if (!s || !clip_set(s)) { toast("Nothing to copy"); return; }
@@ -2027,9 +2062,15 @@ void app_event(const in_event *e) {
             toast(a && clip_set(a) ? "Copied" : "Select some text first");
             return;
         }
-        if (k == K_BACK) { if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0; return; }
+        if (k == K_BACK) {
+            /* Selected text deletes WHOLE. Removing one character from a full selection is what a
+             * field that merely drew a highlight would do, and it is never what was meant. */
+            if (COMPOSE_SEL) { compose_clear(); return; }
+            if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0;
+            return;
+        }
         if (k == K_ENTER) {
-            if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); COMPOSE_N = 0; COMPOSE[0] = 0; return; }
+            if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); compose_clear(); return; }
             /* an empty box on the home screen means "open what is selected" */
             if (CUR < 0 && NCHATS && SEL_ROW >= 0 && SEL_ROW < NCHATS) {
                 CUR = SEL_ROW; SCROLL = 0; return;
@@ -2046,6 +2087,8 @@ void app_event(const in_event *e) {
         if (k == K_DOWN) { SCROLL += 16; return; }
         if (k == K_UP)   { SCROLL -= 16; if (SCROLL < 0) SCROLL = 0; return; }
         if (k >= 32 && k < 127 && COMPOSE_N < (int)sizeof COMPOSE - 1) {
+            /* A keystroke REPLACES the selection rather than appending to it. */
+            if (COMPOSE_SEL) compose_clear();
             COMPOSE[COMPOSE_N++] = (char)k; COMPOSE[COMPOSE_N] = 0;
         }
     }
