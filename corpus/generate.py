@@ -138,7 +138,7 @@ def _best_name(f, ann):
         if cand and not _BADNAME.search(cand): return cand
     return None
 
-recs, _unnamed = [], []
+recs, _unnamed, _uncleaned = [], [], []
 for f, ann in _ann.items():
     src = _mined.get(f) or _store.get(f) or dict(ann)
     r = dict(src); r["f"] = f; r["units"] = ann["units"]
@@ -154,7 +154,22 @@ for f, ann in _ann.items():
     # mined-only record is not, and the filter still earns its place there -- of the 4 mined-only
     # drops, one is `K*E=...` (fusion) and one is `U(x)=...` (definition shape).
     if r.get("drop"): continue
-    if f not in _store and not usable(r): continue
+    # store_clean.json IS THE AUTHORITY ON LEGITIMACY. It is the OUTPUT of a review that deleted 34
+    # records for documented reasons (docs/RESULT_STORE_CLEANING.md): non-physics recurrences,
+    # duplicates, and misnamed relations -- `R_eqv=R_1-R_2` (resistances do not subtract),
+    # `v=lambda*f` labelled "speed of light" when it is wave speed, `F=k*x` against the signed
+    # `F=-k*x`. units_train.json is the authority on UNITS and was never re-cleaned, so it still
+    # carries all three.
+    #
+    # The first version of this change iterated units_train alone and RE-ADMITTED 24 of them,
+    # including three named "Strategy", one named "Graficar una ecuacion polar", and two whose name
+    # is their own formula. That is the store-cleaning silently undone by a change made two
+    # commits later -- the same shape as every other defect in this file's history, and caught only
+    # by auditing what had actually landed.
+    if f not in _store:
+        _uncleaned.append((f, ann.get("name", "")))
+        continue
+    if not usable(r) and f not in _store: continue
     nm = _best_name(f, ann)
     if not nm:
         # REPORTED, NOT SILENT. usable() already drops 31 records with no output at all, and simple
@@ -188,6 +203,11 @@ for r in recs: r["cond"] = condition(r["name"])
 print(f"records usable as physics relations: {len(recs)} of {len(_ann)} annotated "
       f"({len(_unnamed)} skipped for want of a relation name, "
       f"{len(_ann)-len(recs)-len(_unnamed)} by usable(), which exempts hand-curated records)")
+if _uncleaned:
+    print(f"  SKIPPED, NOT IN THE CLEANED STORE ({len(_uncleaned)}) -- units_train was never re-cleaned")
+    print( "  after docs/RESULT_STORE_CLEANING.md deleted 34 records. Each needs a decision:")
+    for _f, _n in _uncleaned[:10]: print(f"    {_f:34} {_n[:40]}")
+    if len(_uncleaned) > 10: print(f"    ... and {len(_uncleaned)-10} more")
 if _unnamed:
     print("  SKIPPED FOR WANT OF A NAME -- add one to corpus/store_clean.json to enable:")
     for _f in _unnamed[:12]: print(f"    {_f}")

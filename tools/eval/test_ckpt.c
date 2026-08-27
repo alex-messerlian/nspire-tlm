@@ -58,7 +58,15 @@ int main(void) {
     printf("test_ckpt\n");
 
     long long real = fsize(REAL);
-    if (real < 0) { printf("  SKIP  %s not present\n", REAL); return 0; }
+    if (real < 0) {
+        /* NOT `return 0`. build/transfer/ is gitignored, so on a fresh clone this printed SKIP and
+         * exited clean -- the gate reported PASS having asserted nothing about the loader. That is
+         * this project's own rule violated inside the suite that enforces it: "cannot check" and
+         * "checked and clean" must never share an exit status. Exit 2, which run_gates.sh already
+         * renders as CANNOT CHECK and counts as a failure. */
+        printf("  CANNOT CHECK  %s not present -- run: cp build/model4096_gs96.bin %s\n", REAL, REAL);
+        return 2;
+    }
 
     /* 1. The derived size reproduces a real artefact exactly. If this drifts, every arm below is
      *    measuring the wrong thing, so it is asserted first. */

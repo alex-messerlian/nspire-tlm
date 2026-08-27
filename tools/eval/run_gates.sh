@@ -55,6 +55,20 @@ $PY tools/eval/shape_spec.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_s
 # pass, not confidence -- this repo has three recorded cases of a suite that passed everything while
 # measuring nothing.
 $PY tools/eval/shape_mutation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_mutation" || { printf "  %-20s FAIL\n" "shape_mutation"; fail=1; }
+# The project log names test_genloop.py as the EXECUTABLE guard that makes the Bug 5 ruling hold -- "the
+# guard is executable and mutation-tested in both directions, which is what makes it hold". It was
+# never listed here, so the guard that documentation could not provide was itself ungated.
+$PY tools/eval/test_genloop.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_genloop" || { printf "  %-20s FAIL\n" "test_genloop"; fail=1; }
+# The generator may only emit relations the CLEANED store contains. docs/RESULT_STORE_CLEANING.md
+# deleted 34 records for documented reasons and units_train.json was never re-cleaned; a change that
+# made units_train the iterated set silently re-admitted 24 of them, three named "Strategy".
+$PY tools/eval/gate_store_authority.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_authority" || { printf "  %-20s FAIL\n" "store_authority"; fail=1; }
+# tools/eval/prov_mutation.py is deliberately NOT listed here. It rebuilds and re-runs THIS SCRIPT
+# once per mutation, so listing it makes the suite call itself -- which is what happened on the
+# first attempt: infinite recursion, killed at the two-minute timeout. It is a meta-check and runs
+# manually, exactly as WIRING_AUDIT already classifies gate_mutation.py and positive_control.py.
+# The same applies to shape_mutation.py, which does NOT re-enter this script and is therefore safe
+# to list above.
 ./build/test_loader build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_loader" || { printf "  %-20s FAIL\n" "test_loader"; fail=1; }
 ./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }
 ./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }
@@ -67,7 +81,8 @@ $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_
 # test_ckpt guards the LOADER. It is listed here and not only in the Makefile because this file,
 # not TESTS, is what decides whether the suite passed -- a roster kept in two places drifts, and
 # the half nobody reads is the half that silently stops running.
-for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_shapecheck test_select test_persist; do
+# test_ckpt exits 2 for CANNOT CHECK, which the loop below already renders distinctly from FAIL.
+for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_shapecheck test_prov test_select test_persist; do
     if [ ! -x "build/$b" ]; then
         # A MISSING binary is a failure, not a skip. "cannot check" and "checked and clean" must
         # never share an exit status.

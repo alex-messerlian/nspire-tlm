@@ -45,9 +45,18 @@ HOST_LINK := src/store/gfx.c src/store/chatstore.c $(BUILD)/hoststub.o
 # Two groups, because they differ in what they link. INCLUDES_APP suites #include app.c directly to
 # reach its file-scope state; the others link toolrun.c and the evaluator.
 TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme test_select test_persist
-TESTS_EVAL := test_toolrun
+TESTS_EVAL := test_toolrun test_prov
+# test_prov.c has existed, correct and well-designed -- it even has the 'rounds to 2 sf is
+# legitimate' case -- and was referenced by NO Makefile and NO gate. Its binary sat committed
+# under tools/eval/ with nothing that rebuilt it. WIRING_AUDIT records provenance.c going from
+# 'exists but is never called' to 'called but never verified'; this is the second half.
 TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck
-TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN)
+# STORE SUITES. These four ran as COMMITTED BINARIES that no rule rebuilt, so they could not see a
+# source change: re-adding the pre-opened `<a>` bug to assemble.c and running `make check` gave ALL
+# GATES PASS. run_gates.sh's own header claims `make check` 'BUILDS the host binaries first'; for
+# four of its twenty-five gates that was false.
+TESTS_STORE:= test_loader test_picker test_assemble test_tokenizer
+TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 
 .PHONY: all tests device check clean
 all: tests device
@@ -77,6 +86,9 @@ $(addprefix $(BUILD)/,$(TESTS_APP)): $(BUILD)/%: tools/eval/%.c $(APP_SRC) src/s
 $(BUILD)/render_app: tools/eval/render_app.c $(APP_SRC) src/store/app.h $(BUILD)/hoststub.o | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< $(HOST_LINK) src/store/toolrun.c $(EVAL_CORE) -lm
 
+$(BUILD)/test_prov: tools/eval/test_prov.c tools/eval/provenance.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< tools/eval/provenance.c -lm
+
 $(BUILD)/test_toolrun: tools/eval/test_toolrun.c src/store/toolrun.c src/store/toolrun.h | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/toolrun.c $(EVAL_CORE) -lm
 
@@ -94,6 +106,15 @@ $(BUILD)/test_shapecheck: tools/eval/test_shapecheck.c src/store/shapecheck.c sr
 # added once covers half the surface; this is what lets both call the same C.
 tools/eval/shapecli: tools/eval/shapecli.c src/store/shapecheck.c src/store/shapecheck.h $(EVAL_CORE)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/shapecheck.c $(EVAL_CORE) -lm
+
+$(BUILD)/test_loader:    tools/eval/../../src/store/test_loader.c    src/store/loader.c src/store/loader.h | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ src/store/test_loader.c src/store/loader.c -lm
+$(BUILD)/test_picker:    src/store/test_picker.c    src/store/picker.c src/store/loader.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/picker.c src/store/loader.c -lm
+$(BUILD)/test_assemble:  src/store/test_assemble.c  src/store/assemble.c src/store/loader.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/assemble.c src/store/loader.c -lm
+$(BUILD)/test_tokenizer: src/store/test_tokenizer.c src/store/tokenizer.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/tokenizer.c -lm
 
 # Compiles runq_nspire.c on the HOST, which is the point: the loader that runs on the calculator is
 # the one under test, not a reimplementation of its rules.
