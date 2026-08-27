@@ -79,7 +79,11 @@ static void say(const char *fmt, ...) {
  * fopen that may succeed on a read-only or full filesystem. */
 static int resolve_paths(void) {
     for (unsigned i = 0; i < sizeof DIRS / sizeof DIRS[0]; i++) {
-        snprintf(STATE_PATH, sizeof STATE_PATH, "%scasnext.txt.tns", DIRS[i]);
+        /* casnext3, not casnext. The device's casnext.txt reads 9 -- every round-2 attempt has
+         * been made -- so a round-3 binary reusing that name would print "all attempts complete"
+         * and exit without running anything. A new attempt TABLE needs a new counter; reusing the
+         * name would make the operator's first round-3 run a silent no-op. */
+        snprintf(STATE_PATH, sizeof STATE_PATH, "%scasnext3.txt.tns", DIRS[i]);
         FILE *f = fopen(STATE_PATH, "w");
         if (!f) continue;
         int wrote = fprintf(f, "0\n") > 0;
@@ -90,7 +94,7 @@ static int resolve_paths(void) {
         int back = -1, ok = (fscanf(f, "%d", &back) == 1 && back == 0);
         fclose(f);
         if (!ok) continue;
-        snprintf(LOG_PATH, sizeof LOG_PATH, "%scaslog.txt.tns", DIRS[i]);
+        snprintf(LOG_PATH, sizeof LOG_PATH, "%scaslog.txt.tns", DIRS[i]);   /* appends; rounds 1-2 are above */
         return 1;
     }
     return 0;
@@ -172,35 +176,133 @@ static void dump_block(const char *name, const char *b) {
         any ? "   <-- NON-ZERO" : "");
 }
 
+/* ---- ROUND 3 ------------------------------------------------------------------------------------
+ * Round 2 got FURTHER than its own log admits, and the reason is an instrumentation choice.
+ *
+ * Reproduced identically in THREE independent launches (caslog rounds 9, 10, 11):
+ *   * p4 required, p1/p2/p5 optional -- rc=1020 on all six attempts with p4 NULL, rc=0 on all three
+ *     with p4 non-NULL. Perfect separation, replicated 3x.
+ *   * b4[0] receives a fresh heap handle each launch: 0x11628740 / 0x116377B8 / 0x116348D8.
+ *   * MathExprToStr(*(void**)b4, NULL, &out) returns rc=0 AND a NON-NULL out, in a DIFFERENT heap
+ *     region: 0x117abb60 / 0x117ac190 / 0x1179ea08. A separate allocation. The chain works.
+ *   * The decoded string is "" every time.
+ *
+ * So the call chain succeeds end to end and yields an allocated, empty-looking string. Round 2
+ * CANNOT tell us why, because of three gaps in its own instrument -- not in the OS:
+ *
+ *   GAP 1  It printed the DECODED ascii and never the RAW BYTES at `out`. utf16_strlen() returning
+ *          0 and a genuinely empty result are the same output. If the OS hands back UTF-16 BIG
+ *          endian, '2' is 00 32 and a length walk stops on the first byte -- reading as empty while
+ *          the data is right there.
+ *   GAP 2  try_render returned on the first `rc==0 && out`, so arrangements 3-6 were never tried on
+ *          attempts 4 and 9. "First non-NULL pointer" was the wrong stopping condition; the right
+ *          one is "first non-EMPTY string".
+ *   GAP 3  Attempt 8 passed p4 as &int4 and the handle landed in i4 (291722704 = 0x116355D0, the
+ *          same heap region as the others). try_render was then called with b4, which was all
+ *          zeroes. That attempt's handle was collected and thrown away.
+ *
+ * Round 3 closes all three, and adds a SECOND expression whose answer cannot be confused with
+ * noise: 1+1 gives "2", one glyph, and a single stray byte can imitate it. 123*456 gives "56088".
+ *
+ * SAFETY: rounds 1 and 2 made these same nine argument shapes 99 times across 11 launches with ZERO
+ * resets, so the call itself is now known-safe on this OS. The new risk is reading 32 bytes behind
+ * two OS-returned pointers. Both were allocated by the OS in this process and both are non-NULL
+ * before we touch them; the counter is still persisted before every attempt, so a reset still costs
+ * one relaunch and not the sweep.
+ */
+
+/* Raw bytes, before any decoding. GAP 1: an empty string and a mis-read string print identically
+ * once decoded, and only one of those two is a result. */
+static void dump_bytes(const char *name, const void *p, int n) {
+    const unsigned char *b = (const unsigned char *)p;
+    char line[160]; int o = 0;
+    o += snprintf(line + o, sizeof line - o, "    %s @%p:", name, p);
+    for (int i = 0; i < n && o < (int)sizeof line - 4; i++)
+        o += snprintf(line + o, sizeof line - o, " %02X", b[i]);
+    say("%s", line);
+}
+
+/* Decode a UTF-16 out-pointer THREE ways, because the encoding is not established.
+ * Returns 1 if any of them produced a non-empty string. */
+static int show_string(uint16_t *out) {
+    dump_bytes("raw out[0..31]", out, 32);
+
+    unsigned n = (unsigned)utf16_strlen(out);
+    say("    utf16_strlen=%u", n);
+
+    int got = 0;
+    if (n) {                                   /* route A: the SDK's own decoder, as round 2 did */
+        char a[128]; unsigned m = n > 120 ? 120 : n;
+        utf162ascii(a, out, (int)m); a[m] = 0;
+        say("    utf162ascii -> \"%s\"", a);
+        if (a[0]) got = 1;
+    }
+    {   /* route B: read as UTF-16 LITTLE endian by hand, ignoring utf16_strlen entirely. If the
+         * length walk is what failed, this still recovers the text. */
+        char a[64]; int k = 0;
+        for (int i = 0; i < 60 && out[i]; i++) {
+            uint16_t c = out[i];
+            a[k++] = (c >= 0x20 && c < 0x7F) ? (char)c : '.';
+        }
+        a[k] = 0;
+        say("    manual LE     -> \"%s\" (%d units)", a, k);
+        if (k) got = 1;
+    }
+    {   /* route C: BIG endian. A BE '2' is 00 32, whose low byte is zero -- which is exactly what
+         * an LE-assuming length walk reads as a terminator on the very first unit. This is the
+         * single most likely explanation for a non-NULL pointer decoding to "". */
+        const unsigned char *b = (const unsigned char *)out;
+        char a[64]; int k = 0;
+        for (int i = 0; i < 60; i++) {
+            uint16_t c = (uint16_t)((b[2*i] << 8) | b[2*i + 1]);
+            if (!c) break;
+            a[k++] = (c >= 0x20 && c < 0x7F) ? (char)c : '.';
+        }
+        a[k] = 0;
+        say("    manual BE     -> \"%s\" (%d units)", a, k);
+        if (k) got = 1;
+    }
+    return got;
+}
+
 /* Given a successful evaluate, try every plausible way of handing the result to MathExprToStr.
- * Each candidate is built only from memory we own or values the OS just wrote there. */
-static void try_render(char *b4blk) {
-    uint32_t *w = (uint32_t *)(void *)b4blk;
+ * Each candidate is built only from memory we own or values the OS just wrote there.
+ *
+ * `hblk` is whichever buffer the OS actually wrote the handle into -- b4 for the A_BLOCK attempts,
+ * &i4 for the A_INT one. GAP 3: round 2 always passed b4, so attempt 8's handle was collected in i4
+ * and then never used. Returns 1 if a NON-EMPTY string was produced. */
+static int try_render(char *hblk, const char *which) {
+    uint32_t *w = (uint32_t *)(void *)hblk;
+    say("  handle source: %s, first word = %08lX", which, (unsigned long)w[0]);
+    if (w[0]) dump_bytes("result object *[0..31]", (const void *)(uintptr_t)w[0], 32);
+
     struct { const char *desc; void *h1; void *h2; } C[] = {
-        { "h1=b4          h2=NULL",        (void *)b4blk,        0 },
-        { "h1=*(void**)b4 h2=NULL",        (void *)(uintptr_t)w[0], 0 },
-        { "h1=NULL        h2=b4",          0,                    (void *)b4blk },
-        { "h1=b4          h2=b4+4",        (void *)b4blk,        (void *)(b4blk + 4) },
-        { "h1=*(void**)b4 h2=*(void**)b4+4", (void *)(uintptr_t)w[0], (void *)(uintptr_t)w[1] },
-        { "h1=&b4         h2=NULL",        (void *)&b4blk,       0 },
+        { "h1=blk         h2=NULL",        (void *)hblk,        0 },
+        { "h1=*(void**)blk h2=NULL",       (void *)(uintptr_t)w[0], 0 },
+        { "h1=NULL        h2=blk",         0,                   (void *)hblk },
+        { "h1=blk         h2=blk+4",       (void *)hblk,        (void *)(hblk + 4) },
+        { "h1=*(void**)blk h2=*(void**)blk+4", (void *)(uintptr_t)w[0], (void *)(uintptr_t)w[1] },
+        { "h1=&blk        h2=NULL",        (void *)&hblk,       0 },
     };
+    int any = 0;
     for (unsigned i = 0; i < sizeof C / sizeof C[0]; i++) {
         uint16_t *out = 0;
         say("  render try %u: %s", i + 1, C[i].desc);
         int rc = TI_MS_MathExprToStr(C[i].h1, C[i].h2, &out);
         say("    rc=%d out=%p", rc, (void *)out);
         if (rc == 0 && out) {
-            char ascii[128];
-            unsigned n = (unsigned)utf16_strlen(out);
-            if (n > 120) n = 120;
-            utf162ascii(ascii, out, (int)n);
-            ascii[n] = 0;
-            say("    *** STRING: \"%s\" ***", ascii);
-            say("    *** if that reads 2, the OS CAS IS DRIVEABLE. Stop and report this line. ***");
-            return;
+            /* DO NOT return here. GAP 2: round 2 stopped on the first non-NULL pointer, which was
+             * arrangement 2 with an empty string, and arrangements 3-6 were never tried. */
+            if (show_string(out)) {
+                say("    *** NON-EMPTY STRING FROM ARRANGEMENT %u. The OS CAS IS DRIVEABLE. ***", i + 1);
+                any = 1;
+            } else {
+                say("    (rc=0, pointer valid, no text recovered by any of the three decoders)");
+            }
         }
     }
-    say("  no handle arrangement produced a string");
+    if (!any) say("  no handle arrangement produced a non-empty string");
+    return any;
 }
 
 int main(void) {
@@ -217,7 +319,7 @@ int main(void) {
     }
     LOG = fopen(LOG_PATH, "a");
 
-    say("=== bench_cas ===");
+    say("=== bench_cas ROUND 3 ===");   /* rounds are appended to one log; label them */
     say("os: hwtype=%u subtype=%u", (unsigned)nl_hwtype(), (unsigned)nl_hwsubtype());
 
     /* ---- Step 1: existence, at RUNTIME. Free, safe, and worth the run on its own. ------------- */
@@ -280,9 +382,19 @@ int main(void) {
     say("--- attempt %d/%d: %s ---", idx + 1, NATTEMPTS, a->desc);
     say("if the calculator resets here, THIS is the attempt that did it.");
 
+    /* TWO expressions per attempt. "1+1" -> "2" is one glyph, and one stray byte can imitate it;
+     * "123*456" -> "56088" cannot be produced by accident. If only the short one ever renders, the
+     * result is noise. */
+    static const struct { const char *txt; const char *want; } EXPRS[] = {
+        { "1+1",     "2"     },
+        { "123*456", "56088" },
+    };
+  for (unsigned ei = 0; ei < sizeof EXPRS / sizeof EXPRS[0]; ei++) {
     static uint16_t expr[32];
-    ascii2utf16(expr, "1+1", 3);
-    say("expr marshalled: utf16_strlen=%u", (unsigned)utf16_strlen(expr));
+    ascii2utf16(expr, (char *)EXPRS[ei].txt, (int)strlen(EXPRS[ei].txt));
+    say("expr=\"%s\" (expect \"%s\") marshalled: utf16_strlen=%u",
+        EXPRS[ei].txt, EXPRS[ei].want, (unsigned)utf16_strlen(expr));
+    dump_bytes("expr utf16[0..15]", expr, 16);
 
     /* 512 not 64. These are handed to an OS routine whose output size is unknown; if it writes a
      * larger structure than the buffer, the overrun lands in this program's own static memory --
@@ -318,10 +430,15 @@ int main(void) {
     /* ---- Step 3: only if evaluate returned something, try to render it. ---------------------- */
     if (rc == 0) {
         say("rc==0 -- walking handle arrangements for the result");
-        try_render(b4);
+        /* GAP 3: the handle goes wherever p4 pointed. For A_INT that is &i4, not b4 -- and round 2
+         * passed b4 unconditionally, so attempt 8's handle (i4 = 0x116355D0) was printed and then
+         * discarded. Pass the buffer the OS was actually given. */
+        if (a->p4_kind == A_INT) try_render((char *)&i4, "&i4 (p4 was an int slot)");
+        else                     try_render(b4,          "b4 (p4 was a block)");
     } else {
         say("rc=%d (1020 = invalid argument on this API), not rendering", rc);
     }
+  }   /* end expression loop */
 
     say("attempt %d survived.", idx + 1);
   }
