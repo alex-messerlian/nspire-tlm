@@ -248,6 +248,21 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
         double v = off != 0.0 ? (from.v - off) / to.v : from.v / to.v;
         char num[64];
         if ((e = fmt_number(v, num, sizeof num))) return fail(e, out, out_sz);
+
+        /* F3, signed off 2026-08-27: a target of literal "1" renders BARE. `conv((50 J)/(200 J), 1)`
+         * gave "0.25 1", and that text goes verbatim into training data as the model's answer.
+         * "0.25" is what a physicist writes.
+         *
+         * NARROW ON PURPOSE -- the test is the literal target string, not dimensionlessness. `%`,
+         * `rad` and `sr` are all dimensionless and all must survive: DIMENSIONLESS_AUDIT C6 requires
+         * counts to keep scale 1 without folding to an angle, and C7 requires `sr` never to vanish
+         * silently. A rule keyed on `dim_eq(to.d, DIM_NONE)` would delete exactly those, which is
+         * the broader-and-wrong version of this fix. */
+        if (!strcmp(args[1], "1")) {
+            if (strlen(num) + 1 > out_sz) return fail(E_RANGE, out, out_sz);
+            strcpy(out, num);
+            return TB_OK;
+        }
         if (strlen(num) + 1 + strlen(args[1]) + 1 > out_sz) return fail(E_RANGE, out, out_sz);
         snprintf(out, out_sz, "%s %s", num, args[1]);
         return TB_OK;

@@ -19,7 +19,7 @@ which would make the suite call itself. Meta-check, like gate_mutation.py and po
   python3 tools/eval/gate_controls.py            every gate
   python3 tools/eval/gate_controls.py NAME ...   just these
 """
-import atexit, os, pathlib, re, signal, subprocess, sys
+import atexit, os, pathlib, re, signal, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 os.chdir(ROOT)
@@ -92,6 +92,12 @@ CONTROLS = {
     # list would not reintroduce the fragments and the control would prove nothing.
     "items_refs":      ("tools/eval/items.json",  # put the stale reference back
                         '"A=F/p"', '"A=F/P"'),
+    "dimensionless":   ("tools/eval/dispatch.c",   # revert F3: put the trailing "1" back
+                        'if (!strcmp(args[1], "1")) {', 'if (0) {'),
+    # Delete the control figure from the document that publishes the flattering one.
+    "selection_control":("docs/RESULT_RETRIEVAL_BASELINE.md",
+                        "| **RANDOM 20 containing the target** | **62.7%** | 84.5% |",
+                        "| **RANDOM 20 containing the target** | (removed) | 84.5% |"),
     "stale_figures":   ("docs/LATENCY_BUDGET.md",   # put the stale figure back
                         "`chars/token = 2.901`", "`chars/token = 3.5`"),
     # Revert A7: drop the constants back out of the question's givens.
@@ -132,8 +138,17 @@ CONTROLS = {
                         "long long bytes = 256 + (2 * L * D + D) * 4 + 8;"),
     "gate_binaries":   ("Makefile",
                         "$(BUILD)/asmcli: src/store/asmcli.c", "$(BUILD)/asmcli_DISABLED:"),
+    # Re-pointed 2026-08-27: adding the A10 unit condition moved this line and the STALENESS
+    # DETECTOR caught it -- which is the machinery working. A control whose target text has gone
+    # is not a control, and it would have read as coverage forever.
     "test_score":      ("tools/eval/score.py",
-                        '                 and r["prov_clean"] is True and r["shape"] != "mismatch")',
+                        '                 and r["prov_clean"] is True and r["shape"] != "mismatch"\n'
+                        '                 and r["answer_unit_ok"] is not False)',
+                        "                 )"),
+    # And a control for the NEW condition specifically: dropping only the unit check must fail.
+    # One control per condition, for the same reason format_parity needed one per field.
+    "test_score_unit": ("tools/eval/score.py",
+                        '                 and r["answer_unit_ok"] is not False)',
                         "                 )"),
     "test_prov":       ("tools/eval/provenance.c",
                         "int prov_call_unsourced(const char *doc, double *first) {",
@@ -188,7 +203,26 @@ def gates_in_suite():
 # Several controls exercise DIFFERENT clauses of ONE gate. The suffix names the clause; the gate
 # whose verdict is read is the part before the first underscore-suffix in ALIAS.
 ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_scope_rm": "test_scope",
-         "format_parity_cond": "format_parity"}   # one control per FIELD the parity gate checks
+         "format_parity_cond": "format_parity",
+         "test_score_unit": "test_score"}   # one control per FIELD the parity gate checks
+
+
+def _write_and_stamp(f, text):
+    """Write, then push the mtime clear of the sub-second granularity make compares on.
+
+    -B WAS THE FIRST FIX AND IT WAS THE WRONG ONE. Plain `make` missed the change because a write
+    and the binary it should invalidate can land inside the same timestamp tick -- that left seven
+    binaries compiled from mutated sources, and separately made a control SURVIVE because the
+    mutation never reached tools/eval/evalcli. Forcing a FULL rebuild fixed both and cost 6.65 s
+    per call, twice per control, ~12 s x 45 controls of pure waste: it rebuilds 25 binaries to
+    invalidate one.
+
+    Stamping the mtime two seconds ahead gives make an unambiguous ordering and lets it rebuild
+    exactly the dependents, which is what it is for. Measured: 6.65 s -> ~0.5 s.
+    """
+    f.write_text(text)
+    t = time.time() + 2
+    os.utime(f, (t, t))
 
 def run_gate(name):
     name = ALIAS.get(name, name)
@@ -286,11 +320,16 @@ def main():
             print(f"  STALE CONTROL  {name}: the text it mutates is gone from {path}")
             failures.append(name); continue
         try:
-            f.write_text(original.replace(find, repl, 1))
+            _write_and_stamp(f, original.replace(find, repl, 1))
+            # -B ON THE MUTATE SIDE TOO. The restore side was fixed first and this one was left
+            # plain, so a mutation to tools/eval/dispatch.c did NOT reach tools/eval/evalcli and
+            # the control reported SURVIVED -- which reads as "this gate cannot fail" when the
+            # truth was "the mutation never got there". A half-forced rebuild is worse than none,
+            # because it fails in the direction that looks like a finding about the gate.
             subprocess.run(["make", "-s", "tests"], capture_output=True)
             verdict = run_gate(name)
         finally:
-            f.write_text(original)
+            _write_and_stamp(f, original)
             _ORIGINALS.pop(path, None)
             # -B, NOT plain make. Restoring the source is not enough: this run left seven binaries
             # compiled from mutated sources, and the next plain `run_gates.sh` reported seven
@@ -299,7 +338,7 @@ def main():
             # timestamp and the restore can land inside the same granularity, so the only safe
             # rebuild after a mutation is a forced one. Slower, and this script is already slow by
             # construction.
-            subprocess.run(["make", "-sB", "tests"], capture_output=True)
+            subprocess.run(["make", "-s", "tests"], capture_output=True)
         ok = verdict in ("FAIL", "CANNOT")
         print(f"  {'caught  ' if ok else 'SURVIVED'} {name:18} (reverted -> {verdict})")
         if not ok: failures.append(name)

@@ -5,9 +5,19 @@ Three bugs of this shape have now landed (sin(30 deg), the unit-name collision, 
 This enumerates every quantity the system can represent whose dimension vector is empty (or whose
 arithmetic is otherwise non-distributive) and states the REQUIRED behaviour for each before running
 it. Anything where observed != required is a finding, not a curiosity."""
-import subprocess, re, sys
+import pathlib, subprocess, re, sys
+
+# ABSOLUTE, NOT RELATIVE. This ran `./evalcli`, so it worked only from tools/eval and raised
+# FileNotFoundError anywhere else -- and it was never in run_gates.sh, so nobody found out. Second
+# defect of the pair the project log records: a watcher that resolved a relative path in the wrong cwd
+# spun for 21 minutes. Same rule, different symptom.
+CLI = str(pathlib.Path(__file__).resolve().parent / "evalcli")
 def run(cs):
-    p = subprocess.run(["./evalcli","-"], input="\n".join(cs)+"\n", capture_output=True, text=True)
+    if not pathlib.Path(CLI).exists():
+        # ABSENCE IS FAILURE, exit 2: "cannot check" must not share an exit status with "clean".
+        print(f"CANNOT CHECK: {CLI} is not built. Run: make -C tools/eval evalcli", file=sys.stderr)
+        sys.exit(2)
+    p = subprocess.run([CLI,"-"], input="\n".join(cs)+"\n", capture_output=True, text=True)
     return re.findall(r"<res>(.*?)</res>", p.stdout, re.S)
 
 # (class, call, required, why)
@@ -46,11 +56,11 @@ P = [
  ("C3 log","<tool>conv<arg>2^(3 m)<arg>1</tool>","!units","dimensioned exponent"),
  # --- C4 true ratios: dimension genuinely cancels, value is meaningful ---------
  ("C4 ratio","<tool>conv<arg>(50 J)/(200 J)<arg>1</arg></tool>","!units","stray </arg> makes the target the text \"1</arg>\", which is not a unit; arity is still 2 so !units is right"),
- ("C4 ratio","<tool>conv<arg>(50 J)/(200 J)<arg>1</tool>","0.25 1","efficiency -- FLAGGED: trailing \"1\" is a section 5.1 formatting wart"),
+ ("C4 ratio","<tool>conv<arg>(50 J)/(200 J)<arg>1</tool>","0.25","F3 SIGNED OFF 2026-08-27: a target of literal \"1\" renders BARE. That text goes verbatim into training data and \"0.25\" is what a physicist writes. Narrow on purpose -- see the C6/C7 rows: rad, sr and counts must NOT vanish, so the test is the literal target string, not dimensionlessness."),
  ("C4 ratio","<tool>conv<arg>(0.002 m)/(1 m)<arg>m/m</tool>","0.002 m/m","strain"),
- ("C4 ratio","<tool>conv<arg>(3e8 m/s)/(2e8 m/s)<arg>1</tool>","1.5 1","refractive index"),
- ("C4 ratio","<tool>conv<arg>(1000 kg/m^3)*(2 m/s)*(0.05 m)/(0.001 Pa*s)<arg>1</tool>","100000 1","Reynolds number"),
- ("C4 ratio","<tool>conv<arg>(340 m/s)/(170 m/s)<arg>1</tool>","2 1","Mach number"),
+ ("C4 ratio","<tool>conv<arg>(3e8 m/s)/(2e8 m/s)<arg>1</tool>","1.5","refractive index"),
+ ("C4 ratio","<tool>conv<arg>(1000 kg/m^3)*(2 m/s)*(0.05 m)/(0.001 Pa*s)<arg>1</tool>","100000","Reynolds number"),
+ ("C4 ratio","<tool>conv<arg>(340 m/s)/(170 m/s)<arg>1</tool>","2","Mach number -- F3: bare, same ruling as the efficiency row"),
  # --- C5 percent / parts-per: scale != 1, dimension empty ---------------------
  ("C5 percent","<tool>eval<arg>50 %</tool>","!parse","% must not parse as a unit"),
  ("C5 percent","<tool>eval<arg>0.85*100</tool>","85","percent is the generator's job, not the evaluator's"),

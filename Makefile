@@ -61,7 +61,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli $(BUILD)/asmcli $(BUILD)/tlmui
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -118,6 +118,18 @@ $(BUILD)/asmcli: src/store/asmcli.c src/store/assemble.c src/store/loader.c src/
 # past moment. Same defect as the four store suites and test_prov, on the check that matters most.
 tools/eval/provcli: tools/eval/provcli.c tools/eval/provenance.c tools/eval/eval.h | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< tools/eval/provenance.c -lm
+
+# evalcli is THE evaluator CLI -- corpus/generate.py executes every training call through it, and
+# tools/eval/audit_dimensionless.py gates on it. It has a rule in tools/eval/Makefile, so
+# gate_binaries correctly calls it buildable; what it did NOT have was a place in `make tests`, and
+# gate_controls rebuilds with `make -sB tests`. So a control that mutated dispatch.c rebuilt
+# everything EXCEPT the binary the gate runs, and SURVIVED -- reported as "the gate cannot fail"
+# when the truth was "the fix never reached it".
+#
+# Same shape as provcli having no rule at all, one level out: it is not enough for an artefact to
+# be buildable, the rebuild the harness actually runs has to reach it.
+tools/eval/evalcli: $(EVAL_CORE) tools/eval/main.c tools/eval/eval.h
+	$(CC) $(HOSTFLAGS) -o $@ tools/eval/main.c $(EVAL_CORE) -lm
 
 tools/eval/shapecli: tools/eval/shapecli.c src/store/shapecheck.c src/store/shapecheck.h $(EVAL_CORE)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/shapecheck.c $(EVAL_CORE) -lm

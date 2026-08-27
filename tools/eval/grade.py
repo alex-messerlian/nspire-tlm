@@ -109,18 +109,117 @@ def shape_ok(full_document):
 def refusal_ok(prompt, generation):
     return well_formed(generation) and is_refusal(generation)
 
+def declared_lhs_unit(full_document):
+    """The unit the record declares for the quantity being solved for, or "" if none applies.
+
+    ONE reader, exported, because test_score.py builds the known-good transcript and this module
+    grades it -- and if those two derived the unit separately they would disagree on exactly the
+    records where it matters, which is the two-graders defect WIRING_AUDIT.md records. The control
+    must build a document the real path produces; it can only do that by asking the same question
+    the grader asks.
+
+    Returns "" for a dimensionless record (declared "1"), matching the F3 ruling in dispatch.c:
+    "0.25", not "0.25 1", because that is what a physicist writes.
+    """
+    # \Z, so a record span that runs to END OF STRING is read rather than silently missed. Without
+    # it this returned "" on a prompt-only document -- and "" means "no unit is required", so the
+    # caller read a PARSE FAILURE as a clean bill of health. That is the dim_gate defect exactly:
+    # "cannot check" must not share a value with "checked and nothing needed".
+    m = re.search(r"<r>(.*?)(?:<tool>|<a>|\Z)", full_document, re.S)
+    if not m: return ""
+    parts = m.group(1).rsplit("|", 4)          # units | missing: | condition | fit:  (from the RIGHT)
+    if len(parts) != 5: return ""
+    lhs = parts[0].split("=", 1)[0].strip()
+    for tok in parts[1].split():
+        if tok.startswith(lhs + ":"):
+            u = tok[len(lhs) + 1:].strip()
+            return "" if u in ("", "1") else u
+    return ""
+
+
+def required_answer_unit(full_document):
+    """The unit the answer must state: the one the RESULT carries, else the record's declaration.
+
+    THE RESULT SPAN IS THE AUTHORITY, and getting that order wrong is what the first version did.
+    It required the record's declared LHS unit unconditionally, and failed 11 CONVERSION items --
+    `v=d/t` declares `v:m/s` while the question asks for km/h and the runtime injects
+    `<res>79.2 km/h</res>`. The answer correctly says km/h. Under the architecture the runtime
+    computed the value and its unit; the record only says what the quantity is. So: read the unit
+    off <res> when it has one, and fall back to the declaration only when <res> is bare.
+
+    Falling back matters -- it is the whole defect. `<res>12</res>` with a record declaring `v:m/s`
+    is precisely the 81% case where the answer said "The speed is 12." and no check looked.
+    """
+    res = re.findall(r"<res>(.*?)</res>", full_document, re.S)
+    if res:
+        m = re.fullmatch(r"\s*-?[\d.]+(?:[eE][-+]?\d+)?\s+(\S+)\s*", res[-1])
+        if m: return m.group(1)
+    return declared_lhs_unit(full_document)
+
+
+def answer_unit_ok(full_document):
+    """The answer must state the unit the record declares for the quantity being solved for.
+
+    A10. 81% of shipped answer spans stated a dimensioned result with NO UNIT -- "The kinetic energy
+    is 18." -- and nothing here looked, so every one passed. That is the model's training target and
+    a student sees it, which makes it a correctness defect in the output rather than a formatting
+    one. This check ships in the SAME change as the fix so the two cannot drift; a generator that
+    emits units and a grader that does not require them is the format-parity defect again.
+
+    THE SCOPE IS THE FULL DOCUMENT, and it is in the name -- prompt AND generation. The record is in
+    the prompt and the answer is in the generation, so neither alone can decide this. Getting that
+    wrong in the opposite directions is exactly what test_scope.py exists to pin.
+
+    THREE-VALUED, deliberately. Returns True when the declared unit is present, False when it is
+    declared and absent, and True when the record declares NO unit for the LHS -- a record that
+    cannot say what unit is required cannot convict an answer of omitting it. Absence of the
+    DECLARATION is not absence of the unit, and conflating them would fail every dimensionless
+    record, of which there are 8 of 141.
+    """
+    unit = required_answer_unit(full_document)
+    if not unit:
+        return True                            # nothing declared, or dimensionless -> bare is right
+    seg = full_document.split("<a>", 1)[1] if "<a>" in full_document else ""
+    if not seg: return True
+    # A REFUSAL STATES NO RESULT, so there is nothing to carry a unit, and the property is
+    # vacuously satisfied. Making this self-contained rather than relying on the caller to run a
+    # refusal check first is deliberate: answer_ok composes it after `not is_refusal`, but a
+    # DIFFERENT caller would get a wrong False on every refusal -- and the project log records that
+    # scope-sensitive checks whose correctness depends on what the caller passes are how three
+    # graders came to publish incomparable numbers. The property is "a stated numeric result must
+    # carry its unit", so no stated result means nothing to check.
+    # A STANDALONE NUMBER, not "contains a digit". Two refusals -- "m_1 is not given" -- read as
+    # stating a result under the crude test, which is the proxy-predicate error in miniature: the
+    # predicate accepted identifiers with digits in them, which the property never meant.
+    if not re.search(r"(?<![A-Za-z0-9_])\d", seg): return True
+    # The unit must follow a NUMBER, not merely appear somewhere: "Substituting into v=d/t" mentions
+    # no unit but "The speed is 12 m/s" does. Matching the bare string anywhere would be a proxy
+    # that the `why` clause satisfies for free on any record whose formula contains the letters.
+    return re.search(r"\d\s*" + re.escape(unit) + r"(?![A-Za-z0-9_])", seg) is not None
+
+
 def answer_ok(prompt, generation):
     return (well_formed(generation) and not is_refusal(generation)
             and answer_matches_result(generation) and prov_clean(prompt + generation)
-            and shape_ok(prompt + generation))
+            and shape_ok(prompt + generation)
+            and answer_unit_ok(prompt + generation))
 
 # scope regression: the exact failure this module was rewritten to prevent
 _REC = "v=d/t | v:m/s d:m t:s | missing:none | constant speed | fit:high"
 _P   = f"<q>A sled goes 84 m in 7 s.</q><r>{_REC}"
 _G   = "<tool>eval<arg>84/7</arg></tool><res>12</res><a> The speed is 12 m/s.<end>"
+_G_NOUNIT = "<tool>eval<arg>84/7</arg></tool><res>12</res><a> The speed is 12.<end>"
 assert is_refusal(_REC),        "record contains 'missing:' -- documents the hazard"
 assert not is_refusal(_G),      "a correct generation must not read as a refusal"
 assert answer_ok(_P, _G),       "a correct answer must pass with prompt/generation split"
+# A10 both directions, asserted at import so the check cannot degrade to a constant unnoticed.
+assert not answer_unit_ok(_P + _G_NOUNIT), "an answer omitting the declared unit must FAIL"
+assert answer_unit_ok(_P + _G),            "an answer stating the declared unit must PASS"
+assert answer_unit_ok("<q>x</q><r>e=m*c^2 | e:1 m:kg c:m/s | missing:none | c | fit:high<a>It is 9.<end>"), \
+       "a dimensionless record must not require a unit"
+# A PROMPT-ONLY document must still yield its unit. This returned "" before \Z was added, and ""
+# means "none required", so a parse failure read as a pass.
+assert declared_lhs_unit(_P) == "m/s", "a record span ending the string must still be read"
 
 # shape regression: provenance and shape must disagree on the mgh case, or one of them is redundant
 _MP = ("<q>A 2.0 kg book sits 5.0 m up. Find its gravitational potential energy. "

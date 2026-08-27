@@ -133,6 +133,23 @@ _mined = {r["f"]: r for r in json.load(open("corpus/records_raw.json"))}
 _store = {r["f"]: r for r in json.load(open("corpus/store_clean.json"))}
 
 
+def lhs_unit(r):
+    """The unit the ANSWER must carry, read from the store first for the reason A9 documents.
+
+    A10. 81% of answer spans stated a dimensioned result with NO UNIT -- "The kinetic energy is 18."
+    That is the model's training target, so it is a correctness defect in the shipped output, not a
+    cosmetic one: a student is shown a bare number and every gate passed it because grade.py had no
+    unit check and items.json's references are bare ("250", not "250 N/m").
+
+    Dimensionless records render BARE, which is the same ruling as F3 in tools/eval/dispatch.c --
+    "0.25", not "0.25 1", because that is what a physicist writes. 8 of 141 records are affected and
+    they must not acquire a spurious "1"."""
+    lhs = r["f"].split("=", 1)[0].strip()
+    u = (_store.get(r.get("f"), {}) or {}).get("units") or r.get("units") or {}
+    un = (u.get(lhs) or "").strip()
+    return "" if un in ("", "1") else un
+
+
 def _condition_field(r):
     """The record span's condition field, by the SHIPPED assembler's rule (assemble.c:94).
 
@@ -493,7 +510,7 @@ def gen(n, seed=0):
                      # `req`, where BOTH producers already read them.
                      "rec": f"{rec_r['f']} | {umap} | missing:{miss} | "
                             f"{_condition_field(rec_r)} | fit:{band}", "lhs": lhs,
-                     "name": r["name"], "head": r["f"],
+                     "name": r["name"], "head": r["f"], "unit": lhs_unit(r),
                      "close": rng.choice(CLOSE), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
     out = re.findall(r"<res>(.*?)</res>",
@@ -515,7 +532,8 @@ def gen(n, seed=0):
         if res.startswith("!"): dropped += 1; continue        # TOOL_SPEC 8.1: drop, never guess
         try:   res = f"{float(res):.4g}"            # signed off: 4 significant figures
         except ValueError: pass
-        ans = d["close"].format(v=d["lhs"], a=res, q=d["name"].lower(), why=d["why"])
+        a_txt = f"{res} {d['unit']}".strip() if d.get("unit") else res
+        ans = d["close"].format(v=d["lhs"], a=a_txt, q=d["name"].lower(), why=d["why"])
         built.append({"head": d["head"],
                       "text": f"<q>{d['q']}</q><r>{d['rec']}{c}<res>{res}</res><a>{ans}<end>",
                       "ans": ans})

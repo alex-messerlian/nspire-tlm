@@ -35,6 +35,7 @@ print(f"  ok  liveness guard: dead pipeline reports None, not 0.0")
 # written passed it a synthetic dict that hid this.
 import json as _j
 _items = {i["id"]: i for i in _j.load(open("tools/eval/items.json"))}
+import grade as _grade_mod
 # END-TO-END POSITIVE CONTROL: build a known-good transcript for every one of the 200 items from
 # the item's own recorded evaluator reference, interleaving call and result as the runtime does.
 # A working scorer must report near-1.0 accuracy and 0 on every low-is-good metric. Before this
@@ -55,7 +56,15 @@ for _k, _i in _items.items():
     elif not _i["calls"]:           _good[_k] = _doc(_i, "<a>It is a definition.<end>")
     else:
         _body = "".join(f"{c}<res>{r}</res>" for c, r in zip(_i["calls"], _i.get("ref", [])))
-        _good[_k] = _doc(_i, f"{_body}<a>{(_i.get('ref') or [''])[-1]}.<end>")
+        # THE ANSWER CARRIES ITS UNIT, because the real path now emits one (A10) -- 81% of shipped
+        # answer spans stated a dimensioned result bare, and grade.py requires it. The unit comes
+        # from grade.declared_lhs_unit, the SAME reader the grader uses: deriving it here
+        # independently is how a control and the check it validates come to disagree.
+        _u = _grade_mod.required_answer_unit(_doc(_i, _body))
+        _last = (_i.get('ref') or [''])[-1]
+        # If the reference already carries the unit -- conversion items do -- do not append it twice.
+        _ans = _last if (_u and _last.rstrip().endswith(_u)) or not _u else f"{_last} {_u}"
+        _good[_k] = _doc(_i, f"{_body}<a>{_ans}.<end>")
 _rows = [score.score(_items[k], v) for k, v in _good.items()]
 _agg = score.aggregate(_rows, _items)
 assert _agg["pipeline_alive"], "scorer reports a dead pipeline on a known-good run"
@@ -131,6 +140,38 @@ if score.score(_ITEM, _fab)["pass"] or _g.answer_ok(_P, _CASES["fabricated, righ
     print("  FAIL  a fabricated premise that lands on the reference number is being PASSED")
 else:
     print("  ok  a fabricated premise landing on the right number is rejected by both")
+
+# A10 -- THE UNIT CHECK, IN BOTH GRADERS. Every case above states its unit, so removing the unit
+# condition from score.py broke nothing and the negative control SURVIVED: the suite had no
+# document where a unit was missing. That survival is what found this hole, and it is the same
+# shape as test_chatstore never asserting the path guard.
+#
+# 81% of shipped answer spans stated a dimensioned result bare -- "The speed is 12." -- so this is
+# the majority case, not an edge one.
+_NOUNIT = "<tool>eval<arg>84/7</tool><res>12</res><a> 12.<end>"
+if score.score(_ITEM, _P + _NOUNIT)["pass"]:
+    fail = True
+    print("  FAIL  score.py PASSES an answer that omits the unit its record declares")
+elif _g.answer_ok(_P, _NOUNIT):
+    fail = True
+    print("  FAIL  grade.py PASSES an answer that omits the unit its record declares")
+else:
+    print("  ok  both graders reject an answer stating a dimensioned result with no unit")
+
+# ...and the converse, so the check cannot be satisfied by refusing everything: a DIMENSIONLESS
+# record must still pass with a bare number, which is the F3 ruling in dispatch.c.
+# ASSERT THE PROPERTY, NOT THE WHOLE CHAIN. The first version of this called answer_ok() with
+# W = 50 and Q = 200 absent from the question, so PROVENANCE rejected it -- and it would have read
+# as "the unit check is over-strict" when the unit check was never consulted. A fixture that fails
+# for a different reason is an oracle failure, not a finding.
+_DIMLESS = ("<q>Give the efficiency. W = 50, Q = 200.</q>"
+            "<r>eff=W/Q | eff:1 W:J Q:J | missing:none | ideal | fit:high"
+            "<tool>eval<arg>50/200</tool><res>0.25</res><a> 0.25.<end>")
+if not _g.answer_unit_ok(_DIMLESS):
+    fail = True
+    print("  FAIL  a dimensionless record is being REQUIRED to state a unit")
+else:
+    print("  ok  a dimensionless record passes with a bare value")
 
 print("FAIL" if fail else "all score.py regressions pass")
 

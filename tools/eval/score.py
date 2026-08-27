@@ -153,12 +153,19 @@ def score(item, output):
     if doc:
         r["prov_clean"] = _grade.prov_clean(doc)
         r["shape"] = _grade.shape_status(doc)
+        # A10, ADDED HERE IN THE SAME CHANGE AS grade.py. This is the FOURTH grader, and the note
+        # above records why that matters: a check added to one covers half the surface. A unit
+        # check in grade.py alone would have made the two disagree on every dimensioned answer,
+        # which is how three graders came to publish incomparable numbers before.
+        r["answer_unit_ok"] = _grade.answer_unit_ok(doc)
     else:
         # A transcript with no question span cannot be sourced. Not clean -- unknown, and said so.
         r["prov_clean"] = None
         r["shape"] = "unchecked"
+        r["answer_unit_ok"] = None
     r["pass"] = (r["call_result_correct"] and r["answer_stated"] and not r["refused"]
-                 and r["prov_clean"] is True and r["shape"] != "mismatch")
+                 and r["prov_clean"] is True and r["shape"] != "mismatch"
+                 and r["answer_unit_ok"] is not False)
     return r
 
 def aggregate(rows, items):

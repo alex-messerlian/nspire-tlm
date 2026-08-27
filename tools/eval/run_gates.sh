@@ -104,6 +104,12 @@ $PY tools/eval/gate_event_producers.py >/dev/null 2>&1 && printf "  %-20s PASS\n
 # to settle three spelling decisions and ref went stale on 7 items -- two of which a correct
 # model could then not pass.
 $PY tools/eval/gate_items_refs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "items_refs" || { printf "  %-20s FAIL\n" "items_refs"; fail=1; }
+# DIMENSIONLESS_AUDIT.md calls this "gating (exit 1 on any)". It was in no gate, and it ran
+# `./evalcli` relative, so it only worked from tools/eval. Both fixed 2026-08-27.
+$PY tools/eval/audit_dimensionless.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "dimensionless" || { printf "  %-20s FAIL\n" "dimensionless"; fail=1; }
+# topic-scoping-artifact, promoted from UNENFORCED 2026-08-27: a published selection improvement
+# must publish its same-size random control. Topic-scoping read 61.2% against a random-20 at 62.7%.
+$PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }
 $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }
 # A7: 16.2% of documents used a constant in the CALL that appeared in neither the question nor
 # the record -- recalled, not read -- and while it was absent the graders could not tell a
