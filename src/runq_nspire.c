@@ -258,6 +258,24 @@ void memory_map_weights(TransformerWeights *w, Config* p, void* ptr, uint8_t sha
 
 long long rq_expected_size(const Config *p, int shared_classifier, int gs);
 
+/* Announce a load stage to BOTH the screen and the log.
+ *
+ * The plain printf()s these replace went to the console only. nspire.c's own STEP macro has always
+ * written to g_nspire_log as well, so the load trace was half in the file and half on a screen
+ * nobody photographs -- and the gap sat exactly across read_checkpoint and malloc_run_state, which
+ * is where every observed failure has been. A trace with a hole in it localises a hang to the hole.
+ *
+ * g_nspire_log is the caller's to set. A caller that leaves it NULL still gets the screen, and gets
+ * nothing in the file -- which is the pre-existing behaviour, not a regression, but it is why
+ * bench_forward.c now assigns it before the first engine call. */
+#ifdef _TINSPIRE
+#define RQ_STEP(msg) do { printf("  stage: " msg "\n"); \
+    if (g_nspire_log) { fprintf(g_nspire_log, "step=" msg "\n"); fflush(g_nspire_log); } } while (0)
+#else
+#define RQ_STEP(msg) do { } while (0)
+#endif
+
+
 void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weights,
                      int* fd, float** data, ssize_t* file_size) {
     FILE *file = fopen(checkpoint, "rb");
@@ -318,17 +336,11 @@ void read_checkpoint(char* checkpoint, Config* config, TransformerWeights* weigh
 #endif
     *data = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, *fd, 0);
     if (*data == MAP_FAILED) { fprintf(stderr, "mmap failed!\n"); exit(EXIT_FAILURE); }
-#ifdef _TINSPIRE
-    printf("  stage: mmap returned\n");
-#endif
+    RQ_STEP("mmap returned");
     void* weights_ptr = ((char*)*data) + header_size; // skip header bytes. char is 1 byte
-#ifdef _TINSPIRE
-    printf("  stage: memory_map_weights...\n");
-#endif
+    RQ_STEP("memory_map_weights");
     memory_map_weights(weights, config, weights_ptr, shared_classifier);
-#ifdef _TINSPIRE
-    printf("  stage: memory_map_weights done\n");
-#endif
+    RQ_STEP("memory_map_weights done");
 }
 
 /* ------------------------------------------------------------------------------------------------
@@ -406,16 +418,14 @@ int rq_probe(const char *path, char *why, int cap) {
 }
 
 void build_transformer(Transformer *t, char* checkpoint_path) {
+    RQ_STEP("read_checkpoint: entry");
     // read in the Config and the Weights from the checkpoint
     read_checkpoint(checkpoint_path, &t->config, &t->weights, &t->fd, &t->data, &t->file_size);
+    RQ_STEP("read_checkpoint: returned");
     // allocate the RunState buffers
-#ifdef _TINSPIRE
-    printf("  stage: malloc_run_state (needs ~3.7MB)...\n");
-#endif
+    RQ_STEP("malloc_run_state (needs ~3.7MB)");
     malloc_run_state(&t->state, &t->config);
-#ifdef _TINSPIRE
-    printf("  stage: malloc_run_state done\n");
-#endif
+    RQ_STEP("malloc_run_state done");
 }
 
 void free_transformer(Transformer* t) {
@@ -520,8 +530,12 @@ void matmul(float* xout, QuantizedTensor *x, QuantizedTensor *w, int n, int d) {
 #define PROF_TIMER 0x900D0000u
 #define PROF_VALUE 0x04u
 #define PROF_RD()  (*(volatile uint32_t *)(uintptr_t)(PROF_TIMER + PROF_VALUE))
+/* PF_FNORM and PF_FQUANT are the FINAL norm and the classifier's input quantize. They are separate
+ * slots because they run once per token while PF_RMSNORM and PF_QUANT run once per layer, and the
+ * whole point of this instrumentation is to split per-layer cost from fixed cost. Keep this enum
+ * byte-identical to the one in bench/bench_forward.c -- they are matched by ordinal. */
 enum { PF_EMBED, PF_RMSNORM, PF_QUANT, PF_QKV, PF_ROPE, PF_KVWRITE,
-       PF_ATTN, PF_SOFTMAX, PF_FFN, PF_CLS, PF_N };
+       PF_ATTN, PF_SOFTMAX, PF_FFN, PF_CLS, PF_FNORM, PF_FQUANT, PF_N };
 uint32_t tlm_prof[PF_N];
 int      tlm_prof_layers = -1;        /* -1 = all; otherwise run only this many layers */
 static uint32_t _pf_t0;
@@ -556,8 +570,13 @@ float* forward(Transformer* transformer, int token, int pos) {
     }
 #else
     memcpy(x, w->token_embedding_table + token*dim, dim * sizeof(float));
-    PF_END(PF_EMBED);
 #endif
+    /* OUTSIDE the _TINSPIRE branch. It used to sit inside the #else, so on the only target that
+     * matters the embedding stage accumulated NOTHING and reported 0 ticks forever -- while
+     * _pf_t0, set just above, was silently discarded by the next PF_BEG(). Embedding is one of the
+     * three FIXED stages the intercept cross-check is built from, so a permanent zero there does
+     * not read as a broken instrument; it reads as "embedding is free". */
+    PF_END(PF_EMBED);
 
     // forward all the layers
 #ifdef TLM_PROFILE
@@ -742,11 +761,17 @@ float* forward(Transformer* transformer, int token, int pos) {
         }
     }
 
-    // final rmsnorm
-    PF_BEG(); rmsnorm(x, x, w->rms_final_weight, dim); PF_END(PF_RMSNORM);
+    /* final rmsnorm -- its OWN slot, not PF_RMSNORM.
+     *
+     * These two run ONCE per token, not once per layer, so they belong in the intercept. Folding
+     * them into PF_RMSNORM/PF_QUANT -- which bench_forward.c's PER_LAYER[] marks per-layer -- made
+     * FIXED_stages_us short by exactly these two stages, guaranteeing that the CROSS_CHECK against
+     * the regression intercept would fail. The bench treats that disagreement as a finding about
+     * the machine; it would have been a finding about the accounting. */
+    PF_BEG(); rmsnorm(x, x, w->rms_final_weight, dim); PF_END(PF_FNORM);
 
     // classifier into logits
-    PF_BEG(); quantize(&s->xq, x, dim); PF_END(PF_QUANT);
+    PF_BEG(); quantize(&s->xq, x, dim); PF_END(PF_FQUANT);
     PF_BEG();
     matmul(s->logits, &s->xq, w->wcls, dim, p->vocab_size);
     PF_END(PF_CLS);

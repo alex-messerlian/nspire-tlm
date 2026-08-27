@@ -36,26 +36,37 @@
 #include "../src/store/loader.h"
 #include <stdint.h>
 
-/* runq_nspire.c and nspire.c log through this; the app defines it, a bench must too. */
+/* runq_nspire.c and nspire.c log through this; the app defines it, a bench must too.
+ *
+ * ASSIGNED IN main(), not left at 0. Leaving it NULL is what cost three device passes: every
+ * failure path from rq_build() reports through fprintf(stderr,...) -- routed to the SCREEN by
+ * nspire_screen.h and to nowhere else -- and every load STEP trace in nspire.c is guarded by
+ * `if (g_nspire_log)`. The operator pulls the log, not the screen. So the log recorded the header,
+ * the model path, and then nothing at all, three sessions running, which is indistinguishable from
+ * a hang and told us nothing about which of half a dozen exit() paths had fired. */
 FILE *g_nspire_log = 0;
 
 extern void  rq_build(const char *path);
+extern int   rq_probe(const char *path, char *why, int cap);
 extern float *rq_forward(int token, int pos);
 extern int   rq_vocab(void);
 extern void  rq_free(void);
 
-/* provided by the profile build of runq_nspire.c */
+/* provided by the profile build of runq_nspire.c. Matched to that enum BY ORDINAL -- if you add a
+ * slot there, add it here, in the same position. */
 enum { PF_EMBED, PF_RMSNORM, PF_QUANT, PF_QKV, PF_ROPE, PF_KVWRITE,
-       PF_ATTN, PF_SOFTMAX, PF_FFN, PF_CLS, PF_N };
+       PF_ATTN, PF_SOFTMAX, PF_FFN, PF_CLS, PF_FNORM, PF_FQUANT, PF_N };
 extern uint32_t tlm_prof[PF_N];
 extern int      tlm_prof_layers;
 
 static const char *PFN[PF_N] = {
     "embedding", "rmsnorm", "quantize", "qkv matmul", "RoPE", "kv write",
-    "attention", "softmax", "ffn matmul", "classifier"
+    "attention", "softmax", "ffn matmul", "classifier", "final norm", "final quant"
 };
-/* Which stages are PER LAYER. The rest land in the intercept. */
-static const int PER_LAYER[PF_N] = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
+/* Which stages are PER LAYER. The rest land in the intercept.
+ * `final norm` and `final quant` are 0: they run once per token, and counting them as per-layer is
+ * what used to make FIXED_stages_us short by two stages and the CROSS_CHECK fail by construction. */
+static const int PER_LAYER[PF_N] = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 };
 
 #define WARM 3
 #define REPS 12
@@ -81,7 +92,38 @@ int main(void) {
         return 1;
     }
     bench_result("model", "%s", MODEL);
+
+    /* ---- 0. PROBE BEFORE BUILDING. -------------------------------------------------------------
+     *
+     * rq_build() reaches read_checkpoint(), which exit()s on EVERY failure path -- bad magic, wrong
+     * version, GS mismatch, size mismatch, failed map -- and reports each one through
+     * fprintf(stderr,...). Under Ndless that reaches the screen at best. A process that vanishes
+     * after printing the model path is indistinguishable from a hang, and that ambiguity is exactly
+     * what has held this measurement for three device passes.
+     *
+     * rq_probe() exists for this and allocates nothing. src/store/device_app.c has called it at
+     * startup since the app was written; this bench was the one caller that walked straight into
+     * the exit() path with no instrument attached. */
+    g_nspire_log = bench_log();          /* BEFORE any engine call, so its traces reach the file */
+    bench_result("log_routed", "%s", g_nspire_log ? "yes -- engine traces will appear below"
+                                                  : "NO -- bench log not open, engine will be silent");
+
+    {   char why[128] = { 0 };
+        int bad = rq_probe(MODEL, why, sizeof why);
+        bench_result("probe", "%s", bad ? why : "ok");
+        if (bad) {
+            /* "Cannot measure" and "measured" must never share an output. */
+            bench_result("RESULT", "%s", "ABORTED -- the checkpoint is unloadable, see probe= above. "
+                                         "No timing was taken. This is not a slow run or a hang.");
+            g_nspire_log = 0;
+            bench_close();
+            return 1;
+        }
+    }
+
+    bench_result("stage", "%s", "rq_build: entering read_checkpoint + malloc_run_state");
     rq_build(MODEL);
+    bench_result("stage", "%s", "rq_build: returned");
     int V = rq_vocab();
     bench_result("vocab", "%d", V);
 
@@ -89,7 +131,9 @@ int main(void) {
     timer_acquire(&tm, TIMER_32K_BASE);
 
     /* ---- 1. the intercept, by varying L on one checkpoint ---------------------------------- */
-    bench_result("probe", "%s", "time per token vs layer count, same weights");
+    /* Key renamed from "probe": `probe=` is now the checkpoint probe's verdict, and two different
+     * facts sharing a log key is how a grep for one silently returns the other. */
+    bench_result("part1", "%s", "time per token vs layer count, same weights");
     uint32_t per_L[8];
     int Lmax = 6;                       /* the ship config; find_model gives d288 L6 */
     for (int L = 1; L <= Lmax; L++) {
@@ -148,14 +192,28 @@ int main(void) {
                  (unsigned long)((uint64_t)total * 1000000u / 32768u));
     bench_result("unattributed", "%ld ticks -- loop overhead and anything not instrumented",
                  (long)total - (long)sum);
-    bench_result("FIXED_stages_us", "%lu -- embedding + final norm + classifier",
+    bench_result("FIXED_stages_us", "%lu -- embedding + final norm + final quant + classifier",
                  (unsigned long)((uint64_t)fixed_sum * 1000000u / 32768u));
-    bench_result("CROSS_CHECK", "%s",
+    /* per_layer_sum was computed and never reported -- a second cross-check, already paid for.
+     * The regression's SLOPE is cost per layer; this sum divided by n_layers is the same quantity
+     * measured a different way. They agree only if per-layer cost is actually uniform across
+     * layers, which is the "linear in L" assumption RESTRUCTURE_TABLES.md's whole parameter table
+     * rests on and which nothing has ever tested. */
+    bench_result("PERLAYER_stages_us", "%lu total over %d layers = %lu us/layer",
+                 (unsigned long)((uint64_t)per_layer_sum * 1000000u / 32768u), Lmax,
+                 (unsigned long)((uint64_t)per_layer_sum * 1000000u / 32768u / (unsigned)Lmax));
+    bench_result("CROSS_CHECK_1", "%s",
         "FIXED_stages_us should equal INTERCEPT_us. A disagreement means the model of the "
         "forward pass is wrong, and that is the finding.");
+    bench_result("CROSS_CHECK_2", "%s",
+        "PERLAYER_stages_us/layer should equal per_layer_us from the regression. A disagreement "
+        "means per-layer cost is NOT uniform in L, which is the table's load-bearing assumption.");
 
     timer_release(&tm);
     rq_free();
+    /* Drop the engine's handle BEFORE bench_close() fcloses it; a dangling FILE* here would be a
+     * use-after-free on the next engine log line, on a device with no fault handler. */
+    g_nspire_log = 0;
     bench_close();
     return 0;
 }

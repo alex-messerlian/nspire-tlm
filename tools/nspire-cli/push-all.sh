@@ -95,6 +95,40 @@ if [ "$GS_WANT" != "$GS_HAVE" ]; then
 fi
 echo "  GS gate: checkpoint and binary both GS=$GS_WANT"
 
+# ---- STALENESS GATE --------------------------------------------------------------------------
+# Refuse to push a program older than the source it was built from.
+#
+# THE GS GATE'S SIBLING, and it has cost as much. bench_forward.tns was built once by a hand-typed
+# cross-compile line -- nothing in the repo produced it -- so an edit to bench_forward.c or to
+# runq_nspire.c's profiling block left a stale binary in place that pushed, ran, and reported the
+# old behaviour. A stale artefact satisfies every consumer; that is what makes it worse than a
+# missing one. `make bench` from the repo root now builds these; this refuses to ship what it did
+# not build.
+stale=0
+newer_than() {   # newer_than <artefact> <source>...
+    art=$1; shift
+    [ -f "$art" ] || { echo "  MISSING: $art -- run: make bench"; stale=1; return; }
+    for s in "$@"; do
+        if [ "$s" -nt "$art" ]; then
+            echo "  STALE: $art is older than $s"; stale=1
+        fi
+    done
+}
+newer_than bench/bench_forward.tns bench/bench_forward.c bench/common.h src/runq_nspire.c src/nspire.c
+newer_than bench/bench_cas.tns      bench/bench_cas.c bench/common.h
+newer_than bench/bench_platform.tns bench/bench_platform.c bench/common.h
+newer_than bench/bench_mem.tns      bench/bench_mem.c bench/common.h
+newer_than bench/bench_mac.tns      bench/bench_mac.c bench/common.h
+newer_than bench/bench_flash.tns    bench/bench_flash.c bench/common.h
+newer_than bench/bench_rtc.tns      bench/bench_rtc.c bench/common.h
+newer_than build/chattlm.tns        $(echo src/store/*.c src/store/*.h src/runq_nspire.c src/nspire.c)
+if [ "$stale" -ne 0 ]; then
+    echo "  FATAL: at least one program is stale or missing. Run 'make bench' and 'make device',"
+    echo "         then re-run this script. Pushing a stale binary measures the previous session."
+    exit 1
+fi
+echo "  staleness gate: every program is newer than its sources"
+
 echo "--- programs ---"
 send tools/eval/eval_device.tns  /eval_device.tns
 send src/llama2.tns              /llama2.tns

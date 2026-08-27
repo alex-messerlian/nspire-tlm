@@ -13,6 +13,30 @@ set -u
 STORE="${1:-corpus/store_clean.json}"
 PY=.venv-tok/bin/python
 fail=0
+
+# ---- PREREQUISITES, NAMED --------------------------------------------------------------------
+# The suite already separates exit 2 (CANNOT CHECK) from a real assertion failure. It did NOT
+# separate a MISSING INTERPRETER or a MISSING INPUT, and both surface as an ordinary FAIL: in a
+# fresh worktree, `.venv-tok/` and `build/store.tns` are gitignored and absent, so nine gates
+# reported FAIL while every one of them passes the moment its input exists. That is the suite's own
+# stated rule -- "cannot check and checked-and-clean must never share an exit status" -- violated
+# one level up, at the prerequisites rather than at the gates.
+#
+# A missing prerequisite is still a non-zero exit. It is not a pass. It is just not a FINDING, and
+# reporting it as one sends the reader looking for a defect in the records.
+prereq_missing=0
+need_file() {   # need_file <path> <how to make it>
+    [ -e "$1" ] || { printf "  %-20s PREREQUISITE MISSING: %s\n" "$(basename "$1")" "$2"; prereq_missing=1; }
+}
+need_file "$PY"              "python3 -m venv .venv-tok && .venv-tok/bin/pip install -r requirements.txt"
+need_file "$STORE"           "the record store; pass a path as \$1 if it lives elsewhere"
+need_file build/store.tns    "python3 tools/store_pack.py $STORE build/store.tns"
+need_file build/tok4096.tok  "python3 tools/tok_pack.py"
+if [ "$prereq_missing" -ne 0 ]; then
+    echo "GATE SUITE DID NOT RUN -- prerequisites above are missing."
+    echo "This is NOT a gate failure. Nothing was checked. Create them and re-run."
+    exit 3
+fi
 for g in lhs_gate lint_leibniz lint_declaration lint_fused_words dim_gate; do
     out=$($PY "tools/eval/$g.py" "$STORE" 2>&1); rc=$?
     case $rc in

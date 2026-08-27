@@ -99,6 +99,42 @@ $(BUILD)/chattlm.tns: $(DEV_SRC) $(EVAL_CORE) | $(BUILD)
 	 rm -f $(BUILD)/chattlm.zehn && \
 	 echo "  $@  $$(wc -c < $@ | tr -d ' ') bytes"
 
+# ---- benches ---------------------------------------------------------------------------------
+# WHY THESE LIVE HERE AND NOT IN bench/Makefile. bench/Makefile's BENCHES list names four programs
+# and its pattern rule compiles exactly `$< + nspire_screen.c`. bench_rtc and bench_cas are absent
+# from the list but at least buildable by that rule; bench_forward is NEITHER listed NOR buildable
+# by it, because it links the inference engine. So nothing in the repo produced bench_forward.tns.
+# It existed only because a multi-file cross-compile line had been typed into a shell once -- the
+# exact situation the header of this file was written to end, reproduced in the bench tree.
+#
+# bench_forward additionally needs -DTLM_PROFILE. Without it `tlm_prof` and `tlm_prof_layers` do not
+# exist (src/runq_nspire.c:505) and the link fails, which is the good case; the bad case is someone
+# adding a stub to make the link succeed and then measuring a forward pass with no instrumentation.
+BENCH_PLAIN := bench_platform bench_mem bench_mac bench_flash bench_rtc bench_cas
+BENCHFLAGS  := -O2 -Wall -Wextra -std=gnu99 -marm -mcpu=arm926ej-s -Iinclude -Isrc -Isrc/store \
+               -Ivendor/Ndless/ndless-sdk/thirdparty/nspire-io/include
+
+.PHONY: bench
+bench: $(addprefix bench/,$(addsuffix .tns,$(BENCH_PLAIN))) bench/bench_forward.tns
+
+bench/%.elf: bench/%.c bench/common.h include/nspire_screen.c
+	@PATH="$(DEVPATH)"; export PATH; \
+	 nspire-gcc $(BENCHFLAGS) $< include/nspire_screen.c -o $@ -lnspireio
+
+# The engine sources are real prerequisites: an edit to runq_nspire.c's profiling block must rebuild
+# this, or the device runs an instrument that does not match the enum bench_forward.c declares.
+bench/bench_forward.elf: bench/bench_forward.c bench/common.h src/runq_nspire.c src/nspire.c \
+                         include/nspire_screen.c
+	@PATH="$(DEVPATH)"; export PATH; \
+	 nspire-gcc $(BENCHFLAGS) -DTLM_PROFILE -o $@ \
+	   bench/bench_forward.c src/runq_nspire.c src/nspire.c include/nspire_screen.c -lnspireio -lm
+
+bench/%.tns: bench/%.elf
+	@PATH="$(DEVPATH)"; export PATH; \
+	 genzehn --input $< --output $@.zehn --name $* && \
+	 make-prg $@.zehn $@ && rm -f $@.zehn && \
+	 echo "  $@  $$(wc -c < $@ | tr -d ' ') bytes"
+
 # ---- gates -----------------------------------------------------------------------------------
 # Builds first, so "not built" can never be mistaken for a passing suite.
 check: tests

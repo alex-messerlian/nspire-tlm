@@ -169,6 +169,15 @@ static inline void bench_open(const char *bench_name) {
     }
 }
 
+/* The open log handle, for benches that link code with its OWN logging seam.
+ *
+ * src/nspire.c and src/runq_nspire.c write their load traces and their out-of-memory report to
+ * `g_nspire_log`, guarded by `if (g_nspire_log)`. A bench that links them and leaves that pointer
+ * NULL discards every one of those lines -- which is what bench_forward did for three device passes,
+ * producing a log that stopped dead after the model path with no way to tell an exit() from a hang.
+ * Returns NULL before bench_open() and after bench_close(); callers must re-clear their copy. */
+static inline FILE *bench_log(void) { return g_log; }
+
 /* Every result line carries its own units and conditions. A bare number is not a result. */
 static inline void bench_result(const char *key, const char *fmt, ...) {
     va_list ap;
