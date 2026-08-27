@@ -122,9 +122,24 @@ newer_than bench/bench_mac.tns      bench/bench_mac.c bench/common.h
 newer_than bench/bench_flash.tns    bench/bench_flash.c bench/common.h
 newer_than bench/bench_rtc.tns      bench/bench_rtc.c bench/common.h
 newer_than build/chattlm.tns        $(echo src/store/*.c src/store/*.h src/runq_nspire.c src/nspire.c)
+# These two have their own Makefiles (tools/eval/, src/) and are NOT built by the repo-root `make`.
+# They were absent from a fresh worktree while push-all.sh sent them unconditionally under `set -e`,
+# so the transfer would have aborted mid-run after the device had already been half-written. Named
+# here so the failure arrives BEFORE anything is sent, with the command that fixes it.
+newer_than tools/eval/eval_device.tns tools/eval/device_main.c tools/eval/eval.h
+newer_than src/llama2.tns             src/nspire_main.c src/runq_nspire.c src/nspire.c
+newer_than build/transfer/store.tns.tns     corpus/store_clean.json
+newer_than build/transfer/tok4096.tok.tns   build/tok4096.tok
 if [ "$stale" -ne 0 ]; then
-    echo "  FATAL: at least one program is stale or missing. Run 'make bench' and 'make device',"
-    echo "         then re-run this script. Pushing a stale binary measures the previous session."
+    echo "  FATAL: at least one program is stale or missing. Pushing a stale binary measures the"
+    echo "         previous session. Rebuild everything the transfer set needs:"
+    echo "           make bench && make device"
+    echo "           (cd tools/eval && make eval_device.tns)      # its own Makefile"
+    echo "           (cd src       && make llama2.tns)            # its own Makefile"
+    echo "           python3 tools/store_pack.py corpus/store_clean.json build/store.tns"
+    echo "           cp build/store.tns build/transfer/store.tns.tns"
+    echo "           cp build/tok4096.tok build/transfer/tok4096.tok.tns"
+    echo "         then re-run this script."
     exit 1
 fi
 echo "  staleness gate: every program is newer than its sources"
