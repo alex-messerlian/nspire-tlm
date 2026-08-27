@@ -19,7 +19,7 @@ which would make the suite call itself. Meta-check, like gate_mutation.py and po
   python3 tools/eval/gate_controls.py            every gate
   python3 tools/eval/gate_controls.py NAME ...   just these
 """
-import os, pathlib, re, subprocess, sys
+import atexit, os, pathlib, re, signal, subprocess, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 os.chdir(ROOT)
@@ -110,6 +110,31 @@ def run_gate(name):
             return parts[1]
     return "ABSENT"
 
+# A KILLED MUTATION RUN MUST NOT LEAVE THE TREE MUTATED. The `finally` below restores the source,
+# and a two-minute timeout killed this script mid-mutation with genloop.py's <res> ban still
+# replaced by `pass`. The gate suite caught it on the next run, which is the system working -- but a
+# mutation harness that can leave the repo broken is a hazard of its own. Every touched file is
+# registered here and restored by atexit AND by a signal handler, so SIGTERM and SIGINT unwind too.
+_ORIGINALS = {}
+
+def _restore_all():
+    for path, text in list(_ORIGINALS.items()):
+        try:
+            if pathlib.Path(path).read_text() != text:
+                pathlib.Path(path).write_text(text)
+                print(f"  restored {path} (interrupted mid-mutation)", file=sys.stderr)
+        except Exception:
+            pass
+    _ORIGINALS.clear()
+
+atexit.register(_restore_all)
+for _sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+    try:
+        signal.signal(_sig, lambda *_a: (_restore_all(), sys.exit(130)))
+    except Exception:
+        pass
+
+
 def main():
     want = sys.argv[1:]
     roster = gates_in_suite() + [k for k in CONTROLS if k in ALIAS]
@@ -132,6 +157,7 @@ def main():
             continue
         path, find, repl = spec
         f = pathlib.Path(path); original = f.read_text()
+        _ORIGINALS[path] = original
         if find not in original:
             print(f"  STALE CONTROL  {name}: the text it mutates is gone from {path}")
             failures.append(name); continue
@@ -141,6 +167,7 @@ def main():
             verdict = run_gate(name)
         finally:
             f.write_text(original)
+            _ORIGINALS.pop(path, None)
             subprocess.run(["make", "-s", "tests"], capture_output=True)
         ok = verdict in ("FAIL", "CANNOT")
         print(f"  {'caught  ' if ok else 'SURVIVED'} {name:18} (reverted -> {verdict})")
