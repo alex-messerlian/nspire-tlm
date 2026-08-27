@@ -32,6 +32,9 @@ CONTROLS = {
                         "if (nodecmp(cw, cg) == 0) return TLM_SHAPE_OK;", "if (1) return TLM_SHAPE_OK;"),
     "test_shapecheck": ("src/store/shapecheck.c",
                         "if (nodecmp(cw, cg) == 0) return TLM_SHAPE_OK;", "if (1) return TLM_SHAPE_OK;"),
+    "test_score":      ("tools/eval/score.py",
+                        '                 and r["prov_clean"] is True and r["shape"] != "mismatch")',
+                        "                 )"),
     "test_prov":       ("tools/eval/provenance.c",
                         "int prov_call_unsourced(const char *doc, double *first) {",
                         "int prov_call_unsourced(const char *doc, double *first) { (void)doc;(void)first; return 0; }\n"

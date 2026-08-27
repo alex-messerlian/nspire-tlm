@@ -61,7 +61,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -104,6 +104,13 @@ $(BUILD)/test_shapecheck: tools/eval/test_shapecheck.c src/store/shapecheck.c sr
 
 # The CLI both Python graders call. WIRING_AUDIT records that two separate graders exist, so a check
 # added once covers half the surface; this is what lets both call the same C.
+# provcli is what grade.py, select_run.py and score.py all shell out to -- the single most-called
+# check in the repo -- and it was a COMMITTED BINARY that no rule rebuilt. A fix to provenance.c
+# never reached it; every provenance number in this repo came from whatever was compiled at some
+# past moment. Same defect as the four store suites and test_prov, on the check that matters most.
+tools/eval/provcli: tools/eval/provcli.c tools/eval/provenance.c tools/eval/eval.h | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< tools/eval/provenance.c -lm
+
 tools/eval/shapecli: tools/eval/shapecli.c src/store/shapecheck.c src/store/shapecheck.h $(EVAL_CORE)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/shapecheck.c $(EVAL_CORE) -lm
 
@@ -175,6 +182,6 @@ check: tests
 	@bash tools/eval/run_gates.sh
 
 clean:
-	rm -f tools/eval/shapecli
+	rm -f tools/eval/shapecli tools/eval/provcli
 	rm -f $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app $(BUILD)/hoststub.[co] \
 	      $(BUILD)/chattlm.elf $(BUILD)/chattlm.zehn

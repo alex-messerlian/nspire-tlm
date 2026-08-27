@@ -59,6 +59,11 @@ $PY tools/eval/shape_mutation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "sha
 # guard is executable and mutation-tested in both directions, which is what makes it hold". It was
 # never listed here, so the guard that documentation could not provide was itself ungated.
 $PY tools/eval/test_genloop.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_genloop" || { printf "  %-20s FAIL\n" "test_genloop"; fail=1; }
+# score.py is the FOURTH grader -- it scores the 200-item eval set and was in no gate. It graded the
+# executed result against the recorded reference and nothing else, so a call that invented its
+# operands and landed on the right number passed. test_score also asserts that score.py and grade.py
+# AGREE, because two graders means every check has to be added twice or it covers half the surface.
+$PY tools/eval/test_score.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_score" || { printf "  %-20s FAIL\n" "test_score"; fail=1; }
 # The generator may only emit relations the CLEANED store contains. docs/RESULT_STORE_CLEANING.md
 # deleted 34 records for documented reasons and units_train.json was never re-cleaned; a change that
 # made units_train the iterated set silently re-admitted 24 of them, three named "Strategy".

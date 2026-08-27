@@ -20,7 +20,22 @@
 static int scan_nums(const char *s, const char *end, double *out, int *sig, int max) {
     int n = 0;
     for (const char *p = s; p < end && n < max; ) {
-        if (!isdigit((unsigned char)*p) && !(*p == '-' && isdigit((unsigned char)p[1]))) { p++; continue; }
+        /* A '-' is a SIGN only where a value can start. After a digit, a ')' or an identifier it is
+         * the SUBTRACTION OPERATOR, and reading it as a sign made the subtrahend a negative literal
+         * that matches nothing: `eval((26-8)/6)` against a question saying "8 m/s to 26 m/s" scanned
+         * -8, reported it unsourced, and failed a correct call. Every relation with a subtraction
+         * was affected -- 21 of 167 in the store, and the eval set's uniform-acceleration,
+         * first-law and beat-frequency items among them.
+         *
+         * Found by making test_score.py's end-to-end control reachable: it had an early sys.exit
+         * above it and had never run. */
+        int sign_ok = 1;
+        if (*p == '-' && p > s) {
+            char prev = p[-1];
+            if (isdigit((unsigned char)prev) || prev == ')' || prev == '.' ||
+                isalpha((unsigned char)prev) || prev == '_') sign_ok = 0;
+        }
+        if (!isdigit((unsigned char)*p) && !(*p == '-' && sign_ok && isdigit((unsigned char)p[1]))) { p++; continue; }
         char *e; double v = strtod(p, &e);
         if (e == p) { p++; continue; }
         int d = 0, seen = 0;                       /* significant figures actually written */

@@ -907,7 +907,7 @@
   "q": "A 340 m/s wave has wavelength 0.85 m. Find the frequency.",
   "record": "v=f*lambda | v:m/s f:Hz lambda:m | missing:none | lambda is wavelength | fit:high",
   "calls": [
-   "<tool>solve<arg>v=f*L<arg>f</tool>",
+   "<tool>solve<arg>v=f*lambda<arg>f</tool>",
    "<tool>eval<arg>340/0.85</tool>"
   ],
   "expect": "answer",
@@ -937,7 +937,7 @@
   "q": "A pressure of 5000 Pa acts over 0.06 m^2. Find the force.",
   "record": "p=F/A | p:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
-   "<tool>solve<arg>P=F/A<arg>F</tool>",
+   "<tool>solve<arg>p=F/A<arg>F</tool>",
    "<tool>eval<arg>5000*0.06</tool>"
   ],
   "expect": "answer",
@@ -952,7 +952,7 @@
   "q": "A spring exerts 30 N when stretched 0.12 m. Find k.",
   "record": "F=-k*x | F:N k:N/m x:m | missing:none | Hooke's law, within elastic limit | fit:high",
   "calls": [
-   "<tool>solve<arg>F=k*x<arg>k</tool>",
+   "<tool>solve<arg>F=-k*x<arg>k</tool>",
    "<tool>eval<arg>30/0.12</tool>"
   ],
   "expect": "answer",
@@ -1027,7 +1027,7 @@
   "q": "A wave of frequency 500 Hz has speed 1500 m/s. Find the wavelength.",
   "record": "v=f*lambda | v:m/s f:Hz lambda:m | missing:none | lambda is wavelength | fit:high",
   "calls": [
-   "<tool>solve<arg>v=f*L<arg>L</tool>",
+   "<tool>solve<arg>v=f*lambda<arg>lambda</tool>",
    "<tool>eval<arg>1500/500</tool>"
   ],
   "expect": "answer",
@@ -1762,7 +1762,7 @@
   "q": "Solve v=f*L for L.",
   "record": "v=f*lambda | v:m/s f:Hz lambda:m | missing:none | lambda is wavelength | fit:high",
   "calls": [
-   "<tool>solve<arg>v=f*L<arg>L</tool>"
+   "<tool>solve<arg>v=f*lambda<arg>lambda</tool>"
   ],
   "expect": "symbolic",
   "ref": [
@@ -1801,7 +1801,7 @@
   "q": "Solve P=F/A for A.",
   "record": "p=F/A | p:Pa F:N A:m^2 | missing:none | force normal to area | fit:high",
   "calls": [
-   "<tool>solve<arg>P=F/A<arg>A</tool>"
+   "<tool>solve<arg>p=F/A<arg>A</tool>"
   ],
   "expect": "symbolic",
   "ref": [
@@ -1840,7 +1840,7 @@
   "q": "Solve F=k*x for x.",
   "record": "F=-k*x | F:N k:N/m x:m | missing:none | Hooke's law, within elastic limit | fit:high",
   "calls": [
-   "<tool>solve<arg>F=k*x<arg>x</tool>"
+   "<tool>solve<arg>F=-k*x<arg>x</tool>"
   ],
   "expect": "symbolic",
   "ref": [

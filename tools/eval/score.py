@@ -72,6 +72,8 @@ def equivalent(expr_a, expr_b, trials=12, seed=0):
         if close(as_num(ra), as_num(rb), rel=1e-9): agree += 1
     return usable >= trials // 2 and agree == usable
 
+import grade as _grade   # THE shared grader. score.py is the SECOND one; they must agree.
+
 def score(item, output):
     """item: dict from the eval set. output: the model transcript for that item."""
     cat = item["id"].split("-")[0].rstrip("0123456789")
@@ -136,7 +138,27 @@ def score(item, output):
     # tolerance was never exercised before: the question-leak bug above was passing these.
     r["answer_stated"] = any(_sig_eq(v, ref, t) for v, t in _nums(prose))
     r["refused"] = bool(REFUSAL_RE.search(prose))
-    r["pass"] = r["call_result_correct"] and r["answer_stated"] and not r["refused"]
+
+    # PROVENANCE AND SHAPE. This scorer graded the executed result against the RECORDED reference
+    # and nothing else, so a call that INVENTS its operands and happens to land on the right number
+    # passed: for reference 12, `eval(3*4)` against `v=d/t | d=84 t=7` scored True here while
+    # grade.py scored it provenance-unclean AND shape-mismatch. That is the exact failure the
+    # architecture exists to prevent, passing the grader for the 200-item eval set.
+    #
+    # WHY IT WAS MISSING is the structural half: this is a SECOND grader. docs/WIRING_AUDIT.md
+    # records that "with two graders every check has to be added twice or it silently covers half
+    # the surface" -- provenance was added to grade.py and to select_run.py, and this one was not
+    # in the audit's list at all.
+    doc = output if "<q>" in output else None
+    if doc:
+        r["prov_clean"] = _grade.prov_clean(doc)
+        r["shape"] = _grade.shape_status(doc)
+    else:
+        # A transcript with no question span cannot be sourced. Not clean -- unknown, and said so.
+        r["prov_clean"] = None
+        r["shape"] = "unchecked"
+    r["pass"] = (r["call_result_correct"] and r["answer_stated"] and not r["refused"]
+                 and r["prov_clean"] is True and r["shape"] != "mismatch")
     return r
 
 def aggregate(rows, items):
