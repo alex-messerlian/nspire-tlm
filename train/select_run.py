@@ -42,6 +42,9 @@ RES_O,RES_C,ENDT,TOOLC=(tk.token_to_id(t) for t in ("<res>","</res>","<end>","</
 
 # ---- train -----------------------------------------------------------------------------
 import math
+from lossmask import masked_targets   # THE loss mask, TOOL_SPEC s1. One definition:
+# eight trainers each carried a copy of this loop and every copy leaked 38.7% of each
+# result span into the loss. See train/lossmask.py.
 args=ModelArgs(dim=DIM,n_layers=LAYERS,n_heads=HEADS,n_kv_heads=HEADS,
                vocab_size=V,max_seq_len=SEQ,dropout=0.0)
 m=Transformer(args).to(dev)
@@ -56,14 +59,7 @@ for s in range(STEPS):
     i=np.random.randint(0,len(tr)-SEQ-1,BS)
     x=np.stack([tr[j:j+SEQ] for j in i]).astype(np.int64)
     y=np.stack([tr[j+1:j+1+SEQ] for j in i]).astype(np.int64)
-    msk=np.zeros_like(y)
-    for rr in range(BS):
-        ins=False
-        for c in range(SEQ):
-            if x[rr,c]==RES_O: ins=True
-            elif x[rr,c]==RES_C: ins=False
-            elif ins: msk[rr,c]=1
-    xb=torch.from_numpy(x).to(dev); yb=torch.from_numpy(np.where(msk==1,-100,y)).to(dev)
+    xb=torch.from_numpy(x).to(dev); yb=torch.from_numpy(masked_targets(y, RES_O, RES_C)).to(dev)
     _=m(xb,yb); l=m.last_loss
     opt.zero_grad(set_to_none=True); l.backward()
     torch.nn.utils.clip_grad_norm_(m.parameters(),1.0); opt.step()

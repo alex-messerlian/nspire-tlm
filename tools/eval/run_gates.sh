@@ -68,6 +68,11 @@ $PY tools/eval/gate_store_authority.py >/dev/null 2>&1 && printf "  %-20s PASS\n
 # on every prompt. EXPERIMENT_PLAN records this skew as fixed -- the five-field skeleton was
 # unified, the units field was not, and nothing compared them afterwards.
 $PY tools/eval/gate_format_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "format_parity" || { printf "  %-20s FAIL\n" "format_parity"; fail=1; }
+# THE LOSS MASK -- TOOL_SPEC s1, "the one rule that matters most". It was an inline loop copied into
+# eight trainers with no function, no test and no gate, and every copy leaked 38.7% of each result
+# span into the loss: the model was trained to predict the leading digits of values it is supposed
+# to READ. Also refuses a ninth copy.
+$PY train/test_lossmask.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_lossmask" || { printf "  %-20s FAIL\n" "test_lossmask"; fail=1; }
 # tools/eval/prov_mutation.py is deliberately NOT listed here. It rebuilds and re-runs THIS SCRIPT
 # once per mutation, so listing it makes the suite call itself -- which is what happened on the
 # first attempt: infinite recursion, killed at the two-minute timeout. It is a meta-check and runs
