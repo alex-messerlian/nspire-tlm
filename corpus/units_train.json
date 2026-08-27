@@ -2146,5 +2146,16 @@
   "scope": "canonical",
   "source": "hand",
   "note": "solvable for d, vi, a; t requires the numeric route (symbolic quadratic is E3, descoped)"
+ },
+ {
+  "f": "v=f*lambda",
+  "name": "Velocity of a wave",
+  "units": {
+   "v": "m/s",
+   "f": "Hz",
+   "lambda": "m"
+  },
+  "scope": "m58382",
+  "source": "store: core relation the eval set tests 7 times, annotated from the hand-curated store entry rather than re-derived"
  }
 ]
