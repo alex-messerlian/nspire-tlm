@@ -59,18 +59,46 @@ if __name__ == "__main__":
         # ABSENCE IS FAILURE: a table that recognised nothing would report a perfect zero.
         print("CANNOT CHECK: no given matched a quantity in the range table"); sys.exit(2)
 
-    # POSITIVE CONTROL in-run: the table must be able to fire.
-    probe = {"f": "y=x*sin(theta)", "name": "probe", "units": {"theta": "1", "x": "m", "y": "m"}}
-    rr = m.quantity_range(probe, "theta")
-    if rr is None or 55.7 <= rr[1]:
-        print("\n  FAIL: the positive control was not caught -- an angle of 55.7 rad is accepted.")
+    # POSITIVE CONTROL, ON A REAL RECORD. It used to probe a SYNTHETIC record, which worked while
+    # the range was INFERRED from the formula and stopped working the moment ranges became
+    # DECLARED per (record, variable) -- a synthetic record has no declaration, correctly. A
+    # control that a change of architecture silently breaks was testing the mechanism, not the
+    # property; this one asks the shipped table about shipped records.
+    #
+    # Snell's law is the case A24 exists for: n_1 was dispatched to the ANGLE window by a
+    # positional heuristic while the refractive-index rule sat below it, unreached.
+    snell = next((r for r in m.recs if r["f"].startswith("theta_2=asin")), None)
+    if snell is None:
+        print("CANNOT CHECK: the Snell record is gone; re-point the positive control"); sys.exit(2)
+    n1, th1 = m.quantity_range(snell, "n_1"), m.quantity_range(snell, "theta_1")
+    if n1 is None or not (n1[0] == 1.0 and n1[1] == 4.0):
+        print(f"\n  FAIL: n_1 in Snell's law has range {n1}, not the refractive index [1, 4].")
+        print( "  That is the A24 misdispatch: an angle window claiming a refractive index.")
         sys.exit(1)
+    if th1 is None or th1[1] > 1.5709:
+        print(f"\n  FAIL: theta_1 in Snell's law has range {th1}; an incidence angle is [0, pi/2].")
+        sys.exit(1)
+    # ...and a value outside it must actually be rejected by the same code the loop uses.
+    if 55.7 <= th1[1]:
+        print("\n  FAIL: 55.7 rad is accepted as an incidence angle."); sys.exit(1)
 
     rate = bad / checked
+    # COVERAGE, REPORTED EVERY RUN. 62.9% of sampled (record, variable) pairs have NO declared
+    # range, and this gate says nothing about them. Printing the fraction on every run is the
+    # difference between a stated limit and an implied clean bill -- a reader who sees only "PASS"
+    # will believe the givens were checked.
+    pairs = [(r["f"], v) for r in m.recs
+             for v in sorted({x for x in m.VAR.findall(r["f"].split("=", 1)[1])} - {"pi", "e"})
+             if m._const_for(r, v) is None]
+    declared = sum(1 for f, v in pairs
+                   if m.quantity_range(next(r for r in m.recs if r["f"] == f), v) is not None)
+    print(f"  DECLARATION COVERAGE         {declared}/{len(pairs)} pairs "
+          f"({declared/len(pairs):.1%}) -- the remaining {len(pairs)-declared} are UNCHECKED, "
+          f"not verified")
     print(f"  givens with a known range    {checked:,}")
     print(f"  OUT OF PHYSICAL RANGE        {bad}  ({rate:.2%}, limit {LIMIT:.2%})")
     for var, val, nm, why in examples: print(f"      {var}={val} in {nm!r} -- {why}")
-    print(f"  positive control             55.7 rad as an angle IS rejected")
+    print(f"  positive control             Snell n_1 -> [1,4], theta_1 -> [0,pi/2]")
     if rate > LIMIT:
         print(f"\n  FAIL: {rate:.2%} of recognised givens are outside the range their quantity allows.")
         print( "  The arithmetic is right and the scenario does not exist; no other gate sees this.")

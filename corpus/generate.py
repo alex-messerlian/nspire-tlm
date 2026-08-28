@@ -132,25 +132,82 @@ def sample_value(rng, unit=None):
 # NARROW AND EXPLICIT, and the limit is the honest part: a variable this table does not recognise
 # is drawn as before. It is a list of quantities somebody has thought about, not a theory of
 # physical plausibility, and "not in the table" must not be read as "checked".
-# A VARIABLE IS AN ANGLE BECAUSE OF WHERE IT APPEARS, NOT WHAT IT IS CALLED. A symbol list had
-# `alpha`, and `alpha` is angular acceleration as often as it is an angle -- it constrained a
-# non-angle in `p=h/lambda` to 2*pi. The property is "this value is consumed as an angle", and the
-# formula says so directly: it is the argument of a trig function, or its unit is rad.
-_TRIG_ARG = re.compile(r"\b(?:sin|cos|tan|asin|acos|atan)\s*\(\s*([^)]*)\)")
+# A24. DECLARATION, NOT INFERENCE. THE CHAIN COULD DISPATCH TO THE WRONG RULE.
+#
+# quantity_range() was an ordered chain, first match wins, with an angle test on top asking whether
+# a variable sits inside a trig call's argument. The extractor was `\(\s*([^)]*)\)` and `[^)]*`
+# cannot match balanced parentheses, so on Snell's law
+#
+#     theta_2 = asin(((n_1*sin(theta_1))/(n_2)))
+#
+# it captured `((n_1*sin(theta_1)` and stopped. n_1 looked like a trig argument and got the ANGLE
+# window [0, 2*pi] -- while THE CORRECT RULE FOR IT, refractive index [1,4], sat twelve lines below
+# and was never reached. Measured: n_1 < 1 on 13.3% of Snell documents against 0% for n_2, the same
+# quantity in the same expression. n_1 = 0.019 asserts light at 52c inside the medium.
+#
+# DIFFERENT FROM EVERY OTHER FAILURE IN A6-A23. Those are ABSENCES -- a window never declared -- and
+# each is fixed by adding a row. This is a PRESENCE THAT IS WRONG: the row is there, and an audit
+# asking "does this variable have a window?" answers yes and moves on.
+#
+# AND THE OBVIOUS REPAIR INVERTS IT: with a balanced-paren extractor BOTH n_1 and n_2 sit inside
+# asin's argument, so both become angles. n_2 is correct today only because of the bug. Being
+# INSIDE a trig argument does not make a variable an angle; the heuristic is unsalvageable.
+#
+# So the inference is gone. A kind is DECLARED per (record, variable), or the unit fixes it
+# soundly, or it is UNCHECKED and counted. No chain remains to misdispatch, and the only failure
+# left is ABSENCE -- which is countable, and the count is printed on every gate run.
 
-# theta and phi ARE angle symbols by universal convention; alpha/beta/gamma are not, which is why
-# a symbol list failed before -- `alpha` is angular acceleration as often as an angle. Restricting
-# the symbolic rule to theta/phi and keeping the positional rule for everything else catches the
-# sector angle in `A=(1/2)*theta*r^2`, which is an angle in radians and is NOT a trig argument.
-_ANGLE_SYMS = {"theta", "phi", "Delta_theta", "Delta_phi"}
+_KIND_RANGE = {          # one range per kind, so two variables of a kind cannot drift apart
+    "angle_quadrant":   (0.0, 1.5708,  False, "an incidence, incline or launch angle is in [0, pi/2]"),
+    "angle_half":       (0.0, 3.14159, False, "an angle between two directions is in [0, pi]"),
+    "angle_turn":       (0.0, 6.28318, False, "an angle within one full turn"),
+    "angle_arc":        (0.0, 12.5664, False, "a swept angle, up to two full turns"),
+    "refractive_index": (1.0, 4.0,     False, "a refractive index below 1 implies light faster than c"),
+    "quantum_number":   (1.0, 12.0,    True,  "a quantum number is a small positive integer"),
+    "turns_count":      (1.0, 5000.0,  True,  "a transformer winding count is a positive integer"),
+    "dof":              (3.0, 7.0,     True,  "degrees of freedom of a gas molecule"),
+    "drag_coefficient": (0.04, 2.0,    False, "from a streamlined body to a flat plate"),
+}
 
-def _is_angle(rec, var):
-    unit = ((rec.get("units") or {}).get(var) or "").strip()
-    if unit == "rad": return True
-    if unit not in ("1", ""): return False
-    if var in _ANGLE_SYMS or re.fullmatch(r"(theta|phi)_[A-Za-z0-9]+", var): return True
-    return any(re.search(rf"(?<![A-Za-z0-9_]){re.escape(var)}(?![A-Za-z0-9_])", a)
-               for a in _TRIG_ARG.findall(rec["f"]))
+# Every DIMENSIONLESS sampled variable in the store, which is exactly where the unit cannot decide:
+# `1` covers angles, counts, indices and bare ratios. This is the complete enumeration; the
+# assertion further down fails if an entry stops matching a real (record, variable) pair.
+_KIND = {
+    ("E_n=-E_0*((1)/((n)^(2)))", "n"):                       "quantum_number",
+    ("K=(n)^(2)*E_1", "n"):                                  "quantum_number",
+    ("E=n*h*f", "n"):                                        "quantum_number",
+    ("lambda_n=((lambda)/(n))", "n"):                        "refractive_index",
+    ("h_i=(((n_2)/(n_1)))*h_o", "n_1"):                      "refractive_index",
+    ("h_i=(((n_2)/(n_1)))*h_o", "n_2"):                      "refractive_index",
+    ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_1"):     "refractive_index",
+    ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_2"):     "refractive_index",
+    ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "theta_1"): "angle_quadrant",
+    ("theta_r=theta_i", "theta_i"):                          "angle_quadrant",
+    ("Delta_l=d*sin(theta)", "theta"):                       "angle_quadrant",
+    ("N=m*g*cos(theta)", "theta"):                           "angle_quadrant",
+    ("T_tof=((2(v_0*sin(theta_0)))/(g))", "theta_0"):        "angle_quadrant",
+    ("a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))", "theta"): "angle_quadrant",
+    ("F=q*v*B*sin(theta)", "theta"):                         "angle_half",
+    ("A=((1)/(2))*theta*(r)^(2)", "theta"):                  "angle_turn",
+    ("M=((theta_image)/(theta_object))", "theta_image"):     "angle_turn",
+    ("M=((theta_image)/(theta_object))", "theta_object"):    "angle_turn",
+    ("s=r*theta", "theta"):                                  "angle_arc",
+    ("d_CM=R*theta", "theta"):                               "angle_arc",
+    ("omega=((theta)/(t))", "theta"):                        "angle_arc",
+    ("omega=((Delta_theta)/(Delta_t))", "Delta_theta"):      "angle_arc",
+    ("C_V=((d)/(2))*R", "d"):                                "dof",
+    ("I_S=((N_P)/(N_S))*I_P", "N_P"):                        "turns_count",
+    ("I_S=((N_P)/(N_S))*I_P", "N_S"):                        "turns_count",
+    ("F_D=((1)/(2))*C*rho*A*(v)^(2)", "C"):                  "drag_coefficient",
+}
+
+# Units that fix the quantity ON THEIR OWN -- no inference. Ambiguous units (1, m, J, Hz, m/s) are
+# absent on purpose: m is a wavelength or a slit or a radius, and the unit cannot say which.
+_UNIT_RANGE = {
+    "rad": (0.0, 6.28318, False, "an angle within one full turn"),
+    "kg":  (1.0e-6, 1.0e6, False, "a laboratory mass"),
+    "T":   (1.0e-5, 100.0, False, "a magnetic field beyond 100 T has never been produced"),
+}
 
 
 # A23. THE SCALE OF A QUANTITY IS PHYSICS, AND NO FORMULA IMPLIES IT. A22 supplied six microscopic
@@ -220,51 +277,31 @@ _SCALE = {
 }
 
 def quantity_range(rec, var):
-    """(lo, hi, integral, why) for a SAMPLED given, or None if this variable is not in the table.
+    """(lo, hi, integral, why) for a SAMPLED given, or None if nothing is DECLARED for it.
 
-    A SUPPLIED CONSTANT IS NOT A SAMPLED GIVEN and is out of scope here. The electron mass
-    9.109e-31 kg is correct and fails the "laboratory mass" window by 25 orders of magnitude --
-    my own range table contradicting my own constant. The table exists to bound a DRAW; a value
-    that came from _const_for has its own justification and is not being drawn.
+    A LOOKUP, NOT A CHAIN (A24). Four sources, each keyed on the thing it decides, none able to
+    claim a variable belonging to another:
+      1. a supplied constant is not a draw and is out of scope -- the electron mass is correct and
+         would fail a "laboratory mass" window by 25 orders of magnitude;
+      2. _SCALE, per (record, variable), for quantities living at a constant's scale (A23);
+      3. _KIND, per (record, variable), for dimensionless quantities the unit cannot separate;
+      4. _UNIT_RANGE, for units that fix the quantity on their own.
+    Anything else returns None: UNCHECKED, counted and printed, never implied clean.
     """
     if _const_for(rec, var) is not None: return None
-    scale = _SCALE.get((rec.get("f"), var))
+    f = rec.get("f")
+    scale = _SCALE.get((f, var))
     if scale is not None:
         return (scale[0], scale[1], False, scale[2])
+    kind = _KIND.get((f, var))
+    if kind is not None:
+        return _KIND_RANGE[kind]
     unit = ((rec.get("units") or {}).get(var) or "").strip()
-    name = (rec.get("name") or "").lower()
-    f = rec["f"]
-    if _is_angle(rec, var):
-        # A physical angle. Full-turn multiples are not wrong arithmetic, they are not a scenario:
-        # no textbook asks for the component of a force at 8.9 turns.
-        return (0.0, 6.28318, False, "an angle beyond one full turn is not a scenario")
-    # THE VARIABLE MUST BE THE INDEX, not merely live in a record about refraction. The first
-    # version keyed on the record NAME alone and applied the [1,4] window to `c`, `h` and `p` in
-    # "Index of refraction" -- constraining the speed of light to at most 4. A range table keyed on
-    # the record instead of the quantity is the same category error as the units field keyed on
-    # position instead of headedness.
-    if var in ("n", "n_1", "n_2") and ("refract" in name or "refract" in f.lower()):
-        return (1.0, 4.0, False, "a refractive index below 1 implies faster than light in vacuum")
-    if var in ("n", "N") and ("quantum" in name or "photon" in name or "level" in name):
-        return (1.0, 12.0, True, "a quantum number is a positive integer")
-    if var == "d" and "degrees of freedom" in name:
-        return (3.0, 7.0, True, "degrees of freedom is a small positive integer")
-    if var in ("N_P", "N_S"):
-        return (1.0, 5000.0, True, "a turns count is a positive integer")
     if unit == "K" and not var.startswith(("Delta", "delta")):
-        return (1.0, 1.0e4, False, "an absolute temperature is positive and not stellar here")
-    if unit == "m/s" and var != "c" and "light" not in name:
-        return (1.0e-3, 2.9979e8, False, "a material speed cannot exceed c")
-    if unit == "kg":
-        return (1.0e-6, 1.0e6, False, "a laboratory mass")
-    if unit == "T":
-        # 45 T is the strongest continuous laboratory field ever attained; 100 T is generous.
-        return (1.0e-5, 100.0, False, "a magnetic field beyond 100 T has never been produced")
-    if var in ("C", "C_d") and "drag" in name:
-        return (0.04, 2.0, False, "a drag coefficient lies between a streamlined body and a plate")
-    if var in ("p_0", "p_a", "p_atm") and unit in ("Pa",):
-        return (5.0e4, 1.5e5, False, "atmospheric pressure is ~1e5 Pa, not an arbitrary draw")
-    return None
+        return (1.0, 1.0e4, False, "an absolute temperature is positive")
+    if unit == "s":
+        return (1.0e-9, 1.0e6, False, "a duration is positive")
+    return _UNIT_RANGE.get(unit)
 
 
 # A22c. SOME PRECONDITIONS ARE RELATIONS BETWEEN GIVENS and no per-variable range can express them.
@@ -658,12 +695,19 @@ def units_field(r):
 
 for r in recs: r["cond"] = condition(r["name"])
 
-_SCALE_STALE = sorted({f for (f, _v) in _SCALE} - {r["f"] for r in recs})
-assert not _SCALE_STALE, (
-    "A23: these _SCALE keys match no record, so the declaration is a silent no-op:\n  "
-    + "\n  ".join(_SCALE_STALE)
-    + "\nFix the spelling against corpus/store_clean.json. A range that never fires reads as "
-      "coverage and is not.")
+# A DECLARATION THAT MATCHES NOTHING IS A NO-OP WEARING A CLAIM'S CLOTHES. _SCALE shipped with two
+# such keys -- my formula spellings, not the store's -- and they read as coverage. Checked BY PAIR,
+# not merely by formula: a key naming a variable the record does not have is the same defect one
+# level down.
+_PAIRS = {(r["f"], v) for r in recs
+          for v in ({x for x in VAR.findall(r["f"].split("=", 1)[1])} - {"pi", "e"})}
+_DECL_STALE = sorted(f"{f}  [{v}]" for (f, v) in (set(_SCALE) | set(_KIND)) if (f, v) not in _PAIRS)
+assert not _DECL_STALE, (
+    "A23/A24: these declarations match no sampled (record, variable) pair, so they are silent "
+    "no-ops:\n  " + "\n  ".join(_DECL_STALE)
+    + "\nFix them against corpus/store_clean.json. A range that never fires reads as coverage.")
+_KIND_BAD = sorted(k for k in _KIND.values() if k not in _KIND_RANGE)
+assert not _KIND_BAD, f"A24: _KIND names kinds with no range: {_KIND_BAD}"
 
 print(f"records usable as physics relations: {len(recs)} of {len(_ann)} annotated "
       f"({len(_unnamed)} skipped for want of a relation name, "
@@ -683,7 +727,6 @@ if _unnamed:
 # corpus/stems.py. The eval set is NEVER used to select templates: it is the only held-out phrasing
 # distribution we have, and tuning against it would destroy the honest read on whether variety
 # closes the 25pp generator-vs-eval gap.
-ASK = json.load(open("corpus/asks_dev.json"))
 
 # A6. THE MINED ASK TEMPLATES ARE 8 USABLE FRAMES AND 36 FRAGMENTS, and {q} was substituted into
 # all 44 blind. Two defects, one cause, both measured on output rather than argued:

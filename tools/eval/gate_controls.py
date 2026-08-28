@@ -125,6 +125,17 @@ CONTROLS = {
     "given_range":     ("corpus/generate.py",     # draw givens from the flat pool again
                         "            return sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else sample_value(rng)",
                         "            return sample_value(rng)"),
+    # A24: restore the MISDISPATCH -- give Snell's n_1 the angle window the positional heuristic
+    # used to hand it, with the correct rule still present and unreachable.
+    # A24: restore the MISDISPATCH -- give Snell's n_1 the angle window the positional
+    # heuristic used to hand it, with the correct rule still present and unreachable.
+    # A24: restore the MISDISPATCH -- give Snell's n_1 the angle window the positional
+    # heuristic handed it, with the correct rule still present and unreachable. The line must
+    # be the SNELL one: an earlier version matched h_i=... first and mutated a record whose
+    # dispatch the gate does not assert, so the control SURVIVED.
+    "given_range_kind":("corpus/generate.py",
+                        '    ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_1"):     "refractive_index",',
+                        '    ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_1"):     "angle_turn",'),
     "plausible":       ("corpus/generate.py",    # stop dropping impossible results
                         "            if _why:", "            if False:"),
     # Revert the units ORDER to sorted -- the skew gate_format_parity excused as cosmetic.
@@ -136,6 +147,9 @@ CONTROLS = {
                         "    seen, vs = set(), []", "    seen, vs = set(), sorted({v for v in "
                         "VAR.findall(r['f'].split('=',1)[1])} - {'pi','e'}); vs = list(vs); vs2 = []\n"
                         "    for _ in []: pass\n    _unused = []"),
+    "no_dup_defs":     ("corpus/generate.py",   # duplicate a top-level definition
+                        "def quantity_range(rec, var):",
+                        "def quantity_range(rec, var):\n    pass\n\n\ndef quantity_range(rec, var):"),
     "store_coverage":  ("corpus/generate.py",
                         "_keys = list(_ann) + [f for f in _store if f not in _ann]",
                         "_keys = list(_ann)"),
@@ -230,7 +244,8 @@ def gates_in_suite():
 ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_scope_rm": "test_scope",
          "format_parity_cond": "format_parity",
          "test_score_unit": "test_score",
-         "fit_cue_units": "fit_cue"}   # one control per FIELD the parity gate checks
+         "fit_cue_units": "fit_cue",
+         "given_range_kind": "given_range"}   # one control per FIELD the parity gate checks
 
 
 def _write_and_stamp(f, text):

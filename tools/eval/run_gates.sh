@@ -136,6 +136,9 @@ $PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "pla
 # verbatim at SIG_DIGITS 10, and the generator was rounding it to 4 s.f. -- 52.88% of docs.
 $PY tools/eval/gate_res_verbatim.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "res_verbatim" || { printf "  %-20s FAIL\n" "res_verbatim"; fail=1; }
 $PY tools/eval/gate_record_bytes.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "record_bytes" || { printf "  %-20s FAIL\n" "record_bytes"; fail=1; }
+# A bulk edit doubled corpus/generate.py (1,070 -> 1,565 lines) and EVERY functional check
+# passed -- Python takes the later definition. Only the mutation meta-gate noticed.
+$PY tools/eval/gate_no_dup_defs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_dup_defs" || { printf "  %-20s FAIL\n" "no_dup_defs"; fail=1; }
 $PY tools/eval/gate_store_coverage.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_coverage" || { printf "  %-20s FAIL\n" "store_coverage"; fail=1; }
 $PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }
 $PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }
