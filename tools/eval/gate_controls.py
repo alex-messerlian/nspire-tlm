@@ -341,11 +341,26 @@ atexit.register(lambda: _LOCK.exists() and _LOCK.unlink())
 _ORIGINALS = {}
 
 def _restore_all():
-    for path, text in list(_ORIGINALS.items()):
+    """RESTORE THE TIMESTAMP AS WELL AS THE BYTES.
+
+    This restored content and not mtime, so an interrupted run left every mutated file
+    byte-identical to HEAD with a FRESH TIMESTAMP -- invisible to `git status`, invisible to a
+    diff, and fatal downstream: make and push-all.sh both decide by mtime. Measured: a killed run
+    stamped src/store/shapecheck.c, and tools/nspire-cli/push-all.sh then refused the whole device
+    transfer as stale, correctly, for a file whose content had never changed.
+
+    The per-control path at the bottom of this file already gets this right and says why. This is
+    the same fix on the UNWIND path, which is the one that runs when something goes wrong -- so it
+    is the path where a leaked timestamp is most likely and least expected. Third instance of
+    "restoring a source is not restoring the tree when a compiler sits in between"."""
+    for path, (text, mtime) in list(_ORIGINALS.items()):
         try:
             if pathlib.Path(path).read_text() != text:
                 pathlib.Path(path).write_text(text)
                 print(f"  restored {path} (interrupted mid-mutation)", file=sys.stderr)
+            # Unconditional: _write_and_stamp may have bumped the mtime even where the bytes are
+            # already correct, and that bump alone invalidates every downstream artefact.
+            os.utime(path, (mtime, mtime))
         except Exception:
             pass
     _ORIGINALS.clear()
@@ -382,11 +397,11 @@ def main():
             continue
         path, find, repl = spec
         f = pathlib.Path(path); original = f.read_text()
-        _ORIGINALS[path] = original
+        _mtime0 = f.stat().st_mtime          # pristine timestamp, put back after the rebuild
+        _ORIGINALS[path] = (original, _mtime0)   # ...and by the unwind path, which also needs it
         if find not in original:
             print(f"  STALE CONTROL  {name}: the text it mutates is gone from {path}")
             failures.append(name); continue
-        _mtime0 = f.stat().st_mtime          # pristine timestamp, put back after the rebuild
         try:
             _write_and_stamp(f, original.replace(find, repl, 1))
             # THE MUTATE SIDE NEEDS THE STAMP TOO. It was left plain when the restore side was
