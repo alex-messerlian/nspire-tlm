@@ -136,6 +136,8 @@ if ! _skip dimensionless; then $PY tools/eval/audit_dimensionless.py >/dev/null 
 if ! _skip selection_control; then $PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }; fi
 if ! _skip stale_figures; then $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }; fi
 if ! _skip shipping_number; then $PY tools/eval/gate_shipping_number.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shipping_number" || { printf "  %-20s FAIL\n" "shipping_number"; fail=1; }; fi
+if ! _skip mutate_helper; then $PY tools/eval/gate_mutate_helper.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "mutate_helper" || { printf "  %-20s FAIL\n" "mutate_helper"; fail=1; }; fi
+if ! _skip test_mutatectx; then $PY tools/eval/test_mutatectx.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_mutatectx" || { printf "  %-20s FAIL\n" "test_mutatectx"; fail=1; }; fi
 # A7: 16.2% of documents used a constant in the CALL that appeared in neither the question nor
 # the record -- recalled, not read -- and while it was absent the graders could not tell a
 # correct constant from a fabricated one (both "unchecked").

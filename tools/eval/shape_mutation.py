@@ -15,6 +15,8 @@ Run: python3 tools/eval/shape_mutation.py     (exit 0 = every mutation was caugh
 """
 import os
 import pathlib, re, subprocess, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from mutatectx import mutating
 
 SRC = pathlib.Path("src/store/shapecheck.c")
 BUILD = [
@@ -58,8 +60,8 @@ MUTATIONS = [
 ]
 
 
-def run_build_and_test(source_text):
-    SRC.write_text(source_text)
+def run_build_and_test(m, source_text):
+    m.write(source_text)
     b = subprocess.run(BUILD, capture_output=True, text=True)
     if b.returncode != 0:
         return "BUILD-FAILED", b.stderr[-300:]
@@ -68,32 +70,20 @@ def run_build_and_test(source_text):
 
 
 def main():
+    # THE MUTATE-AND-RESTORE CONTRACT LIVES IN mutatectx, not here. This file is the third place
+    # the same defect appeared -- content restored, mtime left at "now" -- and the only one that
+    # fired on an ordinary green run, silently invalidating the cross-compiled device build on
+    # every gate suite invocation. See tools/eval/mutatectx.py for the measurement.
     original = SRC.read_text()
-    # RESTORE THE TIMESTAMP, NOT ONLY THE BYTES. This gate runs on EVERY suite invocation and
-    # rewrites shapecheck.c to mutate it. Putting the content back leaves the mtime at "now", so
-    # every artefact built from this source looks stale -- including build/chattlm.tns, which the
-    # host `make` does not rebuild because it needs the cross toolchain. Measured: one
-    # run_gates.sh advanced shapecheck.c by 897 s and tools/nspire-cli/push-all.sh then refused
-    # the entire device transfer, three separate times, for a file whose content never changed.
-    #
-    # THIRD PLACE THIS EXACT DEFECT HAS APPEARED -- after gate_controls' per-control path (fixed,
-    # with a comment naming this hazard) and its interrupt path (fixed the same day). This one is
-    # the worst of the three because it needs no interrupt and no meta-gate: it fires on every
-    # ordinary green run. When a defect turns up in a third implementation of the same operation,
-    # the operation wants a shared helper, not a third fix -- noted, and left as a third fix here
-    # only because the three callers restore under genuinely different conditions.
-    _mtime0 = SRC.stat().st_mtime
     # Sanity first: the unmutated source must PASS, or every "caught" below is meaningless.
-    status, tail = run_build_and_test(original)
-    if status != "PASS":
-        SRC.write_text(original)
-        os.utime(SRC, (_mtime0, _mtime0))
-        print(f"  ABORT: the UNMUTATED source does not pass ({status}). {tail}")
-        return 1
-    print(f"  baseline: unmutated source PASSES -- {tail}")
-
     survived = []
-    try:
+    with mutating(SRC, rebuild=lambda: subprocess.run(BUILD, capture_output=True)) as m:
+        status, tail = run_build_and_test(m, original)
+        if status != "PASS":
+            print(f"  ABORT: the UNMUTATED source does not pass ({status}). {tail}")
+            return 1
+        print(f"  baseline: unmutated source PASSES -- {tail}")
+
         for label, _marker, old, new in MUTATIONS:
             if new is None:
                 continue
@@ -101,18 +91,13 @@ def main():
                 survived.append((label, "MUTATION DID NOT APPLY -- the code it edits has moved"))
                 print(f"  SKIP  {label}\n        the text it patches is not in the source any more")
                 continue
-            status, tail = run_build_and_test(original.replace(old, new, 1))
+            status, tail = run_build_and_test(m, original.replace(old, new, 1))
             caught = status in ("FAIL", "BUILD-FAILED")
             print(f"  {'caught ' if caught else 'SURVIVED'} {label}")
             if not caught:
                 survived.append((label, tail))
             else:
                 print(f"          -> {status}: {tail}")
-    finally:
-        SRC.write_text(original)
-        subprocess.run(BUILD, capture_output=True, text=True)   # restore the good binary
-        # AFTER the rebuild, so make sees the restore, then put the pristine time back.
-        os.utime(SRC, (_mtime0, _mtime0))
 
     if survived:
         print(f"\n  {len(survived)} MUTATION(S) SURVIVED -- the suite does not cover these clauses:")

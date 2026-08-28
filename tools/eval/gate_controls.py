@@ -20,6 +20,8 @@ which would make the suite call itself. Meta-check, like gate_mutation.py and po
   python3 tools/eval/gate_controls.py NAME ...   just these
 """
 import atexit, os, pathlib, re, signal, subprocess, sys, time
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from mutatectx import mutating
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 os.chdir(ROOT)
@@ -41,6 +43,19 @@ CONTROLS = {
     # The shipping number's framing. The control strips the lower-bound qualifier from the one
     # sentence that carries it, which is exactly how the figure would come loose in practice --
     # nobody deletes a citation, they paraphrase one.
+    # The helper's timestamp guarantee. Breaking the mtime restore is the EXACT defect that
+    # shipped four times; test_mutatectx must notice, or it is not testing the property.
+    "test_mutatectx":  ("tools/eval/mutatectx.py",
+                        "            os.utime(self.path, (self.mtime0, self.mtime0))",
+                        "            pass  # mutation: drop the pristine-mtime restore"),
+    # And the gate that keeps a fifth call site from being written.
+    # POINTED AT THE PREDICATE, NOT THE BRANCH. The first mutation disabled the offender branch
+    # and the control SURVIVED -- correctly, because a clean tree has no offenders, so a disabled
+    # check and a check with nothing to find produce the same PASS. The gate now classifies two
+    # built-in samples on every run, so breaking the predicate is observable.
+    "mutate_helper":   ("tools/eval/gate_mutate_helper.py",
+                        "                    if isinstance(t, ast.Name) and assigned.get(t.id, 0) == 1:",
+                        "                    if False:"),
     "shipping_number": ("docs/RESULT_STEP0_FINAL.md",
                         "and it is a lower bound,\nbecause false negatives are not controlled.",
                         "and that is the figure."),
@@ -269,23 +284,6 @@ ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_sc
          }   # one control per FIELD the parity gate checks
 
 
-def _write_and_stamp(f, text):
-    """Write, then push the mtime clear of the sub-second granularity make compares on.
-
-    -B WAS THE FIRST FIX AND IT WAS THE WRONG ONE. Plain `make` missed the change because a write
-    and the binary it should invalidate can land inside the same timestamp tick -- that left seven
-    binaries compiled from mutated sources, and separately made a control SURVIVE because the
-    mutation never reached tools/eval/evalcli. Forcing a FULL rebuild fixed both and cost 6.65 s
-    per call, twice per control, ~12 s x 45 controls of pure waste: it rebuilds 25 binaries to
-    invalidate one.
-
-    Stamping the mtime two seconds ahead gives make an unambiguous ordering and lets it rebuild
-    exactly the dependents, which is what it is for. Measured: 6.65 s -> ~0.5 s.
-    """
-    f.write_text(text)
-    t = time.time() + 2
-    os.utime(f, (t, t))
-
 def run_gate(name):
     name = ALIAS.get(name, name)
     # Announce ourselves as the lock holder so run_gates.sh does not refuse OUR invocation --
@@ -338,39 +336,16 @@ except FileExistsError:
     os.write(_lock_fd, str(os.getpid()).encode())
 atexit.register(lambda: _LOCK.exists() and _LOCK.unlink())
 
-_ORIGINALS = {}
-
-def _restore_all():
-    """RESTORE THE TIMESTAMP AS WELL AS THE BYTES.
-
-    This restored content and not mtime, so an interrupted run left every mutated file
-    byte-identical to HEAD with a FRESH TIMESTAMP -- invisible to `git status`, invisible to a
-    diff, and fatal downstream: make and push-all.sh both decide by mtime. Measured: a killed run
-    stamped src/store/shapecheck.c, and tools/nspire-cli/push-all.sh then refused the whole device
-    transfer as stale, correctly, for a file whose content had never changed.
-
-    The per-control path at the bottom of this file already gets this right and says why. This is
-    the same fix on the UNWIND path, which is the one that runs when something goes wrong -- so it
-    is the path where a leaked timestamp is most likely and least expected. Third instance of
-    "restoring a source is not restoring the tree when a compiler sits in between"."""
-    for path, (text, mtime) in list(_ORIGINALS.items()):
-        try:
-            if pathlib.Path(path).read_text() != text:
-                pathlib.Path(path).write_text(text)
-                print(f"  restored {path} (interrupted mid-mutation)", file=sys.stderr)
-            # Unconditional: _write_and_stamp may have bumped the mtime even where the bytes are
-            # already correct, and that bump alone invalidates every downstream artefact.
-            os.utime(path, (mtime, mtime))
-        except Exception:
-            pass
-    _ORIGINALS.clear()
-
-atexit.register(_restore_all)
+# FILE RESTORATION IS mutatectx's JOB, on every exit path including the interrupt one --
+# importing it registers the atexit and signal hooks. Both of this file's restore paths and
+# shape_mutation.py's carried the SAME defect independently (bytes back, mtime left at now),
+# so the operation got a helper rather than a third fix. What stays here is the LOCK, which
+# is this file's alone; the handler below exits through sys.exit() so mutatectx's atexit
+# still fires and puts every mutated file back, bytes and timestamp.
 for _sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
     try:
-        signal.signal(_sig, lambda *_a: (_restore_all(),
-                                         _LOCK.exists() and _LOCK.unlink(),
-                                         sys.exit(130)))
+        signal.signal(_sig, lambda *_a: (_LOCK.exists() and _LOCK.unlink(),
+                                         sys.exit(130)))   # -> mutatectx atexit restores files
     except Exception:
         pass
 
@@ -397,38 +372,24 @@ def main():
             continue
         path, find, repl = spec
         f = pathlib.Path(path); original = f.read_text()
-        _mtime0 = f.stat().st_mtime          # pristine timestamp, put back after the rebuild
-        _ORIGINALS[path] = (original, _mtime0)   # ...and by the unwind path, which also needs it
         if find not in original:
             print(f"  STALE CONTROL  {name}: the text it mutates is gone from {path}")
             failures.append(name); continue
-        try:
-            _write_and_stamp(f, original.replace(find, repl, 1))
-            # THE MUTATE SIDE NEEDS THE STAMP TOO. It was left plain when the restore side was
-            # fixed, so a mutation to tools/eval/dispatch.c did NOT reach tools/eval/evalcli and
-            # the control reported SURVIVED -- which reads as "this gate cannot fail" when the
-            # truth was "the mutation never got there". A half-invalidated rebuild is worse than
-            # none, because it fails in the direction that looks like a finding about the gate.
-            subprocess.run(["make", "-s", "tests"], capture_output=True)
+        # THE MUTATE-AND-RESTORE CONTRACT IS mutatectx's, in ONE place, for all three call sites.
+        # Both of this file's paths -- per-control and interrupt -- carried the same defect
+        # independently, and shape_mutation.py carried it a third time. The helper's rebuild hook
+        # runs while the mtime is still stamped forward, so make sees the restore; the pristine
+        # time goes back afterwards, so nothing downstream (least of all the cross-compiled device
+        # binaries a host `make` never touches) looks stale.
+        _rebuild = lambda: subprocess.run(["make", "-s", "tests"], capture_output=True)
+        with mutating(f, rebuild=_rebuild) as _m:
+            _m.write(original.replace(find, repl, 1))
+            # THE MUTATE SIDE NEEDS THE STAMP TOO, and mutating.write() gives it. It was once left
+            # plain while the restore side was fixed, so a mutation to tools/eval/dispatch.c did
+            # NOT reach tools/eval/evalcli and the control reported SURVIVED -- which reads as
+            # "this gate cannot fail" when the truth was "the mutation never got there".
+            _rebuild()
             verdict = run_gate(name)
-        finally:
-            _write_and_stamp(f, original)
-            _ORIGINALS.pop(path, None)
-            # Rebuild so the restored source reaches every binary. _write_and_stamp above pushed
-            # the mtime clear of make's sub-second granularity, which is what makes plain `make`
-            # sufficient here: an earlier version used `make -B` and cost 6.65 s a call to rebuild
-            # twenty-five binaries in order to invalidate one.
-            subprocess.run(["make", "-s", "tests"], capture_output=True)
-            # PUT THE TIMESTAMP BACK. The stamp is a message to make and nothing else; leaving it
-            # leaks two seconds of future into the tree, so every file this harness has ever
-            # mutated looks NEWER than binaries whose content never changed -- and
-            # tools/nspire-cli/push-all.sh then reports the whole device set stale and demands a
-            # rebuild that is not needed. It errs safe, and a gate that cries wolf is how a REAL
-            # staleness warning gets waved through.
-            #
-            # ORDER MATTERS: rebuild first, WITH the bump, so make actually sees the restore; only
-            # then reset. The binary ends up newer than the source, which is the truth.
-            os.utime(f, (_mtime0, _mtime0))
         ok = verdict in ("FAIL", "CANNOT")
         print(f"  {'caught  ' if ok else 'SURVIVED'} {name:18} (reverted -> {verdict})")
         if not ok: failures.append(name)
