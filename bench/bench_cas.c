@@ -65,6 +65,7 @@ static const char *DIRS[] = { "/documents/tlm/", "/documents/bench/", "/document
 static char LOG_PATH[64], STATE_PATH[64];
 
 static FILE *LOG;
+static int TIMEPATH_OK;
 
 static void say(const char *fmt, ...) {
     va_list ap;
@@ -329,6 +330,21 @@ static void cas_timing(void)
     unsigned long total = 0, lo = 0xFFFFFFFFul, hi = 0, ok = 0, n = 0;
     const int N_CALLS = 100;
 
+    /* ITS OWN FILE, NOT THE 114 KB APPEND-ONLY LOG. The timing block was written into
+     * caslog.txt.tns, and that file then refused to transfer: `nsp pull` returned "Invalid packet
+     * received" on six consecutive attempts while a LARGER file (the 145 KB tokenizer) pulled
+     * cleanly, so the fault is the file and not the link. The number was measured, is on the
+     * device, and cannot be read -- which is the same as not having measured it.
+     *
+     * A result that has to survive a transfer belongs in a small file of its own. */
+    {
+        char tp[80];
+        for (int i = 0; DIRS[i]; i++) {
+            snprintf(tp, sizeof tp, "%scastime.txt.tns", DIRS[i]);
+            FILE *tf = fopen(tp, "w");
+            if (tf) { fprintf(tf, "castime placeholder\n"); fclose(tf); TIMEPATH_OK = 1; break; }
+        }
+    }
     say("");
     say("=== CAS timing: %d calls, arrangement 'all blocks', 99 MHz timer ===", N_CALLS);
     if (LOG) fflush(LOG);                      /* flush BEFORE, per this file's own rule */
@@ -358,7 +374,20 @@ static void cas_timing(void)
     say("CAS_min_us=%llu", (unsigned long long)lo * 1000000ull / 99000000ull);
     say("CAS_max_us=%llu", (unsigned long long)hi * 1000000ull / 99000000ull);
     say("CAS_note=evaluate only, no render. A usable tool call also needs the UTF-16 decode.");
-    say("CAS_budget=compare against 475000 us/token at d352 L6 2.11 tok/s.");
+    say("CAS_budget=compare against ~470000 us/token at 2 tok/s.");
+    /* Write the numbers to the small file as well, so one bad log cannot lose them again. */
+    if (TIMEPATH_OK) {
+        for (int i = 0; DIRS[i]; i++) {
+            char tp2[80]; snprintf(tp2, sizeof tp2, "%scastime.txt.tns", DIRS[i]);
+            FILE *tf = fopen(tp2, "w");
+            if (!tf) continue;
+            fprintf(tf, "CAS_calls=%lu\nCAS_rc0=%lu\nCAS_mean_us=%llu\nCAS_min_us=%llu\n"
+                        "CAS_max_us=%llu\n", n, ok, mean_us,
+                    (unsigned long long)lo * 1000000ull / 99000000ull,
+                    (unsigned long long)hi * 1000000ull / 99000000ull);
+            fclose(tf); break;
+        }
+    }
 }
 
 int main(void) {
