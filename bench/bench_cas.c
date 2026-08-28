@@ -49,6 +49,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include "nspire_screen.h"   /* printf -> on-screen console */
+#include "common.h"         /* timer_acquire/timer_raw/timer_delta, TIMER_FAST_BASE */
 
 /* Both files are resolved at runtime rather than hardcoded, because this program now runs on a
  * SECOND calculator that has none of this project's directories on it.
@@ -305,6 +306,61 @@ static int try_render(char *hblk, const char *which) {
     return any;
 }
 
+/* ---- CAS ITEM 1: HOW LONG DOES A CALL TAKE? ---------------------------------------------------
+ *
+ * The one number that opens or closes "delegate calculus to the OS CAS", and it has never been
+ * taken. A tool call sits inside a token budget of ~475 ms at the chosen d352 L6 (2.11 tok/s). If a
+ * CAS call costs 400 us it is free; if it costs 4 s the idea is dead, and "driveable but too slow"
+ * is still a result worth the poster.
+ *
+ * IT IS CALLED FROM BOTH EXITS OF main(). The attempt counter on the device already reads 9 of 9,
+ * so the NEXT launch takes the early return -- and a timing phase placed only after the attempt
+ * loop would never have executed. A block of code with no reachable caller reads as a feature and
+ * is not one; that is a recorded failure in this repo (IN_SCROLL handled and never emitted).
+ *
+ * Timed on the 99 MHz FAST timer, not the 32 kHz one: at 32 kHz a sub-millisecond call reads as
+ * 0 ticks, and a stage that reads zero is indistinguishable from a stage that is free. That exact
+ * confusion cost this project a session on the FFN timer. */
+static void cas_timing(void)
+{
+    static uint16_t texpr[32];
+    static char q1[512], q2[512], q4[512], q5[512];
+    bench_timer_t t;
+    unsigned long total = 0, lo = 0xFFFFFFFFul, hi = 0, ok = 0, n = 0;
+    const int N_CALLS = 100;
+
+    say("");
+    say("=== CAS timing: %d calls, arrangement 'all blocks', 99 MHz timer ===", N_CALLS);
+    if (LOG) fflush(LOG);                      /* flush BEFORE, per this file's own rule */
+    timer_acquire(&t, TIMER_FAST_BASE);
+    for (int c = 0; c < N_CALLS; c++) {
+        memset(texpr, 0, sizeof texpr);
+        ascii2utf16(texpr, (char *)"123*456", 7);
+        texpr[7] = 0;
+        memset(q1, 0, sizeof q1); memset(q2, 0, sizeof q2);
+        memset(q4, 0, sizeof q4); memset(q5, 0, sizeof q5);
+        uint32_t t0 = timer_raw(TIMER_FAST_BASE);
+        int rc = TI_MS_evaluateExpr_ACBER(q1, q2, texpr, q4, q5);
+        uint32_t t1 = timer_raw(TIMER_FAST_BASE);
+        uint32_t d  = timer_delta(t0, t1);
+        if (rc == 0) ok++;
+        total += d; n++;
+        if (d < lo) lo = d;
+        if (d > hi) hi = d;
+    }
+    timer_release(&t);
+    /* 64-bit before scaling: the us conversion in bench_forward overflowed 32-bit long and printed
+     * NEGATIVE MICROSECONDS, which read as a finding about the machine rather than about itself. */
+    unsigned long long mean_us = n ? (unsigned long long)total * 1000000ull / 99000000ull / n : 0;
+    say("CAS_calls=%lu", n);
+    say("CAS_rc0=%lu of %lu", ok, n);
+    say("CAS_mean_us=%llu", mean_us);
+    say("CAS_min_us=%llu", (unsigned long long)lo * 1000000ull / 99000000ull);
+    say("CAS_max_us=%llu", (unsigned long long)hi * 1000000ull / 99000000ull);
+    say("CAS_note=evaluate only, no render. A usable tool call also needs the UTF-16 decode.");
+    say("CAS_budget=compare against 475000 us/token at d352 L6 2.11 tok/s.");
+}
+
 int main(void) {
     if (!resolve_paths()) {
         /* No writable directory. The sweep cannot be made bounded without one, so refuse rather
@@ -364,6 +420,7 @@ int main(void) {
         say("");
         say("All %d attempts have been made. See the log for which returned and which reset.", NATTEMPTS);
         say("Delete %s to start over.", STATE_PATH);
+        cas_timing();                          /* the path the device will actually take: 9 of 9 done */
         if (LOG) fclose(LOG);
         wait_key_pressed();
         return 0;
@@ -457,6 +514,9 @@ int main(void) {
   }
     say("");
     say("ALL %d ATTEMPTS COMPLETE in this launch -- none of the remaining ones reset.", NATTEMPTS);
+
+    cas_timing();
+
     if (LOG) fclose(LOG);
     printf("\nlog: %s\nPress any key.\n", LOG_PATH);
     wait_key_pressed();
