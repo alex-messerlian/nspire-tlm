@@ -58,6 +58,12 @@ CONTROLS = {
                         "                    if False:"),
     # The exact shipped defect: a slot declared in the enum and never written by a PF_END, which
     # reads as 0 ticks and is indistinguishable from "this stage costs nothing".
+    # Remove the shear precondition from one two-factor product record: the gate must notice that
+    # the record now bounds neither its inputs' coupling nor its result. This is the EXACT defect
+    # the n=600 read found -- a_t=r*alpha left open while its sibling v_t=r*omega was bounded.
+    "coupling_family": ("corpus/generate.py",
+                        '"a_t=r*alpha":               (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,',
+                        '"a_t=r*alpha_DISABLED":      (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,'),
     "prof_pairing":    ("src/runq_nspire.c",
                         "PF_END(PF_FFN);", "PF_END(PF_CLS);"),
     "shipping_number": ("docs/RESULT_STEP0_FINAL.md",

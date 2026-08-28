@@ -101,6 +101,13 @@ _POOL = sorted(v for vs in _POOL_BY_UNIT.values() for v in vs)
 # here is what the mechanism is for.
 _MICRO_CVAL = {
     # (formula, variable) -> (value, unit, what it is)
+    # A34. E_0 IS THE RYDBERG ENERGY, NOT A FREE PARAMETER. It was declared a SAMPLED given over
+    # (1.6e-19, 1e-17) -- a 40x window, [1 eV, 62 eV] -- under the justification "an atomic ground
+    # state, ~13.6 eV", which names the exact value the window then fails to pin. For a hydrogen-like
+    # ion the ionisation energy is 13.6*Z^2 eV, a DISCRETE set; a continuum draw produced Z = 0.72,
+    # an element that does not exist. Every other constant in these documents arrives at its true
+    # value; this one alone was drawn.
+    ("E_n=-E_0*((1)/((n)^(2)))", "E_0"): (2.179872e-18, "J", "Rydberg energy, 13.6 eV (hydrogen, Z=1)"),
     ("V=((k_e*q)/(r))", "k_e"): (8.988e9, "V*m/C", "Coulomb constant"),
     # A27. ATMOSPHERIC PRESSURE IS A CONSTANT, and the pool cannot reach it: 1.013e5 Pa is ABOVE
     # the pool's maximum of 9,800, so `p_0 = 1` Pa was drawn beside a record asserting "standard
@@ -570,6 +577,32 @@ def quantity_range(rec, var):
 # list is short and explicit; a record not in it has no cross-variable precondition CHECKED, which
 # is not the same as having none.
 _PRECONDITION = {
+    # A34. FOUR SIBLING COUPLINGS. The n=600 read found that FIVE of nine root causes were direct
+    # family siblings of records A32 fixed: the bounds are keyed by exact formula string, so
+    # `v_t=r*omega` got a rim-speed bound and `a_t=r*alpha` -- whose `r` window is BYTE-IDENTICAL,
+    # same justification string -- got nothing. The fixes were correct and were applied per-record
+    # against a per-FAMILY defect. gate_coupling_family below makes the omission fail rather than
+    # wait to be re-read.
+    #
+    # Angular acceleration of a real body is limited by shear, not by the sampler: the stress to
+    # spin up a disc scales as rho*alpha*R^2, so alpha*R^2 past ~1.3e5 exceeds steel's yield
+    # (1 GPa / 7800 kg m^-3). Measured before the fix: 37 GPa demanded, an order past any material.
+    # THE SIXTH SIBLING, found by gate_coupling_family on its first run -- exactly what the read
+    # predicted would still be out there. Same shear argument, same family, different formula string.
+    "a_CM=R*alpha":              (lambda v: v["alpha"] * v["R"]**2 <= 1.3e5,
+                                  "shear limits alpha*R^2: past 1.3e5 the body exceeds steel's yield stress"),
+    "a_t=r*alpha":               (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,
+                                  "shear limits alpha*r^2: past 1.3e5 the rotor exceeds steel's yield stress"),
+    # The `a` window's OWN justification names transients -- "a 30 g crash deceleration" lasts
+    # milliseconds -- and no t window existed, so 24 g was paired with 1455 s to reach 345 km/s.
+    # The sibling `v=v_0-g*t` already bounds its duration; this one did not.
+    "v=a*t":                     (lambda v: v["a"] * v["t"] <= 1.2e4,
+                                  "a*t is the speed reached: 1.2e4 m/s is past any vehicle, and the acceleration window is justified by transients"),
+    # Newtonian gravitation is only the inverse square OUTSIDE both bodies. With m1, m2 and r drawn
+    # independently, r fell inside them. Radii from a rock-like 5500 kg/m^3.
+    "F=G*m1*m2/(r)^(2)":         (lambda v: v["r"] > ((3*v["m1"]/(4*3.141592653589793*5500))**(1/3)
+                                                      + (3*v["m2"]/(4*3.141592653589793*5500))**(1/3)),
+                                  "the inverse square holds only outside both bodies; r must exceed the sum of their radii"),
     # A32. AMENDED: `lambda < d` is true and FIRED ON 0.00% OF 4,000 DRAWS. sample_in_range prefers
     # the mined pool, whose smallest value inside d's window is 1e-3, so d took NINE distinct values
     # and lambda was below it by construction. The live half of the coupling is the paraxial

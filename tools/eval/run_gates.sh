@@ -135,6 +135,8 @@ if ! _skip dimensionless; then $PY tools/eval/audit_dimensionless.py >/dev/null 
 # must publish its same-size random control. Topic-scoping read 61.2% against a random-20 at 62.7%.
 if ! _skip selection_control; then $PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }; fi
 if ! _skip stale_figures; then $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }; fi
+if ! _skip ascii_boundary; then $PY tools/eval/gate_ascii_boundary.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ascii_boundary" || { printf "  %-20s FAIL\n" "ascii_boundary"; fail=1; }; fi
+if ! _skip coupling_family; then $PY tools/eval/gate_coupling_family.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "coupling_family" || { printf "  %-20s FAIL\n" "coupling_family"; fail=1; }; fi
 if ! _skip prof_pairing; then $PY tools/eval/gate_prof_pairing.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "prof_pairing" || { printf "  %-20s FAIL\n" "prof_pairing"; fail=1; }; fi
 if ! _skip shipping_number; then $PY tools/eval/gate_shipping_number.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shipping_number" || { printf "  %-20s FAIL\n" "shipping_number"; fail=1; }; fi
 if ! _skip mutate_helper; then $PY tools/eval/gate_mutate_helper.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "mutate_helper" || { printf "  %-20s FAIL\n" "mutate_helper"; fail=1; }; fi
