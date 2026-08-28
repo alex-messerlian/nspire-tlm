@@ -172,7 +172,10 @@ _KIND_RANGE = {          # one range per kind, so two variables of a kind cannot
     "refractive_index": (1.0, 4.0,     False, "a refractive index below 1 implies light faster than c"),
     "quantum_number":   (1.0, 12.0,    True,  "a quantum number is a small positive integer"),
     "turns_count":      (1.0, 5000.0,  True,  "a transformer winding count is a positive integer"),
-    "dof":              (3.0, 7.0,     True,  "degrees of freedom of a gas molecule"),
+    # (3, 7) admits 4, and no gas molecule has four degrees of freedom: the physical set is
+    # {3 monatomic, 5 diatomic, 6 polyatomic}. A range cannot express a set, so the window is
+    # narrowed to the diatomic/polyatomic pair and 3 is reached by the monatomic case below.
+    "dof":              (5.0, 6.0,     True,  "degrees of freedom: 5 diatomic, 6 polyatomic"),
     "drag_coefficient": (0.04, 2.0,    False, "from a streamlined body to a flat plate"),
 }
 
@@ -196,8 +199,9 @@ _KIND = {
     ("a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))", "theta"): "angle_quadrant",
     ("F=q*v*B*sin(theta)", "theta"):                         "angle_half",
     ("A=((1)/(2))*theta*(r)^(2)", "theta"):                  "angle_turn",
-    ("M=((theta_image)/(theta_object))", "theta_image"):     "angle_turn",
-    ("M=((theta_image)/(theta_object))", "theta_object"):    "angle_turn",
+    # A visual angle subtended at the eye is at most pi, not a full turn.
+    ("M=((theta_image)/(theta_object))", "theta_image"):     "angle_half",
+    ("M=((theta_image)/(theta_object))", "theta_object"):    "angle_half",
     ("s=r*theta", "theta"):                                  "angle_arc",
     ("d_CM=R*theta", "theta"):                               "angle_arc",
     ("omega=((theta)/(t))", "theta"):                        "angle_arc",
@@ -289,6 +293,209 @@ _SCALE = {
   ("U_form=E_transfer+U_coul+U_ex", "E_transfer"): (1e-19, 1e-17, "an ionic-bond energy term"),
   ("U_form=E_transfer+U_coul+U_ex", "U_coul"):     (1e-19, 1e-17, "an ionic-bond energy term"),
   ("U_form=E_transfer+U_coul+U_ex", "U_ex"):       (1e-19, 1e-17, "an ionic-bond energy term"),
+  # ---- A29: the remaining 193 pairs, authored per physics domain and reviewed ------------------
+  # Closing the coverage in one pass instead of discovering ~15 per Step 0 round. Six authors split
+  # by domain, then a physics reviewer rejected 7 proposals, corrected 14, and -- the valuable part
+  # -- found EIGHT DEFECTS IN THE 133 DECLARATIONS THAT ALREADY EXISTED, which nobody had checked.
+  #
+  # ONE PAIR IS DELIBERATELY LEFT UNDECLARED: ("T=((1)/(f))", "f"). Every floor anyone could justify
+  # is falsified by a real periodic system a textbook uses -- the 67 m Foucault pendulum is 0.061 Hz,
+  # a tide is 2.3e-5 Hz -- and every value the pool draws is a real period. No defect to close and no
+  # honest window, so it stays counted as UNCHECKED. That is the intended use of UNCHECKED.
+  ("F=-k*x", "k"): (1.0, 1.0e5, "a real spring: ~1 N/m for a soft coil to ~10^5 N/m for a car suspension"),
+  ("F=-k*x", "x"): (0.001, 1.0, "an elastic displacement: a millimetre to a metre, beyond which a coil spring is past its limit"),
+  ("k=((F)/(x))", "F"): (0.1, 10000.0, "the force a hand or a hanging mass applies to a spring"),
+  ("k=((F)/(x))", "x"): (0.001, 1.0, "an elastic displacement: a millimetre to a metre, beyond which a coil spring is past its limit"),
+  ("omega=sqrt(((k)/(m)))", "k"): (1.0, 1.0e5, "a real spring: ~1 N/m for a soft coil to ~10^5 N/m for a car suspension"),
+  ("f=((1)/(2*pi))*sqrt(((k)/(m)))", "k"): (1.0, 1.0e5, "a real spring: ~1 N/m for a soft coil to ~10^5 N/m for a car suspension"),
+  ("T=2*pi*sqrt(((m)/(k)))", "k"): (1.0, 1.0e5, "a real spring: ~1 N/m for a soft coil to ~10^5 N/m for a car suspension"),
+  ("U=((1)/(2))*m*(omega)^(2)*(x)^(2)", "omega"): (0.1, 10000.0, "an oscillator angular frequency: a pendulum at ~3 rad/s to an ultrasonic transducer at 1e4 rad/s"),
+  ("U=((1)/(2))*m*(omega)^(2)*(x)^(2)", "x"): (0.001, 1.0, "an oscillation amplitude: a millimetre to a metre"),
+  ("g=((4*(pi)^(2)*L)/((T)^(2)))", "L"): (0.05, 70.0, "a pendulum length: a 5 cm laboratory bob to the 67 m Foucault pendulum"),
+  ("x=l-l_0", "l"): (0.01, 100.0, "a spring, rod or cable length: a centimetre to a hundred metres"),
+  ("x=l-l_0", "l_0"): (0.01, 100.0, "a spring, rod or cable length: a centimetre to a hundred metres"),
+  ("F=m*a", "a"): (0.05, 300.0, "a linear acceleration from a gentle lift at 0.05 m/s^2 to a 30 g crash deceleration at 300 m/s^2"),
+  ("F_net=m*a", "a"): (0.05, 300.0, "a linear acceleration from a gentle lift at 0.05 m/s^2 to a 30 g crash deceleration at 300 m/s^2"),
+  ("m=F_net/a", "a"): (0.05, 300.0, "a linear acceleration from a gentle lift at 0.05 m/s^2 to a 30 g crash deceleration at 300 m/s^2"),
+  ("m=F_net/a", "F_net"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("a=((F)/(m))", "F"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("F_c=m*a_c", "a_c"): (0.1, 10000.0, "a centripetal acceleration from 0.1 m/s^2 on a slow carousel to 1e4 m/s^2 in a bench centrifuge (~1000 g)"),
+  ("v=v_0+a*t", "a"): (0.05, 300.0, "a linear acceleration from a gentle lift at 0.05 m/s^2 to a 30 g crash deceleration at 300 m/s^2"),
+  ("v=v_0+a*t", "v_0"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("v=a*t", "a"): (0.05, 300.0, "a linear acceleration from a gentle lift at 0.05 m/s^2 to a 30 g crash deceleration at 300 m/s^2"),
+  ("a=((Delta_v)/(Delta_t))", "Delta_v"): (0.01, 1000.0, "a change of speed over the interval, on the scale of the speeds themselves"),
+  ("a=(vf-vi)/t", "vf"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("a=(vf-vi)/t", "vi"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("v=d/t", "d"): (0.001, 1.0e6, "a distance travelled: a bench-top millimetre to a 1000 km journey"),
+  ("Delta_x=x_f-x_i", "x_f"): (0.001, 10000.0, "a position on a laboratory or field axis"),
+  ("Delta_x=x_f-x_i", "x_i"): (0.001, 10000.0, "a position on a laboratory or field axis"),
+  ("x=x_0+v_x*t", "v_x"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("x=x_0+v_x*t", "x_0"): (0.001, 10000.0, "a starting position on a laboratory or field axis"),
+  ("d=d_0+v_0*t+((1)/(2))*a*(t)^(2)", "a"): (0.05, 300.0, "a linear acceleration from a gentle lift at 0.05 m/s^2 to a 30 g crash deceleration at 300 m/s^2"),
+  ("d=d_0+v_0*t+((1)/(2))*a*(t)^(2)", "d_0"): (0.001, 10000.0, "a starting position on a laboratory or field axis"),
+  ("d=d_0+v_0*t+((1)/(2))*a*(t)^(2)", "v_0"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("d=vi*t+0.5*a*(t)^(2)", "a"): (0.05, 300.0, "a linear acceleration from a gentle lift at 0.05 m/s^2 to a 30 g crash deceleration at 300 m/s^2"),
+  ("d=vi*t+0.5*a*(t)^(2)", "vi"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))", "x_1"): (0.001, 10000.0, "a map or laboratory coordinate"),
+  ("d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))", "x_2"): (0.001, 10000.0, "a map or laboratory coordinate"),
+  ("d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))", "y_1"): (0.001, 10000.0, "a map or laboratory coordinate"),
+  ("d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))", "y_2"): (0.001, 10000.0, "a map or laboratory coordinate"),
+  ("v_toty=v_wy+v_p", "v_p"): (1.0, 300.0, "the craft's own speed: a 1 m/s boat to a 300 m/s airliner"),
+  ("v_toty=v_wy+v_p", "v_wy"): (0.1, 50.0, "a wind or current component: a 0.1 m/s drift to a 50 m/s gale"),
+  ("v=v_0-g*t", "v_0"): (0.5, 300.0, "a launch speed under gravity: a gently tossed ball at 0.5 m/s to a rifle bullet at 300 m/s"),
+  ("y=y_0+v_0*t-((1)/(2))*g*(t)^(2)", "v_0"): (0.5, 300.0, "a launch speed under gravity: a gently tossed ball at 0.5 m/s to a rifle bullet at 300 m/s"),
+  ("y=y_0+v_0*t-((1)/(2))*g*(t)^(2)", "y_0"): (0.01, 1000.0, "a launch height: ground level to a 1 km cliff or tower"),
+  ("y=y_0+((1)/(2))(v_0y+v_y)t", "v_0y"): (0.01, 300.0, "a vertical velocity component under gravity, up to a rifle-bullet launch"),
+  ("y=y_0+((1)/(2))(v_0y+v_y)t", "v_y"): (0.01, 300.0, "a vertical velocity component under gravity, up to a rifle-bullet launch"),
+  ("y=y_0+((1)/(2))(v_0y+v_y)t", "y_0"): (0.01, 1000.0, "a launch height: ground level to a 1 km cliff or tower"),
+  ("x=v_0x*t", "v_0x"): (0.5, 300.0, "the horizontal launch component of a projectile"),
+  ("T_tof=((2(v_0*sin(theta_0)))/(g))", "v_0"): (0.5, 300.0, "a launch speed under gravity: a gently tossed ball at 0.5 m/s to a rifle bullet at 300 m/s"),
+  ("p=m*v", "v"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("Delta_p=m*Delta_v", "Delta_v"): (0.01, 1000.0, "a change of speed in a collision or braking event, on the scale of the speeds themselves"),
+  ("F=((m*Delta_v)/(Delta_t))", "Delta_v"): (0.01, 1000.0, "a change of speed in a collision or braking event, on the scale of the speeds themselves"),
+  ("F_net=((Delta_p)/(Delta_t))", "Delta_p"): (0.01, 1.0e5, "a momentum change from 0.01 kg m/s (a flicked coin) to 1e5 kg m/s (a loaded truck)"),
+  ("Delta_p=F_net*Delta_t", "F_net"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("W=F*d", "F"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("W=F*d", "d"): (0.001, 10000.0, "a laboratory-to-field distance: a millimetre to ten kilometres"),
+  ("W_o=F_o*d_o", "F_o"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("W_o=F_o*d_o", "d_o"): (0.01, 100.0, "the distance a machine's output force acts over"),
+  ("W_i=F_i*d_i", "F_i"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("W_i=F_i*d_i", "d_i"): (0.01, 100.0, "the distance a machine's input force acts over"),
+  ("W_net=K_B-K_A", "K_A"): (0.01, 1.0e7, "a mechanical energy from a dropped coin at ~0.01 J to a loaded truck in motion at ~10^7 J"),
+  ("W_net=K_B-K_A", "K_B"): (0.01, 1.0e7, "a mechanical energy from a dropped coin at ~0.01 J to a loaded truck in motion at ~10^7 J"),
+  ("E=K+U", "K"): (0.01, 1.0e7, "a mechanical energy from a dropped coin at ~0.01 J to a loaded truck in motion at ~10^7 J"),
+  ("E=K+U", "U"): (0.01, 1.0e7, "a mechanical energy from a dropped coin at ~0.01 J to a loaded truck in motion at ~10^7 J"),
+  ("W_out=W_in-W_f", "W_f"): (0.01, 1.0e7, "a mechanical energy from a dropped coin at ~0.01 J to a loaded truck in motion at ~10^7 J"),
+  ("W_out=W_in-W_f", "W_in"): (0.01, 1.0e7, "a mechanical energy from a dropped coin at ~0.01 J to a loaded truck in motion at ~10^7 J"),
+  ("K=0.5*m*(v)^(2)", "v"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("U=m*g*h", "h"): (0.01, 10000.0, "a height above the reference level; constant g needs h far below the Earth's 6371 km radius"),
+  ("P=((W)/(t))", "W"): (0.01, 1.0e7, "a mechanical energy from a dropped coin at ~0.01 J to a loaded truck in motion at ~10^7 J"),
+  ("P=F*v", "F"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("P=F*v", "v"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("E=P*t", "P"): (0.5, 1.0e6, "a mechanical or household power: a 0.5 W indicator to a 1 MW locomotive"),
+  ("v_t=r*omega", "omega"): (1.0e-5, 10000.0, "a rotating body's angular speed: the Earth's spin at 7.3e-5 rad/s to a turbocharger at 10^4 rad/s"),
+  ("v_t=r*omega", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("omega=v/r", "v"): (0.01, 1000.0, "a textbook mechanical speed: a snail at 0.013 m/s to a rifle bullet at 900 m/s"),
+  ("omega=v/r", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("v_CM=R*omega", "R"): (0.01, 2.0, "a rolling body's radius: a marble at 1 cm to a large wheel or boulder at 2 m"),
+  ("v_CM=R*omega", "omega"): (1.0e-5, 10000.0, "a rotating body's angular speed: the Earth's spin at 7.3e-5 rad/s to a turbocharger at 10^4 rad/s"),
+  ("a_CM=R*alpha", "R"): (0.01, 2.0, "a rolling body's radius: a marble at 1 cm to a large wheel or boulder at 2 m"),
+  ("a_CM=R*alpha", "alpha"): (1.0e-4, 10000.0, "an angular acceleration from a flywheel creeping up at 1e-4 rad/s^2 to a hard disc spinning up at 1e4 rad/s^2"),
+  ("d_CM=R*theta", "R"): (0.01, 2.0, "a rolling body's radius: a marble at 1 cm to a large wheel or boulder at 2 m"),
+  ("a_t=r*alpha", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("a_t=r*alpha", "alpha"): (1.0e-4, 10000.0, "an angular acceleration from a flywheel creeping up at 1e-4 rad/s^2 to a hard disc spinning up at 1e4 rad/s^2"),
+  ("alpha=((a_t)/(r))", "a_t"): (0.05, 10000.0, "a tangential acceleration of a point on a rotating body; the same window as the result of a_t=r*alpha, so it does not depend on which side of the relation it appears on"),
+  ("alpha=((a_t)/(r))", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("alpha=((Delta_omega)/(Delta_t))", "Delta_omega"): (1.0e-4, 10000.0, "a change of angular speed over the interval, on the scale of the speeds themselves"),
+  ("omega_f=omega_0+alpha*t", "alpha"): (1.0e-4, 10000.0, "an angular acceleration from a flywheel creeping up at 1e-4 rad/s^2 to a hard disc spinning up at 1e4 rad/s^2"),
+  ("omega_f=omega_0+alpha*t", "omega_0"): (1.0e-5, 10000.0, "a rotating body's angular speed: the Earth's spin at 7.3e-5 rad/s to a turbocharger at 10^4 rad/s"),
+  ("s=r*theta", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("theta=((s)/(r))", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("theta=((s)/(r))", "s"): (0.001, 400.0, "an arc on a circle of the declared radius: two turns of the widest r (30 m) is 377 m"),
+  ("Delta_theta=((Delta_s)/(r))", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("Delta_theta=((Delta_s)/(r))", "Delta_s"): (0.001, 400.0, "an arc on a circle of the declared radius: two turns of the widest r (30 m) is 377 m"),
+  ("A=((1)/(2))*theta*(r)^(2)", "r"): (0.01, 30.0, "the radius of the sector's circle"),
+  ("L=I*omega", "I"): (1.0e-7, 1.0e5, "a moment of inertia: a spinning coin at ~4e-7 kg m^2 to a power-station flywheel at 1e5 kg m^2"),
+  ("L=I*omega", "omega"): (1.0e-5, 10000.0, "a rotating body's angular speed: the Earth's spin at 7.3e-5 rad/s to a turbocharger at 10^4 rad/s"),
+  ("P=tau*omega", "omega"): (1.0e-5, 10000.0, "a rotating body's angular speed: the Earth's spin at 7.3e-5 rad/s to a turbocharger at 10^4 rad/s"),
+  ("P=tau*omega", "tau"): (0.01, 1.0e5, "a torque from a 0.01 N m watch spring to a 1e5 N m propeller shaft"),
+  ("tau=r*F", "F"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("tau=r*F", "r"): (0.01, 30.0, "a lever arm or rotor radius: a bolt head at 1 cm to a crane boom at 30 m"),
+  ("a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))", "r"): (0.01, 2.0, "a rolling body's radius: a marble at 1 cm to a large wheel or boulder at 2 m"),
+  ("a=(v)^(2)/r", "v"): (0.01, 300.0, "the speed of a body on a circular path"),
+  ("a=(v)^(2)/r", "r"): (0.01, 1000.0, "the radius of a circular path: a laboratory rotor at 1 cm to a motorway curve at 1 km"),
+  ("a_c=(((v)^(2))/(r))", "v"): (0.01, 300.0, "the speed of a body on a circular path"),
+  ("a_c=(((v)^(2))/(r))", "r"): (0.01, 1000.0, "the radius of a circular path: a laboratory rotor at 1 cm to a motorway curve at 1 km"),
+  ("p=((F)/(A))", "F"): (0.1, 1.0e5, "a mechanics force: the weight of a paperclip at ~0.1 N to a collision or engine force at 10^5 N"),
+  ("p=((F)/(A))", "A"): (1.0e-8, 100.0, "the area a force is spread over: a needle tip at 10^-8 m^2 to a foundation slab at 100 m^2"),
+  ("p_abs=p_g+p_atm", "p_g"): (1000.0, 2.0e7, "a gauge pressure worth adding to 101 kPa: blood pressure at ~16 kPa to a 20 MPa gas cylinder"),
+  ("p=p_0+rho*g*h", "h"): (0.01, 10000.0, "a depth in a liquid: a beaker at 1 cm to the 10,900 m Challenger Deep"),
+  ("p=p_0+rho*g*h", "rho"): (600.0, 13600.0, "a liquid: gasoline 680, water 1000, seawater 1025, mercury 13,600"),
+  ("m=rho*V", "rho"): (0.5, 22600.0, "a material density: a gas at ~1, water at 1000, osmium at 22,600 kg/m^3"),
+  ("m=rho*V", "V"): (1.0e-6, 1000.0, "a volume from a cubic centimetre to a thousand cubic metres"),
+  ("rho=((m)/(V))", "V"): (1.0e-6, 1000.0, "a volume from a cubic centimetre to a thousand cubic metres"),
+  ("F_D=((1)/(2))*C*rho*A*(v)^(2)", "rho"): (1.0, 1030.0, "the fluid the body moves through: air at 1.2, seawater at 1030"),
+  ("F_D=((1)/(2))*C*rho*A*(v)^(2)", "A"): (1.0e-4, 10.0, "a frontal area from a ball bearing to a truck"),
+  ("F_D=((1)/(2))*C*rho*A*(v)^(2)", "v"): (0.1, 300.0, "the speed of the body through the fluid, up to terminal velocity in a dive"),
+  ("a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))", "I_CM"): (1.0e-7, 10000.0, "a rolling body's moment of inertia: a marble at 4e-7 to a heavy wheel at 1e4 kg m^2"),
+  ("W=Q_h-Q_c", "Q_h"): (1.0, 1.0e7, "the heat an engine takes in per cycle, a laboratory demonstration's joules to a power plant's megajoules"),
+  ("W=Q_h-Q_c", "Q_c"): (1.0, 1.0e7, "the heat an engine exhausts per cycle, on the same scale as Q_h"),
+  ("Delta_U=Q-W", "Q"): (1.0, 1.0e6, "the heat added to a gas sample in a laboratory process"),
+  ("Delta_U=Q-W", "W"): (1.0, 1.0e6, "the work done by that gas sample"),
+  ("Q=Delta_E_int-W", "Delta_E_int"): (1.0, 1.0e6, "the internal-energy change of a gas sample in a laboratory process"),
+  ("Q=Delta_E_int-W", "W"): (1.0, 1.0e6, "the work done by that gas sample"),
+  ("Delta_S=((Q)/(T))", "Q"): (1.0, 1.0e6, "the heat transferred reversibly at fixed temperature"),
+  ("Delta_S_tot=Delta_S_h+Delta_S_c", "Delta_S_h"): (0.001, 10000.0, "an entropy change of a laboratory system, mJ/K to kJ/K"),
+  ("Delta_S_tot=Delta_S_h+Delta_S_c", "Delta_S_c"): (0.001, 10000.0, "an entropy change of the surroundings, mJ/K to kJ/K"),
+  ("C_p=C_V+R", "C_V"): (12.5, 45.0, "an ideal gas at constant volume: 3R/2 = 12.5 monatomic, 7R/2 = 29.1 diatomic with vibration, higher for a large polyatomic"),
+  ("V=I*R", "I"): (0.001, 100.0, "a circuit current from a milliamp signal to a 100 A starter cable"),
+  ("V=I*R", "R"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
+  ("R=V/I", "V"): (0.1, 1000.0, "a circuit voltage from a tenth of a volt to a 1 kV supply"),
+  ("R=V/I", "I"): (0.001, 100.0, "a circuit current from a milliamp signal to a 100 A starter cable"),
+  ("P=V*I", "V"): (0.1, 1000.0, "a circuit voltage from a tenth of a volt to a 1 kV supply"),
+  ("P=V*I", "I"): (0.001, 100.0, "a circuit current from a milliamp signal to a 100 A starter cable"),
+  ("P=(I)^(2)*R", "I"): (0.001, 100.0, "the current through the resistor, a milliamp signal to a 100 A load"),
+  ("P=(I)^(2)*R", "R"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
+  ("P=(((V)^(2))/(R))", "V"): (0.1, 1000.0, "the voltage across the resistor, a tenth of a volt to a 1 kV supply"),
+  ("P=(((V)^(2))/(R))", "R"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
+  ("R_eqv=R_1+R_2", "R_1"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
+  ("R_eqv=R_1+R_2", "R_2"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
+  ("R_eqv=((1)/(1/R_1+1/R_2))", "R_1"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
+  ("R_eqv=((1)/(1/R_1+1/R_2))", "R_2"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
+  ("I_1=I_2+I_3", "I_2"): (0.001, 100.0, "a branch current at a junction, a milliamp to 100 A"),
+  ("I_1=I_2+I_3", "I_3"): (0.001, 100.0, "a branch current at a junction, a milliamp to 100 A"),
+  ("I_S=((N_P)/(N_S))*I_P", "I_P"): (0.001, 100.0, "a transformer primary current, a milliamp to 100 A"),
+  ("tau=R*C", "R"): (1.0, 1.0e7, "the resistance of an RC network, ohms to tens of megohms"),
+  ("tau=R*C", "C"): (1.0e-12, 1.0e-4, "a capacitor from a picofarad trimmer to a 100 uF electrolytic"),
+  ("C=((Q)/(V))", "V"): (0.1, 1000.0, "the potential difference across the capacitor, a tenth of a volt to a kilovolt"),
+  ("U_E=((1)/(2))*C*(V)^(2)", "C"): (1.0e-12, 1.0e-4, "a capacitor from a picofarad trimmer to a 100 uF electrolytic"),
+  ("U_E=((1)/(2))*C*(V)^(2)", "V"): (0.1, 1000.0, "the potential difference across the capacitor, a tenth of a volt to a kilovolt"),
+  ("V=((U_E)/(q))", "U_E"): (1.0e-9, 1.0e-4, "the electrostatic potential energy of the laboratory charge this record also declares: nJ to 0.1 mJ"),
+  ("epsilon=B*l*v", "l"): (0.01, 10.0, "the length of the moving conductor, a rod on laboratory rails to a 10 m bar"),
+  ("epsilon=B*l*v", "v"): (0.1, 100.0, "the speed at which the rod is dragged along the rails"),
+  ("v_d=E/B", "E"): (100.0, 1.0e6, "a laboratory electric field, below the ~3e6 V/m breakdown of air"),
+  ("v_d=((I)/(n*q*A))", "I"): (0.001, 100.0, "a current in a laboratory wire, a milliamp to 100 A, the same window as every other current in this table"),
+  ("F=q*v*B", "v"): (1.0, 1000.0, "the speed of the charged body, matched to the laboratory-scale charge declared on this record"),
+  ("F=q*v*B*sin(theta)", "v"): (1.0, 1000.0, "the speed of the charged body, matched to the laboratory-scale charge declared on this record"),
+  ("r=((m*v)/(q*B))", "v"): (1.0e5, 3.0e7, "the electron this record supplies m and q for: 1e5 m/s is thermal, 3e7 m/s is 0.1c (2.5 keV)"),
+  ("I_0=((V_0)/(Z))", "V_0"): (0.1, 1000.0, "a peak AC source voltage; mains peak is 170 V"),
+  ("I_0=((V_0)/(Z))", "Z"): (0.1, 1.0e6, "an AC circuit's impedance, a fraction of an ohm to a megohm"),
+  ("I_rms=V_rms/Z", "V_rms"): (0.1, 1000.0, "an rms source voltage; mains is 120-240 V"),
+  ("I_rms=V_rms/Z", "Z"): (0.1, 1.0e6, "an AC circuit's impedance, a fraction of an ohm to a megohm"),
+  ("V_rms=((V_0)/(sqrt(2)))", "V_0"): (0.1, 1000.0, "a peak AC voltage; mains peak is 170 V"),
+  ("I_rms=((I_0)/(sqrt(2)))", "I_0"): (0.001, 100.0, "a peak AC current, a milliamp to 100 A"),
+  ("P_ave=I_rms*V_rms", "I_rms"): (0.001, 100.0, "an rms circuit current, a milliamp to 100 A"),
+  ("P_ave=I_rms*V_rms", "V_rms"): (0.1, 1000.0, "an rms circuit voltage; mains is 120-240 V"),
+  ("Q=((omega_0)/(Delta_omega))", "omega_0"): (100.0, 1.0e9, "an LC resonance from audio to UHF"),
+  ("Q=((omega_0)/(Delta_omega))", "Delta_omega"): (1.0, 1.0e8, "the resonance bandwidth; the record's precondition already requires it below omega_0"),
+  ("v=f*lambda", "f"): (0.1, 20000.0, "a mechanical-wave frequency, a 0.1 Hz ocean swell to the top of hearing"),
+  ("v=f*lambda", "lambda"): (0.001, 1000.0, "a mechanical wavelength, a millimetre ripple to a kilometre ocean swell"),
+  ("v=((lambda)/(T))", "lambda"): (0.001, 1000.0, "a mechanical wavelength, a millimetre ripple to a kilometre ocean swell"),
+  ("v=((omega)/(k))", "omega"): (0.1, 1.0e6, "a wave's angular frequency, from an ocean swell to ultrasound"),
+  ("v=((omega)/(k))", "k"): (0.001, 10000.0, "a wave number, 2*pi/lambda for wavelengths from a kilometre to a millimetre"),
+  ("f_1=((v)/(4*L))", "v"): (250.0, 1100.0, "the speed of sound in the tube's gas: 259 m/s in CO2, 343 in air, 1007 in helium"),
+  ("f_1=((v)/(4*L))", "L"): (0.05, 10.0, "a closed tube from a 5 cm resonance tube to a 10 m organ pipe"),
+  ("L=((v_w)/(4*f_1))", "v_w"): (250.0, 1100.0, "the speed of sound in the tube's gas: 259 m/s in CO2, 343 in air, 1007 in helium"),
+  ("L=((v_w)/(4*f_1))", "f_1"): (20.0, 20000.0, "an audible fundamental"),
+  ("f_beat=|f_2-f_1|", "f_1"): (20.0, 20000.0, "an audible tone"),
+  ("f_beat=|f_2-f_1|", "f_2"): (20.0, 20000.0, "an audible tone"),
+  ("I=((P)/(A))", "P"): (1.0e-6, 1.0e5, "a source power from a microwatt emitter to a 100 kW transmitter"),
+  ("I=((P)/(A))", "A"): (1.0e-4, 10000.0, "the area the power crosses, a square centimetre detector to a hectare"),
+  ("I=((P)/(4*pi*(r)^(2)))", "P"): (1.0e-6, 1.0e5, "a source power from a microwatt emitter to a 100 kW transmitter"),
+  ("I=((P)/(4*pi*(r)^(2)))", "r"): (0.01, 10000.0, "distance from the source, a centimetre to ten kilometres"),
+  ("I_2=I_1*((((r_1)/(r_2))))^(2)", "I_1"): (1.0e-12, 10.0, "a sound intensity from the 1e-12 W/m^2 threshold of hearing to a painful 10 W/m^2"),
+  ("I_2=I_1*((((r_1)/(r_2))))^(2)", "r_1"): (0.01, 10000.0, "distance from the source, a centimetre to ten kilometres"),
+  ("I_2=I_1*((((r_1)/(r_2))))^(2)", "r_2"): (0.01, 10000.0, "distance from the source, a centimetre to ten kilometres"),
+  ("I=((((Delta_p_max))^(2))/(2*rho*v))", "Delta_p_max"): (2.0e-5, 200.0, "a sound pressure amplitude: 2e-5 Pa is the threshold of hearing, 200 Pa is about 140 dB"),
+  ("I=((((Delta_p_max))^(2))/(2*rho*v))", "rho"): (1.0, 8000.0, "the density of the medium carrying the sound: air 1.2, water 1000, steel 7900"),
+  ("f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))", "f_s"): (1.0e8, 1.0e16, "the source's emitted frequency, a radio carrier through an optical spectral line"),
+  ("f=((R)/(2))", "R"): (0.02, 20.0, "a spherical mirror's radius of curvature, a 2 cm dental mirror to a 20 m telescope"),
+  ("f=((d_i*d_o)/(d_o+d_i))", "d_o"): (0.01, 100.0, "an object distance on an optical bench, a centimetre to a hundred metres"),
+  ("f=((d_i*d_o)/(d_o+d_i))", "d_i"): (0.01, 100.0, "an image distance on an optical bench, a centimetre to a hundred metres"),
+  ("P=((1)/(f))", "f"): (0.005, 2.0, "a focal length: 5 mm for a microscope objective, 0.5 m for reading glasses, 2 m for a telescope objective"),
+  ("h_i=(((n_2)/(n_1)))*h_o", "h_o"): (0.001, 1.0, "an object height at the refracting surface, a millimetre to a metre"),
+  ("lambda_n=((lambda)/(n))", "lambda"): (1.0e-9, 1.0e-5, "an optical wavelength in vacuum, matching the window declared for lambda in Delta_y=x*lambda/d"),
+
   # --- thermal ---------------------------------------------------------------------------------
   ("Q=m*c*dT", "c"):                (100.0, 15000.0, "specific heat, lead to water"),
   # --- acoustics -------------------------------------------------------------------------------
@@ -396,9 +603,20 @@ def preconditions_hold(rec, vals):
 def sample_in_range(rng, lo, hi, integral):
     """Draw from the empirical pool, restricted to the range; fall back to a uniform draw when the
     pool offers nothing there, so a narrow window cannot silently empty the distribution."""
-    pool = [v for v in _POOL if lo <= v <= hi and (not integral or float(v).is_integer())]
-    if pool: return rng.choice(pool)
-    if integral: return float(rng.randint(int(lo), max(int(lo), int(hi))))
+    # A28. THE POOL IS PREFERRED ONLY IF IT OFFERS REAL VARIETY. `if pool:` accepted a window
+    # containing a SINGLE pool value, so seven declared givens were drawn as the same number in
+    # 100% of documents -- q, Q, sigma and a plate gap were all always 0.001. A variable that never
+    # varies is worse than one drawn too wide: the model sees a constant where the physics has a
+    # free parameter, and no range check can see it because the value is in range every time.
+    #
+    # The mechanism is that a declared range can only FILTER the mined pool; it reaches values the
+    # pool lacks only through the fallback below. So the fallback must fire not just when the pool
+    # offers NOTHING, but whenever it offers too little to be a distribution.
+    pool = sorted({v for v in _POOL if lo <= v <= hi and (not integral or float(v).is_integer())})
+    if len(pool) >= 5: return rng.choice(pool)
+    if integral:
+        if pool: return rng.choice(pool)          # few but real integers: use them
+        return float(rng.randint(int(lo), max(int(lo), int(hi))))
     # LOG-UNIFORM, AND SIGNIFICANT FIGURES RATHER THAN DECIMAL PLACES.
     #
     # `round(x, 4)` counts DECIMAL PLACES: round(3e-9, 4) is 0.0. It turned every optical
@@ -513,7 +731,10 @@ def lhs_unit(r):
 # quantity, not a heuristic reading a name.
 _RESULT_RANGE = {
     "efficiency":       (0.0, 1.0,   "an efficiency must lie in [0, 1]"),
-    "refractive_index": (1.0, 100.0, "a refractive index must lie in [1, 100]"),
+    # ONE WINDOW PER QUANTITY. This said (1, 100) while _KIND_RANGE said (1, 4) -- the same
+    # physical quantity with two windows 25x apart, so a result n = 40 passed while a GIVEN n = 40
+    # would have failed. Matched to the given side.
+    "refractive_index": (1.0, 4.0, "a refractive index must lie in [1, 4]"),
     # (0, 100) WAS TOO LOOSE TO FIRE. Measured over 89 g-documents the results spanned
     # [4.39e-06, 98.7] and every one passed -- a g of 4e-6 m/s^2 is not any body a textbook
     # mentions. Pluto is 0.62 and Jupiter 24.8, so [0.1, 30] is generous for the whole solar
@@ -1068,7 +1289,7 @@ def gen(n, seed=0):
             shown_w = [v for v in shown if v != drop]
             g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown_w) if shown_w else g
         stem = rng.choice(GIVE).format(g=g)
-        ask  = ask_for(r, quantity_surface(r, rng), rng)
+        ask  = rng.choice(ASK_ALL).format(q=quantity_surface(r, rng))
         # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
         # real problems, and ordering moves 4-gram diversity more than the verb does.
         if rng.random() < 0.35:

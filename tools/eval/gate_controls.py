@@ -122,6 +122,9 @@ CONTROLS = {
     # Revert the union: iterate the annotated set alone, and the 25 fall back out.
     "units_parity":    ("corpus/units_train.json",   # put the seconds back in one file only
                         '"T_h": "K"', '"T_h": "s"'),
+    "no_collapse":     ("corpus/generate.py",   # accept a one-value pool window again
+                        "    if len(pool) >= 5: return rng.choice(pool)",
+                        "    if pool: return rng.choice(pool)"),
     "given_range":     ("corpus/generate.py",     # draw givens from the flat pool again
                         "            return sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else sample_value(rng)",
                         "            return sample_value(rng)"),

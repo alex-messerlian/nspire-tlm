@@ -127,6 +127,9 @@ $PY tools/eval/gate_units_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "
 # see digits and dim_gate finds -28.75 a dimensionally fine efficiency.
 # A21: gate_plausible filters RESULTS; every GIVEN was unchecked, and 69% of trig documents fed
 # an angle of several full turns. Range is per QUANTITY, not per unit.
+# Seven declared givens were drawn as 0.001 in 100% of documents: the window contained exactly
+# one pool value. A variable that never varies is invisible to every range check.
+$PY tools/eval/gate_no_collapse.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_collapse" || { printf "  %-20s FAIL\n" "no_collapse"; fail=1; }
 $PY tools/eval/gate_given_range.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "given_range" || { printf "  %-20s FAIL\n" "given_range"; fail=1; }
 $PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "plausible" || { printf "  %-20s FAIL\n" "plausible"; fail=1; }
 # THE SAME DEFECT WAS FOUND FOUR TIMES, ONE FIELD OVER EACH TIME (units, condition, fit,
