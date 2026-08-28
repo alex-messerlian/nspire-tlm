@@ -5,6 +5,7 @@ Token count is the wrong instrument: 310k documents from 27 record heads is 27 p
 and the token count looks identical to a genuinely varied corpus. Everything here is reported
 alongside three diversity measures, never alone."""
 import json
+import pathlib
 import math
 import sys as _sys, pathlib as _pl
 _sys.path.insert(0, str(_pl.Path(__file__).parent))
@@ -1611,6 +1612,27 @@ _rb  = sum(1 for v in _RESULT_KIND.values() if v is not None)
 print(f"declaration coverage  GIVEN-side {_gvd}/{len(_gv)} ({100*_gvd/len(_gv):.1f}%)"
       f"   RESULT-side {len(_RESULT_KIND)}/{len(recs)} declared, of which {_rb} carry a bound "
       f"and {len(_RESULT_KIND)-_rb} are reviewed-unbounded (a window that cannot fire is not a check)")
+# ---- INPUT NORMALISATION: no target may be a single-letter lookalike ---------------------------
+#
+# "Normalise to ASCII" is not sufficient as a rule. rho/p, tau/t, omega/w and sigma/s are ALL live
+# symbol pairs in store_clean.json, so a map sending a Greek glyph to a visually similar Latin
+# letter silently turns a density into a pressure -- and leaves a well-formed document that the
+# units gate, the shape check, provenance and the dimensional gate all pass. It is the
+# is_refusal/prov_clean scope defect in a new place: one surface standing for two meanings.
+#
+# Making it IMPOSSIBLE rather than discouraged: every target is a name, and this assertion refuses
+# to import a table where any Greek glyph maps onto a single letter at all.
+_SYMMAP_PATH = pathlib.Path(__file__).resolve().parent / "symbol_map.json"
+_SYMBOL_MAP = json.load(open(_SYMMAP_PATH))["map"] if _SYMMAP_PATH.exists() else {}
+_GREEK = [(k, v) for k, v in _SYMBOL_MAP.items() if "\u0370" <= k <= "\u03ff"]
+_LOOKALIKE = [(k, v) for k, v in _GREEK if len(v) == 1 and v.isalpha()]
+assert not _LOOKALIKE, (
+    "SYMBOL MAP SENDS A GREEK GLYPH TO A SINGLE LETTER: " + repr(_LOOKALIKE)
+    + "\nEvery Greek target must be its NAME. rho->p turns a density into a pressure and no gate"
+      "\ncan see it. See docs/DESIGN_SYMBOLIC_INPUT.md section 2.")
+_BAD_ASCII = [(k, v) for k, v in _SYMBOL_MAP.items() if any(ord(c) > 127 for c in v)]
+assert not _BAD_ASCII, f"symbol map has a non-ASCII TARGET, which defeats the whole point: {_BAD_ASCII}"
+
 print(f"records usable as physics relations: {len(recs)} of {len(_ann)} annotated "
       f"({len(_unnamed)} skipped for want of a relation name, "
       f"{len(_ann)-len(recs)-len(_unnamed)} by usable(), which exempts hand-curated records)")
@@ -1796,7 +1818,28 @@ def gen(n, seed=0):
         roll = rng.random()
         withhold = roll < 0.10 and len(vs) >= 2
         mismatch = 0.10 <= roll < 0.15
-        nomatch  = 0.15 <= roll < 0.18
+        # A35. D3 IS NOT GENERATED, AND THE REASON IS AN INABILITY, NOT A TUNING PROBLEM.
+        #
+        # Criterion, stated before it was applied (tools/eval/d3_criterion.py): a D3 document is
+        # LEGITIMATE iff the store contains NO record computing the quantity the question asks for
+        # from the givens it supplies. Applied to the corpus: 843 of 843 ILLEGITIMATE -- 100.0%.
+        #
+        # A rate of exactly 100% is the signature of an inability. The question is built FROM a real
+        # record (above) and only then is the record span overwritten with the no-match literal, so
+        # a legitimate D3 is UNREACHABLE from this path -- every one of them declines a question the
+        # store demonstrably answers. The positive control confirms the criterion discriminates
+        # rather than always firing: the six hand-written out-of-scope questions in EVAL_ITEMS.md
+        # (ladder statics, two-block friction, headwind projectile) all score LEGITIMATE.
+        #
+        # This function's own A12 note states the governing rule: "A refusal that fires on a
+        # satisfied precondition is wrong supervision: it teaches the model to refuse a question it
+        # can answer." 843 documents were doing exactly that, and D2's fit-label defect is the same
+        # shape one level up -- teaching a prompt state the runtime cannot produce.
+        #
+        # A real D3 needs questions drawn from OUTSIDE the store. The six hand-written items prove
+        # that is possible and that it is hand-authored work; until such a source exists, generating
+        # D3 is worse than omitting it. gate_d3_legitimacy.py fails if any is emitted.
+        nomatch  = False
         if withhold:
             # A12. WITHHOLD A FREE VARIABLE, NEVER A CONSTANT. `rng.choice(vs)` could pick g, c, h
             # or G -- values the device ALWAYS inlines (A7) -- so 111 of 11,975 documents refused

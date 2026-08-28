@@ -50,6 +50,7 @@ extern void  rq_build(const char *path);
 extern int   rq_probe(const char *path, char *why, int cap);
 extern float *rq_forward(int token, int pos);
 extern int   rq_vocab(void);
+extern int   rq_seq_len(void);
 extern void  rq_free(void);
 
 /* provided by the profile build of runq_nspire.c. Matched to that enum BY ORDINAL -- if you add a
@@ -177,6 +178,47 @@ int main(void) {
         bench_result("INTERCEPT_us", "%lld", (long long)((int64_t)icept_m * 1000000 / 32768 / 1000));
         bench_result("INTERCEPT_note", "%s",
             "this is F0 MEASURED. The table assumed ~180000 us at d288 L6.");
+    }
+
+    /* ---- 1b. HOW DOES COST SCALE WITH POSITION? ------------------------------------------
+     *
+     * THE ONE NUMBER THAT SETTLES N. Two cost models agree on per-layer matmul and fixed cost and
+     * disagree at long context by 23%: one charges attention at the mean position and ignores KV
+     * traffic, the other charges it at the worst-case position and adds KV reads at 97 MB/s. At
+     * d352 L6 C512 that is 2.23 tok/s against 1.72 -- the difference between clearing the 2 tok/s
+     * floor and missing it, and the model size rides on it.
+     *
+     * Every earlier measurement sat at ONE position (~89), so the slope was never observed and both
+     * models were fitted to the same single point. Sweeping position at fixed L measures
+     * d(cost)/d(pos) directly; extrapolating to C=512 is then a 2x extension of a MEASURED slope
+     * rather than a choice between two assumptions.
+     *
+     * Bounded by the checkpoint's own seq_len rather than a hardcoded 500: this model is seq_len
+     * 256, so pos 500 is not reachable and asking for it would read past the KV cache. */
+    {
+        int SL = rq_seq_len();
+        bench_result("part1b", "%s", "time per token vs POSITION, fixed L=6 -- settles the KV term");
+        bench_result("seq_len", "%d", SL);
+        tlm_prof_layers = -1;
+        int bases[5], nb = 0;
+        for (int k = 0; k < 5; k++) {
+            int b = 8 + k * ((SL - REPS - 16) / 4);
+            if (b + REPS < SL) bases[nb++] = b;
+        }
+        for (int i = 0; i < nb; i++) {
+            int b = bases[i];
+            for (int w = 0; w < WARM; w++) rq_forward(1, b + w);
+            uint32_t t0 = timer_raw(TIMER_32K_BASE);
+            for (int r = 0; r < REPS; r++) rq_forward(1, b + r);
+            uint32_t ticks = timer_delta(t0, timer_raw(TIMER_32K_BASE)) / REPS;
+            bench_result("t_per_token_pos", "pos %d = %lu ticks = %lu us",
+                         b, (unsigned long)ticks,
+                         (unsigned long)((uint64_t)ticks * 1000000u / 32768u));
+        }
+        bench_result("part1b_note", "%s",
+            "fit a line to these: the SLOPE is the per-position cost (attention + KV traffic) and "
+            "the INTERCEPT is the position-independent cost. Extrapolate to C/2 for a mean-position "
+            "tok/s, or to C for worst case, and say which you used.");
     }
 
     /* ---- 2. the decomposition of one full pass --------------------------------------------- */

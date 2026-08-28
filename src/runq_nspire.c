@@ -1475,6 +1475,7 @@ void rq_build(const char *path) {
     G_BUILT = 1;
 }
 int rq_vocab(void) { return G_BUILT ? G_T.config.vocab_size : 0; }
+int rq_seq_len(void) { return G_BUILT ? G_T.config.seq_len : 0; }
 int rq_seqlen(void) { return G_BUILT ? G_T.config.seq_len : 0; }
 float *rq_forward(int token, int pos) { return G_BUILT ? forward(&G_T, token, pos) : 0; }
 void rq_free(void) { if (G_BUILT) { free_transformer(&G_T); G_BUILT = 0; } }

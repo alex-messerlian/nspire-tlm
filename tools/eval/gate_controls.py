@@ -61,6 +61,14 @@ CONTROLS = {
     # Remove the shear precondition from one two-factor product record: the gate must notice that
     # the record now bounds neither its inputs' coupling nor its result. This is the EXACT defect
     # the n=600 read found -- a_t=r*alpha left open while its sibling v_t=r*omega was bounded.
+    # A live subject: 'a' [m/s^2] is declared in 7 records with one window and is NOT exempted.
+    # Two earlier attempts survived because they named the wrong subject -- dT appears in a single
+    # record so it cannot conflict, and q is on the DELIBERATE list. A control must name the thing
+    # the gate asserts about, not merely a string the gate's file contains.
+    "decl_siblings":   ("corpus/generate.py",
+                        '("F_net=m*a", "a"):', '("F_net=m*a", "a"): (7.0, 9.0, "x"),  #'),
+    # D3: put back a document that declines an answerable question.
+    "d3_legitimacy":   ("corpus/generate.py", "        nomatch  = False", "        nomatch  = 0.15 <= roll < 0.18"),
     "coupling_family": ("corpus/generate.py",
                         '"a_t=r*alpha":               (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,',
                         '"a_t=r*alpha_DISABLED":      (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,'),
