@@ -53,5 +53,17 @@ int main(int argc, char **argv) {
                logits[0], logits[1], logits[V - 1]);
     }
     printf("CHAIN=%016llx\n", (unsigned long long)chain);
+    /* Optional: dump every logit so the two KV arms can be compared numerically. A CHAIN hash only
+     * says DIFFERENT; the acceptance criteria are about HOW different. */
+    if (argc > 2) {
+        FILE *o = fopen(argv[2], "wb");
+        if (!o) { fprintf(stderr, "cannot write %s\n", argv[2]); return 2; }
+        for (int step = 0; step < NT; step++) {
+            int pos = step * 31; if (pos >= SL) pos = SL - 1;
+            float *lg = rq_forward(toks[step] % V, pos);
+            fwrite(lg, sizeof(float), (size_t)V, o);
+        }
+        fclose(o);
+    }
     return 0;
 }
