@@ -404,7 +404,10 @@
   },
   "scope": "m58359",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "dce41bce"
+  "rid": "dce41bce",
+  "cval": {
+   "p_atm": "101300"
+  }
  },
  {
   "f": "lambda=((h*c)/(E))",
@@ -1771,7 +1774,8 @@
   "verified": "unverifiable-no-source",
   "rid": "fcdd583a",
   "cval": {
-   "g": "9.81"
+   "g": "9.81",
+   "p_0": "101300"
   }
  },
  {
@@ -1800,7 +1804,10 @@
   "scope": "canonical",
   "source": "hand",
   "verified": "unverifiable-no-source",
-  "rid": "f0c8cb87"
+  "rid": "f0c8cb87",
+  "cval": {
+   "k_e": "8.988e9"
+  }
  },
  {
   "f": "E=((sigma)/(epsilon_0))",

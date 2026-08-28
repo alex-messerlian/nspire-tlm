@@ -102,6 +102,12 @@ _POOL = sorted(v for vs in _POOL_BY_UNIT.values() for v in vs)
 _MICRO_CVAL = {
     # (formula, variable) -> (value, unit, what it is)
     ("V=((k_e*q)/(r))", "k_e"): (8.988e9, "V*m/C", "Coulomb constant"),
+    # A27. ATMOSPHERIC PRESSURE IS A CONSTANT, and the pool cannot reach it: 1.013e5 Pa is ABOVE
+    # the pool's maximum of 9,800, so `p_0 = 1` Pa was drawn beside a record asserting "standard
+    # conditions" -- 100.0% of documents on both records. Declared, so A7 inlines it and the model
+    # reads the value.
+    ("p_abs=p_g+p_atm", "p_atm"):  (1.013e5, "Pa", "standard atmospheric pressure"),
+    ("p=p_0+rho*g*h", "p_0"):      (1.013e5, "Pa", "atmospheric pressure at the surface"),
     ("v_d=((I)/(n*q*A))", "q"): (1.602e-19, "C",     "elementary charge"),
     ("v_d=((I)/(n*q*A))", "n"): (8.5e28,    "1/m^3", "conduction-electron density in copper"),
     ("T=((2*pi*m)/(q*B))", "q"): (1.602e-19, "C",    "elementary charge"),
@@ -271,6 +277,18 @@ _SCALE = {
   ("F=G*m1*m2/(r)^(2)", "r"):       (1e6,  1e12,  "orbital separation"),
   # --- relativistic Doppler --------------------------------------------------------------------
   ("f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))", "v"): (1e3, 2.9e8, "sub-luminal source speed"),
+  # --- A27: quantities the pool cannot reach, measured at EXACTLY 100% in Step 0 run 6 ---------
+  ("F=q*v*B", "q"):                 (1e-9, 1e-3, "a laboratory charge, nC to mC"),
+  ("F=q*v*B*sin(theta)", "q"):      (1e-9, 1e-3, "a laboratory charge, nC to mC"),
+  ("V=((U_E)/(q))", "q"):           (1e-9, 1e-3, "a laboratory charge, nC to mC"),
+  ("C=((Q)/(V))", "Q"):             (1e-9, 1e-3, "a laboratory charge, nC to mC"),
+  ("E_n=-E_0*((1)/((n)^(2)))", "E_0"): (1.6e-19, 1e-17, "an atomic ground state, ~13.6 eV"),
+  ("K=(n)^(2)*E_1", "E_1"):         (1e-21, 1e-18, "a particle-in-a-box ground state"),
+  ("n=((K/E_1))^(1/2)", "E_1"):     (1e-21, 1e-18, "a particle-in-a-box ground state"),
+  ("n=((K/E_1))^(1/2)", "K"):       (1e-21, 1e-16, "an energy level of the same well"),
+  ("U_form=E_transfer+U_coul+U_ex", "E_transfer"): (1e-19, 1e-17, "an ionic-bond energy term"),
+  ("U_form=E_transfer+U_coul+U_ex", "U_coul"):     (1e-19, 1e-17, "an ionic-bond energy term"),
+  ("U_form=E_transfer+U_coul+U_ex", "U_ex"):       (1e-19, 1e-17, "an ionic-bond energy term"),
   # --- thermal ---------------------------------------------------------------------------------
   ("Q=m*c*dT", "c"):                (100.0, 15000.0, "specific heat, lead to water"),
   # --- acoustics -------------------------------------------------------------------------------
@@ -321,7 +339,50 @@ _PRECONDITION = {
                                   "friction cannot dissipate more than was supplied"),
     "Eff_C=1-((T_c)/(T_h))":     (lambda v: v["T_c"] < v["T_h"],
                                   "the cold reservoir must be colder than the hot one"),
+    # A27. Five more, each measured violated on 26-54% of its record's documents in Step 0 run 6.
+    # Every one produces correct arithmetic and a scenario that cannot happen.
+    "W=Q_h-Q_c":                 (lambda v: v["Q_c"] < v["Q_h"],
+                                  "an engine cannot exhaust more heat than it takes in"),
+    "x=l-l_0":                   (lambda v: v["l"] > v["l_0"],
+                                  "an extension is positive; l < l_0 is a compression"),
+    "f_beat=|f_2-f_1|":          (lambda v: abs(v["f_2"] - v["f_1"]) <= 20.0,
+                                  "a beat is audible only below about 20 Hz"),
+    "Q=((omega_0)/(Delta_omega))": (lambda v: v["Delta_omega"] < v["omega_0"],
+                                  "a resonance needs a bandwidth narrower than its centre"),
+    # A27b. K AND E_1 ARE NOT INDEPENDENT: K is the energy of level n, so K = n^2 * E_1 and
+    # n = sqrt(K/E_1) must be a positive integer. Drawing them separately gives "a quantum number
+    # of 2.83", which is not a small error -- it is a statement that quantisation does not hold.
+    # A predicate cannot construct the pair, so most draws are rejected and those documents are
+    # dropped; teaching nothing about this record is better than teaching that n is continuous.
+    "n=((K/E_1))^(1/2)":         (lambda v: abs(math.sqrt(v["K"] / v["E_1"])
+                                               - round(math.sqrt(v["K"] / v["E_1"]))) < 1e-6
+                                            and 1 <= round(math.sqrt(v["K"] / v["E_1"])) <= 12,
+                                  "n = sqrt(K/E_1) must be a positive integer: K = n^2 * E_1"),
+    "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))":
+                                 (lambda v: v["I_CM"] <= v["m"] * v["r"] ** 2,
+                                  "no rigid body has more inertia than a hoop of its mass, radius"),
 }
+
+# A27c. SOME VARIABLES ARE NOT INDEPENDENT, AND A FILTER CANNOT MAKE THEM SO. `K = n^2 * E_1` ties
+# two givens through an integer; drawing them separately and rejecting the mismatches left 4
+# surviving documents in 20,000, so the record was effectively untaught -- and coverage of what the
+# device can retrieve is the one property with a measured effect on correctness.
+#
+# A derivation CONSTRUCTS the dependent value instead. It runs after sampling and before the
+# preconditions, so a record can use either or both. Keep these to genuine physical dependencies:
+# anything expressible as a range belongs in _SCALE, and anything expressible as a test belongs in
+# _PRECONDITION -- a derivation is the tool of last resort because it fixes a relationship the
+# draw would otherwise have to stumble on.
+def _derive_quantum_K(vals, rng):
+    """K is the energy of level n in the same well: K = n^2 * E_1, n a positive integer."""
+    n = rng.randint(1, 12)
+    vals["K"] = vals["E_1"] * n * n
+    return vals
+
+_DERIVE = {
+    "n=((K/E_1))^(1/2)": _derive_quantum_K,
+}
+
 
 def preconditions_hold(rec, vals):
     """True if the drawn values satisfy the record's cross-variable precondition, or it has none."""
@@ -780,6 +841,8 @@ assert not _DECL_STALE, (
     "A23/A24: these declarations match no sampled (record, variable) pair, so they are silent "
     "no-ops:\n  " + "\n  ".join(_DECL_STALE)
     + "\nFix them against corpus/store_clean.json. A range that never fires reads as coverage.")
+_DERIVE_STALE = sorted(set(_DERIVE) - {r["f"] for r in recs})
+assert not _DERIVE_STALE, f"A27c: _DERIVE names records that do not exist: {_DERIVE_STALE}"
 _RESULT_STALE = sorted(set(_RESULT_KIND) - {r["f"] for r in recs})
 assert not _RESULT_STALE, f"A25: _RESULT_KIND names records that do not exist: {_RESULT_STALE}"
 _RESULT_BAD = sorted(k for k in _RESULT_KIND.values() if k not in _RESULT_RANGE)
@@ -923,9 +986,12 @@ def gen(n, seed=0):
             rr = quantity_range(r, v)
             return sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else sample_value(rng)
         vals = {v: _draw(v) for v in vs}
+        _der = _DERIVE.get(r.get("f"))
+        if _der is not None: vals = _der(vals, rng)
         for _try in range(24):                     # bounded: a precondition that can never hold
             if preconditions_hold(r, vals): break  # must not spin, and the doc is dropped below
             vals = {v: _draw(v) for v in vs}
+            if _der is not None: vals = _der(vals, rng)
         if not preconditions_hold(r, vals):
             continue                               # cannot satisfy it -- drop, never teach it
         expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
