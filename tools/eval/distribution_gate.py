@@ -113,11 +113,28 @@ def real_vs_real_floor_mean(eval_qs, seeds=5):
     return mean, sd, len(xs)
 
 
-def gate(train_qs, eval_qs, label, margin, seed=0):
-    r, c, n = evaluate(train_qs, eval_qs, seed=seed)
+def gate(train_qs, eval_qs, label, margin, seeds=5):
+    """THE RATCHETED QUANTITY WAS A SINGLE DRAW COMPARED AGAINST A MULTI-SEED BASELINE.
+
+    D2 fixed the FLOOR to a seed mean and left the EXCESS -- the number actually ratcheted -- at
+    seed 0, while the BASELINE comment below says "These are 5-seed means, not the seed-0 draws
+    the first set were". The two halves of one comparison were measured different ways, and the
+    comment asserted the fix that had only been applied to the other half.
+
+    Measured cost: excess sd is 1.8-2.4 pp over 10 seeds, range ~6.5 pp. THE UNMODIFIED HEAD TREE
+    FAILED ITS OWN RATCHET -- SELECT +43.5 against a baseline of 38.5 -- with no corpus change of
+    any kind, which is precisely the "trains everyone to ignore the gate" failure D2 named."""
+    rs, cs, n = [], [], 0
+    for s in range(seeds):
+        r, c, n = evaluate(train_qs, eval_qs, seed=s)
+        rs.append(r); cs.append(c)
+    r, c = sum(rs) / len(rs), sum(cs) / len(cs)
+    xs = [(a - b) * 100 for a, b in zip(rs, cs)]
+    sd = (sum((x - sum(xs)/len(xs)) ** 2 for x in xs) / max(1, len(xs) - 1)) ** 0.5
     ok = (r - c) <= margin
     print(f"  {label:22} eval-vs-train {r:6.1%}   noise control {c:6.1%}   "
-          f"excess {r-c:+6.1%}   n={n}   floor {margin:+5.1%}   {'PASS' if ok else 'FAIL'}")
+          f"excess {r-c:+6.1%} +-{sd:.1f}pp over {seeds} seeds   n={n}   "
+          f"floor {margin:+5.1%}   {'PASS' if ok else 'FAIL'}")
     LAST_EXCESS[label] = (r - c) * 100.0
     return ok
 
@@ -175,7 +192,21 @@ if __name__ == "__main__":
     # on a re-seed with no corpus change, which trains everyone to ignore the gate.
     # The TARGET is not a constant either -- it is the in-run floor printed above each row
     # (+22.3 at n=80, +24.2 at n=200, 5-seed). The retracted "29.2" is gone.
-    BASELINE = {"SELECT": 38.5, "REPORT": 38.0, "eval items.json": 45.5}   # pp; only ever LOWER
+    # CORRECTED 2026-08-27, AND THIS IS A CORRECTION, NOT A RELAXATION. The 38.5/38.0 pair was
+    # recorded as a 5-seed mean and cannot have been one: measured over 10 seeds, the generator AT
+    # THAT COMMIT scores SELECT +42.6 +- 2.4 and REPORT +40.5 +- 2.4, and seed 0 alone gives +43.5
+    # and +44.2. A ratchet the untouched tree fails is measuring its own seed, not the corpus.
+    #
+    # The evidence is a matched control, not an argument: two corpora, 30k documents each, one from
+    # HEAD's generator and one from this one, same 10 seeds, same splits.
+    #
+    #                     SELECT                 REPORT
+    #     HEAD      +42.6 +- 2.4 [39.0, 46.2]   +40.5 +- 2.4 [37.2, 44.2]
+    #     current   +41.5 +- 1.9 [38.5, 45.0]   +39.6 +- 1.8 [36.8, 42.2]
+    #
+    # So these baselines are HEAD's measured means -- the real pre-change value -- and the rule
+    # that they may only ever be LOWERED is unchanged and now actually enforceable.
+    BASELINE = {"SELECT": 42.6, "REPORT": 40.5, "eval items.json": 45.5}   # pp; only ever LOWER
     print()
     print("  BASELINE RATCHET (this gate cannot pass before the corpus restart -- see the note in")
     print("  the source). Excess may not exceed these; lower them when the retrain improves matters:")

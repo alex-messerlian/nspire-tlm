@@ -281,6 +281,11 @@ _SCALE = {
   ("F=G*m1*m2/(r)^(2)", "r"):       (1e6,  1e12,  "orbital separation"),
   # --- relativistic Doppler --------------------------------------------------------------------
   ("f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))", "v"): (1e3, 2.9e8, "sub-luminal source speed"),
+  # The absolute-temperature UNIT rule gave both reservoirs (1, 1e4) K, so T_c < 250 K on 89.3% of
+  # documents and the efficiency exceeded 0.85 on 56.1%, median 0.887. No heat engine a textbook
+  # describes runs at 89% Carnot efficiency; these are the temperatures real reservoirs have.
+  ("Eff_C=1-((T_c)/(T_h))", "T_c"): (250.0, 400.0, "a cold reservoir: ambient to a warm condenser"),
+  ("Eff_C=1-((T_c)/(T_h))", "T_h"): (400.0, 1500.0, "a hot reservoir: a boiler to a gas-turbine inlet"),
   # --- A27: quantities the pool cannot reach, measured at EXACTLY 100% in Step 0 run 6 ---------
   ("F=q*v*B", "q"):                 (1e-9, 1e-3, "a laboratory charge, nC to mC"),
   ("F=q*v*B*sin(theta)", "q"):      (1e-9, 1e-3, "a laboratory charge, nC to mC"),
@@ -425,8 +430,12 @@ _SCALE = {
   ("Q=Delta_E_int-W", "Delta_E_int"): (1.0, 1.0e6, "the internal-energy change of a gas sample in a laboratory process"),
   ("Q=Delta_E_int-W", "W"): (1.0, 1.0e6, "the work done by that gas sample"),
   ("Delta_S=((Q)/(T))", "Q"): (1.0, 1.0e6, "the heat transferred reversibly at fixed temperature"),
-  ("Delta_S_tot=Delta_S_h+Delta_S_c", "Delta_S_h"): (0.001, 10000.0, "an entropy change of a laboratory system, mJ/K to kJ/K"),
-  ("Delta_S_tot=Delta_S_h+Delta_S_c", "Delta_S_c"): (0.001, 10000.0, "an entropy change of the surroundings, mJ/K to kJ/K"),
+  # BOTH ADDENDS WERE DECLARED STRICTLY POSITIVE, so Delta_S_tot > 0 was arithmetically automatic
+  # in 100.00% of documents (n=2000) and the entire physical content of the relation -- a negative
+  # term outweighed by a positive one -- was UNREACHABLE. The hot reservoir gives up the heat, so
+  # its entropy change is negative; the second law is that the cold side's gain exceeds it.
+  ("Delta_S_tot=Delta_S_h+Delta_S_c", "Delta_S_h"): (-1.0e4, -0.001, "the hot reservoir gives up heat: Delta_S_h = -Q/T_h is negative"),
+  ("Delta_S_tot=Delta_S_h+Delta_S_c", "Delta_S_c"): (0.001, 1.0e4, "the cold reservoir absorbs it: Delta_S_c = +Q/T_c is positive"),
   ("C_p=C_V+R", "C_V"): (12.5, 45.0, "an ideal gas at constant volume: 3R/2 = 12.5 monatomic, 7R/2 = 29.1 diatomic with vibration, higher for a large polyatomic"),
   ("V=I*R", "I"): (0.001, 100.0, "a circuit current from a milliamp signal to a 100 A starter cable"),
   ("V=I*R", "R"): (0.1, 1.0e6, "a resistor from a fraction of an ohm to a megohm"),
@@ -496,6 +505,15 @@ _SCALE = {
   ("h_i=(((n_2)/(n_1)))*h_o", "h_o"): (0.001, 1.0, "an object height at the refracting surface, a millimetre to a metre"),
   ("lambda_n=((lambda)/(n))", "lambda"): (1.0e-9, 1.0e-5, "an optical wavelength in vacuum, matching the window declared for lambda in Delta_y=x*lambda/d"),
 
+  # --- A30: three defects run 7 found, one of them a claim I made that was not true ------------
+  #
+  # dT WAS REPORTED FIXED IN 0585c95 AND WAS NEVER DECLARED. That commit message names it among
+  # eight defects closed -- "dT routed to the absolute-temperature rule by var.startswith('Delta')
+  # -- A PROXY PREDICATE INSIDE THE CODE WRITTEN TO ELIMINATE PROXY PREDICATES" -- and the other
+  # seven were changed in that diff. `git log -S '"dT"'` returns no commit that ever added it.
+  # A temperature DIFFERENCE was being bounded by the absolute-temperature rule, which is a false
+  # statement about it, and dT is the only non-absolute variable that rule can reach.
+  ("Q=m*c*dT", "dT"): (0.1, 500.0, "a temperature change with no phase change: tungsten melts at 3695 K"),
   # --- thermal ---------------------------------------------------------------------------------
   ("Q=m*c*dT", "c"):                (100.0, 15000.0, "specific heat, lead to water"),
   # --- acoustics -------------------------------------------------------------------------------
@@ -548,6 +566,8 @@ _PRECONDITION = {
                                   "the cold reservoir must be colder than the hot one"),
     # A27. Five more, each measured violated on 26-54% of its record's documents in Step 0 run 6.
     # Every one produces correct arithmetic and a scenario that cannot happen.
+    "Delta_S_tot=Delta_S_h+Delta_S_c": (lambda v: abs(v["Delta_S_h"]) < v["Delta_S_c"],
+                                  "the second law: the cold side's gain must exceed the hot side's loss"),
     "W=Q_h-Q_c":                 (lambda v: v["Q_c"] < v["Q_h"],
                                   "an engine cannot exhaust more heat than it takes in"),
     "x=l-l_0":                   (lambda v: v["l"] > v["l_0"],
@@ -586,8 +606,23 @@ def _derive_quantum_K(vals, rng):
     vals["K"] = vals["E_1"] * n * n
     return vals
 
+def _derive_pendulum_T(vals, rng):
+    """A SIMPLE PENDULUM'S PERIOD IS NOT INDEPENDENT OF ITS LENGTH, and drawing both freely made
+    68.50% of these documents state an impossible g -- the highest firing rate of any result check
+    and the clearest sign that the defect was on the GIVEN side. g = 4*pi^2*L/T^2 is the relation
+    under test, so T must come from L through it, at some real local g.
+
+    Not a fixed 9.81: that would make the answer a constant in 100% of documents, which is A28's
+    collapse. A pendulum experiment measures g, so the scatter is the point -- 9.6 to 10.0 spans
+    real sites plus ordinary timing error, and keeps the result inside g_local's window."""
+    L = vals["L"]
+    g_site = rng.uniform(9.6, 10.0)
+    vals["T"] = float(f"{2*math.pi*math.sqrt(L/g_site):.4g}")
+    return vals
+
 _DERIVE = {
     "n=((K/E_1))^(1/2)": _derive_quantum_K,
+    "g=((4*(pi)^(2)*L)/((T)^(2)))": _derive_pendulum_T,
 }
 
 
@@ -626,6 +661,13 @@ def sample_in_range(rng, lo, hi, integral):
     #
     # Log-uniform because these windows span orders of magnitude; a linear draw over [1e-9, 1e-5]
     # is 1e-5 with probability 0.9999.
+    # A WHOLLY-NEGATIVE WINDOW IS LOG-UNIFORM IN ITS MAGNITUDE. The `lo <= 0` branch below was
+    # written when every declared window was positive, so it treated "contains zero" and "is
+    # entirely below zero" as one case and drew LINEARLY. On (-1e4, -0.001) that is -1000s with
+    # probability ~0.9999 and the small magnitudes are unreachable -- the same annihilation as
+    # round(x, 4), mirrored. Declaring Delta_S_h negative is what surfaced it; no positive window
+    # could have. Sign and magnitude are separate decisions, so make them separately.
+    if hi < 0:  return -float(f"{math.exp(rng.uniform(math.log(-hi), math.log(-lo))):.3g}")
     if lo <= 0: return float(f"{rng.uniform(lo, hi):.3g}")
     return float(f"{math.exp(rng.uniform(math.log(lo), math.log(hi))):.3g}")
 
@@ -740,11 +782,208 @@ _RESULT_RANGE = {
     # mentions. Pluto is 0.62 and Jupiter 24.8, so [0.1, 30] is generous for the whole solar
     # system and still excludes the absurd. A range wide enough never to fire is not a check.
     "g_local":          (0.1, 30.0, "g must be that of some real body: Pluto 0.62, Jupiter 24.8"),
+    "angle_from_normal": (0.0, math.pi/2, "a ray angle from the normal lies in [0, pi/2]"),
+    "angle_arc":         (1.0e-4, 1.0e3, "an arc angle in radians: a milliradian to ~160 turns"),
+    "quantum_number":    (1.0, 1000.0,   "a bound-state quantum number is a positive integer"),
+    "magnification":     (1.0e-3, 1.0e4, "an angular magnification of a real instrument"),
+    "quality_factor":    (0.5, 1.0e6,    "Q below 1/2 is overdamped; above 1e6 is a reference cavity"),
+    "abs_temperature":   (1.0e-3, 1.0e9, "an absolute temperature is positive; 1e9 K is a stellar core"),
+    "material_density":  (1.0e-2, 2.3e4, "aerogel 1 kg/m^3 to osmium 22590 kg/m^3"),
+    # c IS THE BOUND THAT CAN ACTUALLY FIRE HERE. Every other speed window would be a guess; this
+    # one is a law, and v = a*t or v = v_0 + a*t reaches it from perfectly in-range givens.
+    "sub_light":         (1.0e-9, 2.99792458e8, "no massive body reaches c = 2.998e8 m/s"),
+    "signed_sub_light":  (-2.99792458e8, 2.99792458e8, "a signed velocity, bounded only by c"),
+    "drift_speed":       (1.0e-9, 1.0e-1,  "electron drift in a conductor is mm/s, not m/s"),
+    "positive_frequency":(1.0e-6, 1.0e22,  "a frequency is positive; 1e22 Hz is a gamma ray"),
+    "positive_length":   (1.0e-15, 1.0e13, "a proton radius to the solar system"),
+    # positive_energy RETIRED, NOT WIDENED. It fired on 7.00% of E = mc^2 draws, and every one was
+    # a correct rest energy of a mass the mass window allows (1 tonne is 9e19 J). A bound whose only
+    # violations are true statements is worse than none; the given window already bounds this.
+    "binding_energy_negative": (-1.0e-15, -1.0e-25, "a bound state has NEGATIVE energy: E_n = -E_0/n^2"),
+    "parallel_resistance": (1.0e-6, 1.0e9, "a parallel combination is positive and below either leg"),
 }
+# A31. THE RESULT SIDE WAS DECLARED FOR 3 OF 164 RECORDS AND THE HEADLINE DID NOT SAY SO.
+#
+# "99.7% declared" was GIVEN-SIDE coverage. Result-side was 1.83%, and the two were reported as
+# one number. A18/A25 check the computed value against a window; with no entry there is no window,
+# so 91.46% of records had NO result check and nothing printed that fact.
+#
+# Every record now has an entry and None is a DECISION, not a gap: "reviewed, no intrinsic bound".
+# That distinction is the whole point. A plausibility window on a quantity whose only constraint is
+# that its inputs were in range CANNOT FIRE -- it is the g_local (0, 100) mistake, which passed a
+# g of 4e-6 m/s^2 across 89 documents. Delta_U = Q - W is genuinely negative half the time and
+# W_net = K_B - K_A legitimately so; asserting a sign there would be false physics, not a check.
+#
+# So the honest count is two numbers, and gen() prints both: 164/164 declared, 30 of them bounded.
 _RESULT_KIND = {
-    "Eff_C=1-((T_c)/(T_h))":          "efficiency",
-    "n=((c)/(v))":                    "refractive_index",
-    "g=((4*(pi)^(2)*L)/((T)^(2)))":   "g_local",
+    'A=((1)/(2))*theta*(r)^(2)':                               None,
+    'B=((mu_0*I)/(2*pi*R))':                                   None,
+    'C=((Q)/(V))':                                             None,
+    'C=epsilon_0*((A)/(d))':                                   None,
+    'C_V=((d)/(2))*R':                                         None,
+    'C_p=C_V+R':                                               None,
+    'Delta_E=h*Delta_f':                                       None,
+    'Delta_E=h*f':                                             None,
+    'Delta_S=((Q)/(T))':                                       None,
+    'Delta_S_tot=Delta_S_h+Delta_S_c':                         None,
+    'Delta_U=Q-W':                                             None,
+    'Delta_l=d*sin(theta)':                                    None,
+    'Delta_p=F_net*Delta_t':                                   None,
+    'Delta_p=m*Delta_v':                                       None,
+    'Delta_t=((h)/(E))':                                       None,
+    'Delta_theta=((Delta_s)/(r))':                             "angle_arc",
+    'Delta_x=x_f-x_i':                                         None,
+    'Delta_y=x*lambda/d':                                      None,
+    'E=((h*c)/(lambda))':                                      None,
+    'E=((sigma)/(epsilon_0))':                                 None,
+    'E=(Delta_m)(c)^(2)':                                      None,
+    'E=K+U':                                                   None,
+    'E=P*t':                                                   None,
+    'E=h*f':                                                   None,
+    'E=m*(c)^(2)':                                             None,
+    'E=n*h*f':                                                 None,
+    'E_b=h*f_O':                                               None,
+    'E_f=h*f':                                                 None,
+    'E_n=-E_0*((1)/((n)^(2)))':                                "binding_energy_negative",
+    'Eff_C=1-((T_c)/(T_h))':                                   "efficiency",
+    'F=((m*Delta_v)/(Delta_t))':                               None,
+    'F=-k*x':                                                  None,
+    'F=G*m1*m2/(r)^(2)':                                       None,
+    'F=m*a':                                                   None,
+    'F=q*v*B':                                                 None,
+    'F=q*v*B*sin(theta)':                                      None,
+    'F_D=((1)/(2))*C*rho*A*(v)^(2)':                           None,
+    'F_c=m*a_c':                                               None,
+    'F_net=((Delta_p)/(Delta_t))':                             None,
+    'F_net=m*a':                                               None,
+    'I=((((Delta_p_max))^(2))/(2*rho*v))':                     None,
+    'I=((P)/(4*pi*(r)^(2)))':                                  None,
+    'I=((P)/(A))':                                             None,
+    'I_0=((V_0)/(Z))':                                         None,
+    'I_1=I_2+I_3':                                             None,
+    'I_2=I_1*((((r_1)/(r_2))))^(2)':                           None,
+    'I_S=((N_P)/(N_S))*I_P':                                   None,
+    'I_rms=((I_0)/(sqrt(2)))':                                 None,
+    'I_rms=V_rms/Z':                                           None,
+    'K=(n)^(2)*E_1':                                           None,
+    'K=0.5*m*(v)^(2)':                                         None,
+    'L=((v_w)/(4*f_1))':                                       None,
+    'L=I*omega':                                               None,
+    'M=((theta_image)/(theta_object))':                        "magnification",
+    'N=m*g':                                                   None,
+    'N=m*g*cos(theta)':                                        None,
+    'P=(((V)^(2))/(R))':                                       None,
+    'P=((1)/(f))':                                             None,
+    'P=((W)/(t))':                                             None,
+    'P=(I)^(2)*R':                                             None,
+    'P=F*v':                                                   None,
+    'P=V*I':                                                   None,
+    'P=tau*omega':                                             None,
+    'P_ave=I_rms*V_rms':                                       None,
+    'Q=((omega_0)/(Delta_omega))':                             "quality_factor",
+    'Q=Delta_E_int-W':                                         None,
+    'Q=m*c*dT':                                                None,
+    'R=V/I':                                                   None,
+    'R_eqv=((1)/(1/R_1+1/R_2))':                               "parallel_resistance",
+    'R_eqv=R_1+R_2':                                           None,
+    'T=((1)/(f))':                                             None,
+    'T=((2*pi*m)/(q*B))':                                      None,
+    'T=2*pi*sqrt(((m)/(k)))':                                  None,
+    'T_F=((E_F)/(k_B))':                                       "abs_temperature",
+    'T_tof=((2(v_0*sin(theta_0)))/(g))':                       None,
+    'U=((1)/(2))*m*(omega)^(2)*(x)^(2)':                       None,
+    'U=m*g*h':                                                 None,
+    'U_E=((1)/(2))*C*(V)^(2)':                                 None,
+    'U_form=E_transfer+U_coul+U_ex':                           None,
+    'V=((U_E)/(q))':                                           None,
+    'V=((k_e*q)/(r))':                                         None,
+    'V=I*R':                                                   None,
+    'V_rms=((V_0)/(sqrt(2)))':                                 None,
+    'W=F*d':                                                   None,
+    'W=Q_h-Q_c':                                               None,
+    'W_i=F_i*d_i':                                             None,
+    'W_net=K_B-K_A':                                           None,
+    'W_o=F_o*d_o':                                             None,
+    'W_out=W_in-W_f':                                          None,
+    'a=((Delta_v)/(Delta_t))':                                 None,
+    'a=((F)/(m))':                                             None,
+    'a=((m_2)/(m_1+m_2))*g':                                   None,
+    'a=(v)^(2)/r':                                             None,
+    'a=(vf-vi)/t':                                             None,
+    'a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))':              None,
+    'a_CM=R*alpha':                                            None,
+    'a_c=(((v)^(2))/(r))':                                     None,
+    'a_t=r*alpha':                                             None,
+    'alpha=((Delta_omega)/(Delta_t))':                         None,
+    'alpha=((a_t)/(r))':                                       None,
+    'd=d_0+v_0*t+((1)/(2))*a*(t)^(2)':                         None,
+    'd=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))':                 None,
+    'd=vi*t+0.5*a*(t)^(2)':                                    None,
+    'd_CM=R*theta':                                            None,
+    'epsilon=B*l*v':                                           None,
+    'f=((1)/(2*pi))*sqrt(((k)/(m)))':                          None,
+    'f=((1)/(T))':                                             None,
+    'f=((R)/(2))':                                             None,
+    'f=((c)/(lambda))':                                        None,
+    'f=((d_i*d_o)/(d_o+d_i))':                                 None,
+    'f=(Delta_E_LK)/h':                                        None,
+    'f_1=((v)/(4*L))':                                         None,
+    'f_beat=|f_2-f_1|':                                        None,
+    'f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))':           "positive_frequency",
+    'g=((4*(pi)^(2)*L)/((T)^(2)))':                            "g_local",
+    'h_i=(((n_2)/(n_1)))*h_o':                                 None,
+    'k=((F)/(x))':                                             None,
+    'lambda=((c)/(f))':                                        None,
+    'lambda=((h)/(m*v))':                                      None,
+    'lambda=((h)/(p))':                                        None,
+    'lambda=((h*c)/(E))':                                      None,
+    'lambda_n=((lambda)/(n))':                                 "positive_length",
+    'm=Delta_E/(c)^(2)':                                       None,
+    'm=F_net/a':                                               None,
+    'm=m_R+m_g':                                               None,
+    'm=rho*V':                                                 None,
+    'n=((K/E_1))^(1/2)':                                       "quantum_number",
+    'n=((c)/(v))':                                             "refractive_index",
+    'omega=((Delta_theta)/(Delta_t))':                         None,
+    'omega=((theta)/(t))':                                     None,
+    'omega=sqrt(((k)/(m)))':                                   None,
+    'omega=v/r':                                               None,
+    'omega_f=omega_0+alpha*t':                                 None,
+    'p=((F)/(A))':                                             None,
+    'p=((h)/(lambda))':                                        None,
+    'p=m*v':                                                   None,
+    'p=p_0+rho*g*h':                                           None,
+    'p_abs=p_g+p_atm':                                         None,
+    'r=((m*v)/(q*B))':                                         None,
+    'rho=((m)/(V))':                                           "material_density",
+    's=r*theta':                                               None,
+    'tau=R*C':                                                 None,
+    'tau=r*F':                                                 None,
+    'theta=((s)/(r))':                                         "angle_arc",
+    'theta_2=asin(((n_1*sin(theta_1))/(n_2)))':                "angle_from_normal",
+    'theta_r=theta_i':                                         "angle_from_normal",
+    'v=((lambda)/(T))':                                        "sub_light",
+    'v=((omega)/(k))':                                         "sub_light",
+    'v=a*t':                                                   "sub_light",
+    'v=d/t':                                                   "sub_light",
+    'v=f*lambda':                                              "sub_light",
+    'v=v_0+a*t':                                               "sub_light",
+    # A SIGNED VELOCITY. `sub_light` fired on 80.50% of draws because a body past its apex has
+    # v < 0 -- that is the relation working, and dropping it would have taught that projectiles
+    # never come down. I wrote this row; the firing measurement is what caught it. c still bounds
+    # the magnitude, so the check survives in the form the physics actually supports.
+    'v=v_0-g*t':                                               "signed_sub_light",
+    'v_CM=R*omega':                                            "sub_light",
+    'v_d=((I)/(n*q*A))':                                       "drift_speed",
+    'v_d=E/B':                                                 "sub_light",
+    'v_t=r*omega':                                             "sub_light",
+    'v_toty=v_wy+v_p':                                         "signed_sub_light",
+    'w=m*g':                                                   None,
+    'x=l-l_0':                                                 None,
+    'x=v_0x*t':                                                None,
+    'x=x_0+v_x*t':                                             None,
+    'y=y_0+((1)/(2))(v_0y+v_y)t':                              None,
+    'y=y_0+v_0*t-((1)/(2))*g*(t)^(2)':                         None,
 }
 
 
@@ -1066,8 +1305,17 @@ _DERIVE_STALE = sorted(set(_DERIVE) - {r["f"] for r in recs})
 assert not _DERIVE_STALE, f"A27c: _DERIVE names records that do not exist: {_DERIVE_STALE}"
 _RESULT_STALE = sorted(set(_RESULT_KIND) - {r["f"] for r in recs})
 assert not _RESULT_STALE, f"A25: _RESULT_KIND names records that do not exist: {_RESULT_STALE}"
-_RESULT_BAD = sorted(k for k in _RESULT_KIND.values() if k not in _RESULT_RANGE)
+_RESULT_BAD = sorted(k for k in _RESULT_KIND.values() if k is not None and k not in _RESULT_RANGE)
 assert not _RESULT_BAD, f"A25: _RESULT_KIND names kinds with no range: {_RESULT_BAD}"
+# A31. A MISSING KEY AND A None VALUE MUST NOT MEAN THE SAME THING. .get() returns None for both,
+# so an undeclared record was indistinguishable from one reviewed and found to have no intrinsic
+# bound -- the same "cannot check" / "checked and clean" collision as dim_gate on absent input.
+# The key must be present; only the VALUE may be None.
+_RESULT_MISSING = sorted(r["f"] for r in recs if r["f"] not in _RESULT_KIND)
+assert not _RESULT_MISSING, (
+    "A31: these records have no _RESULT_KIND entry, so their computed value is unchecked and\n"
+    "nothing says whether that was a decision:\n  " + "\n  ".join(_RESULT_MISSING)
+    + "\nDeclare a kind, or None to record that the quantity has no intrinsic bound.")
 # The regex is a DISCOVERY AID, not the decision: a record whose name matches it and is not
 # declared is a new record nobody classified, and that must be noticed rather than guessed at.
 _UNDECLARED_RELATION = sorted(r["f"] for r in recs
@@ -1097,6 +1345,15 @@ assert not _NAME_TABLE_USERS, (
 _KIND_BAD = sorted(k for k in _KIND.values() if k not in _KIND_RANGE)
 assert not _KIND_BAD, f"A24: _KIND names kinds with no range: {_KIND_BAD}"
 
+# A31. THE COVERAGE HEADLINE IS TWO NUMBERS AND HAS TO BE PRINTED AS TWO. "99.7% declared" was
+# GIVEN-side only; the result side was 3 of 164 and no line said so, so PASS read as verified on a
+# surface where 91% of records had no check at all. Never print one of these without the other.
+_gv  = [(r, v) for r in recs for v in sorted({x for x in VAR.findall(r["f"].split("=",1)[1])} - {"pi","e"})]
+_gvd = sum(1 for r, v in _gv if _const_for(r, v) is not None or quantity_range(r, v) is not None)
+_rb  = sum(1 for v in _RESULT_KIND.values() if v is not None)
+print(f"declaration coverage  GIVEN-side {_gvd}/{len(_gv)} ({100*_gvd/len(_gv):.1f}%)"
+      f"   RESULT-side {len(_RESULT_KIND)}/{len(recs)} declared, of which {_rb} carry a bound "
+      f"and {len(_RESULT_KIND)-_rb} are reviewed-unbounded (a window that cannot fire is not a check)")
 print(f"records usable as physics relations: {len(recs)} of {len(_ann)} annotated "
       f"({len(_unnamed)} skipped for want of a relation name, "
       f"{len(_ann)-len(recs)-len(_unnamed)} by usable(), which exempts hand-curated records)")
