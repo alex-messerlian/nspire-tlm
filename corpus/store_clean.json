@@ -1479,7 +1479,7 @@
   "rid": "adc72d99"
  },
  {
-  "f": "Q=Delta_E_int-W",
+  "f": "Q=Delta_E_int+W",
   "name": "heat from internal energy change and work",
   "units": {
    "Q": "J",

@@ -60,9 +60,22 @@ prereq_missing=0
 need_file() {   # need_file <path> <how to make it>
     [ -e "$1" ] || { printf "  %-20s PREREQUISITE MISSING: %s\n" "$(basename "$1")" "$2"; prereq_missing=1; }
 }
+# A33. EXISTENCE IS NOT FRESHNESS, and the stale artefact here is the one the DEVICE reads.
+# Correcting a wrong first law in store_clean.json left build/store.tns holding the old formula --
+# need_file saw the path and passed, so every store-derived gate was checking a store nobody had
+# rebuilt. Only gate_record_bytes caught it, and only because the diff happened to touch a record.
+# Same class as gate_stale_figures over a corpus nobody regenerated, one level more dangerous:
+# this build product is what ships.
+need_fresh() {  # need_fresh <product> <source> <how to make it>
+    if [ -e "$1" ] && [ -e "$2" ] && [ "$2" -nt "$1" ]; then
+        printf "  %-20s STALE: older than %s -- run: %s\n" "$(basename "$1")" "$2" "$3"
+        prereq_missing=1
+    fi
+}
 need_file "$PY"              "python3 -m venv .venv-tok && .venv-tok/bin/pip install -r requirements.txt"
 need_file "$STORE"           "the record store; pass a path as \$1 if it lives elsewhere"
 need_file build/store.tns    "python3 tools/store_pack.py $STORE build/store.tns"
+need_fresh build/store.tns "$STORE" "python3 tools/store_pack.py"
 need_file build/tok4096.tok  "python3 tools/tok_pack.py"
 need_file tools/eval/shapecli "make tests   # the structural call check, ARCHITECTURE.md s6"
 if [ "$prereq_missing" -ne 0 ]; then

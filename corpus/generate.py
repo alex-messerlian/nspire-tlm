@@ -302,12 +302,14 @@ _SCALE = {
   ("K=(n)^(2)*E_1", "E_1"):         (1e-21, 1e-18, "a particle-in-a-box ground state"),
   ("n=((K/E_1))^(1/2)", "E_1"):     (1e-21, 1e-18, "a particle-in-a-box ground state"),
   ("n=((K/E_1))^(1/2)", "K"):       (1e-21, 1e-16, "an energy level of the same well"),
-  ("U_form=E_transfer+U_coul+U_ex", "E_transfer"): (1e-19, 1e-17, "an ionic-bond energy term"),
+  ("U_form=E_transfer+U_coul+U_ex", "E_transfer"): (8e-20, 8e-19, "the ionisation-minus-affinity cost, eV-scale: NaCl is +1.52 eV"),
   # THE COULOMB TERM IS THE ATTRACTION AND IS NEGATIVE. Declared positive with the other two, the
   # sum was positive in 100.00% of 40,000 draws -- every document asserted that an ionic bond does
   # not form. OpenStax's NaCl is E_transfer +1.52 eV, U_coul -5.07 eV, U_ex +0.44 eV, U_form -3.11.
-  ("U_form=E_transfer+U_coul+U_ex", "U_coul"):     (-1e-17, -1e-19, "the Coulomb ATTRACTION, negative: it is what binds the ion pair"),
-  ("U_form=E_transfer+U_coul+U_ex", "U_ex"):       (1e-19, 1e-17, "an ionic-bond energy term"),
+  # A33. The window admitted -52 eV, an ion separation of 0.03 nm -- smaller than any atom -- and a
+  # summed bond energy 8x NaCl's. Real ionic bonds run 2-6 eV, so the terms are eV-scale.
+  ("U_form=E_transfer+U_coul+U_ex", "U_coul"):     (-1.6e-18, -3.2e-19, "the Coulomb ATTRACTION, negative and eV-scale: NaCl is -5.07 eV"),
+  ("U_form=E_transfer+U_coul+U_ex", "U_ex"):       (3e-20, 5e-19, "the exchange repulsion, eV-scale: NaCl is +0.44 eV"),
   # ---- A29: the remaining 193 pairs, authored per physics domain and reviewed ------------------
   # Closing the coverage in one pass instead of discovering ~15 per Step 0 round. Six authors split
   # by domain, then a physics reviewer rejected 7 proposals, corrected 14, and -- the valuable part
@@ -437,8 +439,8 @@ _SCALE = {
   ("W=Q_h-Q_c", "Q_c"): (1.0, 1.0e7, "the heat an engine exhausts per cycle, on the same scale as Q_h"),
   ("Delta_U=Q-W", "Q"): (1.0, 1.0e6, "the heat added to a gas sample in a laboratory process"),
   ("Delta_U=Q-W", "W"): (1.0, 1.0e6, "the work done by that gas sample"),
-  ("Q=Delta_E_int-W", "Delta_E_int"): (1.0, 1.0e6, "the internal-energy change of a gas sample in a laboratory process"),
-  ("Q=Delta_E_int-W", "W"): (1.0, 1.0e6, "the work done by that gas sample"),
+  ("Q=Delta_E_int+W", "Delta_E_int"): (1.0, 1.0e6, "the internal-energy change of a gas sample in a laboratory process"),
+  ("Q=Delta_E_int+W", "W"): (1.0, 1.0e6, "the work done by that gas sample"),
   ("Delta_S=((Q)/(T))", "Q"): (1.0, 1.0e6, "the heat transferred reversibly at fixed temperature"),
   # BOTH ADDENDS WERE DECLARED STRICTLY POSITIVE, so Delta_S_tot > 0 was arithmetically automatic
   # in 100.00% of documents (n=2000) and the entire physical content of the relation -- a negative
@@ -652,6 +654,30 @@ _PRECONDITION = {
     "U_form=E_transfer+U_coul+U_ex":
                                  (lambda v: abs(v["U_coul"]) > v["E_transfer"] + v["U_ex"],
                                   "an ionic bond forms only if the Coulomb attraction outweighs the transfer and exchange costs"),
+
+
+    # --- A33. THE SIX COUPLED-GIVENS DEFECTS THE n=400 READ FOUND -------------------------------
+    #
+    # Every one is a PRODUCT bound -- a rim speed, a current density, a bond energy -- and the A32
+    # enumeration prompt named ratios, conservation laws and degeneracy. Product bounds are the
+    # shape it under-weighted, which is why six survived a pass that reviewed all 121 records.
+    #
+    # v_t = r*omega was CLAIMED by the enumeration and REFUTED by its adversarial checker: "r and
+    # omega are independent parameters of a rotating body". True as stated, and it misses that the
+    # PRODUCT is bounded by material strength. Both readers found it independently. A refutation
+    # that is locally correct can still be wrong about the document.
+    "v_t=r*omega":               (lambda v: v["r"] * v["omega"] <= 1.0e3,
+                                  "no material survives a rim speed past ~1 km/s: 28.8 m at 9600 rad/s is 276 km/s"),
+    "v_CM=R*omega":              (lambda v: v["R"] * v["omega"] <= 1.0e3,
+                                  "no material survives a rim speed past ~1 km/s"),
+    "v_d=((I)/(n*q*A))":         (lambda v: v["I"] / v["A"] <= 3.0e7,
+                                  "30 A/mm^2 fuses copper: I and A are one conductor and the current density is bounded"),
+    "v=((lambda)/(T))":          (lambda v: 0.1 <= v["lambda"] / v["T"] <= 2.0e4,
+                                  "the medium fixes lambda/T, exactly as it fixes f*lambda: a 1 m wave does not travel at 1 mm/s"),
+    "lambda_n=((lambda)/(n))":   (lambda v: 1.0e-7 <= v["lambda"] <= 2.0e-6,
+                                  "a refractive index of ordinary glass belongs to the optical band; at 28 nm every material has n < 1"),
+    "v=v_0-g*t":                 (lambda v: v["t"] <= 3.0 * v["v_0"] / 9.81,
+                                  "a body launched at v_0 is back at launch height after 2*v_0/g; past that the fall needs a height nobody gave"),
 
     # --- the completeness critic's six, which no single batch could see because each saw ten -----
     "U=((1)/(2))*m*(omega)^(2)*(x)^(2)":
@@ -1079,7 +1105,7 @@ _RESULT_KIND = {
     'P=tau*omega':                                             None,
     'P_ave=I_rms*V_rms':                                       None,
     'Q=((omega_0)/(Delta_omega))':                             "quality_factor",
-    'Q=Delta_E_int-W':                                         None,
+    'Q=Delta_E_int+W':                                         None,
     'Q=m*c*dT':                                                None,
     'R=V/I':                                                   None,
     'R_eqv=((1)/(1/R_1+1/R_2))':                               "parallel_resistance",
@@ -1645,7 +1671,11 @@ GIVE = ["Given {g}, ", "With {g}, ", "If {g}, ", "For {g}, ", "Where {g}, ",
 # QUESTION (A6f/A14); the answer side had no such guard, which is the two-implementations pattern
 # again. CLOSE_Q is used only when the record's name really denotes a quantity.
 CLOSE_ANY = ["{v} = {a}. {why}", "{a}. {why}", "That gives {a}. {why}"]
-CLOSE_Q   = CLOSE_ANY + ["The {q} is {a}. {why}"]
+# A33. "The the de broglie wavelength is 2.18e-11 m." -- 38 of 29,982 answers, 0.13%. The template
+# prefixes "The " to a record name that ALREADY begins with "the", and the article is part of the
+# name in the store. Found by the n=400 read; no gate looks at article agreement. The template can
+# no longer supply the article, so a name that lacks one is capitalised instead.
+CLOSE_Q   = CLOSE_ANY + ["{Q} is {a}. {why}"]
 WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}.",
        "This follows from {f}.", "{f} gives it."]
 
@@ -1791,8 +1821,16 @@ def gen(n, seed=0):
         # to the unfiltered draw only if the store somehow offers no alternative.
         rec_r = r
         if mismatch:
-            _lhs = r["f"].split("=", 1)[0].strip()
-            _alt = [x for x in recs if x["f"].split("=", 1)[0].strip() != _lhs]
+            # A33. COMPARING SYMBOLS WHERE THE PROPERTY IS "THE SAME QUANTITY". `W_o != W`, so a
+            # question asking for W_o from F_o and d_o was shown W=F*d and told "does not apply" --
+            # the record computes exactly the quantity asked, under a different subscript. Eighth
+            # instance of the proxy-predicate pattern. Strip the subscript and compare the name too.
+            _b = lambda t: re.sub(r"_[A-Za-z0-9]+$", "", t.strip())
+            _lhs, _nm = _b(r["f"].split("=", 1)[0]), (r.get("name") or "").lower()
+            _alt = [x for x in recs
+                    if _b(x["f"].split("=", 1)[0]) != _lhs
+                    and (x.get("name") or "").lower() != _nm
+                    and lhs_unit(x) != lhs_unit(r)]
             rec_r = rng.choice(_alt) if _alt else rng.choice(recs)
         _given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", g))
         # ONE PATH FOR EVERY CASE. D1 previously set this to `drop` directly; that happened to
@@ -1885,7 +1923,11 @@ def gen(n, seed=0):
         try:   a_val = f"{float(res):.4g}"          # signed off: 4 significant figures, ANSWER only
         except ValueError: pass
         a_txt = f"{a_val} {d['unit']}".strip() if d.get("unit") else a_val
-        ans = d["close"].format(v=d["lhs"], a=a_txt, q=d["name"].lower(), why=d["why"])
+        # A33. `Q` carries the article-correct form: a store name already beginning with "the"
+        # supplies its own, and one that does not gets "The". The template must not add a second.
+        _nm = d["name"].lower()
+        _Q  = (_nm[0].upper() + _nm[1:]) if _nm.startswith("the ") else ("The " + _nm)
+        ans = d["close"].format(v=d["lhs"], a=a_txt, q=_nm, Q=_Q, why=d["why"])
         built.append({"head": d["head"],
                       "text": f"<q>{d['q']}</q><r>{d['rec']}{c}<res>{res}</res><a>{ans}<end>",
                       "ans": ans})

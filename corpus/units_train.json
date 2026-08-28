@@ -1698,7 +1698,7 @@
   "scope": "m54274"
  },
  {
-  "f": "Q=Delta_E_int-W",
+  "f": "Q=Delta_E_int+W",
   "name": "Stirling Engine",
   "units": {
    "Q": "J",
