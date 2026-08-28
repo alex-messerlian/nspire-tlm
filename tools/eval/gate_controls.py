@@ -56,6 +56,10 @@ CONTROLS = {
     "mutate_helper":   ("tools/eval/gate_mutate_helper.py",
                         "                    if isinstance(t, ast.Name) and assigned.get(t.id, 0) == 1:",
                         "                    if False:"),
+    # The exact shipped defect: a slot declared in the enum and never written by a PF_END, which
+    # reads as 0 ticks and is indistinguishable from "this stage costs nothing".
+    "prof_pairing":    ("src/runq_nspire.c",
+                        "PF_END(PF_FFN);", "PF_END(PF_CLS);"),
     "shipping_number": ("docs/RESULT_STEP0_FINAL.md",
                         "and it is a lower bound,\nbecause false negatives are not controlled.",
                         "and that is the figure."),

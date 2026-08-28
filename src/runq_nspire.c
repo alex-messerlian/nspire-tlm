@@ -722,10 +722,19 @@ float* forward(Transformer* transformer, int token, int pos) {
                 }
             }
         }
+        /* CLOSE THE DANGLING PF_BEG(). The softmax line above ends with a bare PF_BEG(), which is
+         * closed by the NEXT head's PF_END(PF_ATTN) -- so every head but the LAST was attributed,
+         * and the last head's weighted sum fell on the floor along with everything after it.
+         * Nothing below here was timed at all: PF_FFN was declared in the enum and never written,
+         * so `stage=ffn matmul` printed 0 ticks -- impossible, the FFN is the largest matmul in
+         * the layer -- and 59% of every token landed in `unattributed`. */
+        PF_END(PF_ATTN);
 
         // final matmul to get the output of the attention
+        PF_BEG();
         quantize(&s->xq, s->xb, dim);
         matmul(s->xb2, &s->xq, w->wo + l, dim, dim);
+        PF_END(PF_ATTN);                    /* the output projection is attention's, not the FFN's */
 
         // residual connection back into x
         for (int i = 0; i < dim; i++) {
@@ -733,11 +742,12 @@ float* forward(Transformer* transformer, int token, int pos) {
         }
 
         // ffn rmsnorm
-        rmsnorm(s->xb, x, w->rms_ffn_weight + l*dim, dim);
+        PF_BEG(); rmsnorm(s->xb, x, w->rms_ffn_weight + l*dim, dim); PF_END(PF_RMSNORM);
 
         // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
         // first calculate self.w1(x) and self.w3(x)
-        quantize(&s->xq, s->xb, dim);
+        PF_BEG(); quantize(&s->xq, s->xb, dim); PF_END(PF_QUANT);
+        PF_BEG();
         matmul(s->hb, &s->xq, w->w1 + l, dim, hidden_dim);
         matmul(s->hb2, &s->xq, w->w3 + l, dim, hidden_dim);
 
@@ -754,6 +764,7 @@ float* forward(Transformer* transformer, int token, int pos) {
         // final matmul to get the output of the ffn
         quantize(&s->hq, s->hb, hidden_dim);
         matmul(s->xb, &s->hq, w->w2 + l, hidden_dim, dim);
+        PF_END(PF_FFN);                     /* w1 + w3 + SwiGLU + w2, the whole feed-forward */
 
         // residual connection
         for (int i = 0; i < dim; i++) {

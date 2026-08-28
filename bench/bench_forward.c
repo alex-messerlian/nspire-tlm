@@ -158,10 +158,23 @@ int main(void) {
         long icept_num = sy*sxx - sx*sxy;
         long slope_m = den ? (slope_num * 1000 / den) : 0;
         long icept_m = den ? (icept_num * 1000 / den) : 0;
+        /* 64-BIT, BECAUSE slope_m AND icept_m ARE MILLI-TICKS AND long IS 32 BITS HERE.
+         *
+         * These two lines were the only conversions in this file that did not widen, and both
+         * overflowed: 1412485 milli-ticks * 1000000 = 1.41e12, which wraps mod 2^32 to a NEGATIVE
+         * int32. The device printed per_layer_us=-17 and INTERCEPT_us=-28 -- and NEGATIVE
+         * MICROSECONDS FROM POSITIVE TICK COUNTS IS ARITHMETIC, NOT PHYSICS. Reproducing the wrap
+         * off-device gives exactly -17 and -29 against the printed -17 and -28.
+         *
+         * The damage was not the wrong number, it was the wrong CONCLUSION: CROSS_CHECK below
+         * compares INTERCEPT_us to FIXED_stages_us and says a disagreement means the model of the
+         * forward pass is wrong. It read as a catastrophic failure of that model. With the widen,
+         * F0 = 39,555 us against 39,154 us measured directly -- 1.0% apart, and the check PASSES.
+         * A reporting-path overflow nearly cost us the headline result of the pass. */
         bench_result("per_layer_ticks", "%ld.%03ld", slope_m/1000, (slope_m%1000+1000)%1000);
-        bench_result("per_layer_us", "%ld", slope_m*1000000/32768/1000);
+        bench_result("per_layer_us", "%lld", (long long)((int64_t)slope_m * 1000000 / 32768 / 1000));
         bench_result("INTERCEPT_ticks", "%ld.%03ld", icept_m/1000, (icept_m%1000+1000)%1000);
-        bench_result("INTERCEPT_us", "%ld", icept_m*1000000/32768/1000);
+        bench_result("INTERCEPT_us", "%lld", (long long)((int64_t)icept_m * 1000000 / 32768 / 1000));
         bench_result("INTERCEPT_note", "%s",
             "this is F0 MEASURED. The table assumed ~180000 us at d288 L6.");
     }

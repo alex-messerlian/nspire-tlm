@@ -390,8 +390,21 @@ int main(void) {
         { "123*456", "56088" },
     };
   for (unsigned ei = 0; ei < sizeof EXPRS / sizeof EXPRS[0]; ei++) {
+    /* CLEAR THE BUFFER. It is `static`, ascii2utf16 does not terminate, and the expressions are
+     * different lengths -- so writing "1+1" (3 units) over "123*456" (7 units) left the tail and
+     * sent `1+1*456`. utf16_strlen then reported 7 for a 3-character expression, which is the tell
+     * that was printed on every run and not read.
+     *
+     * THE ACCIDENT WAS A BETTER EXPERIMENT THAN THE TEST. The CAS returned 457, and
+     * 1 + 1*456 = 457 with correct operator precedence -- on an expression nothing had ever sent.
+     * A stale buffer, a cached constant or a garbage heap read cannot produce that; only a real
+     * parser can. It is stronger evidence that the OS CAS is driveable than the 123*456 -> 56088
+     * case it was meant to support, because that one could in principle have been a coincidence of
+     * adjacent memory. Keeping the note because the corrected harness can no longer reproduce it. */
     static uint16_t expr[32];
+    memset(expr, 0, sizeof expr);
     ascii2utf16(expr, (char *)EXPRS[ei].txt, (int)strlen(EXPRS[ei].txt));
+    expr[strlen(EXPRS[ei].txt)] = 0;                 /* belt and braces: terminate explicitly */
     say("expr=\"%s\" (expect \"%s\") marshalled: utf16_strlen=%u",
         EXPRS[ei].txt, EXPRS[ei].want, (unsigned)utf16_strlen(expr));
     dump_bytes("expr utf16[0..15]", expr, 16);
