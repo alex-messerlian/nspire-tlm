@@ -32,6 +32,16 @@ if [ -f "$_LOCK" ] && [ "${TLM_CONTROLS_OWNER:-}" != "$(cat "$_LOCK" 2>/dev/null
 fi
 
 set -u
+
+# RUN ONE GATE. gate_controls.py runs this suite ONCE PER CONTROL -- 56 of them -- so the whole
+# suite ran 56 times and the meta-gate passed 26 minutes. That is not a performance note: I twice
+# cut the wait short, and on the second occasion a control's mutation was still live when I
+# committed, so commit 0585c95 shipped the A6 revert with ALL GATES PASS printed just above it.
+# Cost is a correctness property (the project log); this makes the meta-gate affordable enough to wait for.
+#
+# GATE_ONLY names one gate; everything else is skipped. Unset, the suite behaves exactly as before.
+_skip() { [ -n "${GATE_ONLY:-}" ] && [ "$1" != "$GATE_ONLY" ]; }
+
 STORE="${1:-corpus/store_clean.json}"
 PY=.venv-tok/bin/python
 fail=0
@@ -61,6 +71,7 @@ if [ "$prereq_missing" -ne 0 ]; then
     exit 3
 fi
 for g in lhs_gate lint_leibniz lint_declaration lint_fused_words dim_gate; do
+    if _skip "$g"; then continue; fi
     out=$($PY "tools/eval/$g.py" "$STORE" 2>&1); rc=$?
     case $rc in
       0) printf "  %-20s PASS\n" "$g" ;;
@@ -68,31 +79,31 @@ for g in lhs_gate lint_leibniz lint_declaration lint_fused_words dim_gate; do
       *) printf "  %-20s FAIL (exit %d)\n" "$g" "$rc"; echo "$out" | head -4 | sed 's/^/      /'; fail=1 ;;
     esac
 done
-$PY tools/eval/test_scope.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_scope" || { printf "  %-20s FAIL\n" "test_scope"; fail=1; }
+if ! _skip test_scope; then $PY tools/eval/test_scope.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_scope" || { printf "  %-20s FAIL\n" "test_scope"; fail=1; }; fi
 # The structural-shape rule (docs/ARCHITECTURE.md s6) validated against all nine known traces,
 # including the two that provenance and dim_gate are both documented as unable to see. Listed here
 # because a rule nothing runs is a rule that will drift from the C that implements it.
-$PY tools/eval/shape_spec.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_spec" || { printf "  %-20s FAIL\n" "shape_spec"; fail=1; }
+if ! _skip shape_spec; then $PY tools/eval/shape_spec.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_spec" || { printf "  %-20s FAIL\n" "shape_spec"; fail=1; }; fi
 # The C implementation, and a mutation pass over it. All-green on a first run triggers the mutation
 # pass, not confidence -- this repo has three recorded cases of a suite that passed everything while
 # measuring nothing.
-$PY tools/eval/shape_mutation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_mutation" || { printf "  %-20s FAIL\n" "shape_mutation"; fail=1; }
+if ! _skip shape_mutation; then $PY tools/eval/shape_mutation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shape_mutation" || { printf "  %-20s FAIL\n" "shape_mutation"; fail=1; }; fi
 # The project log names test_genloop.py as the EXECUTABLE guard that makes the Bug 5 ruling hold -- "the
 # guard is executable and mutation-tested in both directions, which is what makes it hold". It was
 # never listed here, so the guard that documentation could not provide was itself ungated.
-$PY tools/eval/test_genloop.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_genloop" || { printf "  %-20s FAIL\n" "test_genloop"; fail=1; }
+if ! _skip test_genloop; then $PY tools/eval/test_genloop.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_genloop" || { printf "  %-20s FAIL\n" "test_genloop"; fail=1; }; fi
 # score.py is the FOURTH grader -- it scores the 200-item eval set and was in no gate. It graded the
 # executed result against the recorded reference and nothing else, so a call that invented its
 # operands and landed on the right number passed. test_score also asserts that score.py and grade.py
 # AGREE, because two graders means every check has to be added twice or it covers half the surface.
-$PY tools/eval/test_score.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_score" || { printf "  %-20s FAIL\n" "test_score"; fail=1; }
+if ! _skip test_score; then $PY tools/eval/test_score.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_score" || { printf "  %-20s FAIL\n" "test_score"; fail=1; }; fi
 # No tracked binary may exist without a rule that rebuilds it. provcli -- the check the
 # architecture's central claim rests on -- was one, so a fix to provenance.c never reached the
 # running binary. Third instance of the class after the four gate suites and build/asmcli.
-$PY tools/eval/gate_binaries.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "gate_binaries" || { printf "  %-20s FAIL\n" "gate_binaries"; fail=1; }
+if ! _skip gate_binaries; then $PY tools/eval/gate_binaries.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "gate_binaries" || { printf "  %-20s FAIL\n" "gate_binaries"; fail=1; }; fi
 # ITEM 14: every event kind app.c HANDLES must have a producer. WIRING_AUDIT's own closing
 # instruction, never carried out -- and IN_SCROLL is still handled and emitted by nothing.
-$PY tools/eval/gate_event_producers.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "event_producers" || { printf "  %-20s FAIL\n" "event_producers"; fail=1; }
+if ! _skip event_producers; then $PY tools/eval/gate_event_producers.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "event_producers" || { printf "  %-20s FAIL\n" "event_producers"; fail=1; }; fi
 # ITEM 15: distribution_gate.py was written with a __main__ and an exit code and wired to NOTHING.
 # Its first run says the eval set is 91-95% separable from training against a ~52% noise control.
 # Unreachable before the corpus restart, so it ratchets against a recorded baseline.
@@ -103,77 +114,81 @@ $PY tools/eval/gate_event_producers.py >/dev/null 2>&1 && printf "  %-20s PASS\n
 # items.json ref is DERIVED by executing calls. Commit 25393cc edited q/record/calls by hand
 # to settle three spelling decisions and ref went stale on 7 items -- two of which a correct
 # model could then not pass.
-$PY tools/eval/gate_items_refs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "items_refs" || { printf "  %-20s FAIL\n" "items_refs"; fail=1; }
+if ! _skip items_refs; then $PY tools/eval/gate_items_refs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "items_refs" || { printf "  %-20s FAIL\n" "items_refs"; fail=1; }; fi
 # DIMENSIONLESS_AUDIT.md calls this "gating (exit 1 on any)". It was in no gate, and it ran
 # `./evalcli` relative, so it only worked from tools/eval. Both fixed 2026-08-27.
-$PY tools/eval/audit_dimensionless.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "dimensionless" || { printf "  %-20s FAIL\n" "dimensionless"; fail=1; }
+if ! _skip dimensionless; then $PY tools/eval/audit_dimensionless.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "dimensionless" || { printf "  %-20s FAIL\n" "dimensionless"; fail=1; }; fi
 # topic-scoping-artifact, promoted from UNENFORCED 2026-08-27: a published selection improvement
 # must publish its same-size random control. Topic-scoping read 61.2% against a random-20 at 62.7%.
-$PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }
-$PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }
+if ! _skip selection_control; then $PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }; fi
+if ! _skip stale_figures; then $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }; fi
 # A7: 16.2% of documents used a constant in the CALL that appeared in neither the question nor
 # the record -- recalled, not read -- and while it was absent the graders could not tell a
 # correct constant from a fabricated one (both "unchecked").
 # A8: the D2 branch kept its own copy of the units-field rule, so fit:low was 100% predictable
 # from a one-bit formatting cue and every D2 refusal metric measured the cue.
-$PY tools/eval/gate_fit_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "fit_cue" || { printf "  %-20s FAIL\n" "fit_cue"; fail=1; }
-$PY tools/eval/gate_no_orphan_values.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_orphan_values" || { printf "  %-20s FAIL\n" "no_orphan_values"; fail=1; }
+if ! _skip fit_cue; then $PY tools/eval/gate_fit_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "fit_cue" || { printf "  %-20s FAIL\n" "fit_cue"; fail=1; }; fi
+if ! _skip no_orphan_values; then $PY tools/eval/gate_no_orphan_values.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_orphan_values" || { printf "  %-20s FAIL\n" "no_orphan_values"; fail=1; }; fi
 # R_train superseteq R_store: 25 of 166 records were retrievable and never trained, worth
 # 12.2% vs 41.0% correct. The only property with a measured effect on correctness.
 # store_clean and units_train both carry units; the generator prefers units_train, so a fix
 # applied to only one silently does not propagate. The temperature-in-seconds fix did exactly that.
-$PY tools/eval/gate_units_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "units_parity" || { printf "  %-20s FAIL\n" "units_parity"; fail=1; }
+if ! _skip units_parity; then $PY tools/eval/gate_units_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "units_parity" || { printf "  %-20s FAIL\n" "units_parity"; fail=1; }; fi
 # Physically impossible RESULTS -- the class nothing owned, because distribution_gate cannot
 # see digits and dim_gate finds -28.75 a dimensionally fine efficiency.
 # A21: gate_plausible filters RESULTS; every GIVEN was unchecked, and 69% of trig documents fed
 # an angle of several full turns. Range is per QUANTITY, not per unit.
 # Seven declared givens were drawn as 0.001 in 100% of documents: the window contained exactly
 # one pool value. A variable that never varies is invisible to every range check.
-$PY tools/eval/gate_no_collapse.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_collapse" || { printf "  %-20s FAIL\n" "no_collapse"; fail=1; }
-$PY tools/eval/gate_given_range.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "given_range" || { printf "  %-20s FAIL\n" "given_range"; fail=1; }
-$PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "plausible" || { printf "  %-20s FAIL\n" "plausible"; fail=1; }
+if ! _skip no_collapse; then $PY tools/eval/gate_no_collapse.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_collapse" || { printf "  %-20s FAIL\n" "no_collapse"; fail=1; }; fi
+if ! _skip given_range; then $PY tools/eval/gate_given_range.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "given_range" || { printf "  %-20s FAIL\n" "given_range"; fail=1; }; fi
+if ! _skip plausible; then $PY tools/eval/gate_plausible.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "plausible" || { printf "  %-20s FAIL\n" "plausible"; fail=1; }; fi
 # THE SAME DEFECT WAS FOUND FOUR TIMES, ONE FIELD OVER EACH TIME (units, condition, fit,
 # missing). This compares the whole record span BYTE FOR BYTE against build/asmcli, so it
 # cannot be outflanked by a field nobody thought of.
 # <res> is the architecture's central mechanism: toolrun.c writes the evaluator string
 # verbatim at SIG_DIGITS 10, and the generator was rounding it to 4 s.f. -- 52.88% of docs.
-$PY tools/eval/gate_res_verbatim.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "res_verbatim" || { printf "  %-20s FAIL\n" "res_verbatim"; fail=1; }
-$PY tools/eval/gate_record_bytes.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "record_bytes" || { printf "  %-20s FAIL\n" "record_bytes"; fail=1; }
+if ! _skip res_verbatim; then $PY tools/eval/gate_res_verbatim.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "res_verbatim" || { printf "  %-20s FAIL\n" "res_verbatim"; fail=1; }; fi
+if ! _skip record_bytes; then $PY tools/eval/gate_record_bytes.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "record_bytes" || { printf "  %-20s FAIL\n" "record_bytes"; fail=1; }; fi
 # A bulk edit doubled corpus/generate.py (1,070 -> 1,565 lines) and EVERY functional check
 # passed -- Python takes the later definition. Only the mutation meta-gate noticed.
-$PY tools/eval/gate_no_dup_defs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_dup_defs" || { printf "  %-20s FAIL\n" "no_dup_defs"; fail=1; }
-$PY tools/eval/gate_store_coverage.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_coverage" || { printf "  %-20s FAIL\n" "store_coverage"; fail=1; }
-$PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }
-$PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }
+# TWICE a control mutation has been COMMITTED. gate_controls locks against a second run and
+# run_gates refuses to read mid-mutation -- neither stops `git add -A`. The suite passed on
+# the clean file and the commit captured the mutated one, milliseconds apart.
+if ! _skip no_mutation; then $PY tools/eval/gate_no_mutation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_mutation" || { printf "  %-20s FAIL\n" "no_mutation"; fail=1; }; fi
+if ! _skip no_dup_defs; then $PY tools/eval/gate_no_dup_defs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_dup_defs" || { printf "  %-20s FAIL\n" "no_dup_defs"; fail=1; }; fi
+if ! _skip store_coverage; then $PY tools/eval/gate_store_coverage.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_coverage" || { printf "  %-20s FAIL\n" "store_coverage"; fail=1; }; fi
+if ! _skip ask_quantity; then $PY tools/eval/gate_ask_quantity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ask_quantity" || { printf "  %-20s FAIL\n" "ask_quantity"; fail=1; }; fi
+if ! _skip distribution_gate; then $PY tools/eval/distribution_gate.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "distribution_gate" || { printf "  %-20s FAIL\n" "distribution_gate"; fail=1; }; fi
 # The generator may only emit relations the CLEANED store contains. docs/RESULT_STORE_CLEANING.md
 # deleted 34 records for documented reasons and units_train.json was never re-cleaned; a change that
 # made units_train the iterated set silently re-admitted 24 of them, three named "Strategy".
-$PY tools/eval/gate_store_authority.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_authority" || { printf "  %-20s FAIL\n" "store_authority"; fail=1; }
+if ! _skip store_authority; then $PY tools/eval/gate_store_authority.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "store_authority" || { printf "  %-20s FAIL\n" "store_authority"; fail=1; }; fi
 # The record span the generator writes must match the one the device assembles. Three producers of
 # one format disagreed: 0 of 197,428 training documents carried the LHS unit that assemble.c emits
 # on every prompt. EXPERIMENT_PLAN records this skew as fixed -- the five-field skeleton was
 # unified, the units field was not, and nothing compared them afterwards.
-$PY tools/eval/gate_format_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "format_parity" || { printf "  %-20s FAIL\n" "format_parity"; fail=1; }
+if ! _skip format_parity; then $PY tools/eval/gate_format_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "format_parity" || { printf "  %-20s FAIL\n" "format_parity"; fail=1; }; fi
 # THE LOSS MASK -- TOOL_SPEC s1, "the one rule that matters most". It was an inline loop copied into
 # eight trainers with no function, no test and no gate, and every copy leaked 38.7% of each result
 # span into the loss: the model was trained to predict the leading digits of values it is supposed
 # to READ. Also refuses a ninth copy.
-$PY train/test_lossmask.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_lossmask" || { printf "  %-20s FAIL\n" "test_lossmask"; fail=1; }
+if ! _skip test_lossmask; then $PY train/test_lossmask.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_lossmask" || { printf "  %-20s FAIL\n" "test_lossmask"; fail=1; }; fi
 # tools/eval/prov_mutation.py is deliberately NOT listed here. It rebuilds and re-runs THIS SCRIPT
 # once per mutation, so listing it makes the suite call itself -- which is what happened on the
 # first attempt: infinite recursion, killed at the two-minute timeout. It is a meta-check and runs
 # manually, exactly as WIRING_AUDIT already classifies gate_mutation.py and positive_control.py.
 # The same applies to shape_mutation.py, which does NOT re-enter this script and is therefore safe
 # to list above.
-./build/test_loader build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_loader" || { printf "  %-20s FAIL\n" "test_loader"; fail=1; }
-./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }
-./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }
-./build/test_tokenizer build/tok4096.tok build/tok_reference.json >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_tokenizer" || { printf "  %-20s FAIL\n" "test_tokenizer"; fail=1; }
+if ! _skip test_loader; then ./build/test_loader build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_loader" || { printf "  %-20s FAIL\n" "test_loader"; fail=1; }; fi
+if ! _skip test_picker; then ./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }; fi
+if ! _skip test_assemble; then ./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }; fi
+if ! _skip test_tokenizer; then ./build/test_tokenizer build/tok4096.tok build/tok_reference.json >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_tokenizer" || { printf "  %-20s FAIL\n" "test_tokenizer"; fail=1; }; fi
 
 # UI and interaction suites. These were written and NOT LISTED HERE, which is the same defect the
 # gates exist to catch, pointed at the gates themselves: a suite nothing runs is a suite that does
 # not exist. Every one of these is built from source that ships.
-$PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_ui_errs" || { printf "  %-20s FAIL\n" "test_ui_errs"; fail=1; }
+if ! _skip test_ui_errs; then $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_ui_errs" || { printf "  %-20s FAIL\n" "test_ui_errs"; fail=1; }; fi
 # test_ckpt guards the LOADER. It is listed here and not only in the Makefile because this file,
 # not TESTS, is what decides whether the suite passed -- a roster kept in two places drifts, and
 # the half nobody reads is the half that silently stops running.

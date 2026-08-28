@@ -1289,7 +1289,7 @@ def gen(n, seed=0):
             shown_w = [v for v in shown if v != drop]
             g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown_w) if shown_w else g
         stem = rng.choice(GIVE).format(g=g)
-        ask  = rng.choice(ASK_ALL).format(q=quantity_surface(r, rng))
+        ask  = ask_for(r, quantity_surface(r, rng), rng)
         # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
         # real problems, and ordering moves 4-gram diversity more than the verb does.
         if rng.random() < 0.35:
