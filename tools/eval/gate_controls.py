@@ -136,6 +136,17 @@ CONTROLS = {
     "given_range_kind":("corpus/generate.py",
                         '    ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_1"):     "refractive_index",',
                         '    ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_1"):     "angle_turn",'),
+    # NO CONTROL ON A _RESULT_KIND DECLARATION, and the reason is worth keeping.
+    #
+    # gate_plausible and corpus/generate.py CALL THE SAME implausible(). Mutating a declaration
+    # therefore disables the generator's DROP and the gate's CHECK in one step: the impossible
+    # results enter the corpus and the gate, asking the same mutated question, cannot see them.
+    # The control could never fire. It survived twice while I looked for the cause in sample size
+    # and range width, and both of those turned out to be real problems too -- N=3000 gave 14
+    # documents on the record under test, and (0,100) for g never fired on any real output.
+    #
+    # A CONTROL MUST BREAK THE PRODUCER OR THE CHECKER, NEVER THE DEFINITION THEY SHARE. The live
+    # control below mutates the generator's DROP and leaves the gate's predicate intact.
     "plausible":       ("corpus/generate.py",    # stop dropping impossible results
                         "            if _why:", "            if False:"),
     # Revert the units ORDER to sorted -- the skew gate_format_parity excused as cosmetic.
@@ -245,7 +256,8 @@ ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_sc
          "format_parity_cond": "format_parity",
          "test_score_unit": "test_score",
          "fit_cue_units": "fit_cue",
-         "given_range_kind": "given_range"}   # one control per FIELD the parity gate checks
+         "given_range_kind": "given_range",
+         }   # one control per FIELD the parity gate checks
 
 
 def _write_and_stamp(f, text):

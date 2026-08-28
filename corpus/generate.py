@@ -101,6 +101,7 @@ _POOL = sorted(v for vs in _POOL_BY_UNIT.values() for v in vs)
 # here is what the mechanism is for.
 _MICRO_CVAL = {
     # (formula, variable) -> (value, unit, what it is)
+    ("V=((k_e*q)/(r))", "k_e"): (8.988e9, "V*m/C", "Coulomb constant"),
     ("v_d=((I)/(n*q*A))", "q"): (1.602e-19, "C",     "elementary charge"),
     ("v_d=((I)/(n*q*A))", "n"): (8.5e28,    "1/m^3", "conduction-electron density in copper"),
     ("T=((2*pi*m)/(q*B))", "q"): (1.602e-19, "C",    "elementary charge"),
@@ -438,22 +439,51 @@ def lhs_unit(r):
 # NARROW BY CONSTRUCTION, and the limit is the honest part: it covers quantity classes that have a
 # NAMED physical range. A quantity outside this table is unchecked, not blessed -- most results are,
 # and "not in the table" must not read as "verified plausible".
+# A25. THE RESULT CHECK WAS THE SAME CHAIN, and it is replaced before it misdispatches rather
+# than after. implausible() keyed its last three rules on the record NAME -- `"efficiency" in name`
+# claims a window for the LHS of ANY record whose name contains that word, whatever the LHS
+# actually is. Today each rule claims exactly one record and each LHS is the right quantity, so
+# nothing is wrong; the mechanism is A24's exactly, and it will misfire the first time a record is
+# added or renamed. A24 was found only because a regex happened to break; this one is being closed
+# while it still looks fine.
+#
+# Declared per FORMULA (the result is the LHS, so the formula identifies it uniquely). The
+# unit-determined rules stay: a value in seconds IS a duration, and that is the unit fixing the
+# quantity, not a heuristic reading a name.
+_RESULT_RANGE = {
+    "efficiency":       (0.0, 1.0,   "an efficiency must lie in [0, 1]"),
+    "refractive_index": (1.0, 100.0, "a refractive index must lie in [1, 100]"),
+    # (0, 100) WAS TOO LOOSE TO FIRE. Measured over 89 g-documents the results spanned
+    # [4.39e-06, 98.7] and every one passed -- a g of 4e-6 m/s^2 is not any body a textbook
+    # mentions. Pluto is 0.62 and Jupiter 24.8, so [0.1, 30] is generous for the whole solar
+    # system and still excludes the absurd. A range wide enough never to fire is not a check.
+    "g_local":          (0.1, 30.0, "g must be that of some real body: Pluto 0.62, Jupiter 24.8"),
+}
+_RESULT_KIND = {
+    "Eff_C=1-((T_c)/(T_h))":          "efficiency",
+    "n=((c)/(v))":                    "refractive_index",
+    "g=((4*(pi)^(2)*L)/((T)^(2)))":   "g_local",
+}
+
+
 def implausible(r, value):
-    """Why this result cannot occur physically, or None. `r` is the record, `value` the number."""
+    """Why this result cannot occur physically, or None.
+
+    A LOOKUP PLUS SOUND UNIT RULES (A25), not a chain of name matches. A record with no declared
+    result kind and no decisive unit is UNCHECKED -- most are, and gate_plausible prints the
+    fraction so that is visible rather than implied.
+    """
     lhs = r["f"].split("=", 1)[0].strip()
     unit = ((r.get("units") or {}).get(lhs) or "").strip()
-    name = (r.get("name") or "").lower()
-    if unit == "s" and value <= 0:                    return "a duration must be positive"
-    if unit == "kg" and value <= 0:                   return "a mass must be positive"
-    # A CHANGE in temperature may be negative; an ABSOLUTE one may not.
+    # The unit fixes the quantity here -- no inference.
+    if unit == "s" and value <= 0:  return "a duration must be positive"
+    if unit == "kg" and value <= 0: return "a mass must be positive"
     if unit == "K" and not lhs.startswith(("Delta", "delta")) and value <= 0:
         return "an absolute temperature must be positive"
-    if "efficiency" in name and not 0.0 <= value <= 1.0:
-        return "an efficiency must lie in [0, 1]"
-    if "index of refraction" in name and not 1.0 <= value <= 100.0:
-        return "a refractive index must lie in [1, 100]"
-    if "gravitational acceleration" in name and not 0.0 < value < 100.0:
-        return "g must lie in (0, 100) m/s^2"
+    kind = _RESULT_KIND.get(r.get("f"))
+    if kind is not None:
+        lo, hi, why = _RESULT_RANGE[kind]
+        if not lo <= value <= hi: return why
     return None
 
 
@@ -598,8 +628,52 @@ _RELATION_NAME = re.compile(r"\b(law|equation|expression|relationship|relation|t
 # into "change", giving "Find index." and "Determine magnitude." -- 191 of 11,975 documents asking
 # for nothing identifiable. These words are the PROPERTY, and the thing they are a property OF is
 # what got dropped. When the head reduces to one of them, keep the full name instead.
+# A26. THE LAST INFERENCE ON A NAME, converted before it misdispatches (A24's lesson applied
+# rather than re-learned). _RELATION_NAME is a regex over the record's name deciding whether that
+# name denotes a RELATION rather than a quantity -- "Law of reflection" must not become "Calculate
+# law of reflection." It currently classifies all 18 correctly, and it is exactly the shape that
+# failed in quantity_range: a pattern standing in for a fact about a record.
+#
+# So the fact is declared. The regex is KEPT, but only as a DISCOVERY AID: the assertion below
+# fails if a record's name matches it and is not declared, so a newly added "…law" record is
+# noticed rather than silently classified. Declaration decides; the pattern only nags.
+_NAME_IS_RELATION = {
+    'Delta_S=((Q)/(T))',
+    'Delta_U=Q-W',
+    'Delta_p=F_net*Delta_t',
+    'E=m*(c)^(2)',
+    'F=-k*x',
+    'F=G*m1*m2/(r)^(2)',
+    'F=m*a',
+    'F_net=m*a',
+    'I_0=((V_0)/(Z))',
+    'I_1=I_2+I_3',
+    'I_S=((N_P)/(N_S))*I_P',
+    'U=((1)/(2))*m*(omega)^(2)*(x)^(2)',
+    'V=((U_E)/(q))',
+    'V=I*R',
+    'W_net=K_B-K_A',
+    'f=((1)/(T))',
+    'f=((d_i*d_o)/(d_o+d_i))',
+    'f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))',
+    'p=((h)/(lambda))',
+    'theta_2=asin(((n_1*sin(theta_1))/(n_2)))',
+    'theta_r=theta_i',
+    'w=m*g',
+}
+
+
 _NOT_A_QUANTITY = {"magnitude", "index", "change", "difference", "value", "component",
                    "ratio", "number", "amount", "factor", "rate", "size", "amount"}
+
+def rec_is_relation_named(r):
+    """Does this record's NAME denote a relation rather than the quantity it computes?
+
+    DECLARED (A26), not matched. One lookup, so the question surface and the answer template cannot
+    disagree about it -- they consulted the regex separately before, which is the two-implementations
+    pattern waiting to happen."""
+    return r.get("f") in _NAME_IS_RELATION
+
 
 def quantity_surface(r, rng):
     """How the QUESTION refers to the quantity being asked for.
@@ -642,7 +716,7 @@ def quantity_surface(r, rng):
             return
         forms.append(form); weights.append(w)
 
-    if name and _RELATION_NAME.search(name):
+    if name and rec_is_relation_named(r):
         # The name describes the equation, not its output. Only the symbol is usable.
         return lhs or name
     if name:
@@ -706,6 +780,36 @@ assert not _DECL_STALE, (
     "A23/A24: these declarations match no sampled (record, variable) pair, so they are silent "
     "no-ops:\n  " + "\n  ".join(_DECL_STALE)
     + "\nFix them against corpus/store_clean.json. A range that never fires reads as coverage.")
+_RESULT_STALE = sorted(set(_RESULT_KIND) - {r["f"] for r in recs})
+assert not _RESULT_STALE, f"A25: _RESULT_KIND names records that do not exist: {_RESULT_STALE}"
+_RESULT_BAD = sorted(k for k in _RESULT_KIND.values() if k not in _RESULT_RANGE)
+assert not _RESULT_BAD, f"A25: _RESULT_KIND names kinds with no range: {_RESULT_BAD}"
+# The regex is a DISCOVERY AID, not the decision: a record whose name matches it and is not
+# declared is a new record nobody classified, and that must be noticed rather than guessed at.
+_UNDECLARED_RELATION = sorted(r["f"] for r in recs
+                              if _RELATION_NAME.search(r.get("name") or "")
+                              and r["f"] not in _NAME_IS_RELATION)
+assert not _UNDECLARED_RELATION, (
+    "A26: these records have a relation-sounding NAME and no entry in _NAME_IS_RELATION:\n  "
+    + "\n  ".join(_UNDECLARED_RELATION)
+    + "\nDecide for each whether the name denotes the quantity it computes, and declare it.")
+_RELATION_STALE = sorted(_NAME_IS_RELATION - {r["f"] for r in recs})
+assert not _RELATION_STALE, f"A26: _NAME_IS_RELATION names records that do not exist: {_RELATION_STALE}"
+# A26b. NO SAMPLED VARIABLE MAY TAKE ITS VALUE FROM THE GLOBAL NAME TABLE. `CONST[v]` maps a bare
+# identifier to a physical constant with no record scope -- the pattern IDENTIFIER_COLLISION.md
+# records, and the last value-supplying inference in this file. It is dimensionally gated, which
+# makes it fairly safe, and "fairly safe" is what A24 was too. Every constant a RHS variable needs
+# is now declared in the store's `cval` or in _MICRO_CVAL; this fails if that stops being true.
+_NAME_TABLE_USERS = sorted(
+    f"{r['f']}  [{v}]" for r in recs
+    for v in ({x for x in VAR.findall(r["f"].split("=", 1)[1])} - {"pi", "e"})
+    if _const_for(r, v) is not None
+    and (r["f"], v) not in _MICRO_CVAL
+    and v not in ((_store.get(r["f"], {}) or {}).get("cval") or {}))
+assert not _NAME_TABLE_USERS, (
+    "A26b: these SAMPLED variables get their value from the global CONST name table rather than "
+    "from a declaration:\n  " + "\n  ".join(_NAME_TABLE_USERS)
+    + "\nDeclare them in _MICRO_CVAL or in the store's cval.")
 _KIND_BAD = sorted(k for k in _KIND.values() if k not in _KIND_RANGE)
 assert not _KIND_BAD, f"A24: _KIND names kinds with no range: {_KIND_BAD}"
 
@@ -984,7 +1088,7 @@ def gen(n, seed=0):
                      "rec": f"{rec_r['f']} | {umap} | missing:{miss} | "
                             f"{_condition_field(rec_r)} | fit:{band}", "lhs": lhs,
                      "name": r["name"], "head": r["f"], "unit": lhs_unit(r),
-                     "close": rng.choice(CLOSE_Q if not _RELATION_NAME.search(r.get("name") or "") else CLOSE_ANY), "why": rng.choice(WHY).format(f=r["f"])})
+                     "close": rng.choice(CLOSE_ANY if rec_is_relation_named(r) else CLOSE_Q), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
     out = re.findall(r"<res>(.*?)</res>",
           subprocess.run(["tools/eval/evalcli","-"], input="\n".join(calls)+"\n",

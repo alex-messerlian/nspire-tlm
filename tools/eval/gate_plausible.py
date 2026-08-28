@@ -20,7 +20,30 @@ needs a defensible bound, not a guess.
 import importlib.util, io, contextlib, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-N, SEED, LIMIT = 3000, 999, 0.002
+# N = 20,000, NOT 3,000. A uniform draw over 164 records gives ~18 documents per record at
+# N=3000, so NO PER-RECORD PROPERTY IS MEASURABLE: the g-from-a-pendulum record appeared 14 times,
+# and a rule that fires on a quarter of those has an expected count below 4. The negative control
+# survived twice for exactly this reason -- not because the rule was wrong, because the sample
+# could not see it. A gate whose sample size is smaller than its unit of analysis reports 0 and
+# means "not measured".
+N, SEED, LIMIT = 20000, 999, 0.0005
+# LIMIT LOWERED FROM 0.002, BECAUSE THE GATE COULD NOT FAIL. Measured with the generator's drop
+# disabled over 39,771 sampled results, exactly ONE of this gate's rules fires at all:
+#
+#     g outside (0, 100) m/s^2 ......... 61 / 39,771 = 0.153%
+#     duration <= 0 .................... 0     subsumed by the unit rule on `s` givens
+#     mass <= 0 ........................ 0     subsumed
+#     absolute temperature <= 0 ........ 0     subsumed
+#     efficiency outside [0, 1] ........ 0     subsumed by A22c's T_c < T_h precondition
+#     refractive index outside [1,100] . 0     subsumed by A23's scale on `v` in n = c/v
+#
+# At the old 0.2% limit the only live rule sat BELOW the threshold, so no corpus this generator can
+# produce would have failed here. That is a gate that cannot fail, which the project log says is not a
+# gate -- and its negative control said so first, by surviving twice.
+#
+# The five subsumed rules are KEPT: they are cheap, and they are the backstop if a given-range
+# declaration is ever removed. But they are documented as subsumed so nobody reads this gate's PASS
+# as independent evidence about them.
 
 if __name__ == "__main__":
     spec = importlib.util.spec_from_file_location("gen", ROOT / "corpus/generate.py")
@@ -58,6 +81,22 @@ if __name__ == "__main__":
         print("\n  FAIL: the positive control was not caught -- this check is not working.")
         sys.exit(1)
 
+    # COVERAGE, PRINTED EVERY RUN, for the same reason gate_given_range prints it: most records
+    # have no declared result kind and no decisive unit, and this gate says nothing about them.
+    declared = sum(1 for r in m.recs
+                   if r["f"] in m._RESULT_KIND
+                   or ((r.get("units") or {}).get(r["f"].split("=", 1)[0].strip()) or "")
+                      in ("s", "kg", "K"))
+    print(f"  DECLARATION COVERAGE         {declared}/{len(m.recs)} records "
+          f"({declared/len(m.recs):.1%}) -- the other {len(m.recs)-declared} are UNCHECKED, "
+          f"not verified")
+    # COVERAGE, PRINTED EVERY RUN, for the same reason gate_given_range prints it: most records
+    # have no declared result kind and no decisive unit, so this gate says nothing about them.
+    _lhs_unit = lambda r: ((r.get("units") or {}).get(r["f"].split("=", 1)[0].strip()) or "")
+    declared = sum(1 for r in m.recs if r["f"] in m._RESULT_KIND or _lhs_unit(r) in ("s", "kg", "K"))
+    print(f"  DECLARATION COVERAGE         {declared}/{len(m.recs)} records "
+          f"({declared/len(m.recs):.1%}) -- the other {len(m.recs)-declared} are UNCHECKED, "
+          f"not verified")
     rate = bad / checked
     print(f"  results checked              {checked:,}")
     print(f"  PHYSICALLY IMPOSSIBLE        {bad}  ({rate:.2%}, limit {LIMIT:.2%})")
