@@ -38,6 +38,12 @@ CONTROLS = {
                         '"f": "U=m*g*h"', '"f": "U=m*g*h*undeclared_var"'),
     "lint_fused_words":("corpus/store_clean.json",
                         '"name": "Hooke\'s law"', '"name": "Hooke\'s law inthe spring"'),
+    # The shipping number's framing. The control strips the lower-bound qualifier from the one
+    # sentence that carries it, which is exactly how the figure would come loose in practice --
+    # nobody deletes a citation, they paraphrase one.
+    "shipping_number": ("docs/RESULT_STEP0_FINAL.md",
+                        "and it is a lower bound,\nbecause false negatives are not controlled.",
+                        "and that is the figure."),
     "shape_spec":      ("tools/eval/shape_spec.py",
                         'if op not in ("Mult", "Add"):', 'if False:'),
     "shape_mutation":  ("src/store/shapecheck.c",

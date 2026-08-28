@@ -135,6 +135,7 @@ if ! _skip dimensionless; then $PY tools/eval/audit_dimensionless.py >/dev/null 
 # must publish its same-size random control. Topic-scoping read 61.2% against a random-20 at 62.7%.
 if ! _skip selection_control; then $PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }; fi
 if ! _skip stale_figures; then $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }; fi
+if ! _skip shipping_number; then $PY tools/eval/gate_shipping_number.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "shipping_number" || { printf "  %-20s FAIL\n" "shipping_number"; fail=1; }; fi
 # A7: 16.2% of documents used a constant in the CALL that appeared in neither the question nor
 # the record -- recalled, not read -- and while it was absent the graders could not tell a
 # correct constant from a fabricated one (both "unchecked").
