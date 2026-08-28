@@ -280,7 +280,14 @@ _SCALE = {
   ("F=G*m1*m2/(r)^(2)", "m2"):      (1e20, 1e30,  "planetary or stellar mass"),
   ("F=G*m1*m2/(r)^(2)", "r"):       (1e6,  1e12,  "orbital separation"),
   # --- relativistic Doppler --------------------------------------------------------------------
-  ("f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))", "v"): (1e3, 2.9e8, "sub-luminal source speed"),
+  # A32. 100.00% OF THESE DOCUMENTS WERE DEGENERATE, and the window is the reason. sf4(f_obs) ==
+  # sf4(f_s) in every one of 40,000 draws: the mined pool tops out at 9800 m/s, so v/c never
+  # exceeded 3e-5 and the relativistic shift never reached the fourth significant figure the answer
+  # reports. The document asked for a Doppler shift and supervised an answer showing none. A
+  # precondition cannot fix this -- the value it needs is not in the pool, so the floor must rise
+  # above the pool's ceiling to force the log-uniform fallback. Same signature as the microscopic
+  # quantities in A27: a rate of exactly 100% is an inability, not a bad draw.
+  ("f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))", "v"): (3.0e6, 2.7e8, "a relativistic source speed, 0.01c to 0.9c: below 0.01c the shift is under the 4th significant figure"),
   # The absolute-temperature UNIT rule gave both reservoirs (1, 1e4) K, so T_c < 250 K on 89.3% of
   # documents and the efficiency exceeded 0.85 on 56.1%, median 0.887. No heat engine a textbook
   # describes runs at 89% Carnot efficiency; these are the temperatures real reservoirs have.
@@ -296,7 +303,10 @@ _SCALE = {
   ("n=((K/E_1))^(1/2)", "E_1"):     (1e-21, 1e-18, "a particle-in-a-box ground state"),
   ("n=((K/E_1))^(1/2)", "K"):       (1e-21, 1e-16, "an energy level of the same well"),
   ("U_form=E_transfer+U_coul+U_ex", "E_transfer"): (1e-19, 1e-17, "an ionic-bond energy term"),
-  ("U_form=E_transfer+U_coul+U_ex", "U_coul"):     (1e-19, 1e-17, "an ionic-bond energy term"),
+  # THE COULOMB TERM IS THE ATTRACTION AND IS NEGATIVE. Declared positive with the other two, the
+  # sum was positive in 100.00% of 40,000 draws -- every document asserted that an ionic bond does
+  # not form. OpenStax's NaCl is E_transfer +1.52 eV, U_coul -5.07 eV, U_ex +0.44 eV, U_form -3.11.
+  ("U_form=E_transfer+U_coul+U_ex", "U_coul"):     (-1e-17, -1e-19, "the Coulomb ATTRACTION, negative: it is what binds the ion pair"),
   ("U_form=E_transfer+U_coul+U_ex", "U_ex"):       (1e-19, 1e-17, "an ionic-bond energy term"),
   # ---- A29: the remaining 193 pairs, authored per physics domain and reviewed ------------------
   # Closing the coverage in one pass instead of discovering ~15 per Step 0 round. Six authors split
@@ -558,22 +568,114 @@ def quantity_range(rec, var):
 # list is short and explicit; a record not in it has no cross-variable precondition CHECKED, which
 # is not the same as having none.
 _PRECONDITION = {
-    "Delta_y=x*lambda/d":        (lambda v: v["lambda"] < v["d"],
-                                  "an interference maximum needs lambda < d"),
-    "W_out=W_in-W_f":            (lambda v: v["W_f"] < v["W_in"],
-                                  "friction cannot dissipate more than was supplied"),
+    # A32. AMENDED: `lambda < d` is true and FIRED ON 0.00% OF 4,000 DRAWS. sample_in_range prefers
+    # the mined pool, whose smallest value inside d's window is 1e-3, so d took NINE distinct values
+    # and lambda was below it by construction. The live half of the coupling is the paraxial
+    # condition, which the inert half was standing in front of.
+    "Delta_y=x*lambda/d":        (lambda v: 1e-4 <= v["lambda"] / v["d"] <= 0.1,
+                                  "the paraxial form holds only for lambda/d <= 0.1, and below 1e-4 the fringes are microns apart"),
+    "W_out=W_in-W_f":            (lambda v: 1e-3 * v["W_in"] <= v["W_f"] < v["W_in"],
+                                  "friction cannot dissipate more than was supplied, and below a part in a thousand W_out equals W_in at 4 s.f."),
+    # SUBSUMED BY THE WINDOWS, KEPT DELIBERATELY. Accept is 100.00% since the A30 reservoir windows
+    # abut at 400 K, so this is not independent evidence -- but it is the executable form of what
+    # those two windows encode implicitly, and widening either would otherwise violate it silently.
     "Eff_C=1-((T_c)/(T_h))":     (lambda v: v["T_c"] < v["T_h"],
                                   "the cold reservoir must be colder than the hot one"),
     # A27. Five more, each measured violated on 26-54% of its record's documents in Step 0 run 6.
     # Every one produces correct arithmetic and a scenario that cannot happen.
-    "Delta_S_tot=Delta_S_h+Delta_S_c": (lambda v: abs(v["Delta_S_h"]) < v["Delta_S_c"],
-                                  "the second law: the cold side's gain must exceed the hot side's loss"),
-    "W=Q_h-Q_c":                 (lambda v: v["Q_c"] < v["Q_h"],
-                                  "an engine cannot exhaust more heat than it takes in"),
-    "x=l-l_0":                   (lambda v: v["l"] > v["l_0"],
-                                  "an extension is positive; l < l_0 is a compression"),
-    "f_beat=|f_2-f_1|":          (lambda v: abs(v["f_2"] - v["f_1"]) <= 20.0,
-                                  "a beat is audible only below about 20 Hz"),
+    # THE a_CM DEFECT IN A SECOND RECORD, AND I INTRODUCED IT IN THE SAME SESSION I FIXED a_CM's.
+    # I bounded the ratio from below (the second law) and not from above. Delta_S_c/|Delta_S_h| IS
+    # T_h/T_c, and independent 7-decade draws gave it a median of 176, with 55.1% above 100 and a
+    # maximum of 8.5e6 -- a 300 K reservoir exchanging heat with one at 2.6e9 K.
+    "Delta_S_tot=Delta_S_h+Delta_S_c": (lambda v: abs(v["Delta_S_h"]) < v["Delta_S_c"] <= 100.0 * abs(v["Delta_S_h"]),
+                                  "the second law, and the ratio of the two IS T_h/T_c, which no pair of reservoirs takes past ~100"),
+    # One-sided as shipped, and the missing side is the second law rather than mere plausibility:
+    # 1 - Q_c/Q_h IS the thermal efficiency, and it had median 0.107, so MORE THAN HALF of these
+    # documents described an engine above 89% efficient and 5% one above 99.7%.
+
+    # ============================================================================================
+    # A32. THE ENUMERATION PASS. Every record with two or more free variables was reviewed for a
+    # physical coupling -- 121 of them, in one bounded pass, because six rounds of discovery had
+    # stopped producing comparable numbers (at n=30 a true 5.19% and a true 6.67% are the same
+    # observation). 54 couplings were claimed and adversarially checked; 36 were refuted, most for
+    # being a result window wearing a precondition's clothes or for reasoning from the DECLARED
+    # window rather than the drawn distribution -- sample_in_range prefers the mined pool, so the
+    # reachable span is routinely a decade narrower than the declaration says.
+    #
+    # The dominant surviving class is one no earlier round had named: VISIBILITY AT FOUR
+    # SIGNIFICANT FIGURES. A sum or difference whose smaller term falls below the fourth digit
+    # produces an answer byte-identical to one of its own givens, so the document asks for a
+    # calculation and supervises copying. The run-8 Doppler document was one of these.
+    # ============================================================================================
+
+    # --- visibility: the term asked about must move a reported digit ----------------------------
+    "v=v_0+a*t":                 (lambda v: abs(v["a"] * v["t"]) >= 1e-3 * abs(v["v_0"]),
+                                  "the velocity gained must show at 4 s.f., or the answer restates the given v_0"),
+    "x=x_0+v_x*t":               (lambda v: abs(v["v_x"] * v["t"]) >= 1e-3 * abs(v["x_0"]),
+                                  "the distance travelled must show at 4 s.f., or x restates the given x_0"),
+    "omega_f=omega_0+alpha*t":   (lambda v: abs(v["alpha"] * v["t"]) >= 1e-3 * abs(v["omega_0"]),
+                                  "the spin-up term must show at 4 s.f., or omega_f restates the given omega_0"),
+    "d=vi*t+0.5*a*(t)^(2)":      (lambda v: 1e-4 <= (v["vi"] * v["t"]) / (0.5 * v["a"] * v["t"] ** 2) <= 1e4,
+                                  "both terms must move a reported digit, or the document states a given the answer ignores"),
+    "m=m_R+m_g":                 (lambda v: float("%.4g" % (v["m_R"] + v["m_g"]))
+                                            not in (float("%.4g" % v["m_R"]), float("%.4g" % v["m_g"])),
+                                  "a total that equals one of its addends at 4 s.f. never demonstrates the addition"),
+    "E=K+U":                     (lambda v: f"{v['K'] + v['U']:.4g}" != f"{max(v['K'], v['U']):.4g}",
+                                  "the total must differ from the larger term at 4 s.f., or the answer is a given copied out"),
+    "R_eqv=((1)/(1/R_1+1/R_2))": (lambda v: f"{1/(1/v['R_1'] + 1/v['R_2']):.4g}" != f"{min(v['R_1'], v['R_2']):.4g}",
+                                  "the parallel result must differ from the smaller resistor at 4 s.f., or no combination is shown"),
+    "Delta_x=x_f-x_i":           (lambda v: min(abs(v["x_f"]), abs(v["x_i"]))
+                                            >= 1e-3 * max(abs(v["x_f"]), abs(v["x_i"])),
+                                  "endpoints within ~3 decades, or the displacement rounds to one of them at 4 s.f."),
+    "a=((m_2)/(m_1+m_2))*g":     (lambda v: v["m_2"] / v["m_1"] <= 1.0e4,
+                                  "past m_2/m_1 ~ 1e4 the answer rounds to g and m_1 leaves a question about two blocks"),
+    "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))":
+                                 (lambda v: min(abs(v["x_2"] - v["x_1"]), abs(v["y_2"] - v["y_1"]))
+                                            >= 0.015 * max(abs(v["x_2"] - v["x_1"]), abs(v["y_2"] - v["y_1"])),
+                                  "both legs must move a digit: sqrt(a^2+b^2) rounds to a once b < 0.0141*a at 4 s.f."),
+
+    # --- domain and physical-regime couplings ---------------------------------------------------
+    "theta_2=asin(((n_1*sin(theta_1))/(n_2)))":
+                                 (lambda v: v["n_1"] * math.sin(v["theta_1"]) <= v["n_2"]
+                                            and abs(v["n_1"] - v["n_2"]) >= 1e-3 * v["n_2"],
+                                  "a refracted ray exists only below the critical angle; index-matched media refract nothing"),
+    "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)":
+                                 (lambda v: v["t"] <= (v["v_0"] + math.sqrt(v["v_0"] ** 2 + 2 * 9.81 * v["y_0"])) / 9.81,
+                                  "the sample time must lie inside the flight: after it lands the formula describes nothing"),
+    "y=y_0+((1)/(2))(v_0y+v_y)t":
+                                 (lambda v: 0.1 <= abs(v["v_y"] - v["v_0y"]) / v["t"] <= 100.0,
+                                  "v_0y, v_y and t over-determine the acceleration (v_y-v_0y)/t, which must be a real one"),
+    "rho=((m)/(V))":             (lambda v: 1e-3 <= v["m"] / v["V"] <= 2.26e4,
+                                  "one object's mass and volume are tied by its density: a rough vacuum to osmium"),
+    "v=f*lambda":                (lambda v: 0.1 <= v["f"] * v["lambda"] <= 2.0e4,
+                                  "the medium fixes f*lambda: nothing mechanical is faster than diamond or slower than a ripple"),
+    "U_form=E_transfer+U_coul+U_ex":
+                                 (lambda v: abs(v["U_coul"]) > v["E_transfer"] + v["U_ex"],
+                                  "an ionic bond forms only if the Coulomb attraction outweighs the transfer and exchange costs"),
+
+    # --- the completeness critic's six, which no single batch could see because each saw ten -----
+    "U=((1)/(2))*m*(omega)^(2)*(x)^(2)":
+                                 (lambda v: 1.0 <= v["m"] * v["omega"] ** 2 <= 1.0e5,
+                                  "m and omega are one oscillator: the implied stiffness m*omega^2 must be a real spring"),
+    "k=((F)/(x))":               (lambda v: 1.0 <= v["F"] / v["x"] <= 1.0e5,
+                                  "F and x are one spring's force and extension: their ratio is a stiffness this file already bounds"),
+    "epsilon=B*l*v":             (lambda v: v["B"] * v["l"] <= 20.0,
+                                  "a strong field exists only in a small bore: 100 T fills a few millimetres, not a metre-scale rail"),
+    "L=I*omega":                 (lambda v: 0.5 * v["I"] * v["omega"] ** 2 <= 1.0e9,
+                                  "a big rotor cannot spin fast: beyond ~1 GJ the rim outruns any material's burst speed"),
+    "r=((m*v)/(q*B))":           (lambda v: v["m"] * v["v"] / (v["q"] * v["B"]) >= 1.0e-6,
+                                  "an orbit below a micron is not a classical circular path the record can describe"),
+    "Q=m*c*dT":                  (lambda v: v["dT"] <= (100.0 if v["c"] > 1000.0 else 800.0),
+                                  "the specific heat names the material and its liquid range bounds dT: the condition field says no phase change"),
+    "W=Q_h-Q_c":                 (lambda v: 0.15 * v["Q_h"] <= v["Q_c"] < v["Q_h"],
+                                  "an engine cannot exhaust more heat than it takes in, and the reservoir windows cap its efficiency at 0.83"),
+    "x=l-l_0":                   (lambda v: v["l_0"] < v["l"] <= 2.0 * v["l_0"],
+                                  "an extension is positive, and no spring, rod or cable extends past twice its natural length"),
+    # Now a POST-CONDITION on _derive_beat_f2 rather than a filter on the sampler; the strict
+    # inequality is the half the old version lacked -- 0.8% of survivors had f_2 == f_1 exactly,
+    # a beat frequency of zero.
+    "f_beat=|f_2-f_1|":          (lambda v: 0.0 < abs(v["f_2"] - v["f_1"]) <= 20.0,
+                                  "a beat is audible only below about 20 Hz, and two identical tones do not beat"),
     "Q=((omega_0)/(Delta_omega))": (lambda v: v["Delta_omega"] < v["omega_0"],
                                   "a resonance needs a bandwidth narrower than its centre"),
     # A27b. K AND E_1 ARE NOT INDEPENDENT: K is the energy of level n, so K = n^2 * E_1 and
@@ -585,9 +687,15 @@ _PRECONDITION = {
                                                - round(math.sqrt(v["K"] / v["E_1"]))) < 1e-6
                                             and 1 <= round(math.sqrt(v["K"] / v["E_1"])) <= 12,
                                   "n = sqrt(K/E_1) must be a positive integer: K = n^2 * E_1"),
+    # A post-condition on _derive_rolling_I now, and TWO-SIDED. The old form excluded a body with
+    # more inertia than a hoop and permitted one with a ten-thousandth of a solid sphere's.
     "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))":
-                                 (lambda v: v["I_CM"] <= v["m"] * v["r"] ** 2,
-                                  "no rigid body has more inertia than a hoop of its mass, radius"),
+                                 # The tolerance is not slop: _derive_rolling_I rounds I_CM to 4
+                                 # s.f., so beta = 0.4 exactly lands a hair BELOW 0.4*m*r^2 and the
+                                 # post-condition rejected its own derivation's output on 23.45% of
+                                 # draws. A check must admit the thing it is checking.
+                                 (lambda v: 0.399 * v["m"] * v["r"] ** 2 <= v["I_CM"] <= 1.001 * v["m"] * v["r"] ** 2,
+                                  "a rolling body's inertia lies between a solid sphere's 0.4*m*r^2 and a hoop's m*r^2"),
 }
 
 # A27c. SOME VARIABLES ARE NOT INDEPENDENT, AND A FILTER CANNOT MAKE THEM SO. `K = n^2 * E_1` ties
@@ -601,9 +709,79 @@ _PRECONDITION = {
 # _PRECONDITION -- a derivation is the tool of last resort because it fixes a relationship the
 # draw would otherwise have to stumble on.
 def _derive_quantum_K(vals, rng):
-    """K is the energy of level n in the same well: K = n^2 * E_1, n a positive integer."""
-    n = rng.randint(1, 12)
+    """K is the energy of level n in the same well: K = n^2 * E_1, n a positive integer.
+
+    n <= 10, not 12: E_1 is declared (1e-21, 1e-18) and K (1e-21, 1e-16), so n = 11 or 12 at the
+    top of E_1's range puts the DERIVED GIVEN outside its own declared window. A derivation bypasses
+    the sampler, so nothing else would have caught that -- a derived value is exempt from the range
+    check that a drawn one gets, which makes the derivation responsible for its own bounds."""
+    n = rng.randint(1, 10)
     vals["K"] = vals["E_1"] * n * n
+    return vals
+
+
+def _derive_rolling_I(vals, rng):
+    """I_CM IS NOT INDEPENDENT OF m AND r. A rolling body has I_CM = beta*m*r^2 with beta fixed by
+    its shape: 2/5 solid sphere, 1/2 disc or cylinder, 2/3 spherical shell, 1 hoop.
+
+    The shipped precondition bounded the ratio from ABOVE only (I_CM <= m*r^2) -- it excluded a body
+    with more inertia than a hoop and said nothing about one with far less. Measured: beta < 0.4 on
+    80.8% of documents and < 0.01 on 26.2%, so a quarter of them had the rotational term vanish and
+    the relation degenerate to a = g*sin(theta). The record teaches rolling and was demonstrating
+    sliding. This is the defect the run-8 hand-read found by reading one document.
+
+    Constructed, not filtered: a two-sided predicate retains 8.23%, past constraint 2's line."""
+    beta = rng.choice([0.4, 0.5, 2.0 / 3.0, 1.0])
+    vals["I_CM"] = float(f"{beta * vals['m'] * vals['r'] ** 2:.4g}")
+    return vals
+
+
+def _derive_beat_f2(vals, rng):
+    """TWO TONES THAT BEAT ARE NOT INDEPENDENT. Drawn separately over [20, 20000] Hz they land
+    inside the audible-beat band on 6.30% of tries, so the rejection sampler dropped 20.98% of this
+    record's documents -- the worst retention of any predicate here -- and 0.8% of the survivors
+    had f_2 == f_1 exactly, a beat frequency of zero. Construct the partner from the beat instead.
+    0.5 Hz is a two-second beat period, the slowest a listener resolves; 20 Hz is where beating
+    gives way to a difference tone."""
+    b  = round(rng.uniform(0.5, 20.0), 2)
+    f1 = vals["f_1"]
+    vals["f_2"] = f1 + b if f1 + b <= 20000.0 else f1 - b
+    return vals
+
+
+def _derive_medium(vals, rng):
+    """rho AND v ARE ONE MEDIUM. They are the density and sound speed of the same substance, tied
+    through the bulk modulus K = rho*v^2, and 95.8% of independent draws described no real material.
+    Every entry lies inside the DECLARED windows rho [1, 8e3], v [100, 6e3]; helium and lead are
+    absent because those windows exclude them, not because of physics. The +/-3% jitter is required
+    rather than cosmetic -- without it rho takes six values and A28's collapse applies."""
+    media = [(1.2, 343.0), (789.0, 1145.0), (1000.0, 1480.0),
+             (1025.0, 1530.0), (2500.0, 5640.0), (7850.0, 5900.0)]  # air, ethanol, water, seawater, glass, steel
+    rho, v = rng.choice(media)
+    vals["rho"] = float(f"{rho * rng.uniform(0.97, 1.03):.4g}")
+    vals["v"]   = float(f"{v   * rng.uniform(0.97, 1.03):.4g}")
+    return vals
+
+
+def _derive_extension(vals, rng):
+    """A STRETCHED LENGTH IS ITS NATURAL LENGTH PLUS AN EXTENSION. Drawn independently over
+    [0.01, 100] m, l exceeded 2*l_0 constantly: the predicate rejected 90.35% of first draws and
+    still dropped 7.55% after 24 retries, which is a rejection sampler chasing a coincidence rather
+    than a check. l_0 is the specimen, and how far it was stretched is the free parameter."""
+    vals["l"] = float(f"{vals['l_0'] * rng.uniform(1.001, 2.0):.4g}")
+    return vals
+
+
+def _derive_magnifier(vals, rng):
+    """A SIMPLE MAGNIFIER MAGNIFIES. Drawn independently, M = theta_image/theta_object came out
+    below 1 on 49.9% of documents with a median of exactly 1.00, so half of them stated that the
+    device does not do the one thing it is named for. Both angles are subtended at the near point
+    and the instrument is paraxial, so the object angle is drawn and the image angle follows."""
+    th_o = float(f"{math.exp(rng.uniform(math.log(0.005), math.log(0.2))):.3g}")
+    M    = math.exp(rng.uniform(math.log(1.5), math.log(20.0)))
+    M    = min(M, 0.5 / th_o)                 # keep theta_image paraxial; cannot push M below 1.5
+    vals["theta_object"] = th_o
+    vals["theta_image"]  = float(f"{M * th_o:.3g}")
     return vals
 
 def _derive_pendulum_T(vals, rng):
@@ -613,16 +791,33 @@ def _derive_pendulum_T(vals, rng):
     under test, so T must come from L through it, at some real local g.
 
     Not a fixed 9.81: that would make the answer a constant in 100% of documents, which is A28's
-    collapse. A pendulum experiment measures g, so the scatter is the point -- 9.6 to 10.0 spans
-    real sites plus ordinary timing error, and keeps the result inside g_local's window."""
-    L = vals["L"]
-    g_site = rng.uniform(9.6, 10.0)
-    vals["T"] = float(f"{2*math.pi*math.sqrt(L/g_site):.4g}")
+    collapse. A pendulum experiment MEASURES g, so the scatter is the point.
+
+    THE FIRST VERSION OF THIS DOCSTRING WAS FALSE AND THE CODE MATCHED IT. It drew g_site over
+    [9.6, 10.0] and said that range "spans real sites plus ordinary timing error". No site spans it:
+    Earth's surface gravity runs 9.764 (Huascaran) to 9.834 (the poles). No timing error was
+    modelled at all -- the only perturbation was a 4-significant-figure format, worth ~1e-4 -- so
+    100% of the scatter came from g values that are not any place's g. That is a comment asserting
+    a guarantee the code does not make, in a table whose entries exist to be read as claims.
+
+    Honest mechanism, same output spread: draw a real site, then apply the timing error the
+    docstring was already invoking. g = g_site/(1+eps)^2 spans [9.57, 10.04], inside g_local."""
+    L      = vals["L"]
+    g_site = rng.uniform(9.764, 9.834)                 # Huascaran to the poles
+    eps    = rng.uniform(-0.01, 0.01)                  # 1% stopwatch error over the timed swings
+    vals["T"] = float(f"{2*math.pi*math.sqrt(L/g_site)*(1+eps):.4g}")
     return vals
 
 _DERIVE = {
     "n=((K/E_1))^(1/2)": _derive_quantum_K,
     "g=((4*(pi)^(2)*L)/((T)^(2)))": _derive_pendulum_T,
+    # A32. Four more, each one a coupling a rejection sampler cannot reach: the survivor fraction
+    # is below constraint 2's 1-in-20 line, so the pair is CONSTRUCTED rather than filtered.
+    "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))": _derive_rolling_I,
+    "f_beat=|f_2-f_1|":                           _derive_beat_f2,
+    "I=((((Delta_p_max))^(2))/(2*rho*v))":        _derive_medium,
+    "M=((theta_image)/(theta_object))":           _derive_magnifier,
+    "x=l-l_0":                                    _derive_extension,
 }
 
 
@@ -785,7 +980,10 @@ _RESULT_RANGE = {
     "angle_from_normal": (0.0, math.pi/2, "a ray angle from the normal lies in [0, pi/2]"),
     "angle_arc":         (1.0e-4, 1.0e3, "an arc angle in radians: a milliradian to ~160 turns"),
     "quantum_number":    (1.0, 1000.0,   "a bound-state quantum number is a positive integer"),
-    "magnification":     (1.0e-3, 1.0e4, "an angular magnification of a real instrument"),
+    # A simple magnifier magnifies, by the definition of the device. Was (1e-3, 1e4), under which
+    # M < 1 on 49.9% of documents with a median of exactly 1.00 -- half the corpus stating that a
+    # magnifier does not.
+    "magnification":     (1.0, 25.0,     "a simple magnifier magnifies: 1 < M <= 25 for a hand lens"),
     "quality_factor":    (0.5, 1.0e6,    "Q below 1/2 is overdamped; above 1e6 is a reference cavity"),
     "abs_temperature":   (1.0e-3, 1.0e9, "an absolute temperature is positive; 1e9 K is a stellar core"),
     "material_density":  (1.0e-2, 2.3e4, "aerogel 1 kg/m^3 to osmium 22590 kg/m^3"),

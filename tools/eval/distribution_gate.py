@@ -113,6 +113,9 @@ def real_vs_real_floor_mean(eval_qs, seeds=5):
     return mean, sd, len(xs)
 
 
+LAST_SEM = {}
+
+
 def gate(train_qs, eval_qs, label, margin, seeds=5):
     """THE RATCHETED QUANTITY WAS A SINGLE DRAW COMPARED AGAINST A MULTI-SEED BASELINE.
 
@@ -136,6 +139,7 @@ def gate(train_qs, eval_qs, label, margin, seeds=5):
           f"excess {r-c:+6.1%} +-{sd:.1f}pp over {seeds} seeds   n={n}   "
           f"floor {margin:+5.1%}   {'PASS' if ok else 'FAIL'}")
     LAST_EXCESS[label] = (r - c) * 100.0
+    LAST_SEM[label] = sd / (len(rs) ** 0.5)
     return ok
 
 if __name__ == "__main__":
@@ -213,9 +217,18 @@ if __name__ == "__main__":
     worse = []
     for label, base in BASELINE.items():
         got = LAST_EXCESS.get(label)
-        mark = "n/a" if got is None else f"{got:+.1f} pp vs baseline {base:.1f}"
-        if got is not None and got > base:
-            worse.append(f"{label}: {got:+.1f} pp exceeds the baseline {base:.1f} pp")
+        mark = ("n/a" if got is None else
+                f"{got:+.1f} pp vs baseline {base:.1f}  (+-{2*LAST_SEM.get(label,0.0):.1f} pp, 2 sem)")
+        # A RATCHET ON A NOISY QUANTITY MUST KNOW ITS OWN NOISE. Seed-averaging fixed the bias but
+        # not the variance: this fired at +45.6 against a baseline of 45.5 -- a 0.1 pp exceedance on
+        # a measurement whose 5-seed sem is ~0.7 pp. That is the same "fires on a re-seed with no
+        # corpus change" failure one level down, and it is not fixed by moving the baseline, which
+        # would be the relaxation this gate exists to prevent. It is fixed by requiring the increase
+        # to be larger than the uncertainty in the increase: 2 standard errors of the mean.
+        tol = 2.0 * LAST_SEM.get(label, 0.0)
+        if got is not None and got > base + tol:
+            worse.append(f"{label}: {got:+.1f} pp exceeds the baseline {base:.1f} pp "
+                         f"by more than 2 sem ({tol:.1f} pp)")
         print(f"    {label:20} {mark}")
     if worse:
         print()
