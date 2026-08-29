@@ -37,7 +37,15 @@ import genloop                     # THE generation loop; never reimplement it
 from model import Transformer, ModelArgs                       # noqa: E402
 from tokenizers import Tokenizer                               # noqa: E402
 
-TK = Tokenizer.from_file(str(ROOT / "train/tok4096.json"))
+# THE TOKENIZER IS RETRAINED BY EVERY TRAINING RUN, so a preserved checkpoint cannot be re-scored
+# later against whatever tok4096.json happens to be on disk. train/prepare.py calls
+# tk.train_from_iterator on the current corpus, and between retrain 1 and retrain 2 **3,886 of 4,096
+# token ids changed**. Scoring retrain 1 against retrain 2's tokenizer produced 0.0 on every arm --
+# including `answered 0.0/120`, which is the only reason it was obvious. A smaller drift would decode
+# to plausible garbage and read as a model result.
+#
+# TOK overrides the file, so an archived checkpoint is scored with its archived tokenizer.
+TK = Tokenizer.from_file(os.environ.get("TOK", str(ROOT / "train/tok4096.json")))
 RES, ENDT, TOOLC = (TK.token_to_id(t) for t in ("<res>", "<end>", "</tool>"))
 
 
@@ -115,7 +123,7 @@ def score_multi(ck_path, seeds=(1234, 5678, 9012)):
     runs = [score(ck_path, seed=s) for s in seeds]
     out = {"checkpoint": str(ck_path), "corpus_sha": runs[0]["corpus_sha"], "seeds": list(seeds),
            "runs": runs}
-    for nm in ("answer_x", "answer_0"):
+    for nm in ("answer_x", "answer_0", "answer_w", "answer_s"):
         if runs[0].get(nm, {}).get("k") is not None:
             out[nm] = {"k_mean": sum(r[nm]["k"] for r in runs) / len(runs),
                        "refused_mean": sum(r[nm]["refused"] for r in runs) / len(runs),
@@ -140,10 +148,44 @@ def score_multi(ck_path, seeds=(1234, 5678, 9012)):
     return out
 
 
+def pairing_smoke(m, ck=None):
+    """A CHECKPOINT AND A TOKENIZER THAT DO NOT MATCH MUST FAIL LOUDLY, NOT SCORE ZERO.
+
+    WELL-FORMEDNESS IS NOT ENOUGH, and the first version of this guard used it and SURVIVED its own
+    control. The special tokens keep ids 0-10 because prepare.py assigns them first, so a document
+    from a mismatched pair still opens <q>, closes </q> and ends <end> -- the STRUCTURE survives and
+    only the content is garbage. That is the plausible-garbage case, which is worse than a crash.
+
+    So the probe requires a CORRECT computation: well-formed, not a refusal, and the stated answer
+    matching the injected result. Retrain 1 scores 85% on this arm with its own tokenizer, so one
+    success in six is near-certain; a mismatched pair cannot arithmetic at all."""
+    if ck is not None and ck.get("tok_sha"):
+        import hashlib
+        have = hashlib.sha256((ROOT / "train/tok4096.json").read_bytes()).hexdigest()[:16]
+        if have != ck["tok_sha"]:
+            raise SystemExit(
+                f"ABORT: checkpoint was trained with tokenizer {ck['tok_sha']}, on disk is {have}. "
+                f"Score it with its own: TOK=train/tok4096_<run>.json")
+        return
+    probes = json.loads((ROOT / "corpus/split_answer_0.json").read_text())[:6]
+    for it in probes:
+        pr, gn = generate(m, f"<q>{it['q']}</q><r>{it['record']}", maxlen=140)
+        if (grade.well_formed(gn) and not grade.is_refusal(gn)
+                and grade.answer_matches_result(gn)):
+            return
+    raise SystemExit(
+        "ABORT: the checkpoint computed nothing correct on 6 answerable probes. The most likely "
+        "cause is a TOKENIZER MISMATCH -- train/prepare.py retrains the tokenizer on every run, and "
+        "3,886 of 4,096 ids changed between retrain 1 and 2. Score an archived checkpoint with its "
+        "own: TOK=train/tok4096_<run>.json. This is an abort, not a score, because a mismatched "
+        "pair reports 0.0 on every arm and that reads like a result.")
+
+
 def score(ck_path, seed=1234):
     ck = torch.load(ck_path, map_location="cpu", weights_only=False)
     m = Transformer(ModelArgs(**ck["args"])); m.load_state_dict(ck["model"]); m.eval()
     torch.manual_seed(seed)
+    pairing_smoke(m, ck)
     res = {"checkpoint": str(ck_path), "corpus_sha": ck.get("corpus_sha"), "seed": seed}
 
     sel = json.loads((ROOT / "corpus/split_select.json").read_text())
@@ -163,7 +205,9 @@ def score(ck_path, seed=1234):
     res["answer"] = {"k": ok, "n": len(ans)}
 
     for nm, path in (("answer_x", "corpus/split_answer_x.json"),
-                     ("answer_0", "corpus/split_answer_0.json")):
+                     ("answer_0", "corpus/split_answer_0.json"),
+                     ("answer_w", "corpus/split_answer_w.json"),
+                     ("answer_s", "corpus/split_answer_s.json")):
         ax = ROOT / path
         if not ax.exists():
             res[nm] = {"k": None, "refused": None, "n": 0, "note": "arm absent -- NOT a pass"}
@@ -238,8 +282,11 @@ if __name__ == "__main__":
                      f" = {100*a['k_records_mean']/a['n_records']:5.1f}%")
         print(line)
         if arm == "fit_m":
-            for nm, note in (("answer_0", "no spare given -- computation, free of the cue"),
-                             ("answer_x", "one spare given -- the cue probe")):
+            for nm, note in (
+                    ("answer_0", "no spare given -- computation, free of the cue"),
+                    ("answer_x", "one spare given -- the spare-given probe"),
+                    ("answer_s", "answerable, quantity named by SYMBOL (cue and truth agree)"),
+                    ("answer_w", "answerable, quantity named in WORDS (cue says refuse, truth says answer)")):
                 if nm not in r:
                     continue
                 ax = r[nm]

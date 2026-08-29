@@ -103,8 +103,13 @@ import hashlib as _hl
 _corpus_sha = _hl.sha256(open("corpus/synth_sample.jsonl","rb").read()).hexdigest()[:16]
 _heads = {__import__("json").loads(l).get("head") for l in open("corpus/synth_sample.jsonl")}
 _heads.discard(None)
+# STAMP THE TOKENIZER, NOT ONLY THE CORPUS. prepare.py retrains the tokenizer every run, so a
+# checkpoint is only scoreable with the one it was trained against -- 3,886 of 4,096 ids changed
+# between two consecutive runs, and the mismatch scores 0.0 on every arm rather than erroring.
+import hashlib as _hl
+_tok_sha = _hl.sha256(open("train/tok4096.json","rb").read()).hexdigest()[:16]
 torch.save({"model":m.state_dict(),"args":args.__dict__,"seed":SEED,"steps":STEPS,
-            "corpus_sha":_corpus_sha,"corpus_heads":sorted(_heads),},
+            "corpus_sha":_corpus_sha,"corpus_heads":sorted(_heads),"tok_sha":_tok_sha,},
            f"train/sel_s{SEED}.pt")
 
 # ---- divergence gate, BEFORE metrics ----------------------------------------------------

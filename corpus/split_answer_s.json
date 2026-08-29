@@ -1,0 +1,842 @@
+[
+ {
+  "q": "For q = 3.05e-07, v = 76, B = 4.48, estimate F.",
+  "record": "F=q*v*B | q:C v:m/s B:T | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F",
+  "shown": "F"
+ },
+ {
+  "q": "Calculate W_o. You are told F_o = 75.6, d_o = 82.5.",
+  "record": "W_o=F_o*d_o | F_o:N d_o:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "W_o",
+  "shown": "W_o"
+ },
+ {
+  "q": "In a setup with omega = 3.01, m = 0.491, x = 0.156, find U.",
+  "record": "U=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U",
+  "shown": "U"
+ },
+ {
+  "q": "Given K = 2.34e-19, E_1 = 1.45e-21, estimate n.",
+  "record": "n=((K/E_1))^(1/2) | K:J E_1:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "n",
+  "shown": "n"
+ },
+ {
+  "q": "What was V? Suppose q = 1.31e-05, r = 5.76.",
+  "record": "V=((k_e*q)/(r)) | q:C r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "V",
+  "shown": "V"
+ },
+ {
+  "q": "In a setup with m_R = 2.73, m_g = 1600, what was m?",
+  "record": "m=m_R+m_g | m_R:kg m_g:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "m",
+  "shown": "m"
+ },
+ {
+  "q": "You are told v_w = 366, f_1 = 208.4. Compute L.",
+  "record": "L=((v_w)/(4*f_1)) | v_w:m/s f_1:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "L",
+  "shown": "L"
+ },
+ {
+  "q": "In a setup with R = 1.42, omega = 144, compute v_CM.",
+  "record": "v_CM=R*omega | R:m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_CM",
+  "shown": "v_CM"
+ },
+ {
+  "q": "Starting from r = 2.14, v = 0.406, compute omega.",
+  "record": "omega=v/r | v:m/s r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega"
+ },
+ {
+  "q": "The values are x = 0.017, F = 1205.4. Compute k.",
+  "record": "k=((F)/(x)) | F:N x:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "k",
+  "shown": "k"
+ },
+ {
+  "q": "Calculate d. In a setup with a = 118.7, vi = 56.5, t = 7495.44.",
+  "record": "d=vi*t+0.5*a*(t)^(2) | vi:m/s t:s a:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "d",
+  "shown": "d"
+ },
+ {
+  "q": "Assume omega = 555, k = 0.476. Determine v.",
+  "record": "v=((omega)/(k)) | omega:1/s k:1/m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v"
+ },
+ {
+  "q": "Take N_S = 172, I_P = 58.1, N_P = 2300. Determine I_S.",
+  "record": "I_S=((N_P)/(N_S))*I_P | N_P:1 N_S:1 I_P:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_S",
+  "shown": "I_S"
+ },
+ {
+  "q": "Compute I_rms. You are told I_0 = 1.44.",
+  "record": "I_rms=((I_0)/(sqrt(2))) | I_0:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms"
+ },
+ {
+  "q": "Where I_0 = 4.24, compute I_rms.",
+  "record": "I_rms=((I_0)/(sqrt(2))) | I_0:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms"
+ },
+ {
+  "q": "The values are a = 0.998, m = 113.5. Find F.",
+  "record": "F=m*a | m:kg a:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F",
+  "shown": "F"
+ },
+ {
+  "q": "In a setup with omega = 77, I = 1900, compute L.",
+  "record": "L=I*omega | I:kg*m^2 omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "L",
+  "shown": "L"
+ },
+ {
+  "q": "For v = 4.12, r = 9.81, estimate omega.",
+  "record": "omega=v/r | v:m/s r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega"
+ },
+ {
+  "q": "Find f. Starting from m = 5000, k = 2.234.",
+  "record": "f=((1)/(2*pi))*sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "Consider a case where Delta_t = 1.188, m = 0.11, Delta_v = 534. Find F.",
+  "record": "F=((m*Delta_v)/(Delta_t)) | m:kg Delta_v:m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F",
+  "shown": "F"
+ },
+ {
+  "q": "Starting from a = 27.8, t = 589.59, what was v?",
+  "record": "v=a*t | a:m/s^2 t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v"
+ },
+ {
+  "q": "For F = 224, A = 0.336, determine p.",
+  "record": "p=((F)/(A)) | F:N A:m^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p",
+  "shown": "p"
+ },
+ {
+  "q": "Consider a case where Delta_t = 0.619, Delta_theta = 0.675. Compute omega.",
+  "record": "omega=((Delta_theta)/(Delta_t)) | Delta_theta:1 Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega"
+ },
+ {
+  "q": "The values are Q = 4.44e-09, V = 74. Determine C.",
+  "record": "C=((Q)/(V)) | Q:C V:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "C",
+  "shown": "C"
+ },
+ {
+  "q": "Where R = 1.71, what was f?",
+  "record": "f=((R)/(2)) | R:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "Take x = 0.19, F = 41. Find k.",
+  "record": "k=((F)/(x)) | F:N x:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "k",
+  "shown": "k"
+ },
+ {
+  "q": "The values are I = 1.12, R = 132.651. Determine V.",
+  "record": "V=I*R | I:A R:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "V",
+  "shown": "V"
+ },
+ {
+  "q": "Measurements give I_0 = 0.483. Compute I_rms.",
+  "record": "I_rms=((I_0)/(sqrt(2))) | I_0:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms"
+ },
+ {
+  "q": "In a setup with v_p = 51.7, v_wy = 0.282, what is v_toty?",
+  "record": "v_toty=v_wy+v_p | v_wy:m/s v_p:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_toty",
+  "shown": "v_toty"
+ },
+ {
+  "q": "Suppose theta_i = 1.055. Compute theta_r.",
+  "record": "theta_r=theta_i | theta_i:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "theta_r",
+  "shown": "theta_r"
+ },
+ {
+  "q": "Where m = 495, determine N.",
+  "record": "N=m*g | m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "N",
+  "shown": "N"
+ },
+ {
+  "q": "You are told f = 0.1. Find T.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T",
+  "shown": "T"
+ },
+ {
+  "q": "Where V_rms = 1.47, Z = 22.1, determine I_rms.",
+  "record": "I_rms=V_rms/Z | V_rms:V Z:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms"
+ },
+ {
+  "q": "Determine T_F. Using E_F = 4.02e-18.",
+  "record": "T_F=((E_F)/(k_B)) | E_F:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T_F",
+  "shown": "T_F"
+ },
+ {
+  "q": "Estimate f_1. Take L = 2.1, v = 444.3.",
+  "record": "f_1=((v)/(4*L)) | v:m/s L:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f_1",
+  "shown": "f_1"
+ },
+ {
+  "q": "Take W = 6.5, Q = 131.3. Estimate Delta_U.",
+  "record": "Delta_U=Q-W | Q:J W:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_U",
+  "shown": "Delta_U"
+ },
+ {
+  "q": "Where vi = 27.6, t = 771, a = 0.63, compute d.",
+  "record": "d=vi*t+0.5*a*(t)^(2) | vi:m/s t:s a:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "d",
+  "shown": "d"
+ },
+ {
+  "q": "Take Q = 22.29, W = 73.5. What was Delta_U?",
+  "record": "Delta_U=Q-W | Q:J W:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_U",
+  "shown": "Delta_U"
+ },
+ {
+  "q": "You are told Delta_omega = 91.8, Delta_t = 0.964. Estimate alpha.",
+  "record": "alpha=((Delta_omega)/(Delta_t)) | Delta_omega:1/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "alpha",
+  "shown": "alpha"
+ },
+ {
+  "q": "What is Q? Suppose Delta_omega = 92.307, omega_0 = 253.7.",
+  "record": "Q=((omega_0)/(Delta_omega)) | omega_0:1/s Delta_omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Q",
+  "shown": "Q"
+ },
+ {
+  "q": "Estimate Delta_p. You are told Delta_t = 1670, F_net = 1.49.",
+  "record": "Delta_p=F_net*Delta_t | F_net:N Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_p",
+  "shown": "Delta_p"
+ },
+ {
+  "q": "Where R_2 = 19.6, R_1 = 2450, find R_eqv.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "R_eqv",
+  "shown": "R_eqv"
+ },
+ {
+  "q": "Calculate s. Assume r = 4.9, theta = 4.17.",
+  "record": "s=r*theta | r:m theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "s",
+  "shown": "s"
+ },
+ {
+  "q": "You are told t = 3.13, a = 2.093. Find v.",
+  "record": "v=a*t | a:m/s^2 t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v"
+ },
+ {
+  "q": "What is lambda? If E = 8.74e-19.",
+  "record": "lambda=((h*c)/(E)) | E:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "lambda",
+  "shown": "lambda"
+ },
+ {
+  "q": "Consider a case where lambda = 1.82e-07. Estimate E.",
+  "record": "E=((h*c)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E"
+ },
+ {
+  "q": "A system has theta = 1.37, m = 7.19. Compute N.",
+  "record": "N=m*g*cos(theta) | m:kg theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "N",
+  "shown": "N"
+ },
+ {
+  "q": "Consider a case where m = 103, v = 5.66. Compute p.",
+  "record": "p=m*v | m:kg v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p",
+  "shown": "p"
+ },
+ {
+  "q": "If U = 19.6, K = 1.89, calculate E.",
+  "record": "E=K+U | K:J U:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E"
+ },
+ {
+  "q": "The values are R = 0.627, I = 15.9. Estimate B.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "B",
+  "shown": "B"
+ },
+ {
+  "q": "Find P. Starting from f = 0.646.",
+  "record": "P=((1)/(f)) | f:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P",
+  "shown": "P"
+ },
+ {
+  "q": "For N_P = 434, I_P = 21.43, N_S = 323, determine I_S.",
+  "record": "I_S=((N_P)/(N_S))*I_P | N_P:1 N_S:1 I_P:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_S",
+  "shown": "I_S"
+ },
+ {
+  "q": "If v_w = 304.2, f_1 = 35.16, determine L.",
+  "record": "L=((v_w)/(4*f_1)) | v_w:m/s f_1:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "L",
+  "shown": "L"
+ },
+ {
+  "q": "Assume R = 8.9. Calculate f.",
+  "record": "f=((R)/(2)) | R:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "In a setup with v = 207000000, calculate n.",
+  "record": "n=((c)/(v)) | v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "n",
+  "shown": "n"
+ },
+ {
+  "q": "Calculate E. Given m = 740.",
+  "record": "E=m*(c)^(2) | m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E"
+ },
+ {
+  "q": "Using l_0 = 0.045, l = 14.787, what was x?",
+  "record": "x=l-l_0 | l:m l_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "x",
+  "shown": "x"
+ },
+ {
+  "q": "Using t = 3.44, v_x = 77.6, x_0 = 32.4, what was x?",
+  "record": "x=x_0+v_x*t | x_0:m v_x:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "x",
+  "shown": "x"
+ },
+ {
+  "q": "Find y. In a setup with y_0 = 15.9, t = 14.98, v_0 = 285.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | y_0:m v_0:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "y",
+  "shown": "y"
+ },
+ {
+  "q": "You are told m = 34.99, k = 26.1. What is f?",
+  "record": "f=((1)/(2*pi))*sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "You are told h = 264.5, m = 0.121. Estimate U.",
+  "record": "U=m*g*h | m:kg h:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U",
+  "shown": "U"
+ },
+ {
+  "q": "Compute alpha. Given Delta_t = 113, Delta_omega = 815.",
+  "record": "alpha=((Delta_omega)/(Delta_t)) | Delta_omega:1/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "alpha",
+  "shown": "alpha"
+ },
+ {
+  "q": "Using n_2 = 1.03, s_o = 0.486, n_1 = 2.67, what is s_i?",
+  "record": "s_i=(((n_2)/(n_1)))*s_o | n_2:1 n_1:1 s_o:m | missing:none | flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT. | fit:high",
+  "expect": "answer",
+  "asked": "s_i",
+  "shown": "s_i"
+ },
+ {
+  "q": "Measurements give f = 4.5e+16, n = 11. Compute E.",
+  "record": "E=n*h*f | n:1 f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E"
+ },
+ {
+  "q": "Estimate f. Suppose T = 7.43.",
+  "record": "f=((1)/(T)) | T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "What was P? You are told t = 0.91, W = 80.94.",
+  "record": "P=((W)/(t)) | W:J t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P",
+  "shown": "P"
+ },
+ {
+  "q": "In a setup with C = 1.29e-11, V = 58.45, find U_E.",
+  "record": "U_E=((1)/(2))*C*(V)^(2) | C:F V:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U_E",
+  "shown": "U_E"
+ },
+ {
+  "q": "Compute Delta_p. Starting from Delta_t = 1.29, F_net = 5.",
+  "record": "Delta_p=F_net*Delta_t | F_net:N Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_p",
+  "shown": "Delta_p"
+ },
+ {
+  "q": "Using theta_image = 0.284, theta_object = 0.27, find M.",
+  "record": "M=((theta_image)/(theta_object)) | theta_image:1 theta_object:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "M",
+  "shown": "M"
+ },
+ {
+  "q": "Consider a case where r = 38.8, v = 0.76. Determine a_c.",
+  "record": "a_c=(((v)^(2))/(r)) | v:m/s r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "a_c",
+  "shown": "a_c"
+ },
+ {
+  "q": "Take m1 = 1.2e+23, m2 = 1.61e+28, r = 293000000. Estimate F.",
+  "record": "F=G*m1*m2/(r)^(2) | m1:kg m2:kg r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F",
+  "shown": "F"
+ },
+ {
+  "q": "Calculate p. Given lambda = 3.54e-08.",
+  "record": "p=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p",
+  "shown": "p"
+ },
+ {
+  "q": "Compute U_E. The values are C = 1.11e-08, V = 0.681.",
+  "record": "U_E=((1)/(2))*C*(V)^(2) | C:F V:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U_E",
+  "shown": "U_E"
+ },
+ {
+  "q": "Suppose y_0 = 74.6, t = 4.19, v_0 = 86.7. Compute y.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | y_0:m v_0:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "y",
+  "shown": "y"
+ },
+ {
+  "q": "Suppose I = 0.293, V = 72.2. What was R?",
+  "record": "R=V/I | V:V I:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "R",
+  "shown": "R"
+ },
+ {
+  "q": "Estimate U. The values are h = 1.247, m = 9.65.",
+  "record": "U=m*g*h | m:kg h:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U",
+  "shown": "U"
+ },
+ {
+  "q": "Determine M. Assume theta_object = 0.753, theta_image = 0.121.",
+  "record": "M=((theta_image)/(theta_object)) | theta_image:1 theta_object:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "M",
+  "shown": "M"
+ },
+ {
+  "q": "Compute F. Given m2 = 2.9e+23, r = 1360000, m1 = 1.33e+27.",
+  "record": "F=G*m1*m2/(r)^(2) | m1:kg m2:kg r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F",
+  "shown": "F"
+ },
+ {
+  "q": "Take Delta_omega = 614.5, omega_0 = 1590. Calculate Q.",
+  "record": "Q=((omega_0)/(Delta_omega)) | omega_0:1/s Delta_omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Q",
+  "shown": "Q"
+ },
+ {
+  "q": "If m = 589.1, estimate w.",
+  "record": "w=m*g | m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "w",
+  "shown": "w"
+ },
+ {
+  "q": "Estimate P. The values are W = 5.26, t = 611.2.",
+  "record": "P=((W)/(t)) | W:J t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P",
+  "shown": "P"
+ },
+ {
+  "q": "A system has h = 2.75, rho = 4850. Determine p.",
+  "record": "p=p_0+rho*g*h | rho:kg/m^3 h:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p",
+  "shown": "p"
+ },
+ {
+  "q": "Where r = 0.244, q = 2.39e-05, compute V.",
+  "record": "V=((k_e*q)/(r)) | q:C r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "V",
+  "shown": "V"
+ },
+ {
+  "q": "Measurements give omega = 479, I = 19.4. Estimate L.",
+  "record": "L=I*omega | I:kg*m^2 omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "L",
+  "shown": "L"
+ },
+ {
+  "q": "Find Delta_S. Given Q = 209, T = 500.",
+  "record": "Delta_S=((Q)/(T)) | Q:J T:K | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_S",
+  "shown": "Delta_S"
+ },
+ {
+  "q": "Take f = 28600000000000. Determine E.",
+  "record": "E=h*f | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E"
+ },
+ {
+  "q": "Take t = 136.8, v_0 = 3.93. Compute v.",
+  "record": "v=v_0-g*t | v_0:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v"
+ },
+ {
+  "q": "Using omega = 0.363, k = 20.93, find v.",
+  "record": "v=((omega)/(k)) | omega:1/s k:1/m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v"
+ },
+ {
+  "q": "If rho = 56.533, V = 212, find m.",
+  "record": "m=rho*V | rho:kg/m^3 V:m^3 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "m",
+  "shown": "m"
+ },
+ {
+  "q": "Where f = 1280000000000000, estimate E_f.",
+  "record": "E_f=h*f | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E_f",
+  "shown": "E_f"
+ },
+ {
+  "q": "With q = 3.95e-07, r = 9.25, determine V.",
+  "record": "V=((k_e*q)/(r)) | q:C r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "V",
+  "shown": "V"
+ },
+ {
+  "q": "With T = 39.1, find f.",
+  "record": "f=((1)/(T)) | T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "Using lambda = 10.49, T = 7.25, determine v.",
+  "record": "v=((lambda)/(T)) | lambda:m T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v"
+ },
+ {
+  "q": "Consider a case where V_0 = 681. Compute V_rms.",
+  "record": "V_rms=((V_0)/(sqrt(2))) | V_0:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "V_rms",
+  "shown": "V_rms"
+ },
+ {
+  "q": "Suppose t = 3048, a = 74.45. Estimate v.",
+  "record": "v=a*t | a:m/s^2 t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v"
+ },
+ {
+  "q": "With v_0 = 3.43, theta_0 = 0.336, what is T_tof?",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | v_0:m/s theta_0:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T_tof",
+  "shown": "T_tof"
+ },
+ {
+  "q": "Take omega = 575, R = 0.255. What is v_CM?",
+  "record": "v_CM=R*omega | R:m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_CM",
+  "shown": "v_CM"
+ },
+ {
+  "q": "With V_rms = 453.59, I_rms = 0.08, estimate P_ave.",
+  "record": "P_ave=I_rms*V_rms | I_rms:A V_rms:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P_ave",
+  "shown": "P_ave"
+ },
+ {
+  "q": "Estimate C. With d = 2.8e-05, A = 0.037.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "C",
+  "shown": "C"
+ },
+ {
+  "q": "Find E. You are told f = 5080000000000000.",
+  "record": "E=h*f | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E"
+ },
+ {
+  "q": "Compute f. A system has Delta_E_LK = 8.85e-19.",
+  "record": "f=(Delta_E_LK)/h | Delta_E_LK:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "With q = 7.88e-08, U_E = 2.96e-07, compute V.",
+  "record": "V=((U_E)/(q)) | U_E:J q:C | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "V",
+  "shown": "V"
+ },
+ {
+  "q": "Starting from m = 21.8, find w.",
+  "record": "w=m*g | m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "w",
+  "shown": "w"
+ },
+ {
+  "q": "What is g? Given L = 5.001, T = 8281.",
+  "record": "g=((4*(pi)^(2)*L)/((T)^(2))) | L:m T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "g",
+  "shown": "g"
+ },
+ {
+  "q": "Consider a case where theta_object = 0.59, theta_image = 0.568. Determine M.",
+  "record": "M=((theta_image)/(theta_object)) | theta_image:1 theta_object:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "M",
+  "shown": "M"
+ },
+ {
+  "q": "Given f = 0.61, find P.",
+  "record": "P=((1)/(f)) | f:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P",
+  "shown": "P"
+ },
+ {
+  "q": "Determine C_p. Suppose C_V = 15.75.",
+  "record": "C_p=C_V+R | C_V:J/(mol*K) | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "C_p",
+  "shown": "C_p"
+ },
+ {
+  "q": "What was Q? Assume c = 115.5, m = 621.8, dT = 23.7.",
+  "record": "Q=m*c*dT | m:kg c:J/(kg*K) dT:K | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Q",
+  "shown": "Q"
+ },
+ {
+  "q": "With T_c = 380, T_h = 821, determine Eff_C.",
+  "record": "Eff_C=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Eff_C",
+  "shown": "Eff_C"
+ },
+ {
+  "q": "A system has F_i = 826, d_i = 28.22. Compute W_i.",
+  "record": "W_i=F_i*d_i | F_i:N d_i:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "W_i",
+  "shown": "W_i"
+ },
+ {
+  "q": "Using p_g = 6380, estimate p_abs.",
+  "record": "p_abs=p_g+p_atm | p_g:Pa | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p_abs",
+  "shown": "p_abs"
+ },
+ {
+  "q": "In a setup with v = 297000000, compute n.",
+  "record": "n=((c)/(v)) | v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "n",
+  "shown": "n"
+ },
+ {
+  "q": "Measurements give tau = 366, omega = 90.25. Determine P.",
+  "record": "P=tau*omega | tau:N*m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P",
+  "shown": "P"
+ },
+ {
+  "q": "Using v_x = 3.49, x_0 = 1440, t = 256.5, find x.",
+  "record": "x=x_0+v_x*t | x_0:m v_x:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "x",
+  "shown": "x"
+ },
+ {
+  "q": "Consider a case where v = 155000000. What was n?",
+  "record": "n=((c)/(v)) | v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "n",
+  "shown": "n"
+ },
+ {
+  "q": "Given d_i = 1.1, d_o = 6.37, estimate f.",
+  "record": "f=((d_i*d_o)/(d_o+d_i)) | d_i:m d_o:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f"
+ },
+ {
+  "q": "Calculate omega. With t = 42.08, theta = 0.016.",
+  "record": "omega=((theta)/(t)) | theta:1 t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega"
+ },
+ {
+  "q": "Calculate d_CM. The values are R = 0.152, theta = 1.628.",
+  "record": "d_CM=R*theta | R:m theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "d_CM",
+  "shown": "d_CM"
+ },
+ {
+  "q": "Compute omega. Measurements give Delta_theta = 4.39, Delta_t = 5.625.",
+  "record": "omega=((Delta_theta)/(Delta_t)) | Delta_theta:1 Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega"
+ },
+ {
+  "q": "Using P = 9.97, r = 54.4, calculate I.",
+  "record": "I=((P)/(4*pi*(r)^(2))) | P:W r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I",
+  "shown": "I"
+ }
+]
