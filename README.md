@@ -182,3 +182,26 @@ Split the oracle in two:
    metric across the quantization sweep.
 
 Conflating them produces a gate that can never be met and would stall Phase 2 indefinitely.
+
+## Getting `corpus/raw` back
+
+`corpus/raw` is 5.1 GB of OpenStax source — twelve books, 2,987 `.cnxml` modules — and it is
+**gitignored and not in the repository**. `train/prepare.py` and every miner under `corpus/` read it.
+
+```bash
+tools/fetch_oer.sh
+```
+
+That script is the inventory: title, upstream repo and on-disk directory for each of the twelve,
+including the two where the directory name deliberately differs from the repo name because code
+already refers to it. Verify with 2,987 `.cnxml` modules and `prepare.py` reproducing 29,594,922
+tokens.
+
+It exists because the directory was once destroyed and there was no script recording what it held —
+the inventory survived only as a prose table in `docs/CORPUS_MEASURED.md` and three hardcoded names
+in `corpus/tokenizer_study.py`, which turned a two-command restore into archaeology. **A bulk input
+with no fetch script is a single point of failure regardless of how it was obtained.**
+
+Do not symlink it from a worktree: a worktree shares its object store with the main checkout, so a
+committed symlink is checked out over whatever occupies that path there. That is what destroyed it.
+`tools/eval/gate_no_repo_symlink.py` now fails any tracked symlink resolving inside the repo.

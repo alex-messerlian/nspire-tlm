@@ -7,9 +7,23 @@ not, banded fit:high / fit:low. The model must discriminate; a model that answer
 lacked -- it saturated at 100% because the model confabulated on every mismatch.
 
 SEPARATION, on three axes, all asserted at build time:
-  formulas  15 held-out formulas each, disjoint             (never trained on)
+  formulas  15 formulas each, disjoint BETWEEN THE SPLITS
   stems     disjoint slices of 52,804 OpenStax sentences    (never authored by me)
   phrasing  no DEV item text appears in either split
+
+*** CORRECTION. This block used to read "15 held-out formulas each, disjoint (NEVER TRAINED ON)".
+The parenthesis was FALSE and was never asserted: the assertions below check SELECT-vs-REPORT
+disjointness, question overlap, stem-slice overlap and DEV overlap, and none of those is "the model
+never trained on this formula".
+
+MEASURED: the generator emits 164 formulas, units_holdout.json holds 30, 21 overlap. 10 of SELECT's
+13 formulas appear VERBATIM in the training corpus. SELECT is therefore mostly an IN-DISTRIBUTION
+test that was documented as a generalisation test, and every number read off it inherits that --
+including the retracted 16%.
+
+To make the claim true, the holdout must be carved OUT of the store BEFORE generation, so that
+"never trained on" holds by construction rather than by a file name. tools/eval/gate_split_heldout.py
+records the current overlap and will start ENFORCING separation the moment it reaches zero. ***
 """
 import json, re, random, hashlib
 import sys as _sys, pathlib as _pl

@@ -135,6 +135,7 @@ if ! _skip dimensionless; then $PY tools/eval/audit_dimensionless.py >/dev/null 
 # must publish its same-size random control. Topic-scoping read 61.2% against a random-20 at 62.7%.
 if ! _skip selection_control; then $PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }; fi
 if ! _skip stale_figures; then $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }; fi
+if ! _skip split_heldout; then $PY tools/eval/gate_split_heldout.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "split_heldout" || { printf "  %-20s FAIL\n" "split_heldout"; fail=1; }; fi
 if ! _skip split_valid; then $PY tools/eval/gate_split_valid.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "split_valid" || { printf "  %-20s FAIL\n" "split_valid"; fail=1; }; fi
 if ! _skip no_repo_symlink; then $PY tools/eval/gate_no_repo_symlink.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_repo_symlink" || { printf "  %-20s FAIL\n" "no_repo_symlink"; fail=1; }; fi
 if ! _skip d3_legitimacy; then $PY tools/eval/gate_d3_legitimacy.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "d3_legitimacy" || { printf "  %-20s FAIL\n" "d3_legitimacy"; fail=1; }; fi
