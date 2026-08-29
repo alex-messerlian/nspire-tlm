@@ -1,0 +1,15 @@
+{
+ "input_hash": "e5e102efcfedbe11",
+ "n_docs": 239832,
+ "inputs": [
+  "corpus/generate.py",
+  "corpus/store_clean.json",
+  "corpus/units_train.json",
+  "corpus/units_holdout.json",
+  "corpus/d3_stems.json",
+  "corpus/symbol_map.json",
+  "corpus/empirical_values.json",
+  "corpus/asks_dev.json"
+ ],
+ "_doc": "Written by corpus/generate.py. tools/eval/gate_corpus_fresh.py recomputes this and fails when corpus/synth_sample.jsonl was produced by different inputs."
+}

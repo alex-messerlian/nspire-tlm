@@ -135,6 +135,7 @@ if ! _skip dimensionless; then $PY tools/eval/audit_dimensionless.py >/dev/null 
 # must publish its same-size random control. Topic-scoping read 61.2% against a random-20 at 62.7%.
 if ! _skip selection_control; then $PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }; fi
 if ! _skip stale_figures; then $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }; fi
+if ! _skip corpus_fresh; then $PY tools/eval/gate_corpus_fresh.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "corpus_fresh" || { printf "  %-20s FAIL\n" "corpus_fresh"; fail=1; }; fi
 if ! _skip record_derivatives; then $PY tools/eval/audit_record_derivatives.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "record_derivatives" || { printf "  %-20s FAIL\n" "record_derivatives"; fail=1; }; fi
 if ! _skip split_heldout; then $PY tools/eval/gate_split_heldout.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "split_heldout" || { printf "  %-20s FAIL\n" "split_heldout"; fail=1; }; fi
 if ! _skip split_valid; then $PY tools/eval/gate_split_valid.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "split_valid" || { printf "  %-20s FAIL\n" "split_valid"; fail=1; }; fi

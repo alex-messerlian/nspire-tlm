@@ -2130,6 +2130,9 @@ if __name__ == "__main__":
     print(f"      (the composite above is dragged down by the record span, which is a canonical")
     print(f"       retrieval record and is SUPPOSED to repeat -- bounded by head count alone)")
     D.update({"span_"+k: v for k, v in SP.items()})
+    # STAMP THE ARTEFACT WITH ITS INPUTS, so a consumer can tell a fresh corpus from a stale one.
+    import stamp as _stamp
+    _stamp.write(len(docs))
     _wt("corpus/synth_sample.jsonl", 
         "\n".join(json.dumps(d) for d in docs))
     _wj("corpus/diversity.json", D, indent=1)
