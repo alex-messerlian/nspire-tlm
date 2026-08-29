@@ -27,7 +27,7 @@ VAR = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 RESV = {"pi", "e", "sin", "cos", "tan", "asin", "acos", "atan", "sqrt", "log", "ln", "exp", "abs"}
 
 
-def build(n=120, seed=11):
+def build(n=120, seed=11, spare=True):
     spec = importlib.util.spec_from_file_location("gen", ROOT / "corpus/generate.py")
     g = importlib.util.module_from_spec(spec)
     with contextlib.redirect_stdout(io.StringIO()):
@@ -48,13 +48,36 @@ def build(n=120, seed=11):
             rr = g.quantity_range(r, v)
             vals[v] = g._num(g.sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else g.sample_value(rng))
         # ONE SPARE GIVEN from a different record, not used by the shown record.
-        other = rng.choice(g.recs)
-        spare = [v for v in dict.fromkeys(VAR.findall(other["f"].split("=", 1)[1]))
-                 if v not in RESV and v not in vals and v != lhs(r)
-                 and v not in VAR.findall(r["f"])]
+        # spare=False builds the SAME arm without it, which is what keeps the V3 contrast clean:
+        # once the split's answer items carried spares (A43k), `answer` and `answer_x` measured the
+        # same thing -- 89.2% and 76.9% wrongly refused on retrain 1 -- and two arms that differ
+        # only in degree are one arm. answer_0 is the no-spare cell.
         if not spare:
+            if g._device_missing_mod(r, set(vals)) != "none":
+                continue
+            order = list(vals); rng.shuffle(order)
+            ask = g.ask_for(r, g.quantity_surface(r, rng), rng)
+            q = g.compose_question(ask, ", ".join(f"{v} = {vals[v]}" for v in order), rng)
+            um = " ".join(f"{v}:{r['units'][v]}" for v in svs if v in r.get("units", {}))
+            out.append({"q": q,
+                        "record": f"{r['f']} | {um} | missing:none | "
+                                  f"{r.get('req', 'standard conditions')} | fit:high",
+                        "expect": "answer", "asked": lhs(r), "shown": lhs(r), "spare": None})
             continue
-        sv = spare[0]
+        # `cand`, NOT `spare`. The candidate list was called `spare` and SHADOWED THE PARAMETER of
+        # the same name: after the first iteration the flag was gone, so `if not spare:` tested the
+        # list, the no-spare branch stopped firing, and the arm built 120 items with 0.0% spare
+        # givens while reporting itself as the spare arm. The baseline moved 76.9% -> 6.1% and the
+        # only thing that caught it was re-measuring what the items actually contained.
+        #
+        # One name for two things, which this repo has on record from the `res` span defect.
+        other = rng.choice(g.recs)
+        cand = [v for v in dict.fromkeys(VAR.findall(other["f"].split("=", 1)[1]))
+                if v not in RESV and v not in vals and v != lhs(r)
+                and v not in VAR.findall(r["f"])]
+        if not cand:
+            continue
+        sv = cand[0]
         rr = g.quantity_range(other, sv)
         vals[sv] = g._num(g.sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else g.sample_value(rng))
         # the record is still fully bound and still computes exactly what is asked
@@ -72,11 +95,9 @@ def build(n=120, seed=11):
 
 
 if __name__ == "__main__":
-    items = build(int(sys.argv[1]) if len(sys.argv) > 1 else 120)
-    p = ROOT / "corpus/split_answer_x.json"
-    p.write_text(json.dumps(items, indent=1))
-    print(f"  built {len(items)} items -> {p.relative_to(ROOT)}")
-    print(f"  each: the record ANSWERS the question and is fully bound, plus one spare given")
-    print(f"  example  {items[0]['q'][:78]}")
-    print(f"           {items[0]['record'][:78]}")
-    print(f"           spare given: {items[0]['spare']}")
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 120
+    for sp, out in ((True, "corpus/split_answer_x.json"), (False, "corpus/split_answer_0.json")):
+        items = build(n=n, spare=sp)
+        (ROOT / out).write_text(json.dumps(items, indent=1))
+        print(f"  {'spare  ' if sp else 'no spare'} n={len(items):4d} -> {out}")
+        print(f"           {items[0]['q'][:76]}")

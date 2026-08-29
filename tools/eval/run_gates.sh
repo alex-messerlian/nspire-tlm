@@ -157,6 +157,8 @@ if ! _skip fit_cue; then $PY tools/eval/gate_fit_cue.py >/dev/null 2>&1 && print
 if ! _skip bare_pipe; then $PY tools/eval/gate_bare_pipe.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "bare_pipe" || { printf "  %-20s FAIL\n" "bare_pipe"; fail=1; }; fi
 if ! _skip refusal_cue; then $PY tools/eval/gate_refusal_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "refusal_cue" || { printf "  %-20s FAIL\n" "refusal_cue"; fail=1; }; fi
 if ! _skip spare_given; then $PY tools/eval/gate_spare_given.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "spare_given" || { printf "  %-20s FAIL\n" "spare_given"; fail=1; }; fi
+if ! _skip d1_withheld; then $PY tools/eval/gate_d1_withheld.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "d1_withheld" || { printf "  %-20s FAIL\n" "d1_withheld"; fail=1; }; fi
+if ! _skip cval_parity; then $PY tools/eval/gate_cval_parity.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "cval_parity" || { printf "  %-20s FAIL\n" "cval_parity"; fail=1; }; fi
 if ! _skip no_orphan_values; then $PY tools/eval/gate_no_orphan_values.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_orphan_values" || { printf "  %-20s FAIL\n" "no_orphan_values"; fail=1; }; fi
 # R_train superseteq R_store: 25 of 166 records were retrievable and never trained, worth
 # 12.2% vs 41.0% correct. The only property with a measured effect on correctness.

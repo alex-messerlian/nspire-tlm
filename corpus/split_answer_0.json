@@ -1,0 +1,962 @@
+[
+ {
+  "q": "Using I_P = 8.54, N_P = 780, N_S = 2430, find I_S.",
+  "record": "I_S=((N_P)/(N_S))*I_P | N_P:1 N_S:1 I_P:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_S",
+  "shown": "I_S",
+  "spare": null
+ },
+ {
+  "q": "With Delta_s = 0.933, r = 7.9, what was angle of rotation?",
+  "record": "Delta_theta=((Delta_s)/(r)) | Delta_s:m r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_theta",
+  "shown": "Delta_theta",
+  "spare": null
+ },
+ {
+  "q": "Given N_S = 1900, N_P = 1055, I_P = 26.1, what was I_S?",
+  "record": "I_S=((N_P)/(N_S))*I_P | N_P:1 N_S:1 I_P:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_S",
+  "shown": "I_S",
+  "spare": null
+ },
+ {
+  "q": "Starting from l = 0.057, v = 1.35, B = 0.196, calculate motionally induced emf.",
+  "record": "epsilon=B*l*v | B:T l:m v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "epsilon",
+  "shown": "epsilon",
+  "spare": null
+ },
+ {
+  "q": "Calculate rms current. Using I_0 = 12.07.",
+  "record": "I_rms=((I_0)/(sqrt(2))) | I_0:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms",
+  "spare": null
+ },
+ {
+  "q": "If Q = 5.55e-07, V = 21.65, compute C.",
+  "record": "C=((Q)/(V)) | Q:C V:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "C",
+  "shown": "C",
+  "spare": null
+ },
+ {
+  "q": "What is x? You are told v_x = 256.48, t = 20, x_0 = 8.26.",
+  "record": "x=x_0+v_x*t | x_0:m v_x:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "x",
+  "shown": "x",
+  "spare": null
+ },
+ {
+  "q": "Take v = 224000000, f_s = 124000000000. Find f_obs.",
+  "record": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c))))) | f_s:Hz v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f_obs",
+  "shown": "f_obs",
+  "spare": null
+ },
+ {
+  "q": "Take T_c = 333, T_h = 615. What was carnot efficiency?",
+  "record": "Eff_C=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Eff_C",
+  "shown": "Eff_C",
+  "spare": null
+ },
+ {
+  "q": "Compute n. For E_1 = 8.58e-21, K = 4.84e-20.",
+  "record": "n=((K/E_1))^(1/2) | K:J E_1:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "n",
+  "shown": "n",
+  "spare": null
+ },
+ {
+  "q": "Suppose v = 101000000. Determine index of refraction.",
+  "record": "n=((c)/(v)) | v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "n",
+  "shown": "n",
+  "spare": null
+ },
+ {
+  "q": "Where r = 240.1, P = 121, compute I.",
+  "record": "I=((P)/(4*pi*(r)^(2))) | P:W r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I",
+  "shown": "I",
+  "spare": null
+ },
+ {
+  "q": "Assume v_wy = 0.655, v_p = 21.78. What is v_toty?",
+  "record": "v_toty=v_wy+v_p | v_wy:m/s v_p:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_toty",
+  "shown": "v_toty",
+  "spare": null
+ },
+ {
+  "q": "Compute angular speed from angular displacement. For Delta_t = 0.123, Delta_theta = 2.772.",
+  "record": "omega=((Delta_theta)/(Delta_t)) | Delta_theta:1 Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega",
+  "spare": null
+ },
+ {
+  "q": "In a setup with v_0x = 3.73, t = 113.4, what was horizontal displacement in projectile motion?",
+  "record": "x=v_0x*t | v_0x:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "x",
+  "shown": "x",
+  "spare": null
+ },
+ {
+  "q": "Estimate resultant velocity from component velocities. A system has v_p = 2.11, v_wy = 0.399.",
+  "record": "v_toty=v_wy+v_p | v_wy:m/s v_p:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_toty",
+  "shown": "v_toty",
+  "spare": null
+ },
+ {
+  "q": "Using Delta_omega = 56.533, Delta_t = 689, what was angular acceleration?",
+  "record": "alpha=((Delta_omega)/(Delta_t)) | Delta_omega:1/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "alpha",
+  "shown": "alpha",
+  "spare": null
+ },
+ {
+  "q": "A system has V = 5.6, C = 8.55e-06. Find energy stored.",
+  "record": "U_E=((1)/(2))*C*(V)^(2) | C:F V:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U_E",
+  "shown": "U_E",
+  "spare": null
+ },
+ {
+  "q": "If r = 28.35, theta = 1.007, what was s?",
+  "record": "s=r*theta | r:m theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "s",
+  "shown": "s",
+  "spare": null
+ },
+ {
+  "q": "Estimate fundamental frequency of a closed tube. You are told v = 325, L = 0.122.",
+  "record": "f_1=((v)/(4*L)) | v:m/s L:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f_1",
+  "shown": "f_1",
+  "spare": null
+ },
+ {
+  "q": "Determine height of free fall. If v_0 = 6.28, t = 268.62, y_0 = 198.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | y_0:m v_0:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "y",
+  "shown": "y",
+  "spare": null
+ },
+ {
+  "q": "Assume lambda = 3.12e-08. What is p?",
+  "record": "p=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p",
+  "shown": "p",
+  "spare": null
+ },
+ {
+  "q": "What was output work? Where d_o = 0.16, F_o = 0.673.",
+  "record": "W_o=F_o*d_o | F_o:N d_o:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "W_o",
+  "shown": "W_o",
+  "spare": null
+ },
+ {
+  "q": "With a = 37.6, m = 126, what was F_net?",
+  "record": "F_net=m*a | m:kg a:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F_net",
+  "shown": "F_net",
+  "spare": null
+ },
+ {
+  "q": "If W = 47.6, t = 3000, what is P?",
+  "record": "P=((W)/(t)) | W:J t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P",
+  "shown": "P",
+  "spare": null
+ },
+ {
+  "q": "Measurements give theta = 0.102, d = 0.007. What was path length difference for waves from two slits to a common point on a screen?",
+  "record": "Delta_l=d*sin(theta) | d:m theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_l",
+  "shown": "Delta_l",
+  "spare": null
+ },
+ {
+  "q": "The values are a = 49.2, F_net = 46.6. What is mass?",
+  "record": "m=F_net/a | F_net:N a:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "m",
+  "shown": "m",
+  "spare": null
+ },
+ {
+  "q": "You are told E = 1.11e-13. What was approximate time?",
+  "record": "Delta_t=((h)/(E)) | E:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_t",
+  "shown": "Delta_t",
+  "spare": null
+ },
+ {
+  "q": "For f = 1.83e+16, estimate energy of a photon.",
+  "record": "E_f=h*f | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E_f",
+  "shown": "E_f",
+  "spare": null
+ },
+ {
+  "q": "Starting from K = 8920, U = 34.1, estimate E.",
+  "record": "E=K+U | K:J U:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E",
+  "spare": null
+ },
+ {
+  "q": "Determine uniform acceleration. Given t = 256, vi = 269, vf = 0.801.",
+  "record": "a=(vf-vi)/t | vf:m/s vi:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "a",
+  "shown": "a",
+  "spare": null
+ },
+ {
+  "q": "What is power dissipated in a resistor? Measurements give I = 9.82, R = 763.",
+  "record": "P=(I)^(2)*R | I:A R:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "P",
+  "shown": "P",
+  "spare": null
+ },
+ {
+  "q": "Using n = 4, f = 4250000000000000, determine E.",
+  "record": "E=n*h*f | n:1 f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E",
+  "spare": null
+ },
+ {
+  "q": "Take n = 1.93, lambda = 4.16e-08. Compute wavelength.",
+  "record": "lambda_n=((lambda)/(n)) | lambda:m n:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "lambda_n",
+  "shown": "lambda_n",
+  "spare": null
+ },
+ {
+  "q": "Using v_wy = 1.81, v_p = 66.4, find resultant velocity from component velocities.",
+  "record": "v_toty=v_wy+v_p | v_wy:m/s v_p:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_toty",
+  "shown": "v_toty",
+  "spare": null
+ },
+ {
+  "q": "Starting from x_f = 4500, x_i = 0.521, what is displacement?",
+  "record": "Delta_x=x_f-x_i | x_f:m x_i:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_x",
+  "shown": "Delta_x",
+  "spare": null
+ },
+ {
+  "q": "Estimate angular velocity. Starting from v = 88.2, r = 5.2.",
+  "record": "omega=v/r | v:m/s r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega",
+  "spare": null
+ },
+ {
+  "q": "Assume W = 3500, Q = 58.08. Estimate Delta_U.",
+  "record": "Delta_U=Q-W | Q:J W:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_U",
+  "shown": "Delta_U",
+  "spare": null
+ },
+ {
+  "q": "Given theta = 0.717, d = 0.001, find path length difference.",
+  "record": "Delta_l=d*sin(theta) | d:m theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_l",
+  "shown": "Delta_l",
+  "spare": null
+ },
+ {
+  "q": "Measurements give Delta_v = 2.4, m = 8.88, Delta_t = 0.338. Estimate force.",
+  "record": "F=((m*Delta_v)/(Delta_t)) | m:kg Delta_v:m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F",
+  "shown": "F",
+  "spare": null
+ },
+ {
+  "q": "Suppose I_0 = 1.029. Calculate I_rms.",
+  "record": "I_rms=((I_0)/(sqrt(2))) | I_0:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms",
+  "spare": null
+ },
+ {
+  "q": "Assume f = 5550000000000000. Find photon energy from frequency.",
+  "record": "E=h*f | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E",
+  "spare": null
+ },
+ {
+  "q": "Estimate uniform acceleration. A system has t = 641, vi = 221.4, vf = 272.",
+  "record": "a=(vf-vi)/t | vf:m/s vi:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "a",
+  "shown": "a",
+  "spare": null
+ },
+ {
+  "q": "You are told F = 2.54, m = 126.7. What is acceleration from force and mass?",
+  "record": "a=((F)/(m)) | F:N m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "a",
+  "shown": "a",
+  "spare": null
+ },
+ {
+  "q": "For v = 39.7, r = 149, find centripetal acceleration.",
+  "record": "a=(v)^(2)/r | v:m/s r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "a",
+  "shown": "a",
+  "spare": null
+ },
+ {
+  "q": "If p_g = 1850, determine absolute pressure.",
+  "record": "p_abs=p_g+p_atm | p_g:Pa | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p_abs",
+  "shown": "p_abs",
+  "spare": null
+ },
+ {
+  "q": "The values are dT = 0.225, m = 29.5, c = 399.5. Calculate heat transferred with no phase change.",
+  "record": "Q=m*c*dT | m:kg c:J/(kg*K) dT:K | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Q",
+  "shown": "Q",
+  "spare": null
+ },
+ {
+  "q": "Suppose v = 7.4, m = 0.183. What is kinetic energy?",
+  "record": "K=0.5*m*(v)^(2) | m:kg v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "K",
+  "shown": "K",
+  "spare": null
+ },
+ {
+  "q": "If m = 158.89, a = 3.12, determine F_net.",
+  "record": "F_net=m*a | m:kg a:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F_net",
+  "shown": "F_net",
+  "spare": null
+ },
+ {
+  "q": "Suppose P = 505.4, t = 380. What was E?",
+  "record": "E=P*t | P:W t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E",
+  "spare": null
+ },
+ {
+  "q": "Compute C. Take A = 0.225, d = 8.61e-06.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "C",
+  "shown": "C",
+  "spare": null
+ },
+ {
+  "q": "The values are r = 15.75, omega = 277. Find v_t.",
+  "record": "v_t=r*omega | r:m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_t",
+  "shown": "v_t",
+  "spare": null
+ },
+ {
+  "q": "You are told v = 0.031, r = 600. What is centripetal acceleration?",
+  "record": "a=(v)^(2)/r | v:m/s r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "a",
+  "shown": "a",
+  "spare": null
+ },
+ {
+  "q": "If p_g = 5830, find absolute pressure.",
+  "record": "p_abs=p_g+p_atm | p_g:Pa | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p_abs",
+  "shown": "p_abs",
+  "spare": null
+ },
+ {
+  "q": "Determine E. Assume lambda = 3.04e-10.",
+  "record": "E=((h*c)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E",
+  "spare": null
+ },
+ {
+  "q": "Determine p. In a setup with m = 1.852, v = 38.1.",
+  "record": "p=m*v | m:kg v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "p",
+  "shown": "p",
+  "spare": null
+ },
+ {
+  "q": "Compute centripetal force. Given m = 661, a_c = 0.333.",
+  "record": "F_c=m*a_c | m:kg a_c:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F_c",
+  "shown": "F_c",
+  "spare": null
+ },
+ {
+  "q": "In a setup with C_V = 20.22, calculate molar heat capacity at constant pressure.",
+  "record": "C_p=C_V+R | C_V:J/(mol*K) | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "C_p",
+  "shown": "C_p",
+  "spare": null
+ },
+ {
+  "q": "For t = 209, v_0 = 56.67, what was velocity?",
+  "record": "v=v_0-g*t | v_0:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v",
+  "spare": null
+ },
+ {
+  "q": "Given theta_0 = 0.856, v_0 = 4.86, determine time.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | v_0:m/s theta_0:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T_tof",
+  "shown": "T_tof",
+  "spare": null
+ },
+ {
+  "q": "Take p = 5.97e-22. What was lambda?",
+  "record": "lambda=((h)/(p)) | p:kg*m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "lambda",
+  "shown": "lambda",
+  "spare": null
+ },
+ {
+  "q": "Measurements give m2 = 1.98e+25, m1 = 2.42e+26, r = 128000000000. Find F.",
+  "record": "F=G*m1*m2/(r)^(2) | m1:kg m2:kg r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F",
+  "shown": "F",
+  "spare": null
+ },
+ {
+  "q": "Find x. A system has v_x = 28.5, t = 5.31, x_0 = 575.",
+  "record": "x=x_0+v_x*t | x_0:m v_x:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "x",
+  "shown": "x",
+  "spare": null
+ },
+ {
+  "q": "Determine gravitational acceleration. Where T = 64.77, L = 2.27.",
+  "record": "g=((4*(pi)^(2)*L)/((T)^(2))) | L:m T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "g",
+  "shown": "g",
+  "spare": null
+ },
+ {
+  "q": "Measurements give k = 1.45, m = 1890. Estimate period of a mass-spring system in shm.",
+  "record": "T=2*pi*sqrt(((m)/(k))) | m:kg k:N/m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T",
+  "shown": "T",
+  "spare": null
+ },
+ {
+  "q": "In a setup with lambda = 0.016, estimate frequency.",
+  "record": "f=((c)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f",
+  "spare": null
+ },
+ {
+  "q": "Compute intensity for a spherical wave. Using r = 180.2, P = 0.616.",
+  "record": "I=((P)/(4*pi*(r)^(2))) | P:W r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I",
+  "shown": "I",
+  "spare": null
+ },
+ {
+  "q": "For r = 1.116, Delta_s = 1.43, calculate angle.",
+  "record": "Delta_theta=((Delta_s)/(r)) | Delta_s:m r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_theta",
+  "shown": "Delta_theta",
+  "spare": null
+ },
+ {
+  "q": "You are told V = 170, C = 4.09e-05. Calculate U_E.",
+  "record": "U_E=((1)/(2))*C*(V)^(2) | C:F V:V | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U_E",
+  "shown": "U_E",
+  "spare": null
+ },
+ {
+  "q": "With B = 6.82, E = 612, what is drift velocity?",
+  "record": "v_d=E/B | E:V/m B:T | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_d",
+  "shown": "v_d",
+  "spare": null
+ },
+ {
+  "q": "You are told Delta_m = 4.28e-29. Calculate binding energy.",
+  "record": "E=(Delta_m)(c)^(2) | Delta_m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E",
+  "spare": null
+ },
+ {
+  "q": "In a setup with f_O = 214000000000000, what is binding energy?",
+  "record": "E_b=h*f_O | f_O:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E_b",
+  "shown": "E_b",
+  "spare": null
+ },
+ {
+  "q": "In a setup with Delta_E = 4.99e-11, find mass.",
+  "record": "m=Delta_E/(c)^(2) | Delta_E:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "m",
+  "shown": "m",
+  "spare": null
+ },
+ {
+  "q": "Compute f. You are told d_o = 0.476, d_i = 2.345.",
+  "record": "f=((d_i*d_o)/(d_o+d_i)) | d_i:m d_o:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f",
+  "spare": null
+ },
+ {
+  "q": "Suppose m = 320, theta = 0.82. Compute N.",
+  "record": "N=m*g*cos(theta) | m:kg theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "N",
+  "shown": "N",
+  "spare": null
+ },
+ {
+  "q": "Measurements give Delta_s = 0.616, r = 3.95. What is angle?",
+  "record": "Delta_theta=((Delta_s)/(r)) | Delta_s:m r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_theta",
+  "shown": "Delta_theta",
+  "spare": null
+ },
+ {
+  "q": "Estimate T_tof. Consider a case where v_0 = 0.83, theta_0 = 0.19.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | v_0:m/s theta_0:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T_tof",
+  "shown": "T_tof",
+  "spare": null
+ },
+ {
+  "q": "Using Delta_t = 4.448, F_net = 495, determine Delta_p.",
+  "record": "Delta_p=F_net*Delta_t | F_net:N Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_p",
+  "shown": "Delta_p",
+  "spare": null
+ },
+ {
+  "q": "What is mass from density and volume? A system has V = 444, rho = 134.16.",
+  "record": "m=rho*V | rho:kg/m^3 V:m^3 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "m",
+  "shown": "m",
+  "spare": null
+ },
+ {
+  "q": "What is rms current? For Z = 0.558, V_rms = 270.",
+  "record": "I_rms=V_rms/Z | V_rms:V Z:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms",
+  "spare": null
+ },
+ {
+  "q": "For lambda = 37.7, T = 351.07, what was v?",
+  "record": "v=((lambda)/(T)) | lambda:m T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v",
+  "spare": null
+ },
+ {
+  "q": "You are told C = 6.03e-08, R = 900. Find time constant.",
+  "record": "tau=R*C | R:ohm C:F | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "tau",
+  "shown": "tau",
+  "spare": null
+ },
+ {
+  "q": "Determine intensity. The values are r_1 = 337, I_1 = 9.79, r_2 = 632.8.",
+  "record": "I_2=I_1*((((r_1)/(r_2))))^(2) | I_1:W/m^2 r_1:m r_2:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_2",
+  "shown": "I_2",
+  "spare": null
+ },
+ {
+  "q": "Assume V_rms = 640, Z = 32.75. Determine rms current.",
+  "record": "I_rms=V_rms/Z | V_rms:V Z:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms",
+  "spare": null
+ },
+ {
+  "q": "A system has T = 1.75, Q = 70.6. Compute Delta_S.",
+  "record": "Delta_S=((Q)/(T)) | Q:J T:K | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_S",
+  "shown": "Delta_S",
+  "spare": null
+ },
+ {
+  "q": "Calculate radius of a particle's path in a magnetic field. You are told v = 244000, B = 58.45.",
+  "record": "r=((m*v)/(q*B)) | v:m/s B:T | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "r",
+  "shown": "r",
+  "spare": null
+ },
+ {
+  "q": "Compute angular velocity from constant angular acceleration. A system has omega_0 = 0.648, alpha = 7.8, t = 97.7.",
+  "record": "omega_f=omega_0+alpha*t | omega_0:1/s alpha:1/s^2 t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega_f",
+  "shown": "omega_f",
+  "spare": null
+ },
+ {
+  "q": "Where v = 280000000, determine n.",
+  "record": "n=((c)/(v)) | v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "n",
+  "shown": "n",
+  "spare": null
+ },
+ {
+  "q": "Determine velocity in free fall, upward positive. Starting from t = 3800, v_0 = 51.1.",
+  "record": "v=v_0-g*t | v_0:m/s t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v",
+  "spare": null
+ },
+ {
+  "q": "Where T_h = 744, T_c = 310, determine carnot efficiency.",
+  "record": "Eff_C=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Eff_C",
+  "shown": "Eff_C",
+  "spare": null
+ },
+ {
+  "q": "Estimate fringe spacing. Where d = 0.008, x = 3.595, lambda = 1.12e-08.",
+  "record": "Delta_y=x*lambda/d | x:m lambda:m d:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_y",
+  "shown": "Delta_y",
+  "spare": null
+ },
+ {
+  "q": "Take f_2 = 325, f_1 = 114.7. What was beat frequency from two waves that differ in frequency?",
+  "record": "f_beat=|f_2-f_1| | f_2:Hz f_1:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f_beat",
+  "shown": "f_beat",
+  "spare": null
+ },
+ {
+  "q": "What is I? With A = 9.83, P = 5.005.",
+  "record": "I=((P)/(A)) | P:W A:m^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I",
+  "shown": "I",
+  "spare": null
+ },
+ {
+  "q": "A system has d_o = 0.093, d_i = 6.75. What is f?",
+  "record": "f=((d_i*d_o)/(d_o+d_i)) | d_i:m d_o:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f",
+  "spare": null
+ },
+ {
+  "q": "Measurements give m = 1600, k = 4.6. Estimate angular frequency.",
+  "record": "omega=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega",
+  "spare": null
+ },
+ {
+  "q": "If V = 8.1, I = 3.73, find resistance.",
+  "record": "R=V/I | V:V I:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "R",
+  "shown": "R",
+  "spare": null
+ },
+ {
+  "q": "Assume l_0 = 86, l = 80.93. Estimate extension.",
+  "record": "x=l-l_0 | l:m l_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "x",
+  "shown": "x",
+  "spare": null
+ },
+ {
+  "q": "Suppose m_2 = 54.4, m_1 = 2.86. Compute acceleration of two blocks connected over a pulley.",
+  "record": "a=((m_2)/(m_1+m_2))*g | m_2:kg m_1:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "a",
+  "shown": "a",
+  "spare": null
+ },
+ {
+  "q": "If Delta_omega = 467, Delta_t = 0.993, what is alpha?",
+  "record": "alpha=((Delta_omega)/(Delta_t)) | Delta_omega:1/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "alpha",
+  "shown": "alpha",
+  "spare": null
+ },
+ {
+  "q": "Compute wave speed. Given omega = 219.2, k = 1900.",
+  "record": "v=((omega)/(k)) | omega:1/s k:1/m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v",
+  "spare": null
+ },
+ {
+  "q": "Compute angular velocity. In a setup with v = 589.3, r = 0.305.",
+  "record": "omega=v/r | v:m/s r:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "omega",
+  "shown": "omega",
+  "spare": null
+ },
+ {
+  "q": "In a setup with r = 1.35, omega = 46.5, what is tangential speed?",
+  "record": "v_t=r*omega | r:m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_t",
+  "shown": "v_t",
+  "spare": null
+ },
+ {
+  "q": "Consider a case where omega = 619, k = 1948. Compute wave speed.",
+  "record": "v=((omega)/(k)) | omega:1/s k:1/m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v",
+  "spare": null
+ },
+ {
+  "q": "Compute spring constant from force and extension. Measurements give x = 0.88, F = 88.2.",
+  "record": "k=((F)/(x)) | F:N x:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "k",
+  "shown": "k",
+  "spare": null
+ },
+ {
+  "q": "Take m = 64.7. Compute w.",
+  "record": "w=m*g | m:kg | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "w",
+  "shown": "w",
+  "spare": null
+ },
+ {
+  "q": "What was alpha? Suppose Delta_t = 325.304, Delta_omega = 67.",
+  "record": "alpha=((Delta_omega)/(Delta_t)) | Delta_omega:1/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "alpha",
+  "shown": "alpha",
+  "spare": null
+ },
+ {
+  "q": "Consider a case where lambda = 2.62e-06, d = 0.001, x = 8.847. What was fringe spacing?",
+  "record": "Delta_y=x*lambda/d | x:m lambda:m d:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_y",
+  "shown": "Delta_y",
+  "spare": null
+ },
+ {
+  "q": "Compute T_F. If E_F = 2.15e-19.",
+  "record": "T_F=((E_F)/(k_B)) | E_F:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T_F",
+  "shown": "T_F",
+  "spare": null
+ },
+ {
+  "q": "Estimate wave speed from wavelength and period. Where T = 28.09, lambda = 1.17.",
+  "record": "v=((lambda)/(T)) | lambda:m T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v",
+  "spare": null
+ },
+ {
+  "q": "In a setup with E_F = 4.95e-19, compute fermi temperature.",
+  "record": "T_F=((E_F)/(k_B)) | E_F:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "T_F",
+  "shown": "T_F",
+  "spare": null
+ },
+ {
+  "q": "If U_ex = 7.66e-20, U_coul = -1.17e-18, E_transfer = 1.79e-19, compute energy change associated.",
+  "record": "U_form=E_transfer+U_coul+U_ex | E_transfer:J U_coul:J U_ex:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "U_form",
+  "shown": "U_form",
+  "spare": null
+ },
+ {
+  "q": "Measurements give Delta_E_LK = 7.02e-18. Estimate f.",
+  "record": "f=(Delta_E_LK)/h | Delta_E_LK:J | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "f",
+  "shown": "f",
+  "spare": null
+ },
+ {
+  "q": "Given Delta_t = 146, Delta_p = 0.88, estimate net force.",
+  "record": "F_net=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F_net",
+  "shown": "F_net",
+  "spare": null
+ },
+ {
+  "q": "You are told a_c = 3.34, m = 91.1. Estimate F_c.",
+  "record": "F_c=m*a_c | m:kg a_c:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "F_c",
+  "shown": "F_c",
+  "spare": null
+ },
+ {
+  "q": "The values are theta_i = 0.161. Determine theta_r.",
+  "record": "theta_r=theta_i | theta_i:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "theta_r",
+  "shown": "theta_r",
+  "spare": null
+ },
+ {
+  "q": "Where lambda = 0.466, T = 159.9, calculate v.",
+  "record": "v=((lambda)/(T)) | lambda:m T:s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v",
+  "shown": "v",
+  "spare": null
+ },
+ {
+  "q": "Compute velocity. With omega = 136.8, R = 0.105.",
+  "record": "v_CM=R*omega | R:m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "v_CM",
+  "shown": "v_CM",
+  "spare": null
+ },
+ {
+  "q": "A system has I_0 = 0.892. What was rms current?",
+  "record": "I_rms=((I_0)/(sqrt(2))) | I_0:A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "I_rms",
+  "shown": "I_rms",
+  "spare": null
+ },
+ {
+  "q": "Assume f = 1.46e+16. Find photon energy from frequency.",
+  "record": "E=h*f | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "E",
+  "shown": "E",
+  "spare": null
+ },
+ {
+  "q": "You are told d = 0.01, theta = 1.52. Determine path length difference.",
+  "record": "Delta_l=d*sin(theta) | d:m theta:1 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "asked": "Delta_l",
+  "shown": "Delta_l",
+  "spare": null
+ }
+]

@@ -2058,8 +2058,25 @@ def gen(n, seed=0):
             # satisfied precondition is wrong supervision: it teaches the model to refuse a
             # question it can answer.
             drop = rng.choice(free) if free else rng.choice(vs)
-            shown_w = [v for v in shown if v != drop]
-            g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown_w) if shown_w else g
+            # A43h. REMOVE THE WITHHELD VARIABLE FROM THE SOURCE, NOT AT ONE CONSUMER.
+            #
+            # This filtered a LOCAL list to build `g` and left `drop` in `vals`. That was correct
+            # while `g` was built once -- and A43e then rebuilt `g` from `vals` to shuffle the
+            # order, restoring the withheld variable to the question. Measured: 869 of 869 D1
+            # documents (100.0%) supplied the value their own answer says is missing --
+            #     Q: "Where r = 2.42, k_e = 8988000000, q = 3.71e-07, calculate electric potential"
+            #     A: "I cannot answer that -- q is not given."
+            # which is the A12 defect at full strength, a refusal on a satisfied precondition, and
+            # it also re-opened A41 from the other side: with D1 back in missing:none, the printed
+            # `missing:` field became a pure D2 marker again.
+            #
+            # NOTHING IN THE SUITE SAW IT. Every gate passed. It was found by an agent re-deriving
+            # a different measurement from scratch, and the lesson is the one A43c/d already state
+            # one level up: every path that rebuilds the givens must re-decide them from a source
+            # that is already correct. Filtering at a consumer survives exactly until the next
+            # consumer is written.
+            vals.pop(drop, None)
+            g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown if v in vals) or g
         # A43. A SPARE GIVEN IS ADDED INDEPENDENTLY OF THE CLASS, SO IT CARRIES NO INFORMATION.
         #
         # MEASURED ON THE A42 CORPUS: a question supplying a variable the shown record does not use
@@ -2083,20 +2100,62 @@ def gen(n, seed=0):
         # carries their own givens whatever the picker returns. The fix is to make it INDEPENDENT
         # of the class, so the model cannot use it and must read the record. gate_spare_given
         # measures the per-class rates and fails when they diverge.
-        if not nomatch and rng.random() < 0.80:
-            _pool = [x for x in recs if x["f"] != r["f"]]
-            if _pool:
+        # A43b. THE COUNT, NOT ONLY THE PRESENCE. A43 added exactly ONE spare to 80% of documents
+        # and the cue MOVED rather than closing: a mismatch inherits the wrong record's variables
+        # AND that one, so `spare count >= 2 -> refuse` was 100% precision at +85.2 pp -- the same
+        # lift the presence cue had. Measured: ANSWERABLE and D1 had 0.0% with two or more, D2 had
+        # 96.5%.
+        #
+        # This is the "fixed versus merely moved" distinction as a measurement. Presence was fixed;
+        # nothing had asked about COUNT, so nothing saw it. A structural cue has families --
+        # presence, absence, count, ordering -- and closing one says nothing about the others.
+        # gate_spare_given now checks presence AND the count distribution.
+        # A43e. THE ORDER OF THE GIVENS IS SHUFFLED FOR EVERY CLASS.
+        # The mismatch trim shuffles; ANSWERABLE kept the record's natural variable order. So
+        # "are the givens in the record's order" separated the classes on its own -- reverse
+        # alphabetical order alone ran 3.3% on ANSWERABLE against 27.4% on D2 and 75.0% on D3,
+        # a +36.5 pp lift from ORDERING, a family nothing had checked. Shuffling everywhere makes
+        # order carry no class information.
+        _ord0 = list(vals)
+        rng.shuffle(_ord0)
+        g = ", ".join(f"{k} = {_num(vals[k]) if not isinstance(vals[k], str) else vals[k]}"
+                      for k in _ord0 if k in vals)
+        # A43i. EQUALISE THE TOTAL GIVEN COUNT, NOT THE SPARE COUNT.
+        #
+        # Equalising spares left the TOTAL differing by class -- ANSWERABLE 3.84 givens, D1 2.89,
+        # D2 2.27 -- because D1 withholds one and a mismatch is trimmed. "total givens <= 2 ->
+        # refuse" measured +20.2 pp, over the ratchet, and it also showed up indirectly as an
+        # ORDERING statistic: with fewer givens a random shuffle is likelier to be reverse
+        # alphabetical, so D2 looked 28.4% reverse-alpha against ANSWERABLE's 13.3% with no
+        # ordering property involved at all.
+        #
+        # A cue family is not closed by equalising a component of it. Every class now draws a
+        # TARGET TOTAL from one distribution and is filled to it with spares, which makes both the
+        # spare count and the total count uninformative in one step.
+        _target_total = rng.choices((2, 3, 4, 5), weights=(0.16, 0.27, 0.30, 0.27))[0]
+        _n_spare = max(0, _target_total - len(vals))
+        if not nomatch and _n_spare:
+            _added = 0
+            for _ in range(12):
+                if _added >= _n_spare:
+                    break
+                _pool = [x for x in recs if x["f"] != r["f"]]
+                if not _pool:
+                    break
                 _o = rng.choice(_pool)
                 _cand = [v for v in dict.fromkeys(VAR.findall(_o["f"].split("=", 1)[1]))
                          if v not in ("pi", "e") and v not in vals
                          and v not in VAR.findall(r["f"])
                          and _const_for(_o, v) is None]
-                if _cand:
-                    _sv = _cand[0]
-                    _rr = quantity_range(_o, _sv)
-                    _sval = _num(sample_in_range(rng, _rr[0], _rr[1], _rr[2]) if _rr
-                                 else sample_value(rng))
-                    g = f"{g}, {_sv} = {_sval}" if g else f"{_sv} = {_sval}"
+                if not _cand:
+                    continue
+                _sv = _cand[0]
+                _rr = quantity_range(_o, _sv)
+                _sval = _num(sample_in_range(rng, _rr[0], _rr[1], _rr[2]) if _rr
+                             else sample_value(rng))
+                vals[_sv] = _sval
+                g = f"{g}, {_sv} = {_sval}" if g else f"{_sv} = {_sval}"
+                _added += 1
         ask = ask_for(r, quantity_surface(r, rng), rng)
         q = compose_question(ask, g, rng)
         umap = units_field(r)
@@ -2161,7 +2220,13 @@ def gen(n, seed=0):
             # question does not already supply. 0.27 delivers the ~1.1-1.2% the pre-registration
             # fixes as the dose under test. gate_refusal_cue ratchets the delivered fraction, so
             # this constant cannot drift without failing.
-            if rng.random() < 0.27:
+            _rebuilt = False
+            # RATE RE-TUNED AFTER A43c/d. The spare-trimming changed how often the rebuild
+            # finds a variable to add, taking the delivered dose from 1.21% to 1.51%. The dose is
+            # the variable being HELD CONSTANT for retrain 2 -- if it drifts up, the run confounds
+            # a larger dose with the cue fix, which is the one thing this run exists to separate.
+            # 0.24 delivers the pre-registered 1.35%.
+            if rng.random() < 0.24:
                 _extra = {}
                 for _v in dict.fromkeys(VAR.findall(rec_r["f"].split("=", 1)[1])):
                     if _v in ("pi", "e") or _v == rec_r["f"].split("=", 1)[0].strip():
@@ -2192,6 +2257,38 @@ def gen(n, seed=0):
                     #
                     # The givens now go through GIVE like any others, so a fully bound mismatch is
                     # surface-identical to an ordinary question.
+                    # A43c. TRIM THE SPARES TO THE SAME DRAWN COUNT AS EVERY OTHER CLASS.
+                    #
+                    # A mismatch inherits ALL of the correct record's givens as spares -- relative
+                    # to the record actually shown, none of them is used -- so D2 sat at 82.8% with
+                    # three or more while ANSWERABLE was at 22.2%, and `spare count >= 3 -> refuse`
+                    # still carried +10.2 pp after A43b equalised the presence and the low counts.
+                    #
+                    # The alternative was to raise every other question to three spares, which
+                    # closes the gap by making every question noisy. Trimming the mismatch is the
+                    # cheaper direction and leaves the answerable distribution alone.
+                    #
+                    # rec_r's OWN variables are never trimmed: they are what makes missing:none true.
+                    # A43g. A MISMATCH KEEPS AT LEAST ONE GIVEN. For ANSWERABLE a spare count of
+                    # zero still leaves the record's OWN variables in the question; for a mismatch
+                    # every given is spare, so trimming to zero leaves a question with NO NUMBERS.
+                    # That reintroduced the D3 cue from the other side: 15.8% of D2 had no numeric
+                    # given against 0.0% of ANSWERABLE, and "no number -> refuse" stayed at
+                    # +82.6 pp. The count buckets mean different things in the two classes.
+                    # A43j. NEVER TRIM A VARIABLE THE SHOWN RECORD NEEDS. `_extra` holds only the
+                    # rec_r variables that were NOT already present, so any variable shared between
+                    # the two records sat in `vals` and was a trim candidate -- dropping one made
+                    # the record no longer fully bound while the span still said missing:none.
+                    # gate_record_bytes caught it as a one-document byte mismatch: corpus
+                    # "missing:none" against the device's "missing:m".
+                    _need = {v for v in VAR.findall(rec_r["f"].split("=", 1)[1])
+                             if v not in ("pi", "e")}
+                    _keep = max(1, _target_total - len(_extra))
+                    _sp = [v for v in vals if v not in _extra and v not in _need]
+                    rng.shuffle(_sp)
+                    for _drop in _sp[_keep:]:
+                        vals.pop(_drop, None)
+                    _rebuilt = True
                     _all = dict(vals)
                     _all.update(_extra)
                     _order = list(_all)
@@ -2199,6 +2296,26 @@ def gen(n, seed=0):
                     g = ", ".join(f"{k} = {_num(_all[k]) if not isinstance(_all[k], str) else _all[k]}"
                                   for k in _order)
                     q = compose_question(ask, g, rng)
+        if mismatch and not _rebuilt:
+            # A43d. EVERY MISMATCH IS TRIMMED, NOT ONLY THE FULLY-BOUND ONES. The trim first went
+            # inside the A42 branch, which is 27% of mismatches, so `spare count >= 3 -> refuse`
+            # still carried +7.6 pp from the other 73%. A mismatch inherits ALL of the correct
+            # record's givens as spares -- relative to the record actually SHOWN none of them is
+            # used -- so without a trim it sits at 66.5% with three or more against ANSWERABLE's
+            # 22.5%.
+            #
+            # The general rule: every path that changes which record is SHOWN must re-decide the
+            # spares, because "spare" is defined relative to that record and the question was
+            # composed against a different one. Two paths change it; both must trim.
+            _sp = list(vals)
+            rng.shuffle(_sp)
+            for _drop in _sp[max(1, _target_total):]:
+                vals.pop(_drop, None)
+            _order = list(vals)
+            rng.shuffle(_order)
+            g = ", ".join(f"{k} = {_num(vals[k]) if not isinstance(vals[k], str) else vals[k]}"
+                          for k in _order)
+            q = compose_question(ask, g, rng)
         _given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", g))
         # ONE PATH FOR EVERY CASE. D1 previously set this to `drop` directly; that happened to
         # agree, and "happens to agree" is how the other three fields drifted.
@@ -2221,6 +2338,24 @@ def gen(n, seed=0):
         # using it here is precisely the defect the criterion measured at 100.0%: a refusal that
         # declines a question the store demonstrably answers.
         if nomatch:
+            # A43f WAS REVERTED, AND THE REASON IS THE MORE USEFUL FINDING.
+            #
+            # 66.0% of D3 questions carried no numeric given against 0.0% of ANSWERABLE, so
+            # "no number -> refuse" measured +82.6 pp. I fixed it by giving D3 questions numbers --
+            # and gate_d3_legitimacy failed: the added givens made 55 of 307 D3 documents ANSWERABLE
+            # by a store record, which is the A12 defect exactly, a refusal on a satisfied
+            # precondition. One fix, another gate's invariant broken.
+            #
+            # The right reading is that this cue is INTRINSIC for D3 and not a defect. The device
+            # emits "none | missing:none | no matching relation | fit:low" whenever the picker finds
+            # nothing (src/store/assemble.c:109), so the RECORD SPAN already announces D3 perfectly.
+            # A question-side cue adds nothing a model could not already read off the record, and it
+            # is what the runtime genuinely produces.
+            #
+            # What WAS a defect is the same property in D2 -- 15.8% of mismatches had no numeric
+            # given, because trimming their spares to zero empties the question. That is A43g, and
+            # it is kept. The lift is therefore measured over RECORD-BEARING documents, where it is
+            # +0.0 pp; including D3 it is large and intrinsic.
             q = rng.choice(_D3_STEMS)
         docs.append({"q": q, "withhold": drop if withhold else None, "nomatch": nomatch,
                      "mismatch": (rec_r.get("display") or rec_r.get("name","that quantity")) if mismatch else None,

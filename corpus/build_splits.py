@@ -42,6 +42,11 @@ def _runtime_constants():
     assert out, "no cval symbols found in store_clean.json -- refusing to build a split blind"
     return out
 
+def _rng_target(rng):
+    """Same distribution corpus/generate.py A43i draws from, so eval and train match in shape."""
+    return rng.choices((2, 3, 4, 5), weights=(0.16, 0.27, 0.30, 0.27))[0]
+
+
 VAR=re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
 RESV={"pi","e","sin","cos","tan","ln","log","sqrt","exp"}
 norm=lambda x: re.sub(r"[()\s]","",x)
@@ -120,9 +125,37 @@ def build(name, n_match=40, n_mismatch=40):
             rr = _gen.quantity_range(r, v)
             x  = _gen.sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else _gen.sample_value(rng)
             vals[v] = _gen._num(x) if hasattr(_gen, "_num") else x
+        # A43k. THE SPLIT GETS THE SAME SPARE-GIVEN TREATMENT AS TRAINING.
+        #
+        # A43 added spare givens and equalised the total count across classes in the TRAINING
+        # corpus, and this file did not follow -- so eval questions carried 56.8% spare givens and
+        # 2.14 of them on average against training's 78.8% and 3.75. distribution_gate caught it as
+        # a rise in eval-vs-train separability (REPORT excess +43.3 pp against a 40.5 baseline):
+        # the split had become distinguishable from training by question SHAPE, which is the same
+        # class of defect as the ". Also " literal, one file over.
+        #
+        # Seventh instrument defect in this file and the same root as the other six: it constructs
+        # items independently of the generator instead of through it.
+        _target=_rng_target(rng)
+        for _ in range(12):
+            if len(vals) >= _target: break
+            _o=rng.choice(_gen.recs)
+            if _o["f"]==src["f"]: continue
+            _c=[v for v in dict.fromkeys(VAR.findall(_o["f"].split("=",1)[1]))
+                if v not in RESV and v not in vals and v not in VAR.findall(src["f"])
+                and _gen._const_for(_o, v) is None]
+            if not _c: continue
+            _rr=_gen.quantity_range(_o,_c[0])
+            _x=_gen.sample_in_range(rng,_rr[0],_rr[1],_rr[2]) if _rr else _gen.sample_value(rng)
+            vals[_c[0]]=_gen._num(_x) if hasattr(_gen,"_num") else _x
         svs=sorted({v for v in VAR.findall(src["f"].split("=",1)[1]) if v not in RESV})
         um=" ".join(f"{v}:{src['units'][v]}" for v in svs if v in src.get("units",{}))
-        q=st[i % len(st)].strip()+" "+", ".join(f"{v} = {vals[v]}" for v in vs)+"."
+        # ITERATE vals, NOT vs. `vs` is the source record's own variables, so the A43k spares --
+        # which live in `vals` -- never reached the question and the split's shape was unchanged.
+        # A silent no-op: the code ran, the numbers did not move, and only re-measuring the shape
+        # showed it.
+        _ord=list(vals); rng.shuffle(_ord)
+        q=st[i % len(st)].strip()+" "+", ".join(f"{v} = {vals[v]}" for v in _ord)+"."
         # A38. A REAL RECORD IS ALWAYS fit:high. THE DEVICE HAS EXACTLY TWO SHAPES.
         #
         # src/store/assemble.c emits a real record with " | fit:high" and nothing else, or the

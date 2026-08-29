@@ -14,6 +14,10 @@ Arms:
   fit_ho    same, but the record is held out and never generated -- the judgement, no pairwise route
   fit_m     same as fit, with the question also carrying the asked record's own givens (the shape
             A42 teaches in)
+  d1        THE MISSING CELL, found by the factorial check, not by intuition. The record ANSWERS
+            the question and one needed given is WITHHELD, so the model must refuse on the BINDING
+            alone. `refuse` varies wrong-record AND unbound together and a model can pass it on
+            either; this separates them. It is also the capability A43 is most likely to disturb.
   answer_x  THE MATCHED CONTROL. The record ANSWERS the question and is fully bound, plus one spare
             given. A model judging fit answers these; a model using "spare variable -> refuse"
             refuses them. Without this arm, "refuses more" and "judges fit" are the same
@@ -111,12 +115,12 @@ def score_multi(ck_path, seeds=(1234, 5678, 9012)):
     runs = [score(ck_path, seed=s) for s in seeds]
     out = {"checkpoint": str(ck_path), "corpus_sha": runs[0]["corpus_sha"], "seeds": list(seeds),
            "runs": runs}
-    if runs[0].get("answer_x", {}).get("k") is not None:
-        out["answer_x"] = {
-            "k_mean": sum(r["answer_x"]["k"] for r in runs) / len(runs),
-            "refused_mean": sum(r["answer_x"]["refused"] for r in runs) / len(runs),
-            "n": runs[0]["answer_x"]["n"]}
-    for arm in ("answer", "refuse", "fit", "fit_ho", "fit_m"):
+    for nm in ("answer_x", "answer_0"):
+        if runs[0].get(nm, {}).get("k") is not None:
+            out[nm] = {"k_mean": sum(r[nm]["k"] for r in runs) / len(runs),
+                       "refused_mean": sum(r[nm]["refused"] for r in runs) / len(runs),
+                       "n": runs[0][nm]["n"]}
+    for arm in ("answer", "refuse", "d1", "fit", "fit_ho", "fit_m"):
         if arm not in runs[0]:
             continue
         ks = [r[arm]["k"] for r in runs if r[arm]["k"] is not None]
@@ -158,21 +162,24 @@ def score(ck_path, seed=1234):
                and grade.answer_matches_result(gn) and grade.prov_clean(pr + gn))
     res["answer"] = {"k": ok, "n": len(ans)}
 
-    ax = ROOT / "corpus/split_answer_x.json"
-    if ax.exists():
+    for nm, path in (("answer_x", "corpus/split_answer_x.json"),
+                     ("answer_0", "corpus/split_answer_0.json")):
+        ax = ROOT / path
+        if not ax.exists():
+            res[nm] = {"k": None, "refused": None, "n": 0, "note": "arm absent -- NOT a pass"}
+            continue
         items = json.loads(ax.read_text()); ref = ok2 = 0
         for it in items:
             pr, gn = generate(m, f"<q>{it['q']}</q><r>{it['record']}")
             ref += refusal_strict(pr, gn)
             ok2 += (grade.well_formed(gn) and not grade.is_refusal(gn)
                     and grade.answer_matches_result(gn))
-        res["answer_x"] = {"k": ok2, "refused": ref, "n": len(items)}
-    else:
-        res["answer_x"] = {"k": None, "refused": None, "n": 0, "note": "arm absent -- NOT a pass"}
+        res[nm] = {"k": ok2, "refused": ref, "n": len(items)}
 
     for name, path in (("fit", "corpus/split_fit.json"),
                        ("fit_ho", "corpus/split_fit_ho.json"),
-                       ("fit_m", "corpus/split_fit_m.json")):
+                       ("fit_m", "corpus/split_fit_m.json"),
+                       ("d1", "corpus/split_d1.json")):
         f = ROOT / path
         if not f.exists():
             res[name] = {"k": None, "n": 0, "note": "arm absent -- NOT a pass"}
@@ -220,7 +227,7 @@ if __name__ == "__main__":
     r = score_multi(ROOT / ck if not os.path.isabs(ck) else ck)
     print(f"  checkpoint {r['checkpoint']}   corpus {str(r['corpus_sha'])[:16]}")
     print(f"  seeds {r['seeds']}  -- strict refusal (a tool call is not a refusal)")
-    for arm in ("answer", "refuse", "fit", "fit_ho", "fit_m"):
+    for arm in ("answer", "refuse", "d1", "fit", "fit_ho", "fit_m"):
         if arm not in r:
             print(f"    {arm:8s} ABSENT -- not a pass"); continue
         a = r[arm]
@@ -230,11 +237,15 @@ if __name__ == "__main__":
             line += (f"   |  records {a['k_records_mean']:4.1f}/{a['n_records']}"
                      f" = {100*a['k_records_mean']/a['n_records']:5.1f}%")
         print(line)
-        if arm == "fit_m" and "answer_x" in r:
-            ax = r["answer_x"]
-            print(f"    {'answer_x':8s} REFUSED {ax['refused_mean']:5.1f}/{ax['n']:<4}"
-                  f" = {100*ax['refused_mean']/ax['n']:5.1f}%   answered {ax['k_mean']:5.1f}/{ax['n']}"
-                  f"   <- the control: these SHOULD be answered")
+        if arm == "fit_m":
+            for nm, note in (("answer_0", "no spare given -- computation, free of the cue"),
+                             ("answer_x", "one spare given -- the cue probe")):
+                if nm not in r:
+                    continue
+                ax = r[nm]
+                print(f"    {nm:8s} REFUSED {ax['refused_mean']:5.1f}/{ax['n']:<4}"
+                      f" = {100*ax['refused_mean']/ax['n']:5.1f}%   answered {ax['k_mean']:5.1f}/{ax['n']}"
+                      f"   <- {note}")
         if "symbol" in a:
             sy, wd = a["symbol"], a["worded"]
             print(f"             symbol-named {sy['k_mean']:4.1f}/{sy['n']:<3}"

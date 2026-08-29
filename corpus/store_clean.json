@@ -231,7 +231,10 @@
   },
   "scope": "m58766",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "38fd7e71"
+  "rid": "38fd7e71",
+  "cval": {
+   "E_0": "2.17987e-18"
+  }
  },
  {
   "f": "omega=sqrt(((k)/(m)))",
@@ -1174,7 +1177,11 @@
   },
   "scope": "m58745",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "b19adaa8"
+  "rid": "b19adaa8",
+  "cval": {
+   "q": "1.602e-19",
+   "m": "9.109e-31"
+  }
  },
  {
   "f": "A=((1)/(2))*theta*(r)^(2)",
@@ -1958,7 +1965,11 @@
   },
   "scope": "m58735",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "56f0223d"
+  "rid": "56f0223d",
+  "cval": {
+   "q": "1.602e-19",
+   "n": "8.5e+28"
+  }
  },
  {
   "f": "lambda=((c)/(f))",
@@ -2186,7 +2197,11 @@
   },
   "scope": "m58745",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "ca43e731"
+  "rid": "ca43e731",
+  "cval": {
+   "q": "1.602e-19",
+   "m": "9.109e-31"
+  }
  },
  {
   "f": "Delta_E=h*f",
