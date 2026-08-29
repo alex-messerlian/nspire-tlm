@@ -195,8 +195,8 @@ _KIND = {
     ("K=(n)^(2)*E_1", "n"):                                  "quantum_number",
     ("E=n*h*f", "n"):                                        "quantum_number",
     ("lambda_n=((lambda)/(n))", "n"):                        "refractive_index",
-    ("h_i=(((n_2)/(n_1)))*h_o", "n_1"):                      "refractive_index",
-    ("h_i=(((n_2)/(n_1)))*h_o", "n_2"):                      "refractive_index",
+    ("s_i=(((n_2)/(n_1)))*s_o", "n_1"):                      "refractive_index",
+    ("s_i=(((n_2)/(n_1)))*s_o", "n_2"):                      "refractive_index",
     ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_1"):     "refractive_index",
     ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "n_2"):     "refractive_index",
     ("theta_2=asin(((n_1*sin(theta_1))/(n_2)))", "theta_1"): "angle_quadrant",
@@ -371,7 +371,14 @@ _SCALE = {
   ("y=y_0+v_0*t-((1)/(2))*g*(t)^(2)", "v_0"): (0.5, 300.0, "a launch speed under gravity: a gently tossed ball at 0.5 m/s to a rifle bullet at 300 m/s"),
   ("y=y_0+v_0*t-((1)/(2))*g*(t)^(2)", "y_0"): (0.01, 1000.0, "a launch height: ground level to a 1 km cliff or tower"),
   ("y=y_0+((1)/(2))(v_0y+v_y)t", "v_0y"): (0.01, 300.0, "a vertical velocity component under gravity, up to a rifle-bullet launch"),
-  ("y=y_0+((1)/(2))(v_0y+v_y)t", "v_y"): (0.01, 300.0, "a vertical velocity component under gravity, up to a rifle-bullet launch"),
+  ("y=y_0+((1)/(2))(v_0y+v_y)t", "v_y"):
+                                 (-300.0, 300.0,
+                                  "v_y IS SIGNED. It was declared (0.01, 300) -- strictly positive -- "
+                                  "and a projectile past its apex is falling, so the correct value is "
+                                  "NEGATIVE. gate_given_range refused v_y = -89.6 m/s, which is an "
+                                  "ordinary fall. Third instance of a signed quantity declared "
+                                  "positive, after v=v_0-g*t and v_toty: forbidding the sign is "
+                                  "false physics wearing a range check's name"),
   ("y=y_0+((1)/(2))(v_0y+v_y)t", "y_0"): (0.01, 1000.0, "a launch height: ground level to a 1 km cliff or tower"),
   ("x=v_0x*t", "v_0x"): (0.5, 300.0, "the horizontal launch component of a projectile"),
   ("T_tof=((2(v_0*sin(theta_0)))/(g))", "v_0"): (0.5, 300.0, "a launch speed under gravity: a gently tossed ball at 0.5 m/s to a rifle bullet at 300 m/s"),
@@ -522,7 +529,7 @@ _SCALE = {
   ("f=((d_i*d_o)/(d_o+d_i))", "d_o"): (0.01, 100.0, "an object distance on an optical bench, a centimetre to a hundred metres"),
   ("f=((d_i*d_o)/(d_o+d_i))", "d_i"): (0.01, 100.0, "an image distance on an optical bench, a centimetre to a hundred metres"),
   ("P=((1)/(f))", "f"): (0.005, 2.0, "a focal length: 5 mm for a microscope objective, 0.5 m for reading glasses, 2 m for a telescope objective"),
-  ("h_i=(((n_2)/(n_1)))*h_o", "h_o"): (0.001, 1.0, "an object height at the refracting surface, a millimetre to a metre"),
+  ("s_i=(((n_2)/(n_1)))*s_o", "s_o"): (0.001, 1.0, "an object DEPTH below the flat refracting surface, a millimetre to a metre"),
   ("lambda_n=((lambda)/(n))", "lambda"): (1.0e-9, 1.0e-5, "an optical wavelength in vacuum, matching the window declared for lambda in Delta_y=x*lambda/d"),
 
   # --- A30: three defects run 7 found, one of them a claim I made that was not true ------------
@@ -590,10 +597,29 @@ _PRECONDITION = {
     # (1 GPa / 7800 kg m^-3). Measured before the fix: 37 GPa demanded, an order past any material.
     # THE SIXTH SIBLING, found by gate_coupling_family on its first run -- exactly what the read
     # predicted would still be out there. Same shear argument, same family, different formula string.
-    "a_CM=R*alpha":              (lambda v: v["alpha"] * v["R"]**2 <= 1.3e5,
-                                  "shear limits alpha*R^2: past 1.3e5 the body exceeds steel's yield stress"),
-    "a_t=r*alpha":               (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,
-                                  "shear limits alpha*r^2: past 1.3e5 the rotor exceeds steel's yield stress"),
+    # A36. RE-DERIVED ON THE QUANTITY THAT BINDS, after the n=600 read found BOTH of these records
+    # still emitting impossible documents THROUGH the bound that was supposed to stop them. The
+    # shear form alpha*r^2 <= 1.3e5 admitted alpha=865, r=8.06 -> 56,190, comfortably inside, while
+    # that body gains 6,972 m/s of rim speed every second and bursts in about 50 ms.
+    #
+    # I bounded the quantity nearest to hand rather than the quantity that binds, and then recorded
+    # it as closed -- which is this file's own "closed gets skipped" hazard, committed by the person
+    # who wrote the rule. What binds is the TANGENTIAL ACCELERATION ITSELF: a_t = r*alpha is what a
+    # surface must transmit, and it is limited by traction, not by bulk shear.
+    #
+    # mu_s <= ~1.5 for the best dry rubber-on-clean-steel; a rolling body cannot be driven past
+    # a_t = mu_s * g ~ 15 m/s^2 without slipping, and machine spin-up rigs reach ~10^3 m/s^2 only
+    # with positive engagement. 2e3 m/s^2 is generous for both and still excludes the absurd.
+    "a_CM=R*alpha":              (lambda v: v["R"] * v["alpha"] <= 2.0e3,
+                                  "R*alpha IS the tangential acceleration a surface must transmit: past ~2e3 m/s^2 no traction or coupling holds"),
+    "a_t=r*alpha":               (lambda v: v["r"] * v["alpha"] <= 2.0e3,
+                                  "r*alpha IS the tangential acceleration: past ~2e3 m/s^2 the rim outruns any drive that could impose it"),
+    # A36b. THE PROJECTILE-TIME SIBLING, seventh instance of the coupling family. `v=a*t` was given
+    # a*t <= 1.2e4 and this record -- the same product, one family over -- got nothing, so t ran to
+    # 9,533 s and the implied launch speed reached four times escape velocity. A horizontal throw
+    # is over in seconds.
+    "x=v_0x*t":                  (lambda v: v["t"] <= 60.0 and v["v_0x"] * v["t"] <= 1.2e4,
+                                  "a horizontal throw lasts seconds, and v_0x*t is the distance covered"),
     # The `a` window's OWN justification names transients -- "a 30 g crash deceleration" lasts
     # milliseconds -- and no t window existed, so 24 g was paired with 1455 s to reach 345 km/s.
     # The sibling `v=v_0-g*t` already bounds its duration; this one did not.
@@ -678,9 +704,6 @@ _PRECONDITION = {
     "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)":
                                  (lambda v: v["t"] <= (v["v_0"] + math.sqrt(v["v_0"] ** 2 + 2 * 9.81 * v["y_0"])) / 9.81,
                                   "the sample time must lie inside the flight: after it lands the formula describes nothing"),
-    "y=y_0+((1)/(2))(v_0y+v_y)t":
-                                 (lambda v: 0.1 <= abs(v["v_y"] - v["v_0y"]) / v["t"] <= 100.0,
-                                  "v_0y, v_y and t over-determine the acceleration (v_y-v_0y)/t, which must be a real one"),
     "rho=((m)/(V))":             (lambda v: 1e-3 <= v["m"] / v["V"] <= 2.26e4,
                                   "one object's mass and volume are tied by its density: a rough vacuum to osmium"),
     "v=f*lambda":                (lambda v: 0.1 <= v["f"] * v["lambda"] <= 2.0e4,
@@ -868,7 +891,39 @@ def _derive_pendulum_T(vals, rng):
     vals["T"] = float(f"{2*math.pi*math.sqrt(L/g_site)*(1+eps):.4g}")
     return vals
 
+def _derive_projectile_vy(vals, rng):
+    """v_y IS NOT FREE. y = y_0 + (v_0y+v_y)t/2 in the projectile module over-determines the
+    acceleration, and that acceleration is GRAVITY -- so v_y = v_0y - g*t exactly.
+
+    This started as a precondition, 8.5 <= |v_y-v_0y|/t <= 11.0, and the firing measurement killed
+    it: 98.12% fired and 58.77% of documents were DROPPED after 24 retries, because three
+    independent draws almost never land on g. A window that rejects most of its own draws distorts
+    the record's distribution and nearly removes it from the corpus -- the failure the file already
+    records for windows so narrow they collapse a variable.
+
+    A precondition is the wrong instrument for an EXACT coupling. Derive it and nothing is dropped.
+    The small spread is measurement scatter, not free choice: a real reading of v_y carries error."""
+    # t AWAY FROM THE DEGENERATE END. At t = 0.006 s the 4-significant-figure rounding of v_y
+    # dominates the difference -- v_0y = 182.9 against v_y = 182.8 implies 16.7 m/s^2 -- so 0.10%
+    # of draws left the gravity band through arithmetic rather than physics. Nobody samples a
+    # projectile over six milliseconds; 0.05 s is still a fast shutter.
+    if vals["t"] < 0.05:
+        vals["t"] = float(f"{rng.uniform(0.05, 2.0):.3g}")
+    g = rng.uniform(9.6, 10.0)
+    # AND t IS CLAMPED SO v_y STAYS INSIDE ITS DECLARED WINDOW. The first version ignored that
+    # window and produced v_y = -192.7 m/s, which gate_given_range refused -- correctly: nothing
+    # falls at 193 m/s in air, terminal velocity is what stops it. A derivation may not quietly
+    # override a declared range; if it needs values outside one, the range is the thing to argue
+    # with.
+    _vmax = 150.0
+    _tmax = max(0.05, (abs(vals["v_0y"]) + _vmax) / g)
+    if vals["t"] > _tmax:
+        vals["t"] = float(f"{rng.uniform(0.05, _tmax):.3g}")
+    vals["v_y"] = float(f"{vals['v_0y'] - g * vals['t']:.6g}")
+    return vals
+
 _DERIVE = {
+    "y=y_0+((1)/(2))(v_0y+v_y)t": _derive_projectile_vy,
     "n=((K/E_1))^(1/2)": _derive_quantum_K,
     "g=((4*(pi)^(2)*L)/((T)^(2)))": _derive_pendulum_T,
     # A32. Four more, each one a coupling a rejection sampler cannot reach: the survivor fraction
@@ -1189,7 +1244,7 @@ _RESULT_KIND = {
     'f_beat=|f_2-f_1|':                                        None,
     'f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))':           "positive_frequency",
     'g=((4*(pi)^(2)*L)/((T)^(2)))':                            "g_local",
-    'h_i=(((n_2)/(n_1)))*h_o':                                 None,
+    's_i=(((n_2)/(n_1)))*s_o':                                 None,
     'k=((F)/(x))':                                             None,
     'lambda=((c)/(f))':                                        None,
     'lambda=((h)/(m*v))':                                      None,

@@ -23,7 +23,7 @@
  },
  {
   "f": "F=-k*x",
-  "name": "Hooke’s law",
+  "name": "Hooke\u2019s law",
   "units": {
    "F": "N",
    "k": "N/m",
@@ -64,7 +64,7 @@
  },
  {
   "f": "I_0=((V_0)/(Z))",
-  "name": "AC version of Ohm’s law",
+  "name": "AC version of Ohm\u2019s law",
   "units": {
    "I_0": "A",
    "V_0": "V",
@@ -124,7 +124,7 @@
  },
  {
   "f": "E=m*(c)^(2)",
-  "name": "energy–mass conversion",
+  "name": "energy\u2013mass conversion",
   "units": {
    "E": "J",
    "c": "m/s",
@@ -229,7 +229,7 @@
  },
  {
   "f": "E_n=-E_0*((1)/((n)^(2)))",
-  "name": "Electron’s energy inthe nth orbit",
+  "name": "Electron\u2019s energy inthe nth orbit",
   "units": {
    "E_n": "J",
    "E_0": "J",
@@ -447,7 +447,7 @@
  },
  {
   "f": "lambda=((h*c)/(E))",
-  "name": "Calculating the Energy and Wavelength of Electron Transitions in a One–electron (Bohr) System",
+  "name": "Calculating the Energy and Wavelength of Electron Transitions in a One\u2013electron (Bohr) System",
   "units": {
    "lambda": "m",
    "E": "J",
@@ -500,7 +500,7 @@
  },
  {
   "f": "F_net=m*a",
-  "name": "Newton’s second law, scalar form",
+  "name": "Newton\u2019s second law, scalar form",
   "units": {
    "F_net": "N",
    "a": "m/s^2",
@@ -873,7 +873,7 @@
  },
  {
   "f": "n_1*sin(theta_1)=n_2*sin(theta_2)",
-  "name": "Law of refraction (Snell’s law)",
+  "name": "Law of refraction (Snell\u2019s law)",
   "units": {
    "n_1*sin(theta_1)": "1",
    "n_1": "1",
@@ -1154,7 +1154,7 @@
  },
  {
   "f": "F=((Delta_p)/(Delta_t))",
-  "name": "Calculating Force: Venus Williams’ Tennis Serve",
+  "name": "Calculating Force: Venus Williams\u2019 Tennis Serve",
   "units": {
    "F": "N",
    "Delta_p": "kg*m/s",
@@ -1218,15 +1218,16 @@
   "source": "worked-example"
  },
  {
-  "f": "h_i=(((n_2)/(n_1)))*h_o",
-  "name": "Apparent depth equation",
+  "f": "s_i=(((n_2)/(n_1)))*s_o",
+  "name": "apparent depth of an object seen through a flat refracting surface",
   "units": {
-   "h_i": "m",
-   "h_o": "m",
+   "s_i": "m",
+   "s_o": "m",
    "n_1": "1",
    "n_2": "1"
   },
-  "scope": "m58534"
+  "scope": "m58534",
+  "req": "flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT."
  },
  {
   "f": "f=((1)/(T))",
@@ -1272,7 +1273,7 @@
  },
  {
   "f": "p_f=((h)/(lambda))",
-  "name": "Magnitude of photon’s momentum",
+  "name": "Magnitude of photon\u2019s momentum",
   "units": {
    "p_f": "kg*m/s",
    "h": "J*s",
@@ -1367,7 +1368,7 @@
  },
  {
   "f": "T=((2*pi*m)/(q*B))",
-  "name": "Period of a particle’s motion in a magnetic field",
+  "name": "Period of a particle\u2019s motion in a magnetic field",
   "units": {
    "T": "s",
    "B": "T",
@@ -1484,7 +1485,7 @@
  },
  {
   "f": "F_net=((Delta_p)/(Delta_t))",
-  "name": "Calculating Force: Venus Williams’ Racquet",
+  "name": "Calculating Force: Venus Williams\u2019 Racquet",
   "units": {
    "F_net": "N",
    "Delta_p": "kg*m/s",
@@ -1549,7 +1550,7 @@
  },
  {
   "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)",
-  "name": "Displacement with constant acceleration",
+  "name": "position under constant acceleration",
   "units": {
    "d": "m",
    "a": "m/s^2",
@@ -1557,7 +1558,8 @@
    "t": "s",
    "v_0": "m/s"
   },
-  "scope": "m54116"
+  "scope": "m54116",
+  "req": "constant acceleration; d is a POSITION measured from the same origin as d_0, not a displacement"
  },
  {
   "f": "I_rms=V_rms/Z",
@@ -1572,7 +1574,7 @@
  },
  {
   "f": "Delta_p=F_net*Delta_t",
-  "name": "impulse–momentum theorem",
+  "name": "impulse\u2013momentum theorem",
   "units": {
    "Delta_p": "kg*m/s",
    "Delta_t": "s",
@@ -1614,7 +1616,7 @@
  },
  {
   "f": "r=2*s*theta",
-  "name": "Graficar una ecuación polar al convertirla en una ecuación rectangular",
+  "name": "Graficar una ecuaci\u00f3n polar al convertirla en una ecuaci\u00f3n rectangular",
   "units": {
    "r": "m",
    "s": "m",
@@ -1678,7 +1680,7 @@
  },
  {
   "f": "I_1=I_2+I_3",
-  "name": "Calculating Current: Using Kirchhoff’s Rules",
+  "name": "Calculating Current: Using Kirchhoff\u2019s Rules",
   "units": {
    "I_1": "A",
    "I_2": "A",
@@ -1833,7 +1835,7 @@
  },
  {
   "f": "V=I*R",
-  "name": "Common expression of Ohm’s law",
+  "name": "Common expression of Ohm\u2019s law",
   "units": {
    "V": "V",
    "I": "A",

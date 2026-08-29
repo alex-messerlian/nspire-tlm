@@ -1034,18 +1034,18 @@
   "rid": "cb854c8b"
  },
  {
-  "f": "h_i=(((n_2)/(n_1)))*h_o",
-  "name": "image height from object height and refractive indices",
+  "f": "s_i=(((n_2)/(n_1)))*s_o",
+  "name": "apparent depth of an object seen through a flat refracting surface",
   "units": {
-   "h_i": "m",
-   "h_o": "m",
+   "s_i": "m",
+   "s_o": "m",
    "n_1": "1",
    "n_2": "1"
   },
   "scope": "m58534",
   "verified": "gates-passed-hand-coverage-unproven",
   "rid": "10224ce2",
-  "req": "flat refracting surface; h_i and h_o are heights, not depths"
+  "req": "flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT."
  },
  {
   "f": "f=((1)/(T))",
@@ -1348,7 +1348,7 @@
  },
  {
   "f": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)",
-  "name": "Displacement with constant acceleration",
+  "name": "position under constant acceleration",
   "units": {
    "d": "m",
    "a": "m/s^2",
@@ -1358,7 +1358,8 @@
   },
   "scope": "m54116",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "b10d34bd"
+  "rid": "b10d34bd",
+  "req": "constant acceleration; d is a POSITION measured from the same origin as d_0, not a displacement"
  },
  {
   "f": "I_rms=V_rms/Z",

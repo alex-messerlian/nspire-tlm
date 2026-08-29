@@ -76,6 +76,38 @@ EXEMPT = {
 
 TWO_FACTOR = re.compile(r"^\(*([A-Za-z][A-Za-z0-9_]*)\)*\s*([*/])\s*\(*([A-Za-z][A-Za-z0-9_]*)\)*$")
 
+# THE GATE DID NOT SPAN ITS OWN CLASS, WHICH IS WORSE THAN NOT EXISTING because it reads as
+# coverage. `v=a*t` was bounded and `x=v_0x*t` -- the same product, a speed times the same time --
+# was not, so t ran to 9,533 s and the implied launch speed reached four times escape velocity.
+# Seventh instance of the coupling family, found by reading, not by this gate.
+#
+# The cause: EXEMPT is keyed by formula string, so exempting `x=v_0x*t` as "a displacement" also
+# silenced the sibling question. A record may be exempt from needing a PRODUCT bound and still need
+# a bound on a FACTOR -- an unbounded duration is not made acceptable by the product being
+# unbounded too. Records whose factors include a time are therefore checked for a time bound as
+# well, and the exemption above does not reach that.
+# TIMELIKE BY DECLARED UNIT, NOT BY NAME. A name-based set called `tau` timelike, and in
+# P=tau*omega tau is TORQUE -- the gate then demanded a duration bound on a rotational power
+# record. `T` is worse: a period in one record and a temperature in another. The store already
+# declares the unit; asking it is the declaration, and guessing from the symbol is the proxy.
+def _is_timelike(rec, v):
+    return ((rec.get("units") or {}).get(v, "") or "").strip() == "s"
+# Time-factor products whose product is genuinely unbounded, each with the reason.
+EXEMPT_TIME = {
+    "E=P*t":                 "energy delivered over a time is unbounded",
+    "P=((W)/(t))":           "power is work over time; the quotient is not a product to bound",
+    "Delta_p=F_net*Delta_t": "impulse is unbounded",
+    "F_net=((Delta_p)/(Delta_t))": "a quotient, not a product",
+    "a=((Delta_v)/(Delta_t))": "a quotient",
+    "omega=((theta)/(t))":   "a quotient of two declared windows",
+    "omega=((Delta_theta)/(Delta_t))": "a quotient",
+    "alpha=((Delta_omega)/(Delta_t))": "a quotient",
+    "v=d/t":                 "a quotient, and result-bounded by sub_light",
+    "tau=R*C":               "an RC time constant: tau IS the time, not a factor multiplying one",
+    "Delta_S=((Q)/(T))":     "T here is a temperature, not a duration",
+    "T=((1)/(f))":           "T is the computed period, not an input duration",
+}
+
 
 def main():
     spec = importlib.util.spec_from_file_location("gen", ROOT / "corpus/generate.py")
@@ -94,6 +126,22 @@ def main():
         if not TWO_FACTOR.match(rhs.replace(" ", "")):
             continue
         candidates.append(f)
+        # A TIME FACTOR NEEDS A PRECONDITION, not merely a window.
+        #
+        # My first version asked "does the time variable have a declared range?" and the control
+        # SURVIVED: `t` gets one from the unit rule, (1e-9, 1e6) seconds -- eleven days -- so the
+        # answer was yes and the gate passed the exact defect it was written for. That is a proxy
+        # predicate for the second time in one fix, and the control is what caught it, not the
+        # knowledge that the class exists.
+        #
+        # The property is not "is the duration declared" but "can anything bound the PRODUCT", and
+        # a generic duration window never can: any width times any speed is any distance. So a
+        # two-factor product with a time on one side must carry a PRECONDITION, or be exempted here
+        # with a reason.
+        if (any(_is_timelike(r, v) for v in free)
+                and f not in m._PRECONDITION and f not in EXEMPT_TIME):
+            missing.append((f, free))
+            continue
         if f in EXEMPT:
             continue
         if f in m._PRECONDITION:
