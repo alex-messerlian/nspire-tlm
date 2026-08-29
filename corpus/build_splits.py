@@ -154,8 +154,38 @@ def build(name, n_match=40, n_mismatch=40):
         # which live in `vals` -- never reached the question and the split's shape was unchanged.
         # A silent no-op: the code ran, the numbers did not move, and only re-measuring the shape
         # showed it.
+        # A44. THE QUESTION MUST ASK FOR THE RECORD'S QUANTITY.
+        #
+        # This paired a SHUFFLED OpenStax sentence with a record by `i % len(st)` and appended the
+        # record's values, so the question and the record were unrelated BY CONSTRUCTION:
+        #
+        #   Q "What is the cost savings for using the LED in place of the incandescent bulb..."
+        #   R v_CM=r*omega | omega:1/s r:m | missing:none | ... | fit:high     expect: ANSWER
+        #
+        # Retrain 2 refuses 94.6% of those, which is CORRECT, and the arm scored it as failure --
+        # so the model that improved scored worse. The SELECT answer metric has never measured
+        # record-reading; every number it produced (58.8%, 47.5%, 20.0%, 3.6%) is on this shape.
+        #
+        # A6 one level up: mining question surfaces and substituting blind. The fix is the one the
+        # generator and tools/eval/{fit_judgement,answer_control,d1_arm}.py already use -- ask for
+        # the record's own quantity through the reviewed frames. It also makes the split's question
+        # surface match training, which the OpenStax stems never did.
+        #
+        # Eighth instrument defect in this file, and the same root as the other seven: it built
+        # items independently of the generator instead of through it.
+        # AN `expect: answer` ITEM MUST BE FULLY BOUND. Three of 37 in each split carried
+        # `missing:<var>` and were still labelled answerable -- the model refusing them is right,
+        # and the arm scored it wrong. Fill anything the device would call missing.
+        if matched:
+            for _v in dict.fromkeys(VAR.findall(src["f"].split("=", 1)[1])):
+                if _v in RESV or _v in vals or _gen._const_for(src, _v) is not None:
+                    continue
+                _rr = _gen.quantity_range(src, _v)
+                _x = _gen.sample_in_range(rng, _rr[0], _rr[1], _rr[2]) if _rr else _gen.sample_value(rng)
+                vals[_v] = _gen._num(_x) if hasattr(_gen, "_num") else _x
         _ord=list(vals); rng.shuffle(_ord)
-        q=st[i % len(st)].strip()+" "+", ".join(f"{v} = {vals[v]}" for v in _ord)+"."
+        _ask=_gen.ask_for(src, _gen.quantity_surface(src, rng), rng)
+        q=_gen.compose_question(_ask, ", ".join(f"{v} = {vals[v]}" for v in _ord), rng)
         # A38. A REAL RECORD IS ALWAYS fit:high. THE DEVICE HAS EXACTLY TWO SHAPES.
         #
         # src/store/assemble.c emits a real record with " | fit:high" and nothing else, or the
@@ -206,6 +236,9 @@ assert not ({x["q"] for x in S} & dev) and not ({x["q"] for x in R} & dev), "ove
 assert not (set(STEM["SELECT"]) & set(STEM["REPORT"])), "stem slices overlap"
 for x in S+R:
     assert "fit:" in x["record"] and "missing:" in x["record"], "split item out of distribution"
+    # AN ANSWERABLE ITEM THAT IS NOT FULLY BOUND IS A REFUSAL ITEM WEARING THE WRONG LABEL.
+    assert not (x["expect"] == "answer" and " missing:none " not in x["record"]), (
+        f'{x["id"]} expects an answer but the record is missing a variable: {x["record"][:70]}')
 _wj("corpus/split_select.json", S, indent=1)
 _wj("corpus/split_report.json", R, indent=1)
 h=lambda xs: hashlib.sha1(json.dumps([x["q"] for x in xs]).encode()).hexdigest()[:8]
