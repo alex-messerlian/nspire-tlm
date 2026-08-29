@@ -23,6 +23,12 @@ is grammatical -- "What are object?" and "How long is in frequency?" both pass h
 real output. Template grammar is a separate, larger defect measured by hand-reading; see
 docs/CORPUS_PLAN.md. Narrowing the claim to the quantity word is what makes this one precise.
 """
+# D3 DOCUMENTS ARE EXEMPT, AND THE EXEMPTION IS THE POINT OF THE CLASS. A D3 question is a real
+# mined OpenStax stem drawn from corpus/d3_stems.json -- it is SUPPOSED to look like arbitrary
+# prose, because the model has to refuse questions it was never built a frame for. Scanning them
+# for "mined sentence fragment" shape flags the feature as the defect. The frames this gate exists
+# to police are the generated ASK frames, which only appear on answerable documents.
+
 import importlib.util, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -48,6 +54,12 @@ def audit(m, n=N, seed=11):
     out = m.gen(n, seed=seed)
     docs = out[0] if isinstance(out, tuple) else out
     text = lambda d: d["text"] if isinstance(d, dict) else d
+    # D3 IS EXEMPT, AND THE EXEMPTION IS THE POINT OF THE CLASS. A D3 question is a real mined
+    # OpenStax stem from corpus/d3_stems.json -- it is SUPPOSED to read as arbitrary prose, because
+    # the model has to refuse questions no frame was ever built for. Scanning them for
+    # "mined sentence fragment" shape flags the feature as the defect: this gate polices the
+    # GENERATED ASK frames, which only appear on answerable documents.
+    docs = [d for d in docs if "no matching relation" not in text(d)]
     qs = [mm.group(1) for mm in (re.search(r"<q>(.*?)</q>", text(d)) for d in docs) if mm]
     if not qs:
         # ABSENCE IS A FAILURE, NOT A SKIP: a generator emitting no <q> span would otherwise

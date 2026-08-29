@@ -1622,6 +1622,14 @@ print(f"declaration coverage  GIVEN-side {_gvd}/{len(_gv)} ({100*_gvd/len(_gv):.
 #
 # Making it IMPOSSIBLE rather than discouraged: every target is a name, and this assertion refuses
 # to import a table where any Greek glyph maps onto a single letter at all.
+# The certified out-of-scope pool D3 questions are drawn from. Built by
+# tools/eval/build_d3_pool.py and re-checked per document by gate_d3_legitimacy.py.
+_D3_PATH = pathlib.Path(__file__).resolve().parent / "d3_stems.json"
+_D3_STEMS = json.load(open(_D3_PATH))["stems"] if _D3_PATH.exists() else []
+assert _D3_STEMS, ("corpus/d3_stems.json is missing or empty. D3 questions MUST come from outside "
+                   "the store: a D3 built from a record's own question declines something the store "
+                   "answers, which is what made 843 of 843 of them wrong supervision. Run "
+                   "tools/eval/build_d3_pool.py.")
 _SYMMAP_PATH = pathlib.Path(__file__).resolve().parent / "symbol_map.json"
 _SYMBOL_MAP = json.load(open(_SYMMAP_PATH))["map"] if _SYMMAP_PATH.exists() else {}
 _GREEK = [(k, v) for k, v in _SYMBOL_MAP.items() if "\u0370" <= k <= "\u03ff"]
@@ -1836,10 +1844,19 @@ def gen(n, seed=0):
         # can answer." 843 documents were doing exactly that, and D2's fit-label defect is the same
         # shape one level up -- teaching a prompt state the runtime cannot produce.
         #
-        # A real D3 needs questions drawn from OUTSIDE the store. The six hand-written items prove
-        # that is possible and that it is hand-authored work; until such a source exists, generating
-        # D3 is worse than omitting it. gate_d3_legitimacy.py fails if any is emitted.
-        nomatch  = False
+        # A35b. D3 IS BACK, FROM A CERTIFIED OUT-OF-SCOPE POOL -- because removing it opened a
+        # worse hole than it closed. src/store/assemble.c:109 emits
+        # "none | missing:none | no matching relation | fit:low" whenever the picker finds nothing,
+        # so the RUNTIME produces that shape and a corpus without it hands the model a token shape
+        # in a slot it has never seen. That is the <res> failure, and it would have shipped: the
+        # trainer's own pre-run checklist (`any("fit:low" in d)`) would have aborted first, which is
+        # the only reason it was caught.
+        #
+        # The pool is 42,861 OpenStax stems certified by the SAME criterion that condemned the old
+        # documents -- no store record computes what they ask from what they supply -- with eval
+        # stems excluded so training cannot contaminate clean_surface.json. 220 of 43,081 were
+        # rejected. gate_d3_legitimacy re-checks every emitted document.
+        nomatch  = 0.15 <= roll < 0.18
         if withhold:
             # A12. WITHHOLD A FREE VARIABLE, NEVER A CONSTANT. `rng.choice(vs)` could pick g, c, h
             # or G -- values the device ALWAYS inlines (A7) -- so 111 of 11,975 documents refused
@@ -1926,6 +1943,11 @@ def gen(n, seed=0):
             # the cue rather than the judgement. Same shape as the topic-scoping artefact: a number
             # that looks like a capability and is a property of the format.
             umap = units_field(rec_r)
+        # A D3's QUESTION MUST COME FROM OUTSIDE THE STORE. `q` above was built FROM a record, so
+        # using it here is precisely the defect the criterion measured at 100.0%: a refusal that
+        # declines a question the store demonstrably answers.
+        if nomatch:
+            q = rng.choice(_D3_STEMS)
         docs.append({"q": q, "withhold": drop if withhold else None, "nomatch": nomatch,
                      "mismatch": (rec_r.get("display") or rec_r.get("name","that quantity")) if mismatch else None,
                      # A9. THE CONDITION FIELD MUST MATCH THE SHIPPED ASSEMBLER, and it did not

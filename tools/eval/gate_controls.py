@@ -68,7 +68,14 @@ CONTROLS = {
     "decl_siblings":   ("corpus/generate.py",
                         '("F_net=m*a", "a"):', '("F_net=m*a", "a"): (7.0, 9.0, "x"),  #'),
     # D3: put back a document that declines an answerable question.
-    "d3_legitimacy":   ("corpus/generate.py", "        nomatch  = False", "        nomatch  = 0.15 <= roll < 0.18"),
+    # Break the OUT-OF-SCOPE DRAW, not the D3 rate. The old control mutated `nomatch = False` into
+    # the enabled form; once D3 was legitimately restored that string became the correct state and
+    # the control read as a live mutation in the tree. The invariant is not "D3 is off" -- it is
+    # "a D3 question comes from outside the store", so the mutation makes it use the record-derived
+    # question again, which is the exact defect the criterion measured at 100.0%.
+    "d3_legitimacy":   ("corpus/generate.py",
+                        "            q = rng.choice(_D3_STEMS)",
+                        "            pass  # use the record-derived question"),
     "coupling_family": ("corpus/generate.py",
                         '"a_t=r*alpha":               (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,',
                         '"a_t=r*alpha_DISABLED":      (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,'),
