@@ -20,36 +20,67 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "corpus"))
 from recfmt import fields, MISSING
 
-CUE_CEILING = 99.85      # measured 99.80; a rise means fit-judgement documents are vanishing
-PURE_FIT_FLOOR = 0.30    # % of documents that require reading the record; measured 0.05
+# EVERY SURFACE CUE, NOT ONE HAND-NAMED ONE. The first version measured `missing != none` alone and
+# reported 95.77% while the ACTUAL separability was 99.95%, because two more cues existed: the
+# literal ". Also " that A42 itself introduced (100% precision, 109 documents) and the `none` record
+# span of D3. A gate named for a property that checks one instance of it is this repo's
+# gate_format_parity failure, and this is its second occurrence.
+#
+# So the gate now (a) unions the known cues, and (b) SEARCHES for unknown ones: any question n-gram
+# with high in-class frequency and zero occurrences outside is a cue nobody named yet. That second
+# half is what would have caught ". Also " on the day it was written.
+# THE UNION ACCURACY AND THE RESIDUAL ARE THE SAME NUMBER. Once the cue is right on everything
+# except the fully-bound class, accuracy is exactly 100 - residual, so ratcheting both is ratcheting
+# one twice and the second reads as independent evidence. Only the residual is ratcheted; accuracy
+# is printed because it is the sentence a reader wants ("99% of refusals need no read").
+PURE_FIT_FLOOR = 1.00    # % of documents that REQUIRE reading the record. Pre-registered dose.
+NGRAM_MIN = 8            # an n-gram this frequent in-class and absent outside is a cue
 
 
 def main():
     p = ROOT / "corpus/synth_sample.jsonl"
     if not p.exists():
         print("CANNOT CHECK: corpus/synth_sample.jsonl absent -- not a pass"); return 2
+    import collections, re
     n = right = pure = d2 = 0
+    inside, outside = collections.Counter(), collections.Counter()
+
+    def grams(q, k=3):
+        w = re.findall(r"[A-Za-z]+", q.lower())
+        return {" ".join(w[i:i + k]) for i in range(len(w) - k + 1)}
+
     for line in p.open():
         o = json.loads(line)
         rec = o["text"].split("<r>", 1)[1].split("<", 1)[0]
+        q = o["text"].split("<q>")[1].split("</q>")[0]
         f = fields(rec)
         miss = next((x for x in f if x.startswith("missing:")), "missing:none")
         refuses = "<tool>" not in o["text"]
-        cue = miss != "missing:none"
+        # THE UNION of every cue that lets a refusal be decided without reading the record.
+        cue = (miss != "missing:none") or rec.startswith("none")
         n += 1
         right += (cue == refuses)
+        is_pure = o.get("kind") == "D2" and miss == "missing:none"
         if o.get("kind") == "D2":
             d2 += 1
-            if not cue:
-                pure += 1              # a wrong record that is fully bound: reading it is required
+        if is_pure:
+            pure += 1
+            inside.update(grams(q))
+        else:
+            outside.update(grams(q))
     acc = 100.0 * right / n
+    leaks = sorted(((g, c) for g, c in inside.items() if c >= NGRAM_MIN and outside[g] == 0),
+                   key=lambda x: -x[1])
     pf = 100.0 * pure / n
     print(f"  documents {n:,}   D2 {d2:,}")
     print(f"  'refuse <=> missing != none' classifies {acc:.2f}% of the corpus")
     print(f"  documents that REQUIRE reading the record: {pure} ({pf:.2f}%)")
+    print(f"  question n-grams >= {NGRAM_MIN} in the class and ZERO outside: {len(leaks)}")
+    for g, c in leaks[:5]:
+        print(f"    LEAK {g!r} in-class {c}, outside 0")
     bad = []
-    if acc > CUE_CEILING:
-        bad.append(f"cue accuracy {acc:.2f}% exceeds the {CUE_CEILING}% ratchet")
+    if leaks:
+        bad.append(f"{len(leaks)} surface cue(s) separate the class without reading the record")
     if pf < PURE_FIT_FLOOR:
         bad.append(f"only {pf:.2f}% of documents require reading the record, below {PURE_FIT_FLOOR}%")
     for b in bad:

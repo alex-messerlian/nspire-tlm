@@ -1915,6 +1915,27 @@ CLOSE_Q   = CLOSE_ANY + ["{Q} is {a}. {why}"]
 WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}.",
        "This follows from {f}.", "{f} gives it."]
 
+
+# A42c. QUESTION COMPOSITION IS SHARED, BECAUSE THE EVAL ARM MUST NOT HAVE ITS OWN SURFACE.
+#
+# tools/eval/fit_judgement.py built its questions as `ask + " " + "v = 1, w = 2."` -- bare givens,
+# no GIVE frame. Not one of the 16 GIVE frames is bare, so a question beginning `VAR = ` occurs in
+# 0 of 9,994 training documents and in 120 of 120 arm items. The arm was off-distribution in its
+# QUESTION SURFACE while measuring whether the model reads the RECORD, so part of a low score would
+# have been surface novelty and nothing would have separated the two.
+#
+# Third time this session that the fix was "call the generator's own path": _device_missing_mod for
+# the missing field, quantity_surface/ask_for for the asked quantity, and now the composition.
+def compose_question(ask, g, rng):
+    """ask + givens, in the two orderings the corpus uses, with the corpus's own frames."""
+    stem = rng.choice(GIVE).format(g=g)
+    # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
+    # real problems, and ordering moves 4-gram diversity more than the verb does.
+    if rng.random() < 0.35:
+        return ask.rstrip(".?") + ("?" if ask.rstrip().endswith("?") else ".") + " " + \
+            stem.strip().rstrip(",").rstrip(".") + "."
+    return stem + (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask)
+
 def gen(n, seed=0):
     rng = random.Random(seed)
     docs, calls = [], []
@@ -2039,15 +2060,8 @@ def gen(n, seed=0):
             drop = rng.choice(free) if free else rng.choice(vs)
             shown_w = [v for v in shown if v != drop]
             g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown_w) if shown_w else g
-        stem = rng.choice(GIVE).format(g=g)
-        ask  = ask_for(r, quantity_surface(r, rng), rng)
-        # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
-        # real problems, and ordering moves 4-gram diversity more than the verb does.
-        if rng.random() < 0.35:
-            q = ask.rstrip(".?") + ("?" if ask.rstrip().endswith("?") else ".") + " " + \
-                stem.strip().rstrip(",").rstrip(".") + "."
-        else:
-            q = stem + (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask)
+        ask = ask_for(r, quantity_surface(r, rng), rng)
+        q = compose_question(ask, g, rng)
         umap = units_field(r)
         # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
         # becomes a token lookup, the same move as fit for D2 and the tool call for arithmetic.
@@ -2105,7 +2119,12 @@ def gen(n, seed=0):
             # where a refusal class was separable without reading. The difference is that here the
             # field is CORRECT -- the device really does emit missing:none when everything is bound.
             # The defect is not the field, it is that the corpus never exercises the case.
-            if rng.random() < 0.20:
+            # RATE SET FROM A MEASUREMENT, NOT A GUESS. At 0.20 the class landed at 0.85% of
+            # documents because the rebuild only fires when the wrong record has a variable the
+            # question does not already supply. 0.27 delivers the ~1.1-1.2% the pre-registration
+            # fixes as the dose under test. gate_refusal_cue ratchets the delivered fraction, so
+            # this constant cannot drift without failing.
+            if rng.random() < 0.27:
                 _extra = {}
                 for _v in dict.fromkeys(VAR.findall(rec_r["f"].split("=", 1)[1])):
                     if _v in ("pi", "e") or _v == rec_r["f"].split("=", 1)[0].strip():
@@ -2116,9 +2135,33 @@ def gen(n, seed=0):
                     _extra[_v] = _num(sample_in_range(rng, _rr[0], _rr[1], _rr[2]) if _rr
                                       else sample_value(rng))
                 if _extra:
-                    _add = ", ".join(f"{k} = {v}" for k, v in _extra.items())
-                    g = f"{g}, {_add}"
-                    q = q.rstrip(".") + f". Also {_add}."
+                    # A42b. REBUILD THE QUESTION, DO NOT APPEND TO IT.
+                    #
+                    # The first version appended ". Also {extra}." and that string appeared in
+                    # 109 of 114 A42 documents and **0 of the other 9,880** -- a 100%-PRECISION
+                    # SURFACE CUE for the exact class whose whole purpose is to make refusal
+                    # require reading the record. The model would have learned ". Also " -> refuse,
+                    # which is A8/A11/A41 for the fourth time, in the fix written to end them.
+                    #
+                    # Worse, the eval arm carries the cue in 0 of 120 items, so a model that
+                    # learned it perfectly would still score ~0 there and I would have read that
+                    # as "A42 did not teach the judgement". Train and eval must not differ in the
+                    # surface of the very class under test.
+                    #
+                    # TENTH instance of the proxy-predicate pattern and the second one I have
+                    # authored while writing about the previous one. It was not caught by knowing
+                    # the class -- it was caught by an adversarial review that measured what the
+                    # flagged string actually predicts. Controls, not rules.
+                    #
+                    # The givens now go through GIVE like any others, so a fully bound mismatch is
+                    # surface-identical to an ordinary question.
+                    _all = dict(vals)
+                    _all.update(_extra)
+                    _order = list(_all)
+                    rng.shuffle(_order)
+                    g = ", ".join(f"{k} = {_num(_all[k]) if not isinstance(_all[k], str) else _all[k]}"
+                                  for k in _order)
+                    q = compose_question(ask, g, rng)
         _given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", g))
         # ONE PATH FOR EVERY CASE. D1 previously set this to `drop` directly; that happened to
         # agree, and "happens to agree" is how the other three fields drifted.

@@ -29,20 +29,42 @@ VAR = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 RESV = {"pi", "e", "sin", "cos", "tan", "asin", "acos", "atan", "sqrt", "log", "ln", "exp", "abs"}
 
 
-def build(n=40, seed=7):
+def build(n=40, seed=7, source="shipped"):
+    """source="shipped": the wrong record is one the model has seen in training.
+       source="holdout": the wrong record is one it has NEVER seen, in any document.
+
+    THE SHIPPED ARM IS NOT HELD OUT AT THE RECORD LEVEL, and that is measured: 61% of the n=40
+    arm's shown records already appear in A42 training documents at a 10k sample, and at volume
+    (2,736 A42 documents over 164 records) it approaches 100%. So a model could score on the
+    shipped arm by learning PAIRWISE that record X does not answer a question about Y, without
+    acquiring the general judgement. The holdout arm forecloses that: its 26 records are carved
+    out of the store and never generated, so refusing one requires reading it.
+
+    Both are reported. The shipped arm is the PRIMARY because the 0/40 baseline was measured on
+    shipped records and a primary outcome may not change its instrument between arms; the holdout
+    arm is the stronger test and is pre-named as such."""
     import importlib.util, contextlib, io
     spec = importlib.util.spec_from_file_location("gen", ROOT / "corpus/generate.py")
     g = importlib.util.module_from_spec(spec)
     with contextlib.redirect_stdout(io.StringIO()):
         spec.loader.exec_module(g)
     rng = random.Random(seed)
-    recs = g.recs
+    if source == "holdout":
+        held = json.loads((ROOT / "corpus/units_holdout.json").read_text())
+        shipped = {r["f"] for r in g.recs}
+        pool = [r for r in held if r["f"] not in shipped]
+        assert pool, "holdout pool empty -- a source that silently falls back is a guess"
+    else:
+        pool = g.recs
+    recs = g.recs                      # WANT always comes from the shipped store: the question
+                                       # must be about a quantity the model knows, so that a
+                                       # failure is about the RECORD and not the question.
     lhs = lambda r: r["f"].split("=", 1)[0].strip()
     out = []
     for _ in range(n * 40):
         if len(out) >= n:
             break
-        want, shown = rng.choice(recs), rng.choice(recs)
+        want, shown = rng.choice(recs), rng.choice(pool)
         if lhs(want) == lhs(shown) or g.lhs_unit(want) == g.lhs_unit(shown):
             continue
         svs = [v for v in dict.fromkeys(VAR.findall(shown["f"].split("=", 1)[1]))
@@ -60,13 +82,24 @@ def build(n=40, seed=7):
         miss = g._device_missing_mod(shown, set(vals))
         if miss != "none":
             continue
+        # THE ASKED QUANTITY MUST NOT BE ONE OF THE GIVENS. Three of 120 shipped items and one of
+        # 120 holdout items asked for a symbol the question itself supplied -- "Estimate velocity
+        # of a wave. B = 17.9, l = 0.102, v = 31.48." A model answering 31.48 there is not failing
+        # to judge fit, and a model refusing is not necessarily judging it either. The item cannot
+        # discriminate, so it is not an item.
+        if lhs(want) in vals:
+            continue
         um = " ".join(f"{v}:{shown['units'][v]}" for v in svs if v in shown.get("units", {}))
         # REUSE THE GENERATOR'S OWN QUESTION PATH. My first version wrote "Find {name}", and name
         # is a RELATION name, not a quantity -- it produced "Find Law of reflection.", which is
         # ill-posed for reasons unrelated to fit, so a refusal would not have meant what the arm
         # claims. quantity_surface + ask_for are the reviewed frames the corpus itself uses.
-        q = g.ask_for(want, g.quantity_surface(want, rng), rng) + " " + \
-            ", ".join(f"{v} = {vals[v]}" for v in svs) + "."
+        # THE ARM'S QUESTION SURFACE MUST BE THE CORPUS'S. Composing it here produced bare givens
+        # -- `Find E. m = 1, c = 2.` -- a surface that occurs in 0 of 9,994 training documents,
+        # because every one of the 16 GIVE frames has a lead-in. compose_question is the generator's
+        # own path and is now shared rather than mirrored.
+        ask = g.ask_for(want, g.quantity_surface(want, rng), rng)
+        q = g.compose_question(ask, ", ".join(f"{v} = {vals[v]}" for v in svs), rng)
         rec = (f"{shown['f']} | {um} | missing:none | "
                f"{shown.get('req', 'standard conditions')} | fit:high")
         out.append({"q": q, "record": rec, "expect": "refuse",
@@ -75,10 +108,11 @@ def build(n=40, seed=7):
 
 
 if __name__ == "__main__":
-    items = build()
-    p = ROOT / "corpus/split_fit.json"
-    p.write_text(json.dumps(items, indent=1))
-    print(f"  built {len(items)} pure-fit items -> {p.relative_to(ROOT)}")
-    print(f"  every one: a fully-bound record that computes the WRONG quantity, missing:none TRUE")
-    print(f"  example  {items[0]['q'][:76]}")
-    print(f"           {items[0]['record'][:76]}")
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 120
+    for src, out in (("shipped", "corpus/split_fit.json"), ("holdout", "corpus/split_fit_ho.json")):
+        items = build(n=n, source=src)
+        (ROOT / out).write_text(json.dumps(items, indent=1))
+        shown = {i["record"].split(" | ")[0] for i in items}
+        print(f"  {src:8s} n={len(items):4d}  distinct shown records {len(shown):3d}  -> {out}")
+        print(f"           {items[0]['q'][:74]}")
+        print(f"           {items[0]['record'][:74]}")
