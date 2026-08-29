@@ -16,7 +16,17 @@ from tokenizers import Tokenizer
 
 SEED  = int(os.environ.get("SEED","1"))
 STEPS = int(os.environ.get("STEPS","8000"))
-V,DIM,LAYERS,HEADS,SEQ,BS,LR = 4096,288,6,6,256,24,3e-4
+# CONFIG FROM THE ENVIRONMENT, defaults unchanged. The d352 L6 C512 run needs a different shape
+# and editing the constant would have made every prior run in the log ambiguous about which config
+# produced it. docs/PREREG_TRAINING_RUN.md fixes the values for this run.
+V     = int(os.environ.get("VOCAB",  "4096"))
+DIM   = int(os.environ.get("DIM",    "288"))
+LAYERS= int(os.environ.get("LAYERS", "6"))
+HEADS = int(os.environ.get("HEADS",  "6"))
+SEQ   = int(os.environ.get("SEQ",    "256"))
+BS    = int(os.environ.get("BS",     "24"))
+LR    = float(os.environ.get("LR",   "3e-4"))
+assert DIM % HEADS == 0, f"dim {DIM} not divisible by heads {HEADS}"
 dev = "mps" if torch.backends.mps.is_available() else "cpu"
 torch.manual_seed(SEED); np.random.seed(SEED)
 
