@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#ifdef __arm__
+#include "nspire_screen.h"
+#endif
 #define main runq_main_unused
 #include "../../src/runq_nspire.c"
 #undef main
@@ -30,6 +33,14 @@ static uint64_t fnv1a(const void *p, size_t n) {
 }
 
 int main(int argc, char **argv) {
+#ifdef __arm__
+    /* WITHOUT THIS THE PROGRAM IS SILENT AND LOOKS LIKE A CRASH. Every working bench calls
+     * screen_init() through bench_open() before its first printf; this file did not, so on device
+     * it flashed and exited with nothing on screen and nothing written. Three of the five Phase 2
+     * bring-up bugs were exactly this class -- an unrouted console, indistinguishable from a hang.
+     * The repo's own rule: prove the diagnostic can print from the translation unit under test. */
+    screen_init();
+#endif
     /* The Ndless launcher gives no useful argv, so the device needs its own default. The path is
      * the one src/store/device_app.c's DATA_DIRS lists first. On the host the build-tree path is
      * still the default, so `make golden_forward` is unchanged. */
