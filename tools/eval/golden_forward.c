@@ -67,8 +67,22 @@ int main(int argc, char **argv) {
      * three sampled logits, and the argmax, which is what actually decides a token. */
     int step_argmax[NT];
     float step_l0[NT], step_l1[NT], step_lN[NT];
+    int prev_pos = 0;
     for (int step = 0; step < NT; step++) {
         int pos = step * 31;                 /* 0, 31, 62, ... spans the attention range */
+        /* FILL THE INTERVENING POSITIONS. The walk used to JUMP, leaving the KV cache zeroed at
+         * every position it skipped -- at pos=217 that is 210 of 218 slots holding zero keys and
+         * values, so the softmax spread most of its mass across zero-vectors. That is the worst
+         * case for accumulation-order differences and it is nothing like generation, which writes
+         * every position. It showed up exactly there: host-vs-device agreed to ~1e-6 at steps 0-6
+         * and jumped to ~1e-2 at step 7, four orders, discontinuously.
+         *
+         * Real generation fills the cache. So does this now: every position up to the sample point
+         * is computed, and only the sample points are hashed. The cost is 218 forwards instead of
+         * 8, which is minutes on device and worth it -- a divergence measured on a cache that is
+         * 96% zeroes is a measurement of the instrument. */
+        for (int fill = prev_pos; fill < pos; fill++)
+            (void)rq_forward(toks[step] % V, fill);
         if (pos >= SL) pos = SL - 1;
         float *logits = rq_forward(toks[step] % V, pos);
         uint64_t h = fnv1a(logits, (size_t)V * sizeof(float));
@@ -76,6 +90,7 @@ int main(int argc, char **argv) {
         { int am = 0; for (int v = 1; v < V; v++) if (logits[v] > logits[am]) am = v;
           step_argmax[step] = am; }
         step_l0[step] = logits[0]; step_l1[step] = logits[1]; step_lN[step] = logits[V - 1];
+        prev_pos = pos + 1;
         chain ^= h; chain *= 1099511628211ULL;
         printf("step=%d tok=%d pos=%d logit_hash=%016llx  l0=%.9g l1=%.9g lN=%.9g\n",
                step, toks[step] % V, pos, (unsigned long long)h,
