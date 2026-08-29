@@ -24,3 +24,4 @@ build/test_*_mut
 # symlink committed here was checked out over the real directory in the main worktree and
 # destroyed it. Keep it ignored so `git add -A` cannot pick it up.
 corpus/raw
+build/model_*.bin
