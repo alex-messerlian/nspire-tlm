@@ -34,7 +34,16 @@ from recfmt import fields, MISSING
 # one twice and the second reads as independent evidence. Only the residual is ratcheted; accuracy
 # is printed because it is the sentence a reader wants ("99% of refusals need no read").
 PURE_FIT_FLOOR = 1.00    # % of documents that REQUIRE reading the record. Pre-registered dose.
-NGRAM_MIN = 8            # an n-gram this frequent in-class and absent outside is a cue
+# RECALL, NOT A RAW COUNT. The first version flagged any n-gram appearing >= 8 times in-class and
+# never outside. That is a proxy for "is a cue", and at volume it fired on 141 trigrams like
+# 's o n' -- 29 occurrences among 3,249 in-class documents, 0.9% recall, produced by variable names
+# from two different records co-occurring. Real, but not a cue: a model cannot decide the class from
+# a pattern present in 1% of it.
+#
+# ". Also ", the cue this search exists to catch, had 95.6% recall. The property is COVERAGE of the
+# class, and a count threshold tracks corpus size instead. Eleventh proxy predicate, this one inside
+# the gate written to catch the tenth.
+NGRAM_RECALL = 0.20      # an n-gram covering this much of the class, and absent outside, is a cue
 
 
 def main():
@@ -69,15 +78,17 @@ def main():
         else:
             outside.update(grams(q))
     acc = 100.0 * right / n
-    leaks = sorted(((g, c) for g, c in inside.items() if c >= NGRAM_MIN and outside[g] == 0),
+    leaks = sorted(((g, c) for g, c in inside.items()
+                    if pure and c / pure >= NGRAM_RECALL and outside[g] == 0),
                    key=lambda x: -x[1])
     pf = 100.0 * pure / n
     print(f"  documents {n:,}   D2 {d2:,}")
     print(f"  'refuse <=> missing != none' classifies {acc:.2f}% of the corpus")
     print(f"  documents that REQUIRE reading the record: {pure} ({pf:.2f}%)")
-    print(f"  question n-grams >= {NGRAM_MIN} in the class and ZERO outside: {len(leaks)}")
+    print(f"  question n-grams covering >= {100*NGRAM_RECALL:.0f}% of the class and ZERO outside: "
+          f"{len(leaks)}")
     for g, c in leaks[:5]:
-        print(f"    LEAK {g!r} in-class {c}, outside 0")
+        print(f"    LEAK {g!r} recall {100*c/pure:.1f}% ({c}/{pure}), outside 0")
     bad = []
     if leaks:
         bad.append(f"{len(leaks)} surface cue(s) separate the class without reading the record")

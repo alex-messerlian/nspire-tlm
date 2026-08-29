@@ -104,12 +104,19 @@ def score_multi(ck_path, seeds=(1234, 5678, 9012)):
     runs = [score(ck_path, seed=s) for s in seeds]
     out = {"checkpoint": str(ck_path), "corpus_sha": runs[0]["corpus_sha"], "seeds": list(seeds),
            "runs": runs}
-    for arm in ("answer", "refuse", "fit", "fit_ho"):
+    for arm in ("answer", "refuse", "fit", "fit_ho", "fit_m"):
+        if arm not in runs[0]:
+            continue
         ks = [r[arm]["k"] for r in runs if r[arm]["k"] is not None]
         n = runs[0][arm]["n"]
         if ks:
             out[arm] = {"k_mean": sum(ks) / len(ks), "k_min": min(ks), "k_max": max(ks),
                         "n": n, "ks": ks}
+            for strat in ("symbol", "worded"):
+                if strat in runs[0][arm]:
+                    out[arm][strat] = {
+                        "k_mean": sum(r[arm][strat]["k"] for r in runs) / len(runs),
+                        "n": runs[0][arm][strat]["n"]}
             if "k_records" in runs[0][arm]:
                 kr = [r[arm]["k_records"] for r in runs]
                 out[arm].update({"k_records_mean": sum(kr) / len(kr), "k_records": kr,
@@ -139,12 +146,21 @@ def score(ck_path, seed=1234):
                and grade.answer_matches_result(gn) and grade.prov_clean(pr + gn))
     res["answer"] = {"k": ok, "n": len(ans)}
 
-    for name, path in (("fit", "corpus/split_fit.json"), ("fit_ho", "corpus/split_fit_ho.json")):
+    for name, path in (("fit", "corpus/split_fit.json"),
+                       ("fit_ho", "corpus/split_fit_ho.json"),
+                       ("fit_m", "corpus/split_fit_m.json")):
         f = ROOT / path
         if not f.exists():
             res[name] = {"k": None, "n": 0, "note": "arm absent -- NOT a pass"}
             continue
+        # THE ARM MIXES TWO DIFFICULTIES AND ONE NUMBER HIDES THAT. When the question names the
+        # asked quantity as a bare SYMBOL (37-44% of items), refusing needs only a comparison of
+        # that symbol against the record's LHS. When it names it in words ("velocity of a wave"),
+        # symbol matching cannot help and the relation has to be read. Both are reported; a headline
+        # carried entirely by the symbol stratum is a weaker result than the same number spread
+        # across both, and the composite cannot show that.
         items = json.loads(f.read_text()); ok = 0; misses = []
+        sym_k = sym_n = wrd_k = wrd_n = 0
         res[name + "_control"] = control(items, name)
         # ITEMS CLUSTER ON RECORDS, so `k of 120` overstates the independent evidence: the fit arm
         # is 120 items over 82 records and fit_ho is 120 over 26. If the record decides the outcome
@@ -157,13 +173,20 @@ def score(ck_path, seed=1234):
             pr, gn = generate(m, f"<q>{it['q']}</q><r>{it['record']}")
             r = refusal_strict(pr, gn)
             ok += r
+            is_sym = bool(re.search(rf"\b{re.escape(it['asked'])}\b", it["q"]))
+            if is_sym:
+                sym_n += 1; sym_k += r
+            else:
+                wrd_n += 1; wrd_k += r
             if r:
                 hit_records.add(it["shown"])
             if not r and len(misses) < 3:
                 misses.append({"q": it["q"][:70], "shown": it["shown"], "gen": gn[:90]})
         res[name] = {"k": ok, "n": len(items), "misses": misses,
                      "k_records": len(hit_records),
-                     "n_records": len({i["shown"] for i in items})}
+                     "n_records": len({i["shown"] for i in items}),
+                     "symbol": {"k": sym_k, "n": sym_n},
+                     "worded": {"k": wrd_k, "n": wrd_n}}
     return res
 
 
@@ -173,7 +196,7 @@ if __name__ == "__main__":
     r = score_multi(ROOT / ck if not os.path.isabs(ck) else ck)
     print(f"  checkpoint {r['checkpoint']}   corpus {str(r['corpus_sha'])[:16]}")
     print(f"  seeds {r['seeds']}  -- strict refusal (a tool call is not a refusal)")
-    for arm in ("answer", "refuse", "fit", "fit_ho"):
+    for arm in ("answer", "refuse", "fit", "fit_ho", "fit_m"):
         if arm not in r:
             print(f"    {arm:8s} ABSENT -- not a pass"); continue
         a = r[arm]
@@ -183,6 +206,10 @@ if __name__ == "__main__":
             line += (f"   |  records {a['k_records_mean']:4.1f}/{a['n_records']}"
                      f" = {100*a['k_records_mean']/a['n_records']:5.1f}%")
         print(line)
+        if "symbol" in a:
+            sy, wd = a["symbol"], a["worded"]
+            print(f"             symbol-named {sy['k_mean']:4.1f}/{sy['n']:<3}"
+                  f"   worded {wd['k_mean']:4.1f}/{wd['n']}")
     if out:
         pathlib.Path(out).write_text(json.dumps(r, indent=1))
         print(f"  -> {out}")

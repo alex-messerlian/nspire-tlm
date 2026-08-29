@@ -37,6 +37,10 @@ EXPECTED = {
     "corpus/units_holdout.json": "the HELD-OUT set: valid physics deliberately NOT shipped and never "
                                  "trained, so SELECT tests reading the record from the prompt",
     "corpus/split_select.json":  "built from the holdout by construction",
+    "corpus/split_fit_ho.json":  "the HELD-OUT arm of the fit-judgement test: every record is one "
+                                 "carved out of the store and never generated, which is the whole "
+                                 "point -- refusing it cannot be done by having memorised the pair. "
+                                 "docs/PREREG_FIT_RETRAIN.md sec 2.",
     "corpus/split_report.json":  "built from the holdout by construction",
     # --- raw mined inputs to the cleaning, not outputs of it --------------------------------------
     "corpus/records_raw.json":   "raw mined input to the cleaning",

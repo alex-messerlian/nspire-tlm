@@ -36,14 +36,14 @@
  },
  {
   "q": "Take m = 4.383. What was capacitance of a parallel-plate capacitor?",
-  "record": "F=m*g | m:kg | missing:none | standard conditions | fit:high",
+  "record": "F=m*g | m:kg g:m/s^2 | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "C",
   "shown": "F"
  },
  {
   "q": "Using E_0 = 2.85e-19, find velocity of a wave.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J | missing:none | standard conditions | fit:high",
+  "record": "lambda=((2*h*c)/(E_0)) | h:J*s c:m/s E_0:J | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "v",
   "shown": "lambda"
@@ -57,7 +57,7 @@
  },
  {
   "q": "Using E_0 = 2.11e-16, calculate binding energy.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J | missing:none | standard conditions | fit:high",
+  "record": "lambda=((2*h*c)/(E_0)) | h:J*s c:m/s E_0:J | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "E",
   "shown": "lambda"
@@ -78,14 +78,14 @@
  },
  {
   "q": "If lambda = 9.55e-10, what is W_out?",
-  "record": "p_f=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "W_out",
   "shown": "p_f"
  },
  {
   "q": "Consider a case where E_0 = 7.26e-17. Estimate power.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J | missing:none | standard conditions | fit:high",
+  "record": "lambda=((2*h*c)/(E_0)) | h:J*s c:m/s E_0:J | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "P",
   "shown": "lambda"
@@ -218,7 +218,7 @@
  },
  {
   "q": "Given lambda = 8.16e-07, what was F?",
-  "record": "p_f=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "F",
   "shown": "p_f"
@@ -246,7 +246,7 @@
  },
  {
   "q": "Estimate x. Measurements give lambda = 9.1e-08.",
-  "record": "p_f=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "x",
   "shown": "p_f"
@@ -330,7 +330,7 @@
  },
  {
   "q": "Where E_0 = 6e-17, calculate molar heat capacity.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J | missing:none | standard conditions | fit:high",
+  "record": "lambda=((2*h*c)/(E_0)) | h:J*s c:m/s E_0:J | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "C_p",
   "shown": "lambda"
@@ -358,7 +358,7 @@
  },
  {
   "q": "A system has lambda = 5.93e-11. What is p?",
-  "record": "p_f=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "p",
   "shown": "p_f"
@@ -442,7 +442,7 @@
  },
  {
   "q": "Consider a case where m = 60.056. Estimate C.",
-  "record": "F=m*g | m:kg | missing:none | standard conditions | fit:high",
+  "record": "F=m*g | m:kg g:m/s^2 | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "C",
   "shown": "F"
@@ -540,14 +540,14 @@
  },
  {
   "q": "What is apparent depth of an object seen through a flat refracting surface? Using lambda = 2.55e-09.",
-  "record": "p_f=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "s_i",
   "shown": "p_f"
  },
  {
   "q": "Consider a case where E_0 = 1.19e-18. Estimate index of refraction.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J | missing:none | standard conditions | fit:high",
+  "record": "lambda=((2*h*c)/(E_0)) | h:J*s c:m/s E_0:J | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "n",
   "shown": "lambda"
@@ -575,7 +575,7 @@
  },
  {
   "q": "What is mass? Measurements give lambda = 8.34e-08.",
-  "record": "p_f=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "m",
   "shown": "p_f"
@@ -722,7 +722,7 @@
  },
  {
   "q": "Take E_0 = 1.82e-16. Calculate heat from internal energy change and work.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J | missing:none | standard conditions | fit:high",
+  "record": "lambda=((2*h*c)/(E_0)) | h:J*s c:m/s E_0:J | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "Q",
   "shown": "lambda"
@@ -778,7 +778,7 @@
  },
  {
   "q": "Given lambda = 7.56e-12, find pressure.",
-  "record": "p_f=((h)/(lambda)) | lambda:m | missing:none | standard conditions | fit:high",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "refuse",
   "asked": "p",
   "shown": "p_f"
