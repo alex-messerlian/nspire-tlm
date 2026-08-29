@@ -1,3 +1,4 @@
+import json
 #!/usr/bin/env python3
 """PERMANENT GATE: the same quantity may not be declared two different ways in two records.
 
@@ -71,10 +72,22 @@ def main():
     with contextlib.redirect_stdout(io.StringIO()):
         spec.loader.exec_module(m)
 
+    # UNITS COME FROM BOTH MAPS. m.recs is the SHIPPED set; the holdout records are excluded from
+    # it by construction, so resolving units from m.recs alone left every holdout declaration keyed
+    # (var, "") -- bucketed as dimensionless, merged across quantities that units would have kept
+    # apart, and unable to match any DELIBERATE key, all of which use real units. The gate reported
+    # seven conflicts that were entirely the missing lookup: 'omega' collided with itself despite
+    # ("omega","1/s") sitting in the exemption table.
+    #
+    # Same class as gate_units_parity -- one fact in two files, and a consumer that reads one.
     unit_of = {}
     for r in m.recs:
         for v, u in (r.get("units") or {}).items():
             unit_of[(r["f"], v)] = (u or "").strip()
+    _ho = json.loads((ROOT / "corpus/units_holdout.json").read_text())
+    for f, um in (_ho.items() if isinstance(_ho, dict) else ((r["f"], r.get("units") or {}) for r in _ho)):
+        for v, u in (um or {}).items():
+            unit_of.setdefault((f, v), (u or "").strip())
 
     groups = defaultdict(dict)          # (var, unit) -> {window: [formulas]}
     for (f, v), win in m._SCALE.items():
@@ -85,6 +98,24 @@ def main():
         # annihilated every optical wavelength, in a gate, written by someone who had read about it.
         groups[(v, u)].setdefault((_sig(win[0]), _sig(win[1])), []).append(f)
 
+    # A REJECTED STRENGTHENING, RECORDED BECAUSE THE REASONING LOOKED SOUND AND WAS NOT.
+    #
+    # I tried making DELIBERATE unable to exempt a shipped/held-out pair, on the argument that a
+    # held-out record drawing a shared variable from a different band confounds unseen-relation with
+    # unseen-numbers. The argument is right. The implementation could not test it, for two reasons
+    # the listing made obvious and the reasoning did not:
+    #
+    #   1. Shipped records already carry FIFTEEN different windows for v [m/s] among themselves -- a
+    #      de Broglie speed, a speed in a refractive medium, a drag speed. There is no single shipped
+    #      window for a holdout to match, so "differs from a shipped window" is true of almost
+    #      everything and names no defect.
+    #   2. _SCALE is PARTIAL -- 122 of 329 pairs declared. An undeclared pair draws from the mined
+    #      pool, so the union of declared shipped windows is not the trained distribution. The rule
+    #      flagged m [kg] as disjoint because the only DECLARED shipped m is the de Broglie electron
+    #      mass; every macroscopic shipped m is undeclared and invisible here.
+    #
+    # The property is about DRAWS, not declarations, and no gate over _SCALE can see it. It is
+    # measured directly in docs/RESULT_HOLDOUT_DISTRIBUTION.md instead.
     conflicts = [(k, w) for k, w in groups.items() if len(w) > 1 and k not in DELIBERATE]
     total_multi = sum(1 for k, w in groups.items() if len(w) > 1)
     print(f"  (variable, unit) pairs declared in >1 record: {total_multi}")

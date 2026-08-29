@@ -112,7 +112,8 @@
   },
   "scope": "m54305",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "9b66aa28"
+  "rid": "9b66aa28",
+  "req": "physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed"
  },
  {
   "f": "E=m*(c)^(2)",

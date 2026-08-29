@@ -124,6 +124,26 @@ _MICRO_CVAL = {
     ("r=((m*v)/(q*B))",   "m"): (9.109e-31, "kg",    "electron mass"),
 }
 
+# A41. MODULE SCOPE, BECAUSE TWO PRODUCERS NEED IT. This was nested inside the generation
+# function, so corpus/build_splits.py could not import it and hardcoded "none" instead --
+# writing the ANSWERABLE signature onto 100% of its refuse items. The comment below already
+# says a refusal class must be derived by the runtime's own rule; a rule that only one
+# producer can reach is not shared, it is copied, and the copy was a constant.
+def _device_missing_mod(rec, given_names):
+    # FIRST-APPEARANCE ORDER, like units_field() and for the same reason: assemble.c walks
+    # r->var[] in declaration order and returns the FIRST unbound one, so sorting picks a
+    # different variable. `tau=R*C` gave missing:C where the device says missing:R.
+    lhs_ = rec["f"].split("=", 1)[0].strip()
+    _seen, _vs = set(), []
+    for x in VAR.findall(rec["f"].split("=", 1)[1]):
+        if x in ("pi", "e") or x in _seen: continue
+        _seen.add(x); _vs.append(x)
+    for v in _vs:
+        if v == lhs_: continue
+        if _const_for(rec, v) is not None: continue     # supplied constant, not asked for
+        if v not in given_names: return v
+    return "none"
+
 def sample_value(rng, unit=None):
     """Draw from the empirical OpenStax distribution: median ~5, 60-90% round numbers.
     uniform(1.5, 95) produced m = 92.6 kg and r = 70.25 m, which no textbook contains.
@@ -248,6 +268,57 @@ _UNIT_RANGE = {
 # defect of exactly the kind this table exists to remove -- see the Fahrenheit repair, which was a
 # fix that asserted something false.
 _SCALE = {
+  # --- A37. THE HOLDOUT'S OWN WINDOWS -----------------------------------------------------------
+  #
+  # SELECT's givens were drawn through quantity_range like the corpus's, and 51.8% still came out as
+  # small integers against 1.8% in training -- because these 26 records are OUT of the store, so no
+  # (formula, variable) declaration matched and every draw fell through to the generic sampler. The
+  # split therefore posed questions in a numeric register the model has never seen, and the answer
+  # side was measuring that as much as record-reading.
+  #
+  # A holdout is not exempt from declaration just because it is not trained on. These are the same
+  # quantities as the store's, in records the store does not ship, and they get the same treatment.
+  ("Delta_E_int=Q-W", "Q"):        (1.0, 1.0e6, "heat into a laboratory system, joules to megajoules"),
+  ("Delta_E_int=Q-W", "W"):        (1.0, 1.0e6, "work done by it, same scale"),
+  ("F=k*x", "x"):                  (1.0e-3, 0.5, "a spring extension: a millimetre to half a metre"),
+  ("F=m*g", "g"):                  (0.1, 30.0, "a surface gravity: Pluto 0.62 to Jupiter 24.8"),
+  ("F=m*g", "m"):                  (1.0e-3, 1.0e4, "a laboratory mass, a gram to ten tonnes"),
+  ("F_app=F_x+F_y", "F_x"):        (0.1, 1.0e4, "a component of an applied force"),
+  ("F_app=F_x+F_y", "F_y"):        (0.1, 1.0e4, "the other component"),
+  ("I=((((Delta_p))^(2))/(2*rho*v_w))", "Delta_p"): (1.0e-3, 1.0e3, "a sound pressure amplitude: hearing threshold to painfully loud"),
+  ("I=((((Delta_p))^(2))/(2*rho*v_w))", "rho"):     (0.5, 1.3e3, "the medium's density: air to water"),
+  ("L=((v)/(4*f_1))", "f_1"):      (20.0, 20000.0, "a fundamental in the audible band -- A39: MATCHED TO THE SHIPPED TWIN. L=v/(4*f_1) is the holdout twin of the shipped L=v_w/(4*f_1), the same relation with the wave speed renamed. A narrower window here would draw the twin's givens from a different band, so a score gap between them would confound unseen-relation with unseen-numbers -- the one thing the holdout exists to separate"),
+  ("L=((v)/(4*f_1))", "v"):        (300.0, 1.5e3, "the speed of sound in air to water"),
+  ("P=((F)/(A))", "A"):            (1.0e-6, 100.0, "a contact area: a pinhead to a room floor"),
+  ("P=((F)/(A))", "F"):            (0.1, 1.0e6, "a force pressing on it"),
+  ("U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)", "m"):     (1.0e-3, 100.0, "an oscillating mass"),
+  ("U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)", "omega"): (0.1, 1.0e3, "an oscillator's angular frequency"),
+  ("U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)", "x"):     (1.0e-3, 1.0, "a displacement from equilibrium"),
+  ("V=B*l*v_d", "l"):              (1.0e-3, 2.0, "a conductor length in a magnet bore"),
+  ("V=B*l*v_d", "v_d"):            (1.0e-3, 100.0, "the rod's speed through the field"),
+  ("a=((v_c)/(t_1))", "t_1"):      (0.01, 100.0, "the interval over which it reaches v_c"),
+  ("a=((v_c)/(t_1))", "v_c"):      (0.1, 300.0, "a vehicle-scale speed"),
+  ("a_C=(((v)^(2))/(r))", "r"):    (0.01, 1.0e3, "a turn radius: a centrifuge rotor to a motorway curve"),
+  ("a_C=(((v)^(2))/(r))", "v"):    (0.1, 300.0, "the speed around it"),
+  ("d_1=((2*A)/(d_2))", "A"):      (1.0e-4, 100.0, "a rhombus area"),
+  ("d_1=((2*A)/(d_2))", "d_2"):    (0.01, 10.0, "its other diagonal"),
+  ("f_B=|f_1-f_2|", "f_1"):        (20.0, 20000.0, "an audible tone -- A39: matched to the shipped twin f_beat=|f_2-f_1|"),
+  ("lambda=((2*h*c)/(E_0))", "E_0"): (1.6e-19, 1.6e-15, "a photon energy, 1 eV to 10 keV -- A39 NARROWED THIS AND A39 WAS WRONG. I matched it to the shipped E_n=-E_0/n^2 window to remove a train/holdout distribution confound. That window is never drawn: E_0 in E_n is a declared CONSTANT (the Rydberg, 2.179872e-18 J) and appears at that one value in 100% of 62 trained documents. I constrained a free photon energy to match a range belonging to a different quantity that is not sampled at all -- the rule about not applying a range table to a value that was not drawn, applied to my own fix. Restored"),
+  ("lambda=lambda_0/n", "lambda_0"): (1.0e-8, 1.0e-3, "a vacuum wavelength, EUV to far infrared"),
+  ("lambda=lambda_0/n", "n"):      (1.0, 4.0, "a refractive index"),
+  ("p_f=((h)/(lambda))", "lambda"): (1.0e-12, 1.0e-6, "a matter wavelength"),
+  ("v=lambda*f", "f"):             (1.0, 2.0e4, "a mechanical wave frequency"),
+  ("v=lambda*f", "lambda"):        (1.0e-3, 100.0, "its wavelength"),
+  ("v=r*omega", "omega"):          (1.0e-2, 1.0e3, "a rotation rate"),
+  ("v=r*omega", "r"):              (1.0e-2, 5.0, "a rotor or wheel radius"),
+  ("v_CM=r*omega", "omega"):       (1.0e-2, 1.0e3, "a rolling body's rotation rate"),
+  ("v_CM=r*omega", "r"):           (1.0e-2, 5.0, "its radius"),
+  ("v_w=f*lambda", "f"):           (1.0, 2.0e4, "a mechanical wave frequency"),
+  ("v_w=f*lambda", "lambda"):      (1.0e-3, 100.0, "its wavelength"),
+  ("x_1=((3)/(2))*v_0*t", "v_0"):  (0.1, 300.0, "an initial speed"),
+  ("x_2=v*t_2", "t_2"):            (0.01, 1.0e3, "an elapsed time"),
+  ("x_2=v*t_2", "v"):              (0.1, 300.0, "the speed over it"),
+
   # --- photons and atomic transitions -------------------------------------------------------
   ("E_f=h*f", "f"):                 (1e12, 1e19, "IR through X-ray photon frequency"),
   ("E=h*f", "f"):                   (1e12, 1e19, "IR through X-ray photon frequency"),
@@ -306,7 +377,6 @@ _SCALE = {
   ("F=q*v*B*sin(theta)", "q"):      (1e-9, 1e-3, "a laboratory charge, nC to mC"),
   ("V=((U_E)/(q))", "q"):           (1e-9, 1e-3, "a laboratory charge, nC to mC"),
   ("C=((Q)/(V))", "Q"):             (1e-9, 1e-3, "a laboratory charge, nC to mC"),
-  ("E_n=-E_0*((1)/((n)^(2)))", "E_0"): (1.6e-19, 1e-17, "an atomic ground state, ~13.6 eV"),
   ("K=(n)^(2)*E_1", "E_1"):         (1e-21, 1e-18, "a particle-in-a-box ground state"),
   ("n=((K/E_1))^(1/2)", "E_1"):     (1e-21, 1e-18, "a particle-in-a-box ground state"),
   ("n=((K/E_1))^(1/2)", "K"):       (1e-21, 1e-16, "an energy level of the same well"),
@@ -1645,6 +1715,17 @@ assert not _DECL_STALE, (
     "A23/A24: these declarations match no record at all -- not sampled, not held out -- so they are "
     "silent no-ops:\n  " + "\n  ".join(_DECL_STALE)
     + "\nFix them against corpus/store_clean.json. A range that never fires reads as coverage.")
+# A40. A PAIR MAY BE A CONSTANT OR HAVE A RANGE, NEVER BOTH.
+# ("E_n=-E_0/n^2", "E_0") carried a declared range AND a supplied constant. The constant wins, so
+# the range was dead -- and dead is worse than absent, because it reads as a bound somebody chose.
+# gate_declaration_siblings compared it against a held-out record's window and reported a conflict
+# about a quantity that is drawn at exactly one value in 100% of documents, which sent me narrowing
+# a real photon-energy window to match a number that is not sampled.
+_both = sorted(set(_MICRO_CVAL) & set(_SCALE))
+assert not _both, (
+    "declared as BOTH a constant and a range; the range is dead and must be deleted: "
+    + ", ".join(f"{v} in {f}" for f, v in _both))
+
 _DECL_HELD = sorted(f"{f}  [{v}]" for (f, v) in (set(_SCALE) | set(_KIND)) if (f, v) in _HELD_PAIRS)
 # PRINTED, because the comment above says it is. It was not: _DECL_HELD was computed and never
 # emitted, so "counted and printed rather than passed over" was a guarantee the code did not make --
@@ -1984,20 +2065,7 @@ def gen(n, seed=0):
         # must be derived by the RUNTIME'S OWN RULE, so that any tell it leaves is one the device
         # leaves too. Computing it here means D1 and D2 both emit `missing:<var>` and differ only in
         # whether the record relates to the question -- which is the judgement.
-        def _device_missing(rec, given_names):
-            # FIRST-APPEARANCE ORDER, like units_field() and for the same reason: assemble.c walks
-            # r->var[] in declaration order and returns the FIRST unbound one, so sorting picks a
-            # different variable. `tau=R*C` gave missing:C where the device says missing:R.
-            lhs_ = rec["f"].split("=", 1)[0].strip()
-            _seen, _vs = set(), []
-            for x in VAR.findall(rec["f"].split("=", 1)[1]):
-                if x in ("pi", "e") or x in _seen: continue
-                _seen.add(x); _vs.append(x)
-            for v in _vs:
-                if v == lhs_: continue
-                if _const_for(rec, v) is not None: continue     # supplied constant, not asked for
-                if v not in given_names: return v
-            return "none"
+        _device_missing = _device_missing_mod   # A41: one definition, module scope
         band = "high"          # A11: assemble.c:99 -- a real record is ALWAYS fit:high
         # A18. THE MISMATCH RECORD MUST ACTUALLY NOT FIT. `rng.choice(recs)` can draw a record
         # that computes the very quantity asked for -- 2 of 11,975 documents refused while showing
@@ -2017,6 +2085,40 @@ def gen(n, seed=0):
                     and (x.get("name") or "").lower() != _nm
                     and lhs_unit(x) != lhs_unit(r)]
             rec_r = rng.choice(_alt) if _alt else rng.choice(recs)
+
+            # A42. ONE MISMATCH IN FIVE IS FULLY BOUND, SO REFUSING IT REQUIRES READING THE RECORD.
+            #
+            # Measured on the corpus before this: `refuse <=> missing != none` classified 96.87% of
+            # documents, and 99.0% of D2 carried an unbound variable. So the fit judgement was never
+            # REQUIRED -- a model can refuse every ordinary D2 by checking whether the record's
+            # variables appear in the question. The trained checkpoint does exactly that: 97.5% on
+            # ordinary D2 items and 0.0% -- zero of forty -- when the wrong record is fully bound.
+            # It calls the tool on the record it is shown and answers a quantity nobody asked for.
+            # docs/RESULT_FIT_JUDGEMENT.md.
+            #
+            # Only 5 of 9,996 documents presented that case. This raises it to ~1% of the corpus by
+            # supplying the WRONG record's variables in the question, which makes `missing:none`
+            # TRUE rather than asserted -- the cue then points at "answer" and only the record's
+            # meaning says otherwise.
+            #
+            # Same family as A8 (units), A11 (fit) and A41 (missing), and the fourth field in a row
+            # where a refusal class was separable without reading. The difference is that here the
+            # field is CORRECT -- the device really does emit missing:none when everything is bound.
+            # The defect is not the field, it is that the corpus never exercises the case.
+            if rng.random() < 0.20:
+                _extra = {}
+                for _v in dict.fromkeys(VAR.findall(rec_r["f"].split("=", 1)[1])):
+                    if _v in ("pi", "e") or _v == rec_r["f"].split("=", 1)[0].strip():
+                        continue
+                    if _const_for(rec_r, _v) is not None or _v in vals:
+                        continue
+                    _rr = quantity_range(rec_r, _v)
+                    _extra[_v] = _num(sample_in_range(rng, _rr[0], _rr[1], _rr[2]) if _rr
+                                      else sample_value(rng))
+                if _extra:
+                    _add = ", ".join(f"{k} = {v}" for k, v in _extra.items())
+                    g = f"{g}, {_add}"
+                    q = q.rstrip(".") + f". Also {_add}."
         _given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", g))
         # ONE PATH FOR EVERY CASE. D1 previously set this to `drop` directly; that happened to
         # agree, and "happens to agree" is how the other three fields drifted.

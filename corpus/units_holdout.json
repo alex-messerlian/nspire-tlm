@@ -93,7 +93,8 @@
    "Q": "J",
    "W": "J"
   },
-  "scope": "m58401"
+  "scope": "m58401",
+  "req": "physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed"
  },
  {
   "f": "v=lambda*f",

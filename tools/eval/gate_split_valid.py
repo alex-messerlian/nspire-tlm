@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """PERMANENT GATE: no split item may be one the runtime could never produce.
 
@@ -17,6 +18,8 @@ records the model never trained on, because the architecture requires reading th
 prompt rather than from memory. What is checked is that an item is one the DEVICE could emit.
 """
 import json, pathlib, re, sys
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[2] / 'corpus'))
+from recfmt import fields as _rf_fields, formula as _rf_formula  # " | " is the separator; a formula may contain a bare pipe
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 LEIBNIZ = re.compile(r"\(d\*[A-Za-z_]")
@@ -42,7 +45,7 @@ def main():
             return 2
         for it in json.loads(p.read_text()):
             n += 1
-            f = it["record"].split("|")[0].strip()
+            f = _rf_formula(it["record"])
             if LEIBNIZ.search(f):
                 bad.append((name, it["id"], f, "Leibniz artifact: `d` cancels, not a relation"))
             if FUSED.match(f):

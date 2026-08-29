@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """PERMANENT GATE: a D2 refusal must be structurally indistinguishable from an answerable document.
 
@@ -38,7 +39,14 @@ WHAT IT DOES NOT VERIFY: leakage through content (a record whose NAME gives the 
 through features not enumerated below. This is a ratchet over known structural bits, not a proof of
 no leakage. A bit nobody listed is unguarded, and that is stated rather than implied.
 """
+# AND IT CHECKS THE SPLITS, NOT ONLY THE CORPUS. Restricting this gate to synth_sample.jsonl is why
+# the fit:low defect survived in corpus/split_select.json for its whole life: the corpus was fixed,
+# the gate confirmed the corpus, and all 40 SELECT refuse items stayed in a shape the device cannot
+# emit. A gate scoped to one producer of a format does not cover the format.
+
 import importlib, importlib.util, pathlib, re, sys
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[2] / 'corpus'))
+from recfmt import fields as _rf_fields, formula as _rf_formula  # " | " is the separator; a formula may contain a bare pipe
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 N, SEED, MAX_GAP = 6000, 5, 0.25      # ratchet: measured post-fix gap is 0.007 on every bit
@@ -52,7 +60,7 @@ def record_span(doc):
 def bits(span):
     """Structural features only. None of these carries physics, so any of them predicting the
     class is leakage by construction -- which is what makes them the right features to check."""
-    parts = span.split("|")
+    parts = _rf_fields(span)
     lhs = parts[0].split("=", 1)[0].strip()
     units = parts[1] if len(parts) > 1 else ""
     return {
@@ -61,6 +69,20 @@ def bits(span):
         "field count != 5":                 len(parts) != 5,
         "record span has no '='":           "=" not in parts[0],
     }
+
+
+def _check_splits():
+    import json as _j, pathlib as _p
+    root=_p.Path(__file__).resolve().parents[2]
+    bad=[]
+    for name in ("split_select.json","split_report.json"):
+        f=root/"corpus"/name
+        if not f.exists(): return 2, f"CANNOT CHECK: {name} missing"
+        for it in _j.loads(f.read_text()):
+            rec=it["record"]
+            if "fit:low" in rec and not rec.startswith("none"):
+                bad.append((name, it["id"], rec[:70]))
+    return (1 if bad else 0), bad
 
 
 if __name__ == "__main__":

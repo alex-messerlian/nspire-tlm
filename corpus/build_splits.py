@@ -70,6 +70,12 @@ if _dropped:
 stems=sorted({s for s in json.load(open("corpus/stems_all.json"))
               if 40<len(s)<200 and "{" not in s})
 dev={it["q"] for it in json.load(open("tools/eval/items.json"))}
+# the generator itself, so the split's givens come from the declared windows rather than a
+# hand-written list that no device question resembles
+import importlib.util as _u, io as _io, contextlib as _ctx
+_spec=_u.spec_from_file_location("_gen", "corpus/generate.py"); _gen=_u.module_from_spec(_spec)
+with _ctx.redirect_stdout(_io.StringIO()): _spec.loader.exec_module(_gen)
+
 _RUNTIME_CONSTANTS = _runtime_constants()
 rng=random.Random(20260824)
 rng.shuffle(hold); rng.shuffle(stems)
@@ -98,12 +104,62 @@ def build(name, n_match=40, n_mismatch=40):
         _cv = _RUNTIME_CONSTANTS
         vs  = [v for v in vs if v not in _cv]
         if not vs: continue
-        vals={v: rng.choice([2,3,5,8,10,12,20]) for v in vs}
+        # GIVENS FROM THE SAME DISTRIBUTION THE RUNTIME PRODUCES, not seven small integers.
+        #
+        # This drew rng.choice([2,3,5,8,10,12,20]), so SELECT's questions carried SEVEN distinct
+        # values and 98.8% of them were integers <= 20. In the training corpus such values are
+        # 1.8% of all givens -- 4,446 distinct, median 9.259, spanning -566 to 5.4e29. The model
+        # had essentially never seen a question shaped like "r = 12, omega = 2", so the answer side
+        # of SELECT was measuring OUT-OF-DISTRIBUTION ROBUSTNESS and reporting it as record-reading.
+        #
+        # Fourth instrument defect on this one split, after removed records, overridden constants
+        # and the false held-out claim. Same root each time: the split built items the DEVICE would
+        # never emit. Drawing through the generator's own declared windows removes the whole class.
+        vals={}
+        for v in vs:
+            rr = _gen.quantity_range(r, v)
+            x  = _gen.sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else _gen.sample_value(rng)
+            vals[v] = _gen._num(x) if hasattr(_gen, "_num") else x
         svs=sorted({v for v in VAR.findall(src["f"].split("=",1)[1]) if v not in RESV})
         um=" ".join(f"{v}:{src['units'][v]}" for v in svs if v in src.get("units",{}))
         q=st[i % len(st)].strip()+" "+", ".join(f"{v} = {vals[v]}" for v in vs)+"."
-        rec=(f"{src['f']} | {um} | missing:none | "
-             f"{src.get('req','standard conditions')} | fit:{'high' if matched else 'low'}")
+        # A38. A REAL RECORD IS ALWAYS fit:high. THE DEVICE HAS EXACTLY TWO SHAPES.
+        #
+        # src/store/assemble.c emits a real record with " | fit:high" and nothing else, or the
+        # no-match literal with NO record. A real record carrying fit:low is a shape the runtime
+        # CANNOT produce -- and this file emitted it for all 40 refuse items, so the refusal side
+        # was scored entirely on prompts the device will never send.
+        #
+        # This is the A11 defect verbatim. The project log records it -- "D2 emitted a REAL RECORD with
+        # fit:low, a shape the runtime can never produce, 616 of 11,975 documents" -- it was fixed
+        # in corpus/generate.py, and never here. gate_fit_cue enforces it and never looked at the
+        # splits, which is why it stayed. Fifth instrument defect in this file, same root as the
+        # other four: constructing what the runtime cannot emit.
+        #
+        # The consequence is not cosmetic. On the device a BAD match still arrives as fit:high,
+        # because the picker does not judge fit -- so a model that refuses from the LABEL has
+        # learned a cue that is never set that way at serve time. It has to refuse from the
+        # record's CONTENT not matching the question, which is the judgement being tested.
+        # A41. THE missing: FIELD IS COMPUTED BY THE DEVICE, AND THIS FILE HARDCODED IT.
+        #
+        # Sixth instrument defect on this split, and the same root as the other five: a field the
+        # runtime derives, written here as a constant. src/store/assemble.c fills `missing` with the
+        # shown record's variables that the question does not supply, and corpus/generate.py calls
+        # _device_missing for exactly that reason -- its A11 note says D1 and D2 "both emit
+        # missing:<var>".
+        #
+        # Measured on the trained corpus: ANSWERABLE is missing:none in 100.0% of documents, D2 is
+        # missing:<var> in 99.0%. This file wrote missing:none on 100% of refuse items, so in that
+        # field every refuse item was byte-identical to the answerable class.
+        #
+        # It explains both scores and neither is a capability measurement. With the old fit:low the
+        # refuse arm read 100% -- the model was matching a label D3 taught it. With fit:high and
+        # missing:none it read 7.5% -- the model was reading the answerable signature and answering.
+        # I was one step from publishing "the model cannot judge whether a record fits", which the
+        # evidence does not support: the split had never put that judgement to it.
+        miss = _gen._device_missing_mod(src, set(vals))
+        rec=(f"{src['f']} | {um} | missing:{miss} | "
+             f"{src.get('req','standard conditions')} | fit:high")
         out.append({"id":f"{name[:3]}-{len(out)+1:03d}","q":q,"record":rec,
                     "expect":"answer" if matched else "refuse","calls":["x"] if matched else []})
     return out

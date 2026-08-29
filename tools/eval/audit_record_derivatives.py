@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """AUDIT: every artefact derived from the record set, checked against the CLEANED store.
 
@@ -24,6 +25,8 @@ The failure mode is a DERIVED artefact -- one a consumer treats as current -- si
 records the cleaning removed.
 """
 import json, pathlib, re, subprocess, sys
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[2] / 'corpus'))
+from recfmt import fields as _rf_fields, formula as _rf_formula  # " | " is the separator; a formula may contain a bare pipe
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 FORMULA = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\s*=\s*\S")
@@ -91,7 +94,7 @@ def walk(o, out):
     if isinstance(o, dict):
         for k, v in o.items():
             if k in ("f", "formula", "record") and isinstance(v, str):
-                cand = v.split("|")[0].strip()
+                cand = _rf_formula(v)
                 if FORMULA.match(cand): out.add(cand)
             walk(v, out)
     elif isinstance(o, list):

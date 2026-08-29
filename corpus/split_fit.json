@@ -1,0 +1,282 @@
+[
+ {
+  "q": "What is theta_r? m_2 = 71.8, m_1 = 944.",
+  "record": "a=((m_2)/(m_1+m_2))*g | m_2:kg m_1:kg | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "theta_r",
+  "shown": "a"
+ },
+ {
+  "q": "Find omega. m = 0.933, c = 649, dT = 0.654.",
+  "record": "Q=m*c*dT | m:kg c:J/(kg*K) dT:K | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "omega",
+  "shown": "Q"
+ },
+ {
+  "q": "What is E? L = 8.064, T = 90.2.",
+  "record": "g=((4*(pi)^(2)*L)/((T)^(2))) | L:m T:s | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "E",
+  "shown": "g"
+ },
+ {
+  "q": "Compute intensity. V_0 = 416.",
+  "record": "V_rms=((V_0)/(sqrt(2))) | V_0:V | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "I",
+  "shown": "V_rms"
+ },
+ {
+  "q": "What was d? p_g = 1875.",
+  "record": "p_abs=p_g+p_atm | p_g:Pa | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "d",
+  "shown": "p_abs"
+ },
+ {
+  "q": "What is a_CM? I = 21.2, A = 3.86e-07.",
+  "record": "v_d=((I)/(n*q*A)) | I:A A:m^2 | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "a_CM",
+  "shown": "v_d"
+ },
+ {
+  "q": "What was theta_2? C = 2.07e-10, V = 3.24.",
+  "record": "U_E=((1)/(2))*C*(V)^(2) | C:F V:V | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "theta_2",
+  "shown": "U_E"
+ },
+ {
+  "q": "Find m. Delta_f = 597000000.",
+  "record": "Delta_E=h*Delta_f | Delta_f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "m",
+  "shown": "Delta_E"
+ },
+ {
+  "q": "What is fundamental frequency of a closed tube? f = 7150000000000.",
+  "record": "lambda=((c)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "f_1",
+  "shown": "lambda"
+ },
+ {
+  "q": "Estimate velocity of a wave. B = 17.9, l = 0.102, v = 31.48.",
+  "record": "epsilon=B*l*v | B:T l:m v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "v",
+  "shown": "epsilon"
+ },
+ {
+  "q": "Determine F. I_2 = 65.6, I_3 = 3.07.",
+  "record": "I_1=I_2+I_3 | I_2:A I_3:A | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "F",
+  "shown": "I_1"
+ },
+ {
+  "q": "Estimate w. x = 1.2, lambda = 1.58e-08, d = 0.003.",
+  "record": "Delta_y=x*lambda/d | x:m lambda:m d:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "w",
+  "shown": "Delta_y"
+ },
+ {
+  "q": "Calculate velocity. k = 1410, m = 23.24.",
+  "record": "f=((1)/(2*pi))*sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "v",
+  "shown": "f"
+ },
+ {
+  "q": "Compute vertical position. k = 6.88, m = 243.",
+  "record": "omega=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "y",
+  "shown": "omega"
+ },
+ {
+  "q": "Estimate period of a particle's motion in a magnetic field. m_2 = 189, m_1 = 91.7.",
+  "record": "a=((m_2)/(m_1+m_2))*g | m_2:kg m_1:kg | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "T",
+  "shown": "a"
+ },
+ {
+  "q": "Calculate time constant. n_1 = 3.75, theta_1 = 1.01, n_2 = 2.186.",
+  "record": "theta_2=asin(((n_1*sin(theta_1))/(n_2))) | n_1:1 theta_1:1 n_2:1 | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "tau",
+  "shown": "theta_2"
+ },
+ {
+  "q": "What is height of free fall? F = 540, d = 132.651.",
+  "record": "W=F*d | F:N d:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "y",
+  "shown": "W"
+ },
+ {
+  "q": "Estimate quantum number from energy, particle in a box. W = 2762, t = 1150.",
+  "record": "P=((W)/(t)) | W:J t:s | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "n",
+  "shown": "P"
+ },
+ {
+  "q": "Determine path length difference for waves from two slits to a common point on a screen. I = 37.6, A = 1.94e-05.",
+  "record": "v_d=((I)/(n*q*A)) | I:A A:m^2 | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "Delta_l",
+  "shown": "v_d"
+ },
+ {
+  "q": "What is area of a sector? V = 169.98, R = 56.533.",
+  "record": "P=(((V)^(2))/(R)) | V:V R:ohm | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "A",
+  "shown": "P"
+ },
+ {
+  "q": "Find momentum. R = 0.44, alpha = 19.51.",
+  "record": "a_CM=R*alpha | R:m alpha:1/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "p",
+  "shown": "a_CM"
+ },
+ {
+  "q": "Calculate position under constant acceleration. E_transfer = 6.61e-19, U_coul = -7.12e-19, U_ex = 4.79e-20.",
+  "record": "U_form=E_transfer+U_coul+U_ex | E_transfer:J U_coul:J U_ex:J | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "d",
+  "shown": "U_form"
+ },
+ {
+  "q": "Estimate F_net. F_i = 413, d_i = 2.338.",
+  "record": "W_i=F_i*d_i | F_i:N d_i:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "F_net",
+  "shown": "W_i"
+ },
+ {
+  "q": "Find E. m = 1835.",
+  "record": "N=m*g | m:kg | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "E",
+  "shown": "N"
+ },
+ {
+  "q": "What is acceleration? Q = 1.14e-08, V = 9.81.",
+  "record": "C=((Q)/(V)) | Q:C V:V | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "a",
+  "shown": "C"
+ },
+ {
+  "q": "What is kinetic energy? f = 3.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "K",
+  "shown": "T"
+ },
+ {
+  "q": "Calculate horizontal displacement. m = 306.464, a_c = 63.5.",
+  "record": "F_c=m*a_c | m:kg a_c:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "x",
+  "shown": "F_c"
+ },
+ {
+  "q": "Compute lambda. E = 138, B = 8.2.",
+  "record": "v_d=E/B | E:V/m B:T | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "lambda",
+  "shown": "v_d"
+ },
+ {
+  "q": "Find capacitance. E_transfer = 2e-19, U_coul = -6.03e-19, U_ex = 1.16e-19.",
+  "record": "U_form=E_transfer+U_coul+U_ex | E_transfer:J U_coul:J U_ex:J | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "C",
+  "shown": "U_form"
+ },
+ {
+  "q": "What is electron energy? v_0 = 114.23, a = 3.9, t = 1.28.",
+  "record": "v=v_0+a*t | v_0:m/s a:m/s^2 t:s | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "E_n",
+  "shown": "v"
+ },
+ {
+  "q": "Calculate fundamental frequency. k = 1167, x = 0.12.",
+  "record": "F=-k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "f_1",
+  "shown": "F"
+ },
+ {
+  "q": "What was R_eqv? f = 0.112.",
+  "record": "P=((1)/(f)) | f:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "R_eqv",
+  "shown": "P"
+ },
+ {
+  "q": "What was F_net? m_2 = 781, m_1 = 10.41.",
+  "record": "a=((m_2)/(m_1+m_2))*g | m_2:kg m_1:kg | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "F_net",
+  "shown": "a"
+ },
+ {
+  "q": "Determine total entropy change. W = 1.76, t = 1.45.",
+  "record": "P=((W)/(t)) | W:J t:s | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "Delta_S_tot",
+  "shown": "P"
+ },
+ {
+  "q": "Estimate average speed. m = 27.5, a = 0.964.",
+  "record": "F=m*a | m:kg a:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "v",
+  "shown": "F"
+ },
+ {
+  "q": "Find T. R = 9.4.",
+  "record": "f=((R)/(2)) | R:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "T",
+  "shown": "f"
+ },
+ {
+  "q": "Estimate pressure. V = 7.557, R = 340.",
+  "record": "P=(((V)^(2))/(R)) | V:V R:ohm | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "p",
+  "shown": "P"
+ },
+ {
+  "q": "Compute d. f = 0.659.",
+  "record": "P=((1)/(f)) | f:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "d",
+  "shown": "P"
+ },
+ {
+  "q": "Calculate V_rms. d_i = 12.4, d_o = 4.66.",
+  "record": "f=((d_i*d_o)/(d_o+d_i)) | d_i:m d_o:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "V_rms",
+  "shown": "f"
+ },
+ {
+  "q": "Compute energy. m1 = 2.6e+25, m2 = 1.06e+25, r = 6590000000.",
+  "record": "F=G*m1*m2/(r)^(2) | m1:kg m2:kg r:m | missing:none | standard conditions | fit:high",
+  "expect": "refuse",
+  "asked": "K",
+  "shown": "F"
+ }
+]

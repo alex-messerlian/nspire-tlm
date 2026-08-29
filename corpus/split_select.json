@@ -1,7 +1,7 @@
 [
  {
   "id": "SEL-001",
-  "q": "What is the cost savings for using the LED in place of the incandescent bulb for one year, assuming $0. omega = 2, r = 12.",
+  "q": "What is the cost savings for using the LED in place of the incandescent bulb for one year, assuming $0. omega = 0.019, r = 4.9.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -10,7 +10,7 @@
  },
  {
   "id": "SEL-002",
-  "q": "Find the probability that a car battery lasts more than 36 months. m = 8, omega = 2, x = 8.",
+  "q": "Find the probability that a car battery lasts more than 36 months. m = 5.22, omega = 0.282, x = 0.393.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -19,7 +19,7 @@
  },
  {
   "id": "SEL-003",
-  "q": "The electron beam is created in an electron gun by heating a tungsten element and by accelerating the electrons across a 600-V potential. B = 2, l = 10, v_d = 10.",
+  "q": "The electron beam is created in an electron gun by heating a tungsten element and by accelerating the electrons across a 600-V potential. B = 0.026, l = 0.23, v_d = 43.3.",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -28,7 +28,7 @@
  },
  {
   "id": "SEL-004",
-  "q": "(b) What is the magnitude of the resultant displacement? f = 3, lambda = 12.",
+  "q": "(b) What is the magnitude of the resultant displacement? f = 5.001, lambda = 2.28.",
   "record": "v_w=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -37,7 +37,7 @@
  },
  {
   "id": "SEL-005",
-  "q": "The equilibrium concentrations are [ PCl 5 ] = 1. A = 2, d_2 = 5.",
+  "q": "The equilibrium concentrations are [ PCl 5 ] = 1. A = 0.149, d_2 = 0.646.",
   "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -46,7 +46,7 @@
  },
  {
   "id": "SEL-006",
-  "q": "The part of the graph that is below the horizontal line is not meaningful here since there cannot be a negative area (which doesn\u2019t make sense). omega = 2, r = 5.",
+  "q": "The part of the graph that is below the horizontal line is not meaningful here since there cannot be a negative area (which doesn\u2019t make sense). omega = 513, r = 0.687.",
   "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -55,7 +55,7 @@
  },
  {
   "id": "SEL-007",
-  "q": "Determine whether 1,290 is divisible by 2 , 3 , 5 , and 10 . E_0 = 10.",
+  "q": "Determine whether 1,290 is divisible by 2 , 3 , 5 , and 10 . E_0 = 3.9e-19.",
   "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -64,8 +64,8 @@
  },
  {
   "id": "SEL-008",
-  "q": "Find the smallest angle the magnetic moment makes with the z -axis. Q = 5, W = 2.",
-  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | standard conditions | fit:high",
+  "q": "Find the smallest angle the magnetic moment makes with the z -axis. Q = 520, W = 6.64.",
+  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -73,7 +73,7 @@
  },
  {
   "id": "SEL-009",
-  "q": "How many of them would it take to equal 1 2 ? A = 12, F = 8.",
+  "q": "How many of them would it take to equal 1 2 ? A = 21.4, F = 0.472.",
   "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -82,7 +82,7 @@
  },
  {
   "id": "SEL-010",
-  "q": "0 mm, or does the range have an average value with some statistical fluctuations in the distances traveled? lambda = 2.",
+  "q": "0 mm, or does the range have an average value with some statistical fluctuations in the distances traveled? lambda = 1.39e-12.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -91,7 +91,7 @@
  },
  {
   "id": "SEL-011",
-  "q": "What is the maximum negative gauge pressure you can create in your lungs on dry land, assuming you can achieve \u2212 3. F_x = 10, F_y = 2.",
+  "q": "What is the maximum negative gauge pressure you can create in your lungs on dry land, assuming you can achieve \u2212 3. F_x = 1332, F_y = 5.1.",
   "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -100,7 +100,7 @@
  },
  {
   "id": "SEL-012",
-  "q": "A Carnot refrigerator exhausts heat to the air, which is at a temperature of 25 \u00b0 C . f = 2, lambda = 20.",
+  "q": "A Carnot refrigerator exhausts heat to the air, which is at a temperature of 25 \u00b0 C . f = 22.29, lambda = 52.9.",
   "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -109,7 +109,7 @@
  },
  {
   "id": "SEL-013",
-  "q": "What is this compound\u2019s percent composition? r_1 = 12, r_2 = 20.",
+  "q": "What is this compound\u2019s percent composition? r_1 = 5, r_2 = 6.",
   "record": "r=r_1+r_2 | r_1:m r_2:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -118,7 +118,7 @@
  },
  {
   "id": "SEL-014",
-  "q": "0 eV is required to create each ion pair? omega = 3, r = 3.",
+  "q": "0 eV is required to create each ion pair? omega = 6.93, r = 1.609.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -127,7 +127,7 @@
  },
  {
   "id": "SEL-015",
-  "q": "A light beam in air has an angle of incidence of 35 \u00b0 at the surface of a glass plate. m = 12, omega = 3, x = 3.",
+  "q": "A light beam in air has an angle of incidence of 35 \u00b0 at the surface of a glass plate. m = 0.889, omega = 535.77, x = 0.08.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -136,7 +136,7 @@
  },
  {
   "id": "SEL-016",
-  "q": "\u24d2 Which store should Jason buy the dog food from? B = 3, l = 8, v_d = 3.",
+  "q": "\u24d2 Which store should Jason buy the dog food from? B = 2.733, l = 1.001, v_d = 44.7.",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -145,7 +145,7 @@
  },
  {
   "id": "SEL-017",
-  "q": "An arrow is shot from the ground into the air at an initial speed of 108 ft/sec. f = 20, lambda = 10.",
+  "q": "An arrow is shot from the ground into the air at an initial speed of 108 ft/sec. f = 5950, lambda = 0.161.",
   "record": "v_w=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -154,7 +154,7 @@
  },
  {
   "id": "SEL-018",
-  "q": "The switch in the circuit shown below is closed at t = 0 s . A = 2, d_2 = 5.",
+  "q": "The switch in the circuit shown below is closed at t = 0 s . A = 4.39, d_2 = 0.87.",
   "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -163,7 +163,7 @@
  },
  {
   "id": "SEL-019",
-  "q": "A sample of neon gas (Ne, molar mass M = 20. omega = 8, r = 12.",
+  "q": "A sample of neon gas (Ne, molar mass M = 20. omega = 268.8, r = 3.22.",
   "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -172,7 +172,7 @@
  },
  {
   "id": "SEL-020",
-  "q": "2 ( x 4 \u2212 16 ) In the parentheses, is it a binomial, trinomial, or are there more than three terms? E_0 = 10.",
+  "q": "2 ( x 4 \u2212 16 ) In the parentheses, is it a binomial, trinomial, or are there more than three terms? E_0 = 1.75e-18.",
   "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -181,8 +181,8 @@
  },
  {
   "id": "SEL-021",
-  "q": "The error formula for Simpson\u2019s rule depends on___. Q = 2, W = 5.",
-  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | standard conditions | fit:high",
+  "q": "The error formula for Simpson\u2019s rule depends on___. Q = 72.15, W = 384.",
+  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -190,7 +190,7 @@
  },
  {
   "id": "SEL-022",
-  "q": "Suppose that an annuity has a present value P = 10 million dollars . A = 5, F = 20.",
+  "q": "Suppose that an annuity has a present value P = 10 million dollars . A = 0.112, F = 71.7.",
   "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -199,7 +199,7 @@
  },
  {
   "id": "SEL-023",
-  "q": "Find the point on the line y = 2 x + 3 that is closest to point ( 4 , 2 ) . lambda = 10.",
+  "q": "Find the point on the line y = 2 x + 3 that is closest to point ( 4 , 2 ) . lambda = 1.53e-11.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -208,7 +208,7 @@
  },
  {
   "id": "SEL-024",
-  "q": "What conclusion can you draw from this comparison about what would be required to create a black hole? F_x = 12, F_y = 5.",
+  "q": "What conclusion can you draw from this comparison about what would be required to create a black hole? F_x = 33.05, F_y = 313.",
   "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -217,7 +217,7 @@
  },
  {
   "id": "SEL-025",
-  "q": "What is the change in the internal energy of a system when a total of 150. f = 20, lambda = 5.",
+  "q": "What is the change in the internal energy of a system when a total of 150. f = 291, lambda = 98.8.",
   "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -226,7 +226,7 @@
  },
  {
   "id": "SEL-026",
-  "q": "The formula for the power dissipated in a resistor is P = V I . r_1 = 8, r_2 = 2.",
+  "q": "The formula for the power dissipated in a resistor is P = V I . r_1 = 2, r_2 = 6.",
   "record": "r=r_1+r_2 | r_1:m r_2:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -235,7 +235,7 @@
  },
  {
   "id": "SEL-027",
-  "q": "Which object experiences a greater force from the wall or are the forces equal? omega = 8, r = 3.",
+  "q": "Which object experiences a greater force from the wall or are the forces equal? omega = 5.9, r = 2.53.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -244,7 +244,7 @@
  },
  {
   "id": "SEL-028",
-  "q": "The number 145 \u00d7 10 \u2212 8 is not in scientific notation because 145 is not at least 1 and less than 10. m = 10, omega = 5, x = 10.",
+  "q": "The number 145 \u00d7 10 \u2212 8 is not in scientific notation because 145 is not at least 1 and less than 10. m = 0.456, omega = 756, x = 0.313.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -253,7 +253,7 @@
  },
  {
   "id": "SEL-029",
-  "q": "The outlier is the student who had a grade of 65 on the third exam and 175 on the final exam; this point is further than two standard deviations away from the best-fit line. B = 8, l = 20, v_d = 10.",
+  "q": "The outlier is the student who had a grade of 65 on the third exam and 175 on the final exam; this point is further than two standard deviations away from the best-fit line. B = 1.001, l = 0.56, v_d = 0.094.",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -262,7 +262,7 @@
  },
  {
   "id": "SEL-030",
-  "q": "The student is confused about the speed of sound through solids versus the speed of sound in air. f = 12, lambda = 2.",
+  "q": "The student is confused about the speed of sound through solids versus the speed of sound in air. f = 483, lambda = 0.297.",
   "record": "v_w=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -271,7 +271,7 @@
  },
  {
   "id": "SEL-031",
-  "q": "Calculate the speed of the water (a) in the hose and (b) in the nozzle. A = 5, d_2 = 3.",
+  "q": "Calculate the speed of the water (a) in the hose and (b) in the nozzle. A = 2.11, d_2 = 5.45.",
   "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -280,7 +280,7 @@
  },
  {
   "id": "SEL-032",
-  "q": "(c) Is the torque equal to the time rate of change of the angular momentum? omega = 20, r = 10.",
+  "q": "(c) Is the torque equal to the time rate of change of the angular momentum? omega = 0.501, r = 0.223.",
   "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -289,7 +289,7 @@
  },
  {
   "id": "SEL-033",
-  "q": "After the wheels have made 200 revolutions (assume no slippage): (a) How far has the train moved down the track? E_0 = 2.",
+  "q": "After the wheels have made 200 revolutions (assume no slippage): (a) How far has the train moved down the track? E_0 = 4.94e-19.",
   "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -298,8 +298,8 @@
  },
  {
   "id": "SEL-034",
-  "q": "The approximate minimum daily dietary requirement of the amino acid leucine, C 6 H 13 NO 2 , is 1. Q = 20, W = 10.",
-  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | standard conditions | fit:high",
+  "q": "The approximate minimum daily dietary requirement of the amino acid leucine, C 6 H 13 NO 2 , is 1. Q = 254, W = 62.5.",
+  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -307,7 +307,7 @@
  },
  {
   "id": "SEL-035",
-  "q": "What is the angular width of the central peak? A = 5, F = 3.",
+  "q": "What is the angular width of the central peak? A = 3.41, F = 268.",
   "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -316,7 +316,7 @@
  },
  {
   "id": "SEL-036",
-  "q": "The direction of the field at any given location should be tangent to the circle centered on the origin and counterclockwise. lambda = 10.",
+  "q": "The direction of the field at any given location should be tangent to the circle centered on the origin and counterclockwise. lambda = 5.67e-11.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -325,7 +325,7 @@
  },
  {
   "id": "SEL-037",
-  "q": "A la cent\u00e9sima m\u00e1s cercana, \u00bfcu\u00e1ntos a\u00f1os tardar\u00e1 el lago en alcanzar 80 % de su capacidad de carga? F_x = 5, F_y = 2.",
+  "q": "A la cent\u00e9sima m\u00e1s cercana, \u00bfcu\u00e1ntos a\u00f1os tardar\u00e1 el lago en alcanzar 80 % de su capacidad de carga? F_x = 1.065, F_y = 6.58.",
   "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -334,7 +334,7 @@
  },
  {
   "id": "SEL-038",
-  "q": "\u00bfCu\u00e1l es la probabilidad de obtener 3 M&amp;M azules? f = 12, lambda = 8.",
+  "q": "\u00bfCu\u00e1l es la probabilidad de obtener 3 M&amp;M azules? f = 1.034, lambda = 39.12.",
   "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -343,7 +343,7 @@
  },
  {
   "id": "SEL-039",
-  "q": "Is the following an example of a linear equation? r_1 = 2, r_2 = 5.",
+  "q": "Is the following an example of a linear equation? r_1 = 15.03, r_2 = 128.",
   "record": "r=r_1+r_2 | r_1:m r_2:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -352,7 +352,7 @@
  },
  {
   "id": "SEL-040",
-  "q": "To the nearest tenth, what was the speed of the car (in mph) before the brakes were applied? omega = 20, r = 12.",
+  "q": "To the nearest tenth, what was the speed of the car (in mph) before the brakes were applied? omega = 0.389, r = 0.036.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -361,281 +361,281 @@
  },
  {
   "id": "SEL-041",
-  "q": "(b) How much kinetic energy is lost during the collision? m = 12, omega = 2, x = 2.",
-  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:low",
+  "q": "(b) How much kinetic energy is lost during the collision? m = 59.09, omega = 138.57, x = 0.889.",
+  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-042",
-  "q": "If you must keep the vertical rise at 25 in, what will the other dimensions have to be? B = 2, l = 3, v_d = 20.",
-  "record": "v_w=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "If you must keep the vertical rise at 25 in, what will the other dimensions have to be? B = 0.283, l = 0.66, v_d = 14.13.",
+  "record": "v_w=f*lambda | f:Hz lambda:m | missing:f | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-043",
-  "q": "Does adding heat to a system always increase its internal energy? f = 8, lambda = 5.",
-  "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:none | standard conditions | fit:low",
+  "q": "Does adding heat to a system always increase its internal energy? f = 11.4, lambda = 2.725.",
+  "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:A | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-044",
-  "q": "How many units can she take to have a maximum cost of $1,365? A = 5, d_2 = 10.",
-  "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:low",
+  "q": "How many units can she take to have a maximum cost of $1,365? A = 44, d_2 = 1.11.",
+  "record": "v=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-045",
-  "q": "(b) Is this value within the normal range for pressures in the eye? omega = 5, r = 5.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:none | standard conditions | fit:low",
+  "q": "(b) Is this value within the normal range for pressures in the eye? omega = 158.11, r = 0.5.",
+  "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:E_0 | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-046",
-  "q": "A scientist begins with 100 milligrams of a radioactive substance that decays exponentially. E_0 = 2.",
-  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | standard conditions | fit:low",
+  "q": "A scientist begins with 100 milligrams of a radioactive substance that decays exponentially. E_0 = 1.41e-18.",
+  "record": "Delta_E_int=Q-W | Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-047",
-  "q": "Find the slope of the line shown: Solution Locate two points on the graph. Q = 3, W = 2.",
-  "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:low",
+  "q": "Find the slope of the line shown: Solution Locate two points on the graph. Q = 39.9, W = 20.4.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:F | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-048",
-  "q": "What is its speed at the top of the loop? A = 12, F = 12.",
-  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:low",
+  "q": "What is its speed at the top of the loop? A = 4.99, F = 1852.",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-049",
-  "q": "Determining Inverse Relationships for Power Functions If f ( x ) = x 3 (the cube function) and g ( x ) = 1 3 x , is g = f \u2212 1 ? lambda = 5.",
-  "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:none | standard conditions | fit:low",
+  "q": "Determining Inverse Relationships for Power Functions If f ( x ) = x 3 (the cube function) and g ( x ) = 1 3 x , is g = f \u2212 1 ? lambda = 1.3e-12.",
+  "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:F_x | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-050",
-  "q": "6 ( y 2 \u2212 12 ) Is it a binomial, trinomial, or are there more than 3 terms? F_x = 8, F_y = 2.",
-  "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "6 ( y 2 \u2212 12 ) Is it a binomial, trinomial, or are there more than 3 terms? F_x = 92, F_y = 305.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:lambda | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-051",
-  "q": "The square base will be adjacent to one leg of the triangle. f = 2, lambda = 20.",
-  "record": "r=r_1+r_2 | r_1:m r_2:m | missing:none | standard conditions | fit:low",
+  "q": "The square base will be adjacent to one leg of the triangle. f = 268, lambda = 4.32.",
+  "record": "r=r_1+r_2 | r_1:m r_2:m | missing:r_1 | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-052",
-  "q": "The mean comes out to be 475 minutes, with a standard deviation of 45 minutes. r_1 = 20, r_2 = 8.",
-  "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:low",
+  "q": "The mean comes out to be 475 minutes, with a standard deviation of 45 minutes. r_1 = 4, r_2 = 245.",
+  "record": "v_CM=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-053",
-  "q": "How many liters of water are in Tank A after 4 minutes? omega = 12, r = 2.",
-  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:low",
+  "q": "How many liters of water are in Tank A after 4 minutes? omega = 19.03, r = 1.41.",
+  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-054",
-  "q": "The bicep muscle is closer to your elbow than the downward force placed on your hand from the dumbbell. m = 12, omega = 12, x = 5.",
-  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:low",
+  "q": "The bicep muscle is closer to your elbow than the downward force placed on your hand from the dumbbell. m = 8.252, omega = 96.3, x = 0.63.",
+  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-055",
-  "q": "A = $ 50,000 P = $ 10,000 Identify the variables in the formula r = ? B = 10, l = 3, v_d = 5.",
-  "record": "v_w=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "A = $ 50,000 P = $ 10,000 Identify the variables in the formula r = ? B = 22.4, l = 0.22, v_d = 19.26.",
+  "record": "v_w=f*lambda | f:Hz lambda:m | missing:f | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-056",
-  "q": "(c) If the train is 130 m long, what is the velocity of the end of the train as it leaves? f = 12, lambda = 8.",
-  "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:none | standard conditions | fit:low",
+  "q": "(c) If the train is 130 m long, what is the velocity of the end of the train as it leaves? f = 5.25, lambda = 7.16.",
+  "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:A | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-057",
-  "q": "The complement of set C is the set of elements in the universal set U that are not in set C . A = 8, d_2 = 3.",
-  "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:low",
+  "q": "The complement of set C is the set of elements in the universal set U that are not in set C . A = 45, d_2 = 9.18.",
+  "record": "v=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-058",
-  "q": "What are the ground speed and new direction of the airplane? omega = 3, r = 3.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:none | standard conditions | fit:low",
+  "q": "What are the ground speed and new direction of the airplane? omega = 273, r = 4.73.",
+  "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:E_0 | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-059",
-  "q": "The following data represent the number of employees at various restaurants in New York City. E_0 = 3.",
-  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | standard conditions | fit:low",
+  "q": "The following data represent the number of employees at various restaurants in New York City. E_0 = 3.21e-16.",
+  "record": "Delta_E_int=Q-W | Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-060",
-  "q": "The first job would pay her $83,000 per year. Q = 3, W = 8.",
-  "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:low",
+  "q": "The first job would pay her $83,000 per year. Q = 2.04, W = 9.5.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:F | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-061",
-  "q": "(b) At what wave speed does the wave travel up the string? A = 20, F = 12.",
-  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:low",
+  "q": "(b) At what wave speed does the wave travel up the string? A = 17.81, F = 58.43.",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-062",
-  "q": "The initial rotational kinetic energy of the propeller is K 0 = 1 2 I \u03c9 2 = 1 2 ( 800. lambda = 2.",
-  "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:none | standard conditions | fit:low",
+  "q": "The initial rotational kinetic energy of the propeller is K 0 = 1 2 I \u03c9 2 = 1 2 ( 800. lambda = 3.79e-10.",
+  "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:F_x | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-063",
-  "q": "Find the volume of a solid of revolution formed by revolving the region bounded by the graphs of f ( x ) = x and g ( x ) = 1 / x over the interval [ 1 , 3 ] around the x -axis . F_x = 3, F_y = 8.",
-  "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "Find the volume of a solid of revolution formed by revolving the region bounded by the graphs of f ( x ) = x and g ( x ) = 1 / x over the interval [ 1 , 3 ] around the x -axis . F_x = 0.279, F_y = 3.595.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:lambda | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-064",
-  "q": "The ion Li 2+ makes an atomic transition from an n = 4 state to an n = 2 state. f = 10, lambda = 8.",
-  "record": "r=r_1+r_2 | r_1:m r_2:m | missing:none | standard conditions | fit:low",
+  "q": "The ion Li 2+ makes an atomic transition from an n = 4 state to an n = 2 state. f = 27.4, lambda = 40.",
+  "record": "r=r_1+r_2 | r_1:m r_2:m | missing:r_1 | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-065",
-  "q": "The final mass is the sum m ( 235 U ) + m ( 4 He ) = 235. r_1 = 20, r_2 = 5.",
-  "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:low",
+  "q": "The final mass is the sum m ( 235 U ) + m ( 4 He ) = 235. r_1 = 500.1, r_2 = 12.",
+  "record": "v_CM=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-066",
-  "q": "Find the currents flowing in the circuit in the preceding problem. omega = 12, r = 10.",
-  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:low",
+  "q": "Find the currents flowing in the circuit in the preceding problem. omega = 897, r = 3.",
+  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-067",
-  "q": "The closest the comet gets to the sun is approximately 15 AU and the furthest is approximately 85 AU. m = 3, omega = 12, x = 8.",
-  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:low",
+  "q": "The closest the comet gets to the sun is approximately 15 AU and the furthest is approximately 85 AU. m = 14.29, omega = 5.46, x = 0.974.",
+  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-068",
-  "q": "2 N 2 + 5 O 2 \u27f6 2 N 2 O 5 Element Reactants Products Balanced? B = 5, l = 20, v_d = 8.",
-  "record": "v_w=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "2 N 2 + 5 O 2 \u27f6 2 N 2 O 5 Element Reactants Products Balanced? B = 0.125, l = 0.25, v_d = 0.285.",
+  "record": "v_w=f*lambda | f:Hz lambda:m | missing:f | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-069",
-  "q": "Calculate the average atomic mass of this element. f = 8, lambda = 8.",
-  "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:none | standard conditions | fit:low",
+  "q": "Calculate the average atomic mass of this element. f = 2.78, lambda = 4.46.",
+  "record": "d_1=((2*A)/(d_2)) | A:m^2 d_2:m | missing:A | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-070",
-  "q": "The slope of the tangent line near x = 1 is 2. A = 10, d_2 = 10.",
-  "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:low",
+  "q": "The slope of the tangent line near x = 1 is 2. A = 0.006, d_2 = 5.37.",
+  "record": "v=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-071",
-  "q": "\u00bfQu\u00e9 cantidad de cada material utiliz\u00f3 el agricultor? omega = 2, r = 10.",
-  "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:none | standard conditions | fit:low",
+  "q": "\u00bfQu\u00e9 cantidad de cada material utiliz\u00f3 el agricultor? omega = 4.93, r = 0.163.",
+  "record": "lambda=((2*h*c)/(E_0)) | E_0:J c:m/s h:J*s | missing:E_0 | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-072",
-  "q": "The work done by the engine per cycle is 50 J. E_0 = 20.",
-  "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | standard conditions | fit:low",
+  "q": "The work done by the engine per cycle is 50 J. E_0 = 5.06e-16.",
+  "record": "Delta_E_int=Q-W | Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-073",
-  "q": "The intensity of light measured in foot-candles varies inversely with the square of the distance from the light source. Q = 2, W = 8.",
-  "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:low",
+  "q": "The intensity of light measured in foot-candles varies inversely with the square of the distance from the light source. Q = 4.75, W = 306.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:F | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-074",
-  "q": "What is the half-life of a waste product of a nuclear reaction? A = 12, F = 10.",
-  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:low",
+  "q": "What is the half-life of a waste product of a nuclear reaction? A = 0.524, F = 22.22.",
+  "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-075",
-  "q": "The equation is already written in standard form, and r ( x ) is identically zero, so the equation is homogeneous. lambda = 12.",
-  "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:none | standard conditions | fit:low",
+  "q": "The equation is already written in standard form, and r ( x ) is identically zero, so the equation is homogeneous. lambda = 2.05e-09.",
+  "record": "F_app=F_x+F_y | F_x:N F_y:N | missing:F_x | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-076",
-  "q": "However, we can only use it if we have a closed system. F_x = 20, F_y = 8.",
-  "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "However, we can only use it if we have a closed system. F_x = 75.5, F_y = 3.93.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:lambda | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-077",
-  "q": "The table does not include horse-racing or motor-racing stadiums. f = 2, lambda = 20.",
-  "record": "r=r_1+r_2 | r_1:m r_2:m | missing:none | standard conditions | fit:low",
+  "q": "The table does not include horse-racing or motor-racing stadiums. f = 271.5, lambda = 11.6.",
+  "record": "r=r_1+r_2 | r_1:m r_2:m | missing:r_1 | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-078",
-  "q": "Where might the gas and dust (if any) in an elliptical galaxy come from? r_1 = 3, r_2 = 10.",
-  "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:low",
+  "q": "Where might the gas and dust (if any) in an elliptical galaxy come from? r_1 = 23, r_2 = 7.9.",
+  "record": "v_CM=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-079",
-  "q": "A beam of white light goes from air into water at an incident angle of 75. omega = 5, r = 8.",
-  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:low",
+  "q": "A beam of white light goes from air into water at an incident angle of 75. omega = 134.16, r = 0.737.",
+  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "SEL-080",
-  "q": "Find the probability that she must call three or four dealerships. m = 8, omega = 2, x = 3.",
-  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:low",
+  "q": "Find the probability that she must call three or four dealerships. m = 64.56, omega = 668, x = 0.59.",
+  "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "expect": "refuse",
   "calls": []
  }

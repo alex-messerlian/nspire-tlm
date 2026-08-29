@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """PERMANENT GATE: SELECT's separation claim must be true, or stated as false.
 
@@ -21,6 +22,8 @@ and for the 97.8% refusal rate. The fix is not to silence the gate: it is to car
 of the store before generation, so "never trained on" becomes true by construction.
 """
 import importlib.util, io, contextlib, json, pathlib, sys
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[2] / 'corpus'))
+from recfmt import fields as _rf_fields, formula as _rf_formula  # " | " is the separator; a formula may contain a bare pipe
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 # Flipped 2026-08-28, when tools/carve_holdout.py made the claim true by construction: the holdout
@@ -35,9 +38,9 @@ def main():
     with contextlib.redirect_stdout(io.StringIO()):
         spec.loader.exec_module(m)
     trained = {r["f"] for r in m.recs}
-    sel = {i["record"].split("|")[0].strip()
+    sel = {_rf_formula(i["record"])
            for i in json.loads((ROOT / "corpus/split_select.json").read_text())}
-    rep = {i["record"].split("|")[0].strip()
+    rep = {_rf_formula(i["record"])
            for i in json.loads((ROOT / "corpus/split_report.json").read_text())}
     overlap_s, overlap_r = sel & trained, rep & trained
     print(f"  generator emits {len(trained)} formulas")
