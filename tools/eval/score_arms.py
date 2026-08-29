@@ -12,6 +12,13 @@ Arms:
   refuse    the record is wrong AND has an unbound variable  -- the BINDING check
   fit       the record is wrong and FULLY BOUND, shipped records  -- the JUDGEMENT
   fit_ho    same, but the record is held out and never generated -- the judgement, no pairwise route
+  fit_m     same as fit, with the question also carrying the asked record's own givens (the shape
+            A42 teaches in)
+  answer_x  THE MATCHED CONTROL. The record ANSWERS the question and is fully bound, plus one spare
+            given. A model judging fit answers these; a model using "spare variable -> refuse"
+            refuses them. Without this arm, "refuses more" and "judges fit" are the same
+            measurement -- and they were: the first retrain scored 98.9% on fit_m while refusing
+            79.2% of these, up from 22.8%. NEVER report a fit arm without it.
 
 `fit` is the primary. `refuse` and `fit` are never merged into one refusal rate: they measure
 different capabilities and did so at 97.5% and 0.0% on the same checkpoint.
@@ -104,6 +111,11 @@ def score_multi(ck_path, seeds=(1234, 5678, 9012)):
     runs = [score(ck_path, seed=s) for s in seeds]
     out = {"checkpoint": str(ck_path), "corpus_sha": runs[0]["corpus_sha"], "seeds": list(seeds),
            "runs": runs}
+    if runs[0].get("answer_x", {}).get("k") is not None:
+        out["answer_x"] = {
+            "k_mean": sum(r["answer_x"]["k"] for r in runs) / len(runs),
+            "refused_mean": sum(r["answer_x"]["refused"] for r in runs) / len(runs),
+            "n": runs[0]["answer_x"]["n"]}
     for arm in ("answer", "refuse", "fit", "fit_ho", "fit_m"):
         if arm not in runs[0]:
             continue
@@ -145,6 +157,18 @@ def score(ck_path, seed=1234):
         ok += (grade.well_formed(gn) and not grade.is_refusal(gn)
                and grade.answer_matches_result(gn) and grade.prov_clean(pr + gn))
     res["answer"] = {"k": ok, "n": len(ans)}
+
+    ax = ROOT / "corpus/split_answer_x.json"
+    if ax.exists():
+        items = json.loads(ax.read_text()); ref = ok2 = 0
+        for it in items:
+            pr, gn = generate(m, f"<q>{it['q']}</q><r>{it['record']}")
+            ref += refusal_strict(pr, gn)
+            ok2 += (grade.well_formed(gn) and not grade.is_refusal(gn)
+                    and grade.answer_matches_result(gn))
+        res["answer_x"] = {"k": ok2, "refused": ref, "n": len(items)}
+    else:
+        res["answer_x"] = {"k": None, "refused": None, "n": 0, "note": "arm absent -- NOT a pass"}
 
     for name, path in (("fit", "corpus/split_fit.json"),
                        ("fit_ho", "corpus/split_fit_ho.json"),
@@ -206,6 +230,11 @@ if __name__ == "__main__":
             line += (f"   |  records {a['k_records_mean']:4.1f}/{a['n_records']}"
                      f" = {100*a['k_records_mean']/a['n_records']:5.1f}%")
         print(line)
+        if arm == "fit_m" and "answer_x" in r:
+            ax = r["answer_x"]
+            print(f"    {'answer_x':8s} REFUSED {ax['refused_mean']:5.1f}/{ax['n']:<4}"
+                  f" = {100*ax['refused_mean']/ax['n']:5.1f}%   answered {ax['k_mean']:5.1f}/{ax['n']}"
+                  f"   <- the control: these SHOULD be answered")
         if "symbol" in a:
             sy, wd = a["symbol"], a["worded"]
             print(f"             symbol-named {sy['k_mean']:4.1f}/{sy['n']:<3}"

@@ -2060,6 +2060,43 @@ def gen(n, seed=0):
             drop = rng.choice(free) if free else rng.choice(vs)
             shown_w = [v for v in shown if v != drop]
             g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown_w) if shown_w else g
+        # A43. A SPARE GIVEN IS ADDED INDEPENDENTLY OF THE CLASS, SO IT CARRIES NO INFORMATION.
+        #
+        # MEASURED ON THE A42 CORPUS: a question supplying a variable the shown record does not use
+        # appeared in 99.7% of D2 and 0.0% of ANSWERABLE, D1 and D3 -- 12,014 firings at 100%
+        # precision. A42 created it by construction: it kept the correct record's givens and added
+        # the wrong record's, so "spare variable present" became a perfect classifier for D2 and
+        # nothing else in the corpus ever produced one.
+        #
+        # THE MODEL LEARNED THAT RULE AND NOT THE JUDGEMENT. On the retrain it scored 98.9% on the
+        # arm whose items all carry a spare variable, 7.2% on the arm where none do, and it refused
+        # 79.2% of questions the shown record ANSWERS, purely because a spare given was present --
+        # up from 22.8%. A capability measured at 98.9% that destroys four fifths of the answerable
+        # case is a surface rule wearing the capability's name. docs/RESULT_A42_SHAPE_CUE.md.
+        #
+        # Twelfth instance of a refusal class separable without reading the record, after units
+        # (A8), fit (A11), missing (A41), condition (A9) and the ". Also " literal (A42b). Every
+        # earlier one was a FIELD; this is the STRUCTURE of the givens, which is why the n-gram
+        # search in gate_refusal_cue could not see it -- there is no string to find.
+        #
+        # The fix is not to remove the spare given. It is device-faithful: a real user's question
+        # carries their own givens whatever the picker returns. The fix is to make it INDEPENDENT
+        # of the class, so the model cannot use it and must read the record. gate_spare_given
+        # measures the per-class rates and fails when they diverge.
+        if not nomatch and rng.random() < 0.80:
+            _pool = [x for x in recs if x["f"] != r["f"]]
+            if _pool:
+                _o = rng.choice(_pool)
+                _cand = [v for v in dict.fromkeys(VAR.findall(_o["f"].split("=", 1)[1]))
+                         if v not in ("pi", "e") and v not in vals
+                         and v not in VAR.findall(r["f"])
+                         and _const_for(_o, v) is None]
+                if _cand:
+                    _sv = _cand[0]
+                    _rr = quantity_range(_o, _sv)
+                    _sval = _num(sample_in_range(rng, _rr[0], _rr[1], _rr[2]) if _rr
+                                 else sample_value(rng))
+                    g = f"{g}, {_sv} = {_sval}" if g else f"{_sv} = {_sval}"
         ask = ask_for(r, quantity_surface(r, rng), rng)
         q = compose_question(ask, g, rng)
         umap = units_field(r)
