@@ -49,17 +49,45 @@ int main(int argc, char **argv) {
     const int toks[] = { 1, 2, 100, 7, 4095 % 4096, 42, 3, 900 };
     const int NT = (int)(sizeof toks / sizeof toks[0]);
     uint64_t chain = 1469598103934665603ULL;
+    uint64_t step_hash[NT];
     for (int step = 0; step < NT; step++) {
         int pos = step * 31;                 /* 0, 31, 62, ... spans the attention range */
         if (pos >= SL) pos = SL - 1;
         float *logits = rq_forward(toks[step] % V, pos);
         uint64_t h = fnv1a(logits, (size_t)V * sizeof(float));
+        step_hash[step] = h;
         chain ^= h; chain *= 1099511628211ULL;
         printf("step=%d tok=%d pos=%d logit_hash=%016llx  l0=%.9g l1=%.9g lN=%.9g\n",
                step, toks[step] % V, pos, (unsigned long long)h,
                logits[0], logits[1], logits[V - 1]);
     }
     printf("CHAIN=%016llx\n", (unsigned long long)chain);
+
+#ifdef __arm__
+    /* A RESULT THAT CANNOT BE TRANSFERRED IS A RESULT YOU DO NOT HAVE. The screen shows a 16-hex
+     * chain hash that would otherwise be copied by hand off a calculator LCD, which is exactly the
+     * transcription this project has already lost a CAS timing to.
+     *
+     * Its OWN small file, not an append to /documents/bench/results.txt: that log reached 114 KB
+     * and then failed to pull six consecutive times with "Invalid packet received" while a LARGER
+     * file pulled cleanly, so the fault was the file. A few hundred bytes, written fresh each run. */
+    {
+        FILE *g = fopen("/documents/bench/golden.txt.tns", "w");
+        if (g) {
+            fprintf(g, "model=%s\nvocab=%d seq_len=%d GS=%d\n", model, V, SL, FIXED_GS);
+            for (int step = 0; step < NT; step++) {
+                int pos = step * 31; if (pos >= SL) pos = SL - 1;
+                fprintf(g, "step=%d pos=%d hash=%016llx\n", step, pos,
+                        (unsigned long long)step_hash[step]);
+            }
+            fprintf(g, "CHAIN=%016llx\n", (unsigned long long)chain);
+            fclose(g);
+            printf("wrote /documents/bench/golden.txt.tns\n");
+        } else {
+            printf("WARNING: could not write the result file; the CHAIN above is screen-only\n");
+        }
+    }
+#endif
     /* Optional: dump every logit so the two KV arms can be compared numerically. A CHAIN hash only
      * says DIFFERENT; the acceptance criteria are about HOW different. */
     if (argc > 2) {
