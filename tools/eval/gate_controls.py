@@ -73,6 +73,11 @@ CONTROLS = {
     # the control read as a live mutation in the tree. The invariant is not "D3 is off" -- it is
     # "a D3 question comes from outside the store", so the mutation makes it use the record-derived
     # question again, which is the exact defect the criterion measured at 100.0%.
+    # Put back the defect that produced the retracted 16%: a split item supplying a value for a
+    # constant the runtime inlines. Mutating the constant SET is the subject the gate asserts about.
+    "split_valid":     ("corpus/build_splits.py",
+                        "        _cv = _RUNTIME_CONSTANTS",
+                        "        _cv = set()  # mutated"),
     "d3_legitimacy":   ("corpus/generate.py",
                         "            q = rng.choice(_D3_STEMS)",
                         "            pass  # use the record-derived question"),

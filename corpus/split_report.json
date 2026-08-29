@@ -1,8 +1,8 @@
 [
  {
   "id": "REP-001",
-  "q": "An ideal gas at 300 K is compressed isothermally to one-fifth its original volume. B = 5, m = 10, q = 12, v = 5.",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:high",
+  "q": "An ideal gas at 300 K is compressed isothermally to one-fifth its original volume. t = 5, v_0y = 20, v_y = 12, y_0 = 10.",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -10,8 +10,8 @@
  },
  {
   "id": "REP-002",
-  "q": "Find the amount of money in the account after 10 years and after 20 years. k = 8, m = 5.",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
+  "q": "The actual atomic mass of boron can vary from 10. Delta_E = 10.",
+  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -19,8 +19,8 @@
  },
  {
   "id": "REP-003",
-  "q": "How many people who donated blood do not have the Rh + blood factor? g = 20, theta_0 = 10, v_0 = 10.",
-  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:high",
+  "q": "the money won X = the amount of money won or lost $5, &#8211;$6, $10 Roll x P ( x ) 6 10 1 6 4 or 5 5 2 6 1, 2, or 3 &#8211;6 3 6 Expected&#160;Value = (10) 1 6 + (5) 2 6 &#8211; (6) 3 6 = 0. R_1 = 3, R_2 = 20.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -28,7 +28,7 @@
  },
  {
   "id": "REP-004",
-  "q": "The independent variable ( x ) is the number of hours Svetlana tutors each session. I = 8, R = 12, mu_0 = 5.",
+  "q": "The number of pennies is seven less than twice the number of nickels. I = 2.",
   "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -37,7 +37,7 @@
  },
  {
   "id": "REP-005",
-  "q": "The part completed by Corey plus the part completed by Casey equals the amount completed together. a_n = 10, a_n1 = 12.",
+  "q": "If the trip took 10 hours, how fast was the friend driving? a_n = 10, a_n1 = 3.",
   "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -46,8 +46,8 @@
  },
  {
   "id": "REP-006",
-  "q": "How do such properties as specific heat and thermal conductivity affect the use of each material as a thermometer? f = 8, lambda = 8.",
-  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "q": "What mass of hydrogen gas results from the reaction of 8. A = 2, d = 2.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -55,8 +55,8 @@
  },
  {
   "id": "REP-007",
-  "q": "The probabilities for A and for B are P ( A ) = 3 4 and P ( B ) = 1 4 . A = 2, d = 10, epsilon_0 = 5.",
-  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
+  "q": "The water flows out at rate ( 2 \u03c0 ) 5 m 3 /min. f = 5, lambda = 2.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -64,8 +64,8 @@
  },
  {
   "id": "REP-008",
-  "q": "If you draw 3 slips, what is the probability that the letters will spell out (in order) the word BAD? f = 12, lambda = 2.",
-  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "q": "The length of the swimming pool is 70 feet and the width is 30 feet. f = 20.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -73,8 +73,8 @@
  },
  {
   "id": "REP-009",
-  "q": "The amount collected is 1 , 000 ( 30 ) + 2 , 500 ( 40 ) , which is 30 , 000 + 100 , 000 or 130,000. f = 20, h = 5.",
-  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
+  "q": "The flame contains hot gas (heated by combustion). k = 3, omega = 2.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -82,8 +82,8 @@
  },
  {
   "id": "REP-010",
-  "q": "The system is acted on by an external force of 8 sin ( 4 t ) lb. k = 2, omega = 2.",
-  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
+  "q": "The relatively ordered solid precipitating decreases the number of mobile ions in solution. t = 20, v_0 = 12, y_0 = 12.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -91,8 +91,8 @@
  },
  {
   "id": "REP-011",
-  "q": "a k = ( k k + ln k ) k ( Hint: a k = ( 1 + ln k k ) \u2212 ( k / ln k ) ln k \u2248 e \u2212 ln k . g = 8, t = 5, v_0 = 10, y_0 = 2.",
-  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:high",
+  "q": "Suppose an experiment has outcomes black, white, red, orange, yellow, green, blue, and purple, where each outcome has an equal chance of occurring. x_1 = 2, x_2 = 8, y_1 = 3, y_2 = 5.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -100,8 +100,8 @@
  },
  {
   "id": "REP-012",
-  "q": "Find the length of the curve r ( t ) = \u2329 2 sin t , 5 t , 2 cos t \u232a for t \u2208 [ \u221210 , 10 ] . x_1 = 12, x_2 = 5, y_1 = 20, y_2 = 2.",
-  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:high",
+  "q": "Find the length of the corral along the river that will give the maximum area, and then find the maximum area of the corral. r = 10, v = 5.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -109,8 +109,8 @@
  },
  {
   "id": "REP-013",
-  "q": "The expectation value of momentum in the x -direction also requires an integral. R_1 = 10, R_2 = 8.",
-  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:high",
+  "q": "The existence of the dwarf planet Pluto was proposed based on irregularities in Neptune\u2019s orbit. f = 8.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -118,8 +118,8 @@
  },
  {
   "id": "REP-014",
-  "q": "Would the cell potential increase, decrease, or remain the same? f = 3.",
-  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "q": "What is the wavelength of the waves you create in a swimming pool if you splash your hand at a rate of 2. t = 3, v_0y = 12, v_y = 8, y_0 = 10.",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -127,8 +127,8 @@
  },
  {
   "id": "REP-015",
-  "q": "What force does he apply if the stone accelerates at a rate of 1. T = 20, lambda = 12.",
-  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:high",
+  "q": "What feature of a Lewis structure can be used to tell if a molecule\u2019s (or ion\u2019s) electron-pair geometry and molecular structure will be identical? Delta_E = 12.",
+  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
    "x"
@@ -136,115 +136,7 @@
  },
  {
   "id": "REP-016",
-  "q": "The graph is a vertical line crossing the x -axis at \u22123 . B = 2, m = 3, q = 20, v = 3.",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-017",
-  "q": "If many random samples were taken of size 14, what percent of the confidence intervals constructed should contain the population mean worth of coupons? k = 8, m = 20.",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-018",
-  "q": "An artist wants to make a small monument in the shape of a square base topped by a right triangle, as shown below. g = 5, theta_0 = 8, v_0 = 3.",
-  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-019",
-  "q": "A compass needle is placed to the north of the bar magnet. I = 12, R = 10, mu_0 = 3.",
-  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-020",
-  "q": "6 \u00d7 10 6 J) of electricity would be required to provide the heat necessary to heat the house? a_n = 20, a_n1 = 5.",
-  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-021",
-  "q": "When will the potato hit the ground, or have a height of zero feet? f = 5, lambda = 3.",
-  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-022",
-  "q": "Why do infrared or radio telescopes work better? A = 8, d = 20, epsilon_0 = 2.",
-  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-023",
-  "q": "Find the 95% Confidence Interval for the true population mean for the amount of soda served. f = 12, lambda = 12.",
-  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-024",
-  "q": "The magnitudes of charge of the proton and the electron are equal, but the charge of the proton is negative, whereas the charge of the electron is positive. f = 12, h = 2.",
-  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-025",
-  "q": "What are the values of its magnetic field at r = 8. k = 5, omega = 12.",
-  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-026",
-  "q": "Find the probability that there are fewer than 130 that favor a charter school for grades K through 5. g = 5, t = 3, v_0 = 12, y_0 = 20.",
-  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-027",
-  "q": "The temperature of the calorimeter increases from 26. x_1 = 5, x_2 = 8, y_1 = 10, y_2 = 2.",
-  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-028",
-  "q": "Can you have a finite absolute maximum for y = a x 2 + b x + c over ( \u2212 \u221e , \u221e ) ? R_1 = 8, R_2 = 10.",
+  "q": "The graph is a parabola and the graph fails the horizontal line test. R_1 = 5, R_2 = 10.",
   "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -252,53 +144,8 @@
   ]
  },
  {
-  "id": "REP-029",
-  "q": "The results of the sample data _____________________________________. f = 8.",
-  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-030",
-  "q": "Qu\u00e9 gemelo ganar\u00e1 m\u00e1s intereses al momento en que tengan 55 a\u00f1os? T = 2, lambda = 8.",
-  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-031",
-  "q": "Find the quotient: ( \u22126 a 6 b 9 ) ( \u22128 a 5 b 8 ) \u221212 a 10 b 12 . B = 20, m = 2, q = 5, v = 20.",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-032",
-  "q": "A loop of wire should be placed at angle greater than 90\u00b0 to the vacuum cleaner wire to maximize the magnetic flux through the loop. k = 8, m = 5.",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-033",
-  "q": "Find the average velocity v avg of the rock for when the rock is released and the rock hits the ground. g = 20, theta_0 = 5, v_0 = 8.",
-  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-034",
-  "q": "The formula for the perimeter of a rectangle relates all the information. I = 10, R = 10, mu_0 = 12.",
+  "id": "REP-017",
+  "q": "The maximum value of the force of static friction is \u03bc s N = ( 0. I = 12.",
   "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -306,8 +153,8 @@
   ]
  },
  {
-  "id": "REP-035",
-  "q": "A farmer picks pumpkins from a large field. a_n = 10, a_n1 = 10.",
+  "id": "REP-018",
+  "q": "An artist wants to make a small monument in the shape of a square base topped by a right triangle, as shown below. a_n = 5, a_n1 = 8.",
   "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -315,17 +162,8 @@
   ]
  },
  {
-  "id": "REP-036",
-  "q": "The solubility of NaHCO 3 in hot water of 60 \u00b0C is 164 g/L. f = 20, lambda = 20.",
-  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
- },
- {
-  "id": "REP-037",
-  "q": "How can you decide if a wire is infinite? A = 8, d = 10, epsilon_0 = 2.",
+  "id": "REP-019",
+  "q": "A compass needle is placed to the north of the bar magnet. A = 5, d = 20.",
   "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -333,8 +171,8 @@
   ]
  },
  {
-  "id": "REP-038",
-  "q": "What charge is stored in the capacitor in ? f = 2, lambda = 20.",
+  "id": "REP-020",
+  "q": "6 \u00d7 10 6 J) of electricity would be required to provide the heat necessary to heat the house? f = 10, lambda = 10.",
   "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -342,8 +180,8 @@
   ]
  },
  {
-  "id": "REP-039",
-  "q": "--> Can a virtual image be projected onto a screen with additional lenses or mirrors? f = 5, h = 12.",
+  "id": "REP-021",
+  "q": "Estimate the tunneling probability between the nanowires by 7. f = 8.",
   "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -351,8 +189,8 @@
   ]
  },
  {
-  "id": "REP-040",
-  "q": "Finding Zeros and y -Intercepts of a Function Consider the function f ( x ) = \u22124 x + 2 . k = 12, omega = 3.",
+  "id": "REP-022",
+  "q": "How much heat is produced when 100 mL of 0. k = 12, omega = 5.",
   "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
   "expect": "answer",
   "calls": [
@@ -360,282 +198,444 @@
   ]
  },
  {
+  "id": "REP-023",
+  "q": "Find the 95 th percentile, and express it in a sentence. t = 10, v_0 = 12, y_0 = 8.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-024",
+  "q": "The sale price is the original price minus the discount, so the sale price is $80 \u2013 $24 = $56. x_1 = 8, x_2 = 2, y_1 = 10, y_2 = 5.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-025",
+  "q": "What are the two principal differences between nuclear reactions and ordinary chemical changes? r = 12, v = 2.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-026",
+  "q": "Is the sale price less than the original price? f = 20.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-027",
+  "q": "The linear approximation exact when y = f ( x ) is linear or constant. t = 5, v_0y = 2, v_y = 2, y_0 = 8.",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-028",
+  "q": "Can you have a finite absolute maximum for y = a x 2 + b x + c over ( \u2212 \u221e , \u221e ) ? Delta_E = 5.",
+  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-029",
+  "q": "If there are 5 students selected, what is the amount of the scholarship they will receive? R_1 = 10, R_2 = 2.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-030",
+  "q": "How far from the starter cable of a car, carrying 150 A, must you be to experience a field less than the Earth\u2019s ( 5 . I = 12.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-031",
+  "q": "Find the quotient: ( \u221212 x 6 y 9 ) ( \u22124 x 5 y 8 ) \u221212 x 10 y 12 . a_n = 5, a_n1 = 20.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-032",
+  "q": "A loop of wire should be placed at angle greater than 90\u00b0 to the vacuum cleaner wire to maximize the magnetic flux through the loop. A = 2, d = 10.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-033",
+  "q": "The figure on the left below represents the triangle formed by the cities on the map. f = 8, lambda = 3.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-034",
+  "q": "The data in the following table are used to estimate the average power output produced by Peter Sagan for each of the last 18 sec of Stage 1 of the 2012 Tour de France . f = 20.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-035",
+  "q": "A farmer picks pumpkins from a large field. k = 12, omega = 2.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-036",
+  "q": "What is the probability of rolling a pair? t = 3, v_0 = 20, y_0 = 3.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-037",
+  "q": "The right whisker shows that 25% of the population are adults 50 and older, so adults 65 and over represent less than 25%. x_1 = 8, x_2 = 20, y_1 = 5, y_2 = 8.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-038",
+  "q": "What changed with the equations of these functions? r = 3, v = 12.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-039",
+  "q": "--> Can a virtual image be projected onto a screen with additional lenses or mirrors? f = 10.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
+  "id": "REP-040",
+  "q": "Finding Vertical Traces Find vertical traces for the function f ( x , y ) = sin x cos y corresponding to x = \u2212 \u03c0 4 , 0 , and \u03c0 4 , and y = \u2212 \u03c0 4 , 0 , and \u03c0 4 . t = 3, v_0y = 20, v_y = 5, y_0 = 5.",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | missing:none | standard conditions | fit:high",
+  "expect": "answer",
+  "calls": [
+   "x"
+  ]
+ },
+ {
   "id": "REP-041",
-  "q": "The instructor surveys 84 of students in the class and finds that 11 of them attended the midnight showing. g = 8, t = 3, v_0 = 12, y_0 = 5.",
-  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
+  "q": "Two types of medication for hives are being tested to determine if there is a difference in the proportions of adult patient reactions. Delta_E = 3.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-042",
-  "q": "The polynomial \u221216 t 2 + 275 gives the height of the squeegee t seconds after it was dropped. x_1 = 2, x_2 = 12, y_1 = 12, y_2 = 8.",
-  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
+  "q": "If you play this game many times, will you come out ahead? R_1 = 8, R_2 = 20.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-043",
-  "q": "(c) What mass of 235 U is fissioned in 1 year of full-power operation? R_1 = 20, R_2 = 20.",
-  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
+  "q": "(c) What mass of 235 U is fissioned in 1 year of full-power operation? I = 2.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-044",
-  "q": "The polynomial h ( t ) = \u221216 t 2 + 200 gives the height of the ball, in feet, t seconds after it is dropped. f = 5.",
-  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:low",
+  "q": "The angular acceleration of a rotating rigid body is given by \u03b1 = ( 2. a_n = 12, a_n1 = 12.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-045",
-  "q": "Calculate the heat of formation, \u0394 H f \u00b0 of propane given that \u0394 H f \u00b0 of H 2 O( l ) = \u2212285. T = 3, lambda = 2.",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:low",
+  "q": "Calculate the heat of formation, \u0394 H f \u00b0 of propane given that \u0394 H f \u00b0 of H 2 O( l ) = \u2212285. A = 12, d = 2.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-046",
-  "q": "A balloon filled with helium gas takes 6 hours to deflate to 50% of its original volume. B = 12, m = 5, q = 2, v = 2.",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:low",
+  "q": "A balloon filled with helium gas takes 6 hours to deflate to 50% of its original volume. f = 5, lambda = 12.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-047",
-  "q": "(b) What is the magnitude of the force exerted on the ship by the artillery shell, and why? k = 8, m = 12.",
-  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:low",
+  "q": "(b) What is the magnitude of the force exerted on the ship by the artillery shell, and why? f = 5.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-048",
-  "q": "Is any new information gained by applying the junction rule at e? g = 10, theta_0 = 20, v_0 = 3.",
-  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
+  "q": "The motion of the ball is independent of the reference frame and is same for different reference frames. k = 3, omega = 12.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-049",
-  "q": "The mean weaning age was nine months (3/4 year) with a standard deviation of 4 months. I = 5, R = 8, mu_0 = 20.",
-  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
+  "q": "Find the 90 th percentile for the sum of the 39 ages. t = 20, v_0 = 5, y_0 = 8.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-050",
-  "q": "How can it be demonstrated that colloidal particles are electrically charged? a_n = 5, a_n1 = 12.",
-  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "The two time intervals differ by a factor of 3. x_1 = 10, x_2 = 2, y_1 = 8, y_2 = 10.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-051",
-  "q": "The correct conversion factors are those that cancel the unwanted units and leave the desired units in their place. f = 10, lambda = 8.",
-  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:low",
+  "q": "The force of 20 j ^ N is applied at r \u2192 = ( 4. r = 8, v = 2.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-052",
-  "q": "(b) How many homes could be supplied at the 500 kW\u00b7h per month rate for one year by the energy from the described mass conversion? A = 5, d = 10, epsilon_0 = 5.",
-  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "(b) How many homes could be supplied at the 500 kW\u00b7h per month rate for one year by the energy from the described mass conversion? f = 8.",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-053",
-  "q": "Find the quotient: ( x 4 \u2212 11 x 2 \u2212 7 x \u2212 6 ) \u00f7 ( x + 3 ) . f = 8, lambda = 20.",
-  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:low",
+  "q": "Find the quotient: ( x 3 \u2212 64 ) \u00f7 ( x \u2212 4 ) . t = 20, v_0y = 2, v_y = 5, y_0 = 20.",
+  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-054",
-  "q": "What was the sales tax rate for this purchase? f = 20, h = 2.",
-  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:low",
+  "q": "Determine whether y = 3 4 is a solution for 4 y + 3 = 8 y . Delta_E = 8.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-055",
-  "q": "Show algebraically that c \u2212 P ( t ) P ( t ) = c \u2212 P 0 P 0 e \u2212 b t . k = 8, omega = 10.",
-  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:low",
+  "q": "Which of the following decays cannot occur because the law of conservation of lepton number is violated? R_1 = 5, R_2 = 20.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-056",
-  "q": "Determine la longitud del arco de un c\u00edrculo de radio 10 cent\u00edmetros subtendido por el \u00e1ngulo central de 50\u00b0. g = 2, t = 8, v_0 = 8, y_0 = 8.",
-  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
+  "q": "Determine la longitud del arco de un c\u00edrculo de radio 10 cent\u00edmetros subtendido por el \u00e1ngulo central de 50\u00b0. I = 5.",
+  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-057",
-  "q": "The resultant wave form when you add the two functions is y R = 2 A sin ( k x + \u03d5 2 ) cos ( \u03c9 t + \u03d5 2 ) . x_1 = 10, x_2 = 2, y_1 = 10, y_2 = 12.",
-  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-058",
-  "q": "(a) If at time t = 0 the origins coincide, what is the position of the origin O \u2032 in the S frame as a function of time? R_1 = 3, R_2 = 8.",
-  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-059",
-  "q": "The earthbound observer measures \u0394 t as given by the equation \u0394 t = \u03b3 \u0394 \u03c4 . f = 20.",
-  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-060",
-  "q": "The lower bound z = x 2 + y 2 is the upper half of a cone and the upper bound z = 18 \u2212 x 2 \u2212 y 2 is the upper half of a sphere. T = 12, lambda = 10.",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-061",
-  "q": "A spring attached to a ceiling is pulled down 11 cm from equilibrium and released. B = 8, m = 3, q = 2, v = 12.",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-062",
-  "q": "50 from each customer, how much will they have in the tip jar if they serve n more customers during the shift? k = 20, m = 10.",
-  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-063",
-  "q": "The frequencies of two successive modes of standing waves on a string are 258. g = 12, theta_0 = 5, v_0 = 3.",
-  "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-064",
-  "q": "The Forum Research surveyed 1,046 Torontonians. I = 3, R = 8, mu_0 = 12.",
-  "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-065",
-  "q": "a n = ( 1 \u2212 2 n ) n Since ( 1 + 1 / n ) n \u2192 e , one has ( 1 \u2212 2 / n ) n \u2248 ( 1 + k ) \u22122 k \u2192 e \u22122 as k \u2192 \u221e . a_n = 10, a_n1 = 3.",
-  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-066",
-  "q": "The amount of work the force does is the scalar product F \u2192 \u00b7 D \u2192 . f = 10, lambda = 20.",
+  "q": "How many cars must he detail to have enough money to rent the apartment? a_n = 8, a_n1 = 10.",
   "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-067",
-  "q": "The greenhouse effect comes from the difference between the atmosphere\u2019s transmission of visible light and its rather strong absorption of infrared. A = 5, d = 2, epsilon_0 = 8.",
+  "id": "REP-058",
+  "q": "(a) If at time t = 0 the origins coincide, what is the position of the origin O \u2032 in the S frame as a function of time? A = 10, d = 12.",
   "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-068",
-  "q": "If there is the same amount of almonds as cashews, how many of each item is in the trail mix? f = 5, lambda = 2.",
+  "id": "REP-059",
+  "q": "The duration of the flash is related to the RC time constant, \u03c4 . f = 10, lambda = 10.",
   "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-069",
-  "q": "The z -scores are \u20131 and +1 for 44 and 56, respectively. f = 12, h = 10.",
+  "id": "REP-060",
+  "q": "The lost production from a shutdown is potentially so great that management feels that the level of confidence in the analysis should be 99%. f = 20.",
   "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-070",
-  "q": "How many pounds of prepared dishes can Kiran buy? k = 5, omega = 3.",
+  "id": "REP-061",
+  "q": "A spring attached to a ceiling is pulled down 11 cm from equilibrium and released. k = 20, omega = 8.",
   "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-071",
-  "q": "The marital status distribution of the population of U. g = 20, t = 10, v_0 = 8, y_0 = 12.",
+  "id": "REP-062",
+  "q": "50 from each customer, how much will they have in the tip jar if they serve n more customers during the shift? t = 10, v_0 = 2, y_0 = 2.",
   "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-072",
-  "q": "Which of the gas giants has the largest icy/rocky core compared to its overall size? x_1 = 8, x_2 = 2, y_1 = 5, y_2 = 2.",
-  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
+  "id": "REP-063",
+  "q": "The free-body diagram shows the normal force, kinetic friction force, and the components of the weight m g \u2192 . x_1 = 20, x_2 = 5, y_1 = 12, y_2 = 12.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-073",
-  "q": "Find the linear function that models the baby\u2019s weight W as a function of the age of the baby, in months, t . R_1 = 5, R_2 = 10.",
+  "id": "REP-064",
+  "q": "In what way could you modify this simple experiment to increase the rigidity of the system? r = 3, v = 8.",
   "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-074",
-  "q": "How would you write each of the following scientific notation values in decimal form? f = 2.",
-  "record": "v_w=((lambda)/(T)) | T:s lambda:m | missing:none | standard conditions | fit:low",
+  "id": "REP-065",
+  "q": "The electron enters through a small hole in the negative plate and moves toward the positive plate. f = 3.",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-075",
-  "q": "The graph of the parametric equations is in red and the graph of the rectangular equation is drawn in blue dots on top of the parametric equations. T = 10, lambda = 2.",
-  "record": "r=((m*v)/(q*B)) | B:T m:kg q:C v:m/s | missing:none | standard conditions | fit:low",
+  "id": "REP-066",
+  "q": "How might this relate to the degrees of the vertices? t = 12, v_0y = 5, v_y = 2, y_0 = 12.",
+  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-076",
-  "q": "The number of 49-cent stamps was four less than three times the number of 20-cent stamps. B = 3, m = 12, q = 5, v = 8.",
-  "record": "omega_0=sqrt(((k)/(m))) | k:N/m m:kg | missing:none | standard conditions | fit:low",
+  "id": "REP-067",
+  "q": "The greatest ocean depths on the Earth are found in the Marianas Trench near the Philippines. Delta_E = 12.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-077",
-  "q": "The rate (in degrees per foot) at which temperature is increasing or decreasing for a given height x . k = 10, m = 5.",
-  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | g:m/s^2 theta_0:1 v_0:m/s | missing:none | standard conditions | fit:low",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-078",
-  "q": "How much greater is the internal energy of the helium in the ball than it would be at zero gauge pressure? g = 5, theta_0 = 20, v_0 = 20.",
+  "id": "REP-068",
+  "q": "If there is no observable edge to the universe, can we determine where its center of expansion is? R_1 = 8, R_2 = 20.",
   "record": "B=((mu_0*I)/(2*pi*R)) | I:A R:m mu_0:T*m/A | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
-  "id": "REP-079",
-  "q": "Finding the Zeros of an Absolute Value Function For the function f ( x ) = | 4 x + 1 | \u2212 7 , find the values of x such that f ( x ) = 0 . I = 10, R = 10, mu_0 = 3.",
+  "id": "REP-069",
+  "q": "The z -component of the velocity can be neglected, because it is parallel to the magnetic field and therefore generates no force. I = 20.",
   "record": "a_n2=a_n+a_n1 | a_n:m/s^2 a_n1:m/s^2 | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  },
  {
+  "id": "REP-070",
+  "q": "The electrons strike a phosphor-coated glass screen at the end of the tube, which produces a bright spot of light. a_n = 5, a_n1 = 3.",
+  "record": "C=epsilon_0*((A)/(d)) | A:m^2 d:m epsilon_0:C^2/(N*m^2) | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-071",
+  "q": "Which group is most likely to have an outlier? A = 2, d = 12.",
+  "record": "c=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-072",
+  "q": "Which variables need to be controlled in the experiment? f = 5, lambda = 2.",
+  "record": "Delta_E=h*f | f:Hz h:J*s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-073",
+  "q": "The slope increased and the correlation coefficient got closer to 1. f = 2.",
+  "record": "v=((omega)/(k)) | k:1/m omega:1/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-074",
+  "q": "The power emitted by an antenna has a power density per unit volume given in spherical coordinates by p ( \u03c1 , \u03b8 , \u03c6 ) = P 0 \u03c1 2 cos 2 \u03b8 sin 4 \u03c6 , where P 0 is a constant with units in watts. k = 8, omega = 12.",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | g:m/s^2 t:s v_0:m/s y_0:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-075",
+  "q": "Find the wavelength and energy of a photon with momentum 5. t = 10, v_0 = 20, y_0 = 3.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | x_1:m x_2:m y_1:m y_2:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-076",
+  "q": "The total receipts for 1650 tickets at one performance were $47,150. x_1 = 5, x_2 = 8, y_1 = 20, y_2 = 5.",
+  "record": "a_c=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-077",
+  "q": "The logarithmic function is defined only when the input is positive, so this function is defined when x + 3 &gt; 0. r = 12, v = 10.",
+  "record": "T=((1)/(f)) | f:Hz | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-078",
+  "q": "The velocity of a particle moving along the x- axis varies with time according to v ( t ) = A + B t \u22121 , where A = 2 m/s, B = 0. f = 8.",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | t:s v_0y:m/s v_y:m/s y_0:m | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
+  "id": "REP-079",
+  "q": "The maximum characteristic x-ray photon energy comes from the capture of a free electron into a K shell vacancy. t = 5, v_0y = 10, v_y = 5, y_0 = 8.",
+  "record": "m=Delta_E/(c)^(2) | Delta_E:J c:m/s | missing:none | standard conditions | fit:low",
+  "expect": "refuse",
+  "calls": []
+ },
+ {
   "id": "REP-080",
-  "q": "How much would it cost to bake a cake for 30 minutes if the electric rate is 14 cents per kilowatt-hour? a_n = 12, a_n1 = 8.",
-  "record": "v=f*lambda | f:Hz lambda:m | missing:none | standard conditions | fit:low",
+  "q": "The points are closest to having a linear model. Delta_E = 20.",
+  "record": "R_eqv=R_1+R_2 | R_1:ohm R_2:ohm | missing:none | standard conditions | fit:low",
   "expect": "refuse",
   "calls": []
  }

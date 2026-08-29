@@ -16,16 +16,47 @@ import sys as _sys, pathlib as _pl
 _sys.path.insert(0, str(_pl.Path(__file__).parent))
 from atomic import write_json as _wj
 
+# Symbols the device resolves from the store rather than reading from the question. Derived from
+# store_clean.json rather than hardcoded, so a new constant cannot silently start appearing as a
+# "given" in a split item.
+def _runtime_constants():
+    S = json.load(open("corpus/store_clean.json"))
+    S = S if isinstance(S, list) else S.get("records", [])
+    out = set()
+    for r in S:
+        out |= set((r.get("cval") or {}).keys())
+    assert out, "no cval symbols found in store_clean.json -- refusing to build a split blind"
+    return out
+
 VAR=re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
 RESV={"pi","e","sin","cos","tan","ln","log","sqrt","exp"}
 norm=lambda x: re.sub(r"[()\s]","",x)
 
-hold=[r for r in json.load(open("corpus/units_holdout.json")) if r.get("units")]
+# THE HOLDOUT WAS NEVER CLEANED. store_clean.json went through the lints; units_holdout.json did
+# not, so 3 of its 30 records are MathML conversion garbage -- two Leibniz artifacts,
+# Q=((d*V)/(d*t)) and F_l=-((d*U)/(d*l)) where `d` cancels, and one fused identifier, B*E=h*f_O
+# whose real form is E_b=h*f_O. The split draws 15 records from 30, so they landed in the split the
+# SELECTION RULE reads, and the model was scored on answering formulas that are not physics.
+#
+# THIRD INSTANCE of a correction that did not propagate: the cleaning reached store_clean.json,
+# not units_train.json (fixed earlier), and not this. Filtered here AND gated, because a filter in
+# one builder is exactly what the previous two instances looked like.
+_LEIBNIZ = re.compile(r"\(d\*[A-Za-z_]")
+_FUSED   = re.compile(r"^[A-Z]\*[A-Z][A-Za-z0-9_]*=")
+def _clean(r):
+    f = r.get("f", "")
+    return bool(r.get("units")) and not _LEIBNIZ.search(f) and not _FUSED.match(f)
+_raw = json.load(open("corpus/units_holdout.json"))
+hold = [r for r in _raw if _clean(r)]
+_dropped = [r["f"] for r in _raw if not _clean(r)]
+if _dropped:
+    print(f"  holdout cleaned: dropped {len(_dropped)} of {len(_raw)} -> {_dropped}")
 # Deduplicate BEFORE splitting: the same exercise sentence appears in several modules,
 # so disjoint index slices are not disjoint sets. Caught by the build-time assertion.
 stems=sorted({s for s in json.load(open("corpus/stems_all.json"))
               if 40<len(s)<200 and "{" not in s})
 dev={it["q"] for it in json.load(open("tools/eval/items.json"))}
+_RUNTIME_CONSTANTS = _runtime_constants()
 rng=random.Random(20260824)
 rng.shuffle(hold); rng.shuffle(stems)
 half=len(hold)//2
@@ -41,6 +72,17 @@ def build(name, n_match=40, n_mismatch=40):
         other = forms[(i+1) % len(forms)]
         src = r if matched else other          # mismatched: record is for a DIFFERENT relation
         vs=sorted({v for v in VAR.findall(r["f"].split("=",1)[1]) if v not in RESV})
+        if not vs: continue
+        # NEVER SUPPLY A VALUE FOR A CONSTANT THE RUNTIME INLINES. This assigned a small integer
+        # to every RHS variable, so 32% of items said things like `c = 2` for the speed of light
+        # and `h = 2` for Planck's -- and then scored the model WRONG for correctly inlining
+        # c = 2.998e8, which is what the device does and what the corpus trains. The item was
+        # out of distribution and the failure it produced was the model behaving correctly.
+        # THE HOLDOUT RECORDS CARRY NO `cval` FIELD -- only the store's copies do -- so reading
+        # r["cval"] here found nothing and 30 items still supplied `c`, `h` and `g`. The set of
+        # symbols the runtime inlines is a property of the STORE, not of an individual record.
+        _cv = _RUNTIME_CONSTANTS
+        vs  = [v for v in vs if v not in _cv]
         if not vs: continue
         vals={v: rng.choice([2,3,5,8,10,12,20]) for v in vs}
         svs=sorted({v for v in VAR.findall(src["f"].split("=",1)[1]) if v not in RESV})
