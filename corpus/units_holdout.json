@@ -1,328 +1,281 @@
 [
  {
-  "f": "C=epsilon_0*((A)/(d))",
-  "name": "Capacitance of a parallel-plate capacitor",
+  "f": "L=((v)/(4*f_1))",
+  "name": "Strategy",
   "units": {
-   "C": "F",
-   "A": "m^2",
-   "d": "m",
-   "epsilon_0": "C^2/(N*m^2)"
+   "L": "m",
+   "f_1": "Hz",
+   "v": "m/s"
   },
-  "scope": "m58452"
- },
- {
-  "f": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
-  "name": "Distance",
-  "units": {
-   "d": "m",
-   "x_1": "m",
-   "x_2": "m",
-   "y_1": "m",
-   "y_2": "m"
-  },
-  "scope": "m51256"
- },
- {
-  "f": "d_2=((2*A)/(d_1))",
-  "name": "(from worked example)",
-  "units": {
-   "d_2": "m",
-   "A": "m^2",
-   "d_1": "m"
-  },
-  "scope": "m81426",
+  "scope": "m54335",
   "source": "worked-example"
  },
  {
-  "f": "v=((omega)/(k))",
-  "name": "Wave speed",
+  "f": "F=k*x",
+  "name": "Hooke's law",
+  "units": {
+   "k": "N/m",
+   "x": "m",
+   "F": "N"
+  },
+  "scope": "canonical",
+  "source": "hand"
+ },
+ {
+  "f": "d_1=((2*A)/(d_2))",
+  "name": "(from worked example)",
+  "units": {
+   "d_1": "m",
+   "A": "m^2",
+   "d_2": "m"
+  },
+  "scope": "m81364",
+  "source": "worked-example"
+ },
+ {
+  "f": "a=((v_c)/(t_1))",
+  "name": "(from worked example)",
+  "units": {
+   "a": "m/s^2",
+   "t_1": "s",
+   "v_c": "m/s"
+  },
+  "scope": "m42069",
+  "source": "worked-example"
+ },
+ {
+  "f": "v=r*omega",
+  "name": "Tangential speed:",
   "units": {
    "v": "m/s",
-   "k": "1/m",
-   "omega": "1/s"
-  },
-  "scope": "m58373"
- },
- {
-  "f": "Delta_E=h*Delta_f",
-  "name": "Atomic Transitions",
-  "units": {
-   "Delta_E": "J",
-   "Delta_f": "Hz",
-   "h": "J*s"
-  },
-  "scope": "m58578",
-  "source": "worked-example"
- },
- {
-  "f": "a_n2=a_n+a_n1",
-  "name": "(from worked example)",
-  "units": {
-   "a_n2": "m/s^2",
-   "a_n": "m/s^2",
-   "a_n1": "m/s^2"
-  },
-  "scope": "m53758",
-  "source": "worked-example"
- },
- {
-  "f": "omega_0=sqrt(((k)/(m)))",
-  "name": "Natural angular frequency of amass-spring system",
-  "units": {
-   "omega_0": "1/s",
-   "k": "N/m",
-   "m": "kg"
-  },
-  "scope": "m58366"
- },
- {
-  "f": "v_d=((I)/(n*q*A))",
-  "name": "Drift velocity",
-  "units": {
-   "v_d": "m/s",
-   "A": "m^2",
-   "I": "A",
-   "n": "1/m^3",
-   "q": "C"
-  },
-  "scope": "m58735"
- },
- {
-  "f": "lambda=((c)/(f))",
-  "name": "Deriving and Using the Wave Equation",
-  "units": {
-   "lambda": "m",
-   "c": "m/s",
-   "f": "Hz"
-  },
-  "scope": "m59792",
-  "source": "worked-example"
- },
- {
-  "f": "w=m*g",
-  "name": "Definition of weight, scalar form",
-  "units": {
-   "w": "N",
-   "g": "m/s^2",
-   "m": "kg"
-  },
-  "scope": "m58301"
- },
- {
-  "f": "T=((1)/(f))",
-  "name": "period",
-  "units": {
-   "T": "s",
-   "f": "Hz"
-  },
-  "scope": "m54321"
- },
- {
-  "f": "omega=((Delta_theta)/(Delta_t))",
-  "name": "Angular speed:",
-  "units": {
    "omega": "1/s",
-   "Delta_t": "s",
-   "Delta_theta": "1"
+   "r": "m"
   },
   "scope": "m54176"
  },
  {
-  "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
-  "name": "Height of free fall",
+  "f": "x_1=((3)/(2))*v_0*t",
+  "name": "(from worked example)",
   "units": {
-   "y": "m",
-   "g": "m/s^2",
+   "x_1": "m",
    "t": "s",
-   "v_0": "m/s",
-   "y_0": "m"
+   "v_0": "m/s"
   },
-  "scope": "m58287"
- },
- {
-  "f": "B=((mu_0*I)/(2*pi*R))",
-  "name": "Magnetic field due to along straight wire",
-  "units": {
-   "B": "T",
-   "I": "A",
-   "R": "m",
-   "mu_0": "T*m/A"
-  },
-  "scope": "m58467"
- },
- {
-  "f": "v_w=((lambda)/(T))",
-  "name": "wave velocity",
-  "units": {
-   "v_w": "m/s",
-   "T": "s",
-   "lambda": "m"
-  },
-  "scope": "m54321"
- },
- {
-  "f": "c=f*lambda",
-  "name": "Strategy",
-  "units": {
-   "c": "m/s",
-   "f": "Hz",
-   "lambda": "m"
-  },
-  "scope": "m54559",
+  "scope": "m58287",
   "source": "worked-example"
  },
  {
-  "f": "a_n=((a_1)/(n!))",
-  "name": "Series Solutions to Differential Equations",
+  "f": "v_CM=r*omega",
+  "name": "Curiosity Rover",
   "units": {
-   "a_n": "m/s^2",
-   "a_1": "m/s^2",
-   "n": "1"
+   "v_CM": "m/s",
+   "omega": "1/s",
+   "r": "m"
   },
-  "scope": "m54046",
+  "scope": "m58335",
   "source": "worked-example"
  },
  {
-  "f": "B*E=h*f_O",
-  "name": "binding energy of an electron",
+  "f": "a_C=(((v)^(2))/(r))",
+  "name": "Centripetal acceleration",
   "units": {
-   "B*E": "J",
-   "B": "T",
-   "E": "J",
-   "f_O": "Hz",
-   "h": "J*s"
+   "a_C": "m/s^2",
+   "r": "m",
+   "v": "m/s"
   },
-  "scope": "m54559"
+  "scope": "m58293"
  },
  {
-  "f": "v=f*lambda",
-  "name": "Velocity of a wave",
+  "f": "Delta_E_int=Q-W",
+  "name": "First law of thermodynamics",
+  "units": {
+   "Delta_E_int": "J",
+   "Q": "J",
+   "W": "J"
+  },
+  "scope": "m58401"
+ },
+ {
+  "f": "v=lambda*f",
+  "name": "speed of light",
   "units": {
    "v": "m/s",
    "f": "Hz",
    "lambda": "m"
   },
-  "scope": "m58382"
+  "scope": "m54280"
  },
  {
-  "f": "y=y_0+((1)/(2))(v_0y+v_y)t",
-  "name": "A Fireworks Projectile Explodes High and Away",
-  "units": {
-   "y": "m",
-   "t": "s",
-   "v_0y": "m/s",
-   "v_y": "m/s",
-   "y_0": "m"
-  },
-  "scope": "m42042",
-  "source": "worked-example"
- },
- {
-  "f": "E=n*h*f",
-  "name": "quantum energy",
-  "units": {
-   "E": "J",
-   "f": "Hz",
-   "h": "J*s",
-   "n": "1"
-  },
-  "scope": "m54566"
- },
- {
-  "f": "R_eqv=R_1+R_2",
+  "f": "x_2=v*t_2",
   "name": "(from worked example)",
   "units": {
-   "R_eqv": "ohm",
-   "R_1": "ohm",
-   "R_2": "ohm"
+   "x_2": "m",
+   "t_2": "s",
+   "v": "m/s"
   },
-  "scope": "m54442",
+  "scope": "m58297",
   "source": "worked-example"
  },
  {
-  "f": "a_c=(((v)^(2))/(r))",
-  "name": "Centripetal acceleration",
+  "f": "P=((F)/(A))",
+  "name": "pressure",
   "units": {
-   "a_c": "m/s^2",
-   "r": "m",
-   "v": "m/s"
+   "P": "Pa",
+   "A": "m^2",
+   "F": "N"
   },
-  "scope": "m54181"
+  "scope": "m54305"
  },
  {
-  "f": "T_tof=((2(v_0*sin(theta_0)))/(g))",
-  "name": "Time of flight",
+  "f": "e=1-((T_c)/(T_h))",
+  "name": "Resulting efficiency of a Carnot cycle",
   "units": {
-   "T_tof": "s",
-   "g": "m/s^2",
-   "theta_0": "1",
-   "v_0": "m/s"
+   "e": "1",
+   "T_c": "K",
+   "T_h": "K"
   },
-  "scope": "m58293"
+  "scope": "m58408"
  },
  {
-  "f": "T=2*pi*sqrt(((m)/(k)))",
-  "name": "Period of a mass-spring system in SHM",
+  "f": "lambda=lambda_0/n",
+  "name": "Measuring the Refractive Index of a Gas",
   "units": {
-   "T": "s",
-   "k": "N/m",
-   "m": "kg"
+   "lambda": "m",
+   "lambda_0": "m",
+   "n": "1"
   },
-  "scope": "m58366"
- },
- {
-  "f": "m=Delta_E/(c)^(2)",
-  "name": "Calculating the Mass of a Pion",
-  "units": {
-   "m": "kg",
-   "Delta_E": "J",
-   "c": "m/s"
-  },
-  "scope": "m42669",
+  "scope": "m58541",
   "source": "worked-example"
  },
  {
-  "f": "r=((m*v)/(q*B))",
-  "name": "Radius of a particle\u2019s path in a magnetic field",
+  "f": "F=((Delta_p)/(Delta_t))",
+  "name": "Calculating Force: Venus Williams\u2019 Tennis Serve",
   "units": {
-   "r": "m",
-   "B": "T",
-   "m": "kg",
-   "q": "C",
-   "v": "m/s"
+   "F": "N",
+   "Delta_p": "kg*m/s",
+   "Delta_t": "s"
   },
-  "scope": "m58745"
+  "scope": "m58319",
+  "source": "worked-example"
  },
  {
-  "f": "Q=((d*V)/(d*t))",
-  "name": "Volume flow rate",
+  "f": "v=((s)/(t))",
+  "name": "linear speed",
   "units": {
-   "Q": "m^3/s",
-   "V": "m^3",
-   "d": "m",
+   "v": "m/s",
+   "s": "m",
    "t": "s"
   },
-  "scope": "m58359"
+  "scope": "m51283"
  },
  {
-  "f": "F_l=-((d*U)/(d*l))",
-  "name": "Conservative force is the negative derivative of potential energy",
+  "f": "F_app=F_x+F_y",
+  "name": "Drag Force on a Barge",
   "units": {
-   "F_l": "N",
-   "U": "J",
-   "d": "m",
-   "l": "m"
+   "F_app": "N",
+   "F_x": "N",
+   "F_y": "N"
   },
-  "scope": "m58661"
+  "scope": "m42132",
+  "source": "worked-example"
  },
  {
-  "f": "Delta_E=h*f",
-  "name": "Energy quantum of radiation",
+  "f": "r=r_1+r_2",
+  "name": "(from worked example)",
   "units": {
-   "Delta_E": "J",
+   "r": "m",
+   "r_1": "m",
+   "r_2": "m"
+  },
+  "scope": "m58352",
+  "source": "worked-example"
+ },
+ {
+  "f": "v_w=f*lambda",
+  "name": "Strategy FOR (B)",
+  "units": {
+   "v_w": "m/s",
    "f": "Hz",
-   "h": "J*s"
+   "lambda": "m"
+  },
+  "scope": "m54321",
+  "source": "worked-example"
+ },
+ {
+  "f": "p_f=((h)/(lambda))",
+  "name": "Magnitude of photon\u2019s momentum",
+  "units": {
+   "p_f": "kg*m/s",
+   "h": "J*s",
+   "lambda": "m"
   },
   "scope": "m58766"
+ },
+ {
+  "f": "f_B=|f_1-f_2|",
+  "name": "beat frequency",
+  "units": {
+   "f_B": "Hz",
+   "f_1": "Hz",
+   "f_2": "Hz"
+  },
+  "scope": "m54335"
+ },
+ {
+  "f": "F=m*g",
+  "name": "(from worked example)",
+  "units": {
+   "F": "N",
+   "g": "m/s^2",
+   "m": "kg"
+  },
+  "scope": "m42075",
+  "source": "worked-example"
+ },
+ {
+  "f": "lambda=((2*h*c)/(E_0))",
+  "name": "(from worked example)",
+  "units": {
+   "lambda": "m",
+   "E_0": "J",
+   "c": "m/s",
+   "h": "J*s"
+  },
+  "scope": "m42573",
+  "source": "worked-example"
+ },
+ {
+  "f": "V=B*l*v_d",
+  "name": "V=B*l*v_d",
+  "units": {
+   "V": "V",
+   "l": "m",
+   "B": "T",
+   "v_d": "m/s"
+  },
+  "scope": "canonical",
+  "source": "hand"
+ },
+ {
+  "f": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "name": "Potential-energy function of a harmonic oscillator",
+  "units": {
+   "U(x)": "J",
+   "m": "kg",
+   "omega": "1/s",
+   "x": "m"
+  },
+  "scope": "m58582"
+ },
+ {
+  "f": "I=((((Delta_p))^(2))/(2*rho*v_w))",
+  "name": "sound intensity",
+  "units": {
+   "I": "W/m^2",
+   "Delta_p": "Pa",
+   "rho": "kg/m^3",
+   "v_w": "m/s"
+  },
+  "scope": "m54333"
  }
 ]

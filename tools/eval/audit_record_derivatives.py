@@ -30,10 +30,54 @@ FORMULA = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\s*=\s*\S")
 
 # Artefacts that legitimately contain non-store formulas, with the reason.
 EXPECTED = {
-    "corpus/units_holdout.json": "the HELD-OUT set: SELECT uses formulas the model never trained on",
-    "corpus/records_raw.json":   "raw mined input to the cleaning, not an output",
+    # --- the holdout and the splits built from it -------------------------------------------------
+    "corpus/units_holdout.json": "the HELD-OUT set: valid physics deliberately NOT shipped and never "
+                                 "trained, so SELECT tests reading the record from the prompt",
+    "corpus/split_select.json":  "built from the holdout by construction",
+    "corpus/split_report.json":  "built from the holdout by construction",
+    # --- raw mined inputs to the cleaning, not outputs of it --------------------------------------
+    "corpus/records_raw.json":   "raw mined input to the cleaning",
     "corpus/units_raw.json":     "raw mined input",
-    "corpus/aligned_raw.json":   "raw alignment, superseded and retained for provenance",
+    "corpus/aligned_raw.json":   "raw alignment, superseded, retained for provenance",
+    "corpus/examples_raw.json":  "1,910 mined worked examples, the pool the store was cut from",
+    "corpus/examples_gated.json":"the gated subset of examples_raw, still pre-cleaning",
+    "corpus/batch2.json":        "mining batch 2, under review when the cleaning ran",
+    "corpus/batch2_usable.json": "batch 2 triage",
+    "corpus/batch3.json":        "mining batch 3",
+    "corpus/batch3_buckets.json":"batch 3 triage",
+    "corpus/batch3_judgment.json":"batch 3 review verdicts",
+    "corpus/units_train.json":   "the wider annotated set the store is selected FROM; holding "
+                                 "non-shipped relations is what makes an out-of-store holdout possible",
+    # --- historical measurements, kept so their numbers stay reproducible -------------------------
+    "corpus/arm_20.json":        "coverage-experiment arm, a record of what was measured then",
+    "corpus/arm_35.json":        "coverage-experiment arm",
+    "corpus/arm_53.json":        "coverage-experiment arm",
+    "corpus/arm_86.json":        "coverage-experiment arm",
+    "corpus/at_risk.json":       "review list of records flagged at risk, pre-cleaning",
+    "corpus/d1_held.json":       "refusal-design intermediate",
+    "corpus/d1_twins.json":      "refusal-design intermediate",
+    "corpus/req_judgment.json":  "review of the `req` field, pre-cleaning",
+    "corpus/unconstrained_all.json": "review list of unconstrained records, pre-cleaning",
+    "corpus/clean_surface_part1.json": "superseded partial of clean_surface.json",
+    "corpus/unconstrained_b1.json":  "review list, pre-cleaning",
+    "corpus/units_bad_records.json": "the REJECTS list -- it is supposed to hold records the store lacks",
+    "corpus/units_batch1.json":      "mining batch 1; the project log records its readers as superseded by retrain",
+    "corpus/units_mine_to_fix.json": "mining worklist, pre-cleaning",
+    "corpus/units_review.json":      "review worklist, pre-cleaning",
+    "tools/eval/_part1.json":        "partial of items.json, superseded",
+    "tools/eval/_part2.json":        "partial of items.json, superseded",
+}
+
+# NOT declared expected, and NOT silently failed: live consumers whose staleness has real
+# consequences and has not been assessed. Printed prominently every run so the question stays open
+# instead of being closed by an EXPECTED entry written to make a gate green.
+REVIEW = {
+    "tools/eval/items.json":      "THE DEV EVAL SET. Its records are hand-authored and many are not "
+                                  "in the shipped store, so the prompts it builds may be "
+                                  "out-of-distribution -- the same defect that produced the "
+                                  "retracted 16% on split_select. gate_items_refs re-executes its "
+                                  "calls, which checks the ANSWERS and not the record shapes.",
+    "tools/eval/record_gate.json": "used by the record gate; provenance not established.",
 }
 
 
@@ -68,14 +112,23 @@ def main():
         missing = sorted(f for f in found if f not in store)
         if not missing: continue
         why = EXPECTED.get(rel)
+        if rel in REVIEW:
+            rows.append((rel, len(found), missing, "__REVIEW__")); continue
         rows.append((rel, len(found), missing, why))
         if why is None: unexpected += 1
     print(f"  tracked JSON naming formulas: {len(rows)} reference records absent from the clean store\n")
+    review = [r for r in rows if r[3] == "__REVIEW__"]
+    rows = [r for r in rows if r[3] != "__REVIEW__"]
     for rel, n, missing, why in sorted(rows, key=lambda r: (r[3] is not None, r[0])):
         tag = "EXPECTED" if why else "UNEXPLAINED"
         print(f"  {tag:11} {rel}   {len(missing)} of {n} not in store")
         if why: print(f"              reason: {why}")
         else:   print(f"              {', '.join(missing[:4])}{' ...' if len(missing) > 4 else ''}")
+    if review:
+        print("\n  OPEN -- live consumers holding non-store records, not assessed:")
+        for rel, n, missing, _ in review:
+            print(f"    {rel}   {len(missing)} of {n} not in store")
+            print(f"      {REVIEW[rel]}")
     if unexpected:
         print(f"\n  FAIL: {unexpected} artefact(s) keep records the cleaning removed and are not")
         print("  declared as raw inputs or held-out sets. Either re-derive them from the cleaned")

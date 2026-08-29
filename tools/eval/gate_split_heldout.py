@@ -23,8 +23,10 @@ of the store before generation, so "never trained on" becomes true by constructi
 import importlib.util, io, contextlib, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-# Set true only when the holdout is genuinely excluded from generation.
-CLAIMS_HELD_OUT = False
+# Flipped 2026-08-28, when tools/carve_holdout.py made the claim true by construction: the holdout
+# is drawn FROM the store and corpus/generate.py skips those formulas, so overlap is 0 by design
+# rather than by a file name. From here this gate ENFORCES separation.
+CLAIMS_HELD_OUT = True
 
 
 def main():

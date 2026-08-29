@@ -1317,9 +1317,20 @@ def _best_name(f, ann):
 # This closes the rule and stops. Breadth beyond the store (the 377 Gate-A survivors) is a separate
 # decision with its own control: it has no measured effect on correctness, and coverage of what
 # SHIPS is what 41.0/12.2 measures.
+# THE HOLDOUT IS EXCLUDED FROM GENERATION. Without this, "held out" is a file name and nothing
+# more: 21 of the 30 records in the old units_holdout.json were also generated, so 10 of SELECT's
+# 13 formulas appeared verbatim in the training corpus and SELECT measured memorisation, not
+# generalisation. Carved by tools/carve_holdout.py from this same store, so the two cannot drift.
+_HOLDOUT_PATH = pathlib.Path(__file__).resolve().parent / "units_holdout.json"
+_HOLDOUT = {r["f"] for r in json.load(open(_HOLDOUT_PATH))} if _HOLDOUT_PATH.exists() else set()
+assert _HOLDOUT, ("corpus/units_holdout.json is missing or empty. Generating without it would "
+                  "silently train on the split's formulas. Run tools/carve_holdout.py.")
+
 recs, _unnamed, _uncleaned = [], [], []
 _keys = list(_ann) + [f for f in _store if f not in _ann]
 for f in _keys:
+    if f in _HOLDOUT:
+        continue                      # held out: the splits test reading it from the prompt
     ann = _ann.get(f) or {}
     src = _mined.get(f) or _store.get(f) or dict(ann)
     r = dict(src); r["f"] = f
@@ -1554,14 +1565,40 @@ for r in recs: r["cond"] = condition(r["name"])
 # level down.
 _PAIRS = {(r["f"], v) for r in recs
           for v in ({x for x in VAR.findall(r["f"].split("=", 1)[1])} - {"pi", "e"})}
-_DECL_STALE = sorted(f"{f}  [{v}]" for (f, v) in (set(_SCALE) | set(_KIND)) if (f, v) not in _PAIRS)
+# HELD OUT IS NOT THE SAME AS NONEXISTENT, and collapsing them would have blocked the carve.
+# This guard exists to catch a declaration whose (record, variable) pair matches NO RECORD -- a typo
+# that reads as coverage. A record deliberately excluded from generation still exists, its
+# declaration is still correct, and it will be exercised again the moment the holdout changes.
+#
+# So the failure is checked against every KNOWN pair, and the merely-unexercised ones are COUNTED
+# AND PRINTED rather than passed over -- because "cannot fire" and "checked and clean" must not
+# share an exit status, which is the rule this file already applies to UNCHECKED ranges.
+# EXACTLY the construction _PAIRS uses, `- {"pi","e"}`. My first version subtracted RES, which in
+# this file also contains d, f, x and t -- reserved so a differential is not read as a variable --
+# and so dropped `lambda=c/f [f]` and `v=d/t [d]`, the two pairs it then reported as nonexistent.
+# A set-membership check is only as good as the two sets being built the same way.
+# ONE SET, USED BY EVERY "does this record exist" GUARD. Three of them asked it separately against
+# `recs` alone -- _DERIVE_STALE, _RESULT_STALE, _RELATION_STALE -- and carving the holdout made all
+# three fire in turn, one per run. Fixing them one at a time is the pattern that produced four
+# propagation instances; they get one definition.
+_KNOWN_RECORDS = {r["f"] for r in recs} | {r["f"] for r in json.load(open(_HOLDOUT_PATH))}
+_HELD_PAIRS = {(_hr["f"], _hv) for _hr in json.load(open(_HOLDOUT_PATH))
+               for _hv in ({x for x in VAR.findall(_hr["f"].split("=", 1)[1])} - {"pi", "e"})}
+_DECL_STALE = sorted(f"{f}  [{v}]" for (f, v) in (set(_SCALE) | set(_KIND))
+                     if (f, v) not in _PAIRS and (f, v) not in _HELD_PAIRS)
 assert not _DECL_STALE, (
-    "A23/A24: these declarations match no sampled (record, variable) pair, so they are silent "
-    "no-ops:\n  " + "\n  ".join(_DECL_STALE)
+    "A23/A24: these declarations match no record at all -- not sampled, not held out -- so they are "
+    "silent no-ops:\n  " + "\n  ".join(_DECL_STALE)
     + "\nFix them against corpus/store_clean.json. A range that never fires reads as coverage.")
-_DERIVE_STALE = sorted(set(_DERIVE) - {r["f"] for r in recs})
+_DECL_HELD = sorted(f"{f}  [{v}]" for (f, v) in (set(_SCALE) | set(_KIND)) if (f, v) in _HELD_PAIRS)
+# PRINTED, because the comment above says it is. It was not: _DECL_HELD was computed and never
+# emitted, so "counted and printed rather than passed over" was a guarantee the code did not make --
+# written in the same session as tools/eval/audit_guarantees.py, and found BY it.
+print(f"declarations parked on held-out records: {len(_DECL_HELD)} "
+      f"(correct, unexercised while their record is held out -- NOT stale)")
+_DERIVE_STALE = sorted(set(_DERIVE) - _KNOWN_RECORDS)
 assert not _DERIVE_STALE, f"A27c: _DERIVE names records that do not exist: {_DERIVE_STALE}"
-_RESULT_STALE = sorted(set(_RESULT_KIND) - {r["f"] for r in recs})
+_RESULT_STALE = sorted(set(_RESULT_KIND) - _KNOWN_RECORDS)
 assert not _RESULT_STALE, f"A25: _RESULT_KIND names records that do not exist: {_RESULT_STALE}"
 _RESULT_BAD = sorted(k for k in _RESULT_KIND.values() if k is not None and k not in _RESULT_RANGE)
 assert not _RESULT_BAD, f"A25: _RESULT_KIND names kinds with no range: {_RESULT_BAD}"
@@ -1583,7 +1620,7 @@ assert not _UNDECLARED_RELATION, (
     "A26: these records have a relation-sounding NAME and no entry in _NAME_IS_RELATION:\n  "
     + "\n  ".join(_UNDECLARED_RELATION)
     + "\nDecide for each whether the name denotes the quantity it computes, and declare it.")
-_RELATION_STALE = sorted(_NAME_IS_RELATION - {r["f"] for r in recs})
+_RELATION_STALE = sorted(_NAME_IS_RELATION - _KNOWN_RECORDS)
 assert not _RELATION_STALE, f"A26: _NAME_IS_RELATION names records that do not exist: {_RELATION_STALE}"
 # A26b. NO SAMPLED VARIABLE MAY TAKE ITS VALUE FROM THE GLOBAL NAME TABLE. `CONST[v]` maps a bare
 # identifier to a physical constant with no record scope -- the pattern IDENTIFIER_COLLISION.md
