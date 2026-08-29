@@ -32,7 +32,23 @@
 // Globals
 #ifdef _TINSPIRE
 #ifndef FIXED_GS
-#define FIXED_GS 96
+/* 88, NOT 96 -- BECAUSE THE FRONTIER CONFIG IS NOT DIVISIBLE BY 96.
+ *
+ * RESULT_N_TABLE picks d352 L6 as the widest model clearing 2 tok/s. 352 = 2^5 x 11, so 96 = 2^5 x 3
+ * does not divide any of its tensor lengths, and tools/legacy_to_q80.py silently backed off
+ * 96 -> 48 -> 24 -> 12 -> 6 -> 3 -> 1. At group 1 there is one fp32 scale per int8 value: 5 bytes
+ * per parameter, a 52.01 MiB "quantised" file against a 10.43 MiB prediction and 241% of the
+ * device's single-malloc ceiling -- reported with quantisation error 0.000000, which reads as a
+ * flawless conversion.
+ *
+ * 88 divides every d352 tensor length and costs 1.0455 bytes/param against 96's 1.0417: +0.36%.
+ * The constant exists only to remove two __divsi3 per group, so any value works.
+ *
+ * A model built for one GS refuses another at load (read_checkpoint, and the check at line ~404),
+ * and tools/nspire-cli/push-all.sh compares the two before sending. Changing this means
+ * re-exporting the checkpoint.
+ */
+#define FIXED_GS 88
 #endif
 #define GS FIXED_GS   /* compile-time: removes two __divsi3 per group */
 #else

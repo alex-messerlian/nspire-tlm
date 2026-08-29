@@ -30,7 +30,14 @@ static uint64_t fnv1a(const void *p, size_t n) {
 }
 
 int main(int argc, char **argv) {
+    /* The Ndless launcher gives no useful argv, so the device needs its own default. The path is
+     * the one src/store/device_app.c's DATA_DIRS lists first. On the host the build-tree path is
+     * still the default, so `make golden_forward` is unchanged. */
+#ifdef __arm__
+    const char *model = argc > 1 ? argv[1] : "/documents/tlm/model4096.bin.tns";
+#else
     const char *model = argc > 1 ? argv[1] : "build/transfer/model4096.bin.tns";
+#endif
     rq_build((char *)model);
     int V = rq_vocab();
     int SL = rq_seq_len();

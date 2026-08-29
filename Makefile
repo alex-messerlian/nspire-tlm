@@ -167,13 +167,13 @@ $(BUILD)/tlmui: src/store/tlm_demo.c src/store/ui_host.c src/store/host_stubs.c 
 # Compiles runq_nspire.c on the HOST, which is the point: the loader that runs on the calculator is
 # the one under test, not a reimplementation of its rules.
 $(BUILD)/test_ckpt: tools/eval/test_ckpt.c src/runq_nspire.c | $(BUILD)
-	$(CC) $(HOSTFLAGS) -DFIXED_GS=96 -o $@ $< -lm
+	$(CC) $(HOSTFLAGS) -DFIXED_GS=88 -o $@ $< -lm
 
 # THE FORWARD-PASS GOLDEN. Compiles the same runq_nspire.c the calculator runs, so a claim that a
 # hot-loop change is bit-exact is checkable on the host without a device round-trip. Phase 1 of the
 # brief asks for this artefact; it did not exist until the soft-float attention work needed it.
 $(BUILD)/golden_forward: tools/eval/golden_forward.c src/runq_nspire.c | $(BUILD)
-	$(CC) $(HOSTFLAGS) -DFIXED_GS=96 -o $@ $< -lm
+	$(CC) $(HOSTFLAGS) -DFIXED_GS=88 -o $@ $< -lm
 
 
 # ---- device ----------------------------------------------------------------------------------

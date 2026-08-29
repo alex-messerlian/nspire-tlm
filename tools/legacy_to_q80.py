@@ -77,10 +77,33 @@ def main(src, dst):
         print(f"WARNING: {len(leftover)} trailing bytes unread -- layout assumption may be wrong")
 
     # ---- write v2 ----
-    group = GROUP
-    while dim % group != 0:
-        group //= 2
-        print(f"BACKOFF: group size -> {group}")
+    # GROUP SELECTION. THE OLD LOOP HALVED UNTIL IT DIVIDED, AND SILENTLY BOTTOMED OUT AT 1.
+    #
+    # It checked only `dim % group` and halved on failure: for dim=352 that is
+    # 96 -> 48 -> 24 -> 12 -> 6 -> 3 -> 1, and group 1 means ONE FP32 SCALE PER INT8 VALUE.
+    # The output is 5 bytes per parameter -- larger than the fp32 input -- and quantisation error is
+    # exactly 0.000000, which reads like a flawless conversion. A d352 checkpoint came out at
+    # 52.01 MiB against a 10.43 MiB prediction and 241% of the device's single-malloc ceiling.
+    #
+    # Two things were wrong. It checked ONE dimension rather than every tensor's length, and it
+    # DEGRADED instead of failing. Now: take the largest divisor of every tensor length that is
+    # <= GROUP, and abort below a floor where the scales stop being a rounding cost and become the
+    # payload.
+    _lens = {len(t) for t in [tok_emb] + wq + wk + wv + wo + w1 + w2 + w3}
+    if not shared:
+        _lens.add(len(out_w))
+    group = max((g for g in range(1, GROUP + 1) if all(L % g == 0 for L in _lens)), default=1)
+    GROUP_FLOOR = 32
+    if group < GROUP_FLOOR:
+        raise SystemExit(
+            f"ABORT: no group size <= {GROUP} divides every tensor length {sorted(_lens)}; the "
+            f"largest is {group}, below the floor of {GROUP_FLOOR}. At group {group} a scale costs "
+            f"{4/group:.2f} bytes per parameter and the 'quantised' file would be larger than the "
+            f"fp32 input. Choose a dim whose tensor lengths share a larger factor.")
+    if group != GROUP:
+        print(f"GROUP {group} (not {GROUP}): {GROUP} does not divide every tensor length. "
+              f"{1 + 4/group:.4f} bytes/param against {1 + 4/GROUP:.4f} -- "
+              f"{100*((1+4/group)/(1+4/GROUP)-1):+.2f}%")
 
     o = open(dst, 'wb')
     o.write(struct.pack('I', 0x616b3432))               # magic "ak42"
