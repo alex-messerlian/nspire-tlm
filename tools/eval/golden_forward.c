@@ -61,12 +61,21 @@ int main(int argc, char **argv) {
     const int NT = (int)(sizeof toks / sizeof toks[0]);
     uint64_t chain = 1469598103934665603ULL;
     uint64_t step_hash[NT];
+    /* A HASH ONLY SAYS DIFFERENT. The device chain diverged from the host at step 0, and FNV over
+     * raw float bytes flips completely on one ULP of soft-float rounding -- so the hash cannot
+     * distinguish "ARM rounds differently" from "the matmul is wrong". These carry the magnitude:
+     * three sampled logits, and the argmax, which is what actually decides a token. */
+    int step_argmax[NT];
+    float step_l0[NT], step_l1[NT], step_lN[NT];
     for (int step = 0; step < NT; step++) {
         int pos = step * 31;                 /* 0, 31, 62, ... spans the attention range */
         if (pos >= SL) pos = SL - 1;
         float *logits = rq_forward(toks[step] % V, pos);
         uint64_t h = fnv1a(logits, (size_t)V * sizeof(float));
         step_hash[step] = h;
+        { int am = 0; for (int v = 1; v < V; v++) if (logits[v] > logits[am]) am = v;
+          step_argmax[step] = am; }
+        step_l0[step] = logits[0]; step_l1[step] = logits[1]; step_lN[step] = logits[V - 1];
         chain ^= h; chain *= 1099511628211ULL;
         printf("step=%d tok=%d pos=%d logit_hash=%016llx  l0=%.9g l1=%.9g lN=%.9g\n",
                step, toks[step] % V, pos, (unsigned long long)h,
@@ -88,11 +97,22 @@ int main(int argc, char **argv) {
             fprintf(g, "model=%s\nvocab=%d seq_len=%d GS=%d\n", model, V, SL, FIXED_GS);
             for (int step = 0; step < NT; step++) {
                 int pos = step * 31; if (pos >= SL) pos = SL - 1;
-                fprintf(g, "step=%d pos=%d hash=%016llx\n", step, pos,
-                        (unsigned long long)step_hash[step]);
+                fprintf(g, "step=%d pos=%d hash=%016llx argmax=%d l0=%.9g l1=%.9g lN=%.9g\n",
+                        step, pos, (unsigned long long)step_hash[step], step_argmax[step],
+                        (double)step_l0[step], (double)step_l1[step], (double)step_lN[step]);
             }
             fprintf(g, "CHAIN=%016llx\n", (unsigned long long)chain);
             fclose(g);
+            /* THE WHOLE STEP-0 VECTOR, so the divergence can be measured rather than described.
+             * 4096 floats is 16 KB -- small enough to pull reliably, unlike the 114 KB CAS log
+             * that failed six consecutive transfers. */
+            FILE *b = fopen("/documents/bench/logits0.bin.tns", "wb");
+            if (b) {
+                float *l0v = rq_forward(toks[0] % V, 0);
+                fwrite(l0v, sizeof(float), (size_t)V, b);
+                fclose(b);
+                printf("wrote /documents/bench/logits0.bin.tns\n");
+            }
             printf("wrote /documents/bench/golden.txt.tns\n");
         } else {
             printf("WARNING: could not write the result file; the CHAIN above is screen-only\n");
