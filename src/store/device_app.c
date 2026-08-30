@@ -294,7 +294,34 @@ static int keypad_poll(void) {
         { &KEY_NSPIRE_RET, K_ENTER }, { &KEY_NSPIRE_ENTER, K_ENTER },
         { &KEY_NSPIRE_ESC, K_ESC }, { &KEY_NSPIRE_TAB, K_TAB },
         { &KEY_NSPIRE_DEL, K_BACK }, { &KEY_NSPIRE_UP, K_UP }, { &KEY_NSPIRE_DOWN, K_DOWN },
-        { &KEY_NSPIRE_SPACE, ' ' }, { &KEY_NSPIRE_PERIOD, '.' },
+        { &KEY_NSPIRE_SPACE, ' ' },
+        /* PUNCTUATION, WITHOUT WHICH THE APP CANNOT BE USED AT ALL.
+         *
+         * The map was letters, digits, space and period. The input format the model is trained on
+         * is `what is force, k = 500, x = 0.4` -- it needs '=' and ',' in every question that
+         * supplies a value, and '-' for a negative one. Neither was mapped, so a user could type a
+         * bare question and nothing else, and every prompt the device could physically produce was
+         * one with no givens: a shape that occurs in 0 of 232,613 training documents.
+         *
+         * All of these keys are on the physical keypad and all have SDK constants. They were simply
+         * never mapped. Found by running the app, not by reading it -- the composer's own tests
+         * feed it characters directly and never ask which ones a keypad can produce.
+         *
+         * NEGATIVE is the (-) key, distinct from MINUS; a student reaching for either means the
+         * same thing here. EE is the scientific-notation key and the corpus is full of values like
+         * 3.71e-07, so it maps to 'e'. */
+        { &KEY_NSPIRE_EQU,      '=' },
+        { &KEY_NSPIRE_COMMA,    ',' },
+        { &KEY_NSPIRE_MINUS,    '-' },
+        { &KEY_NSPIRE_NEGATIVE, '-' },
+        { &KEY_NSPIRE_PLUS,     '+' },
+        { &KEY_NSPIRE_MULTIPLY, '*' },
+        { &KEY_NSPIRE_DIVIDE,   '/' },
+        { &KEY_NSPIRE_LP,       '(' },
+        { &KEY_NSPIRE_RP,       ')' },
+        { &KEY_NSPIRE_EE,       'e' },
+        { &KEY_NSPIRE_COLON,    ':' },
+        { &KEY_NSPIRE_QUES,     '?' }, { &KEY_NSPIRE_PERIOD, '.' },
         { &KEY_NSPIRE_0, '0' }, { &KEY_NSPIRE_1, '1' }, { &KEY_NSPIRE_2, '2' },
         { &KEY_NSPIRE_3, '3' }, { &KEY_NSPIRE_4, '4' }, { &KEY_NSPIRE_5, '5' },
         { &KEY_NSPIRE_6, '6' }, { &KEY_NSPIRE_7, '7' }, { &KEY_NSPIRE_8, '8' },
