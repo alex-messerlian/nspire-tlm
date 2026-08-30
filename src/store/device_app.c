@@ -14,6 +14,7 @@
 #include "app.h"
 #include "loader.h"
 #include "assemble.h"
+#include "askparse.h"
 #include "tokenizer.h"
 #include "../../tools/eval/eval.h"
 #include "toolrun.h"
@@ -422,31 +423,30 @@ void app_request(const char *question, const char *rid) {
     app_begin_turn(question);
     app_draw();
 
-    /* pick the first record whose name appears in the question, else the first record.
-     * Retrieval measured 8.0% on real questions, so this is a placeholder until the picker UI
-     * lands -- it is NOT a retrieval claim. */
-    int idx = 0;
-    static char prompt[NS_PROMPT_MAX];
-    ns_input in; in.nvals = 0;
-
-    /* SESSION CONTEXT, compacted. The model is single-turn -- every training document is one
-     * <q>..</q><r>..<a>..<end> and it has never seen a conversation -- so prior turns go in as
-     * plain text inside the question rather than as extra document structure.
+    /* RETRIEVE, AND PARSE THE VALUES. Both of these were placeholders and both were reached by
+     * every question the device could ask.
      *
-     * Budget in CHARACTERS rather than tokens: counting tokens costs a full BPE pass per keystroke
-     * on a 396 MHz core. 4.15 chars/token measured on this corpus, and the budget below is derived
-     * from the 167-token context allowance that survives the record and question.
-     */
-    static char withctx[NS_PROMPT_MAX];
-    char ctx[512];
-    int rec_tok = 38, q_tok = (int)strlen(question) / 4;
-    int budget_tok = 256 - rec_tok - q_tok - 24;
-    if (budget_tok < 0) budget_tok = 0;
-    int budget_chars = budget_tok * 4;
-    if (budget_chars > (int)sizeof ctx - 1) budget_chars = (int)sizeof ctx - 1;
-    app_context(ctx, sizeof ctx, budget_chars);
-    snprintf(withctx, sizeof withctx, "%s%s", ctx, question);
-    question = withctx;
+     * `int idx = 0` meant the app ALWAYS showed record 0, which is F=-k*x. Every question on the
+     * device came back "the record gives hooke's law, which does not apply" -- not a model failure
+     * at all, the model was shown Hooke's law every time. The comment described a name match that
+     * the code did not do.
+     *
+     * `in.nvals = 0` with nothing populating it meant NO GIVENS ever reached ns_assemble, so the
+     * record span always said missing:<var> however many values the student typed. Combined with
+     * the keypad that could not produce '=', every prompt the device was capable of building had
+     * no givens -- a shape that occurs in 0 of 232,613 training documents.
+     *
+     * The logic is in askparse.c so it can be tested on the host against the shipped store; see
+     * the header for why it is not inline here any more. It is not a retrieval claim -- ns_retrieve
+     * in store.c ranks the same way and measured 8.0% on real questions -- but "the record the
+     * question names" is strictly better than "record 0", and the model reads the record from the
+     * prompt regardless. */
+    static char prompt[NS_PROMPT_MAX];
+    static ns_ask ask;
+    ask_build(&ST, question, &ask);
+    const int idx = ask.idx;
+    const ns_input in = ask.in;
+    question = ask.question;
 
     if (ns_assemble(prompt, sizeof prompt, &ST.rec[idx], question, &in) < 0) {
         app_stream_token("<a> could not assemble a prompt<end>"); app_stream_end(); return;

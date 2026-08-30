@@ -34,7 +34,7 @@ EVAL_CORE := $(addprefix tools/eval/, fmt.c ast.c units.c parser.c numeric.c der
 
 APP_SRC   := src/store/app.c src/store/gfx.c src/store/loader.c src/store/assemble.c \
              src/store/tokenizer.c src/store/picker.c src/store/toolrun.c src/store/chatstore.c \
-             src/store/shapecheck.c
+             src/store/shapecheck.c src/store/askparse.c
 
 DEV_SRC   := src/store/device_app.c $(APP_SRC) src/runq_nspire.c src/nspire.c include/nspire_screen.c
 
@@ -55,13 +55,13 @@ TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck
 # source change: re-adding the pre-opened `<a>` bug to assemble.c and running `make check` gave ALL
 # GATES PASS. run_gates.sh's own header claims `make check` 'BUILDS the host binaries first'; for
 # four of its twenty-five gates that was false.
-TESTS_STORE:= test_loader test_picker test_assemble test_tokenizer
+TESTS_STORE:= test_loader test_picker test_assemble test_tokenizer test_askparse
 TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -142,6 +142,13 @@ $(BUILD)/test_assemble:  src/store/test_assemble.c  src/store/assemble.c src/sto
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/assemble.c src/store/loader.c -lm
 $(BUILD)/test_tokenizer: src/store/test_tokenizer.c src/store/tokenizer.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/tokenizer.c -lm
+# askparse.c is the record picker and the given parser, lifted out of app_request() in
+# device_app.c precisely so it could be compiled here. build/askcli is the same code with a
+# stdin driver, used to MEASURE retrieval rather than assert it.
+$(BUILD)/test_askparse:  tools/eval/test_askparse.c src/store/askparse.c src/store/assemble.c src/store/loader.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
+$(BUILD)/askcli:         tools/eval/askcli.c       src/store/askparse.c src/store/assemble.c src/store/loader.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
 
 # build/tlmui -- the host UI harness that tools/uiserver/server.py drives, and that every
 # localhost UI decision was validated against. It was a COMMITTED BINARY with no rule, and the
