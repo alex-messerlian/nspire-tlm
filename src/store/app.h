@@ -133,6 +133,8 @@ typedef struct {
 #define K_ESC  0x1B
 #define K_ENTER 0x0D
 #define K_TAB  0x09
+#define K_LEFT 0x103
+#define K_RIGHT 0x104
 #define K_BACK 0x08
 /* Chords. Ctrl is a modifier on the Nspire keypad, so the poll reports these as their own codes
  * rather than as a flag -- the app never has to know how the hardware spells "held". */

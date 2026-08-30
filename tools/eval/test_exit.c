@@ -16,6 +16,11 @@ static void T(const char *n, int got, int want) {
     if (!ok) F++;
     printf("  %s  %-46s got=%d want=%d\n", ok ? "PASS" : "FAIL", n, got, want);
 }
+static void T2(const char *n, const char *got, const char *want) {
+    int ok = !strcmp(got, want);
+    if (!ok) F++;
+    printf("  %s  %-46s got=\"%s\" want=\"%s\"\n", ok ? "PASS" : "FAIL", n, got, want);
+}
 static void key(int k) { in_event e; memset(&e,0,sizeof e); e.kind=IN_KEY; e.key=k; app_event(&e); }
 static void click(int x, int y) { in_event e; memset(&e,0,sizeof e); e.kind=IN_CLICK; e.x=x; e.y=y; app_event(&e); }
 /* app_init() clears the chat state but NOT the view state, so SIDEBAR, the cursor and HOVER
@@ -340,6 +345,32 @@ int main(void) {
     T("and the question is held, not lost", PENDQ[0] != 0, 1);
     key(K_ESC);                       /* family list: esc is "ask anyway" -> Form C, picker closes */
     T("esc at the family list closes it", PICK_ON, 0);
+
+    /* -- the caret, and editing anywhere but the end --
+     *
+     * The field could only be edited from the end: a typo three characters back meant deleting
+     * everything after it. Reported from the device as "I have to delete stuff to write something
+     * again". Left/right were never mapped and there was no caret index at all. */
+    printf("\n  -- editing in the middle --\n");
+    reset(); CUR = -1; compose_clear();
+    for (const char *c = "v_0 = 5"; *c; c++) key(*c);
+    T("typing puts the caret at the end", COMPOSE_C, COMPOSE_N);
+    for (int i = 0; i < 4; i++) key(K_LEFT);
+    T("left moves the caret", COMPOSE_C, 3);
+    key('1');
+    T2("insert lands AT the caret", COMPOSE, "v_01 = 5");
+    T("and the caret advances past it", COMPOSE_C, 4);
+    key(K_BACK);
+    T2("backspace deletes BEFORE the caret", COMPOSE, "v_0 = 5");
+    T("caret steps back with it", COMPOSE_C, 3);
+    for (int i = 0; i < 20; i++) key(K_LEFT);
+    T("left clamps at the start", COMPOSE_C, 0);
+    key(K_BACK);
+    T2("backspace at the start deletes nothing", COMPOSE, "v_0 = 5");
+    for (int i = 0; i < 40; i++) key(K_RIGHT);
+    T("right clamps at the end", COMPOSE_C, COMPOSE_N);
+    compose_clear();
+    T("clearing resets the caret", COMPOSE_C, 0);
 
     /* -- controls respond outside their drawn box --
      *

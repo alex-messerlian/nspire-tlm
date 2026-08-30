@@ -320,6 +320,10 @@ static int keypad_poll(void) {
         { &KEY_NSPIRE_RET, K_ENTER }, { &KEY_NSPIRE_ENTER, K_ENTER },
         { &KEY_NSPIRE_ESC, K_ESC }, { &KEY_NSPIRE_TAB, K_TAB },
         { &KEY_NSPIRE_DEL, K_BACK }, { &KEY_NSPIRE_UP, K_UP }, { &KEY_NSPIRE_DOWN, K_DOWN },
+        /* LEFT AND RIGHT MOVE THE CARET. They were never mapped, so the composer could only be
+         * edited from the end: a typo three characters back meant deleting everything after it.
+         * The touchpad's own left/right rocker reports as these. */
+        { &KEY_NSPIRE_LEFT, K_LEFT }, { &KEY_NSPIRE_RIGHT, K_RIGHT },
         { &KEY_NSPIRE_SPACE, ' ' },
         /* PUNCTUATION, WITHOUT WHICH THE APP CANNOT BE USED AT ALL.
          *
@@ -541,8 +545,24 @@ void app_request(const char *question, const char *rid) {
     const int ID_TOOLC = ns_tok_special_id(&TK, "</tool>");
     const int ID_END   = ns_tok_special_id(&TK, "<end>");
 
+    /* THE PREFILL REPAINTS, and it has to: reading a 51-token prompt is 51 forward passes at the
+     * measured 1.753 tok/s, so the app sat with a frozen screen for ~29 seconds before the first
+     * generated token. Nothing was wrong and nothing said so -- which on a device with no other
+     * feedback is indistinguishable from a hang, and was reported as one.
+     *
+     * A draw costs a fraction of one forward pass, so this is progress for free. ESC is honoured
+     * here too: an interrupt during the longest phase of a turn used to be ignored entirely. */
     int tok = ids[0], pos = 0;
-    while (pos < n - 1) { rq_forward(tok, pos); pos++; tok = ids[pos]; }
+    while (pos < n - 1) {
+        rq_forward(tok, pos); pos++; tok = ids[pos];
+        if ((pos & 7) == 0 || pos == n - 1) {
+            char pr[40];
+            snprintf(pr, sizeof pr, "%d%%", (100 * pos) / (n > 1 ? n - 1 : 1));
+            app_status("Reading", pr);
+            app_draw();
+            if (app_take_abort()) { app_stream_token("<a> stopped<end>"); app_stream_end(); return; }
+        }
+    }
 
     static int emitted[300];                 /* what the model has produced, for span extraction */
     int nemit = 0;

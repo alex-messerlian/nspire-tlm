@@ -211,7 +211,12 @@ static int COMPOSE_SEL;
  * an empty box, and after that the next keystroke would "replace a selection" that no longer had
  * any text in it. Three earlier defects in this file were state a reset forgot; this removes the
  * chance rather than adding a fourth careful call site. */
-static void compose_clear(void) { COMPOSE_N = 0; COMPOSE[0] = 0; COMPOSE_SEL = 0; }
+/* WHERE THE NEXT CHARACTER GOES. Without it the field could only be edited from the end -- a typo
+ * three characters back meant deleting everything after it, which is what "I have to delete stuff
+ * to write something again" was. Kept in [0, COMPOSE_N] by every path that touches the buffer, and
+ * reset here with the rest of the state for the reason this function exists. */
+static int COMPOSE_C;
+static void compose_clear(void) { COMPOSE_N = 0; COMPOSE[0] = 0; COMPOSE_SEL = 0; COMPOSE_C = 0; }
 
 static void clip_paste(void) {
     if (!CLIP[0]) { toast("Clipboard is empty"); return; }
@@ -223,6 +228,7 @@ static void clip_paste(void) {
     int take = n < room ? n : room;
     memcpy(COMPOSE + COMPOSE_N, CLIP, (size_t)take);
     COMPOSE_N += take; COMPOSE[COMPOSE_N] = 0;
+    COMPOSE_C = COMPOSE_N;   /* a paste leaves the caret after what it pasted */
     /* Says so when it could not take all of it. Truncating quietly is how a paste looks like it
      * worked and is not what was copied. */
     if (take < n) toast("Pasted, trimmed to fit");
@@ -1842,13 +1848,34 @@ static void draw_composer(int x0, int w, int cy) {
                              C_FIELD, tw, COMPOSE_LH, 1, &last_w);
         }
         gfx_clip_reset();
-        /* the caret follows the text, on the last visible line */
-        int cxx = R_FIELD.x + 9 + last_w + 1, cyy = cy + 6 + (shown - 1) * COMPOSE_LH;
+        /* THE CARET SITS AT COMPOSE_C, not at the end of the text.
+         *
+         * It used to be drawn at `last_w`, the width of the whole string, which was correct only
+         * because the field could not be edited anywhere but the end. With left/right it would
+         * have pointed at the wrong place on every keystroke.
+         *
+         * The position is measured the same way the text is laid out -- by WRAPPING THE PREFIX
+         * COMPOSE[0, COMPOSE_C) with drawing off. Its last-line width is the caret's x and its
+         * line count is the caret's row, so the caret cannot disagree with the glyphs: both come
+         * from gfx_text_wrap_ex on the same width. */
+        int caret_w = last_w, caret_line = total;
+        if (COMPOSE_C < COMPOSE_N) {
+            static char pre[sizeof COMPOSE];
+            int pn = COMPOSE_C < (int)sizeof pre - 1 ? COMPOSE_C : (int)sizeof pre - 1;
+            memcpy(pre, COMPOSE, (size_t)pn); pre[pn] = 0;
+            caret_line = gfx_text_wrap_ex(0, 0, pre, F_UI, C_INK, C_FIELD, tw, COMPOSE_LH,
+                                          0, &caret_w);
+            if (caret_line < 1) caret_line = 1;
+        }
+        int caret_row = caret_line - 1 - skip;
+        if (caret_row < 0) caret_row = 0;
+        if (caret_row > shown - 1) caret_row = shown - 1;
+        int cxx = R_FIELD.x + 9 + caret_w + 1, cyy = cy + 6 + caret_row * COMPOSE_LH;
         /* Blinks on the app clock, half a second on and half off. A steady bar reads as a piece
          * of the layout; a blinking one reads as the insertion point. */
         /* No caret while everything is selected. A blinking insertion point next to a full
          * highlight says two contradictory things about where the next keystroke lands. */
-        if (!COMPOSE_SEL && last_w < tw - 2 && (NOW_MS / 500u) % 2u == 0u)
+        if (!COMPOSE_SEL && caret_w < tw - 2 && (NOW_MS / 500u) % 2u == 0u)
             gfx_vline(cxx, cyy, 12, C_INK);
     } else if (FIELD_FOCUS) {
         /* Focused and empty: a blinking caret and no placeholder. The caret is the thing that says
@@ -2230,6 +2257,7 @@ void app_event(const in_event *e) {
             compose_clear();
             COMPOSE_N = (int)snprintf(COMPOSE, sizeof COMPOSE, "%s", TRY_Q[i]);
             if (COMPOSE_N >= (int)sizeof COMPOSE) COMPOSE_N = (int)sizeof COMPOSE - 1;
+            COMPOSE_C = COMPOSE_N;
             FIELD_FOCUS = 1;
             return;
         }
@@ -2325,7 +2353,10 @@ void app_event(const in_event *e) {
             /* Selected text deletes WHOLE. Removing one character from a full selection is what a
              * field that merely drew a highlight would do, and it is never what was meant. */
             if (COMPOSE_SEL) { compose_clear(); return; }
-            if (COMPOSE_N) COMPOSE[--COMPOSE_N] = 0;
+            if (COMPOSE_C > 0 && COMPOSE_N > 0) {
+                memmove(COMPOSE + COMPOSE_C - 1, COMPOSE + COMPOSE_C, (size_t)(COMPOSE_N - COMPOSE_C));
+                COMPOSE_C--; COMPOSE_N--; COMPOSE[COMPOSE_N] = 0;
+            }
             return;
         }
         if (k == K_ENTER) {
@@ -2345,10 +2376,16 @@ void app_event(const in_event *e) {
         }
         if (k == K_DOWN) { SCROLL += 16; return; }
         if (k == K_UP)   { SCROLL -= 16; if (SCROLL < 0) SCROLL = 0; return; }
+        if (k == K_LEFT)  { if (COMPOSE_C > 0) COMPOSE_C--; COMPOSE_SEL = 0; return; }
+        if (k == K_RIGHT) { if (COMPOSE_C < COMPOSE_N) COMPOSE_C++; COMPOSE_SEL = 0; return; }
         if (k >= 32 && k < 127 && COMPOSE_N < (int)sizeof COMPOSE - 1) {
             /* A keystroke REPLACES the selection rather than appending to it. */
             if (COMPOSE_SEL) compose_clear();
-            COMPOSE[COMPOSE_N++] = (char)k; COMPOSE[COMPOSE_N] = 0;
+            if (COMPOSE_C < 0) COMPOSE_C = 0;
+            if (COMPOSE_C > COMPOSE_N) COMPOSE_C = COMPOSE_N;
+            memmove(COMPOSE + COMPOSE_C + 1, COMPOSE + COMPOSE_C, (size_t)(COMPOSE_N - COMPOSE_C));
+            COMPOSE[COMPOSE_C++] = (char)k;
+            COMPOSE_N++; COMPOSE[COMPOSE_N] = 0;
         }
     }
 }
