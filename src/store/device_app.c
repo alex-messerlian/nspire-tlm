@@ -410,6 +410,28 @@ static int keypad_poll(void) {
 }
 
 /* ---- generation ------------------------------------------------------------------------------- */
+/* Does the prose state the runtime's number, to within the 4-significant-figure rounding the
+ * corpus applies below 1e5? Compared as VALUES, not as strings: "20000" and "2e+04" are the same
+ * answer, and a string compare would flag the correct one. Any number in the answer may be the
+ * match, because the prose legitimately restates givens too -- this asks whether the RESULT is
+ * among them, not whether every number is right. */
+static int answer_states_result(const char *ans, const char *res) {
+    double want = atof(res);
+    if (want == 0.0) return 1;                    /* 0 is unreliable to match; do not flag it */
+    for (const char *p = ans; *p; p++) {
+        if (!((*p >= '0' && *p <= '9') || (*p == '-' && p[1] >= '0' && p[1] <= '9'))) continue;
+        if (p != ans && (p[-1] == 'e' || p[-1] == 'E' || p[-1] == '.')) continue;
+        char *end = 0;
+        double got = strtod(p, &end);
+        if (end == p) continue;
+        double tol = (want < 0 ? -want : want) * 0.02;
+        double d = got - want; if (d < 0) d = -d;
+        if (d <= tol) return 1;
+        p = end - 1;
+    }
+    return 0;
+}
+
 static int argmax(const float *v, int n) { int b = 0; for (int i = 1; i < n; i++) if (v[i] > v[b]) b = i; return b; }
 
 /* Tool execution lives in toolrun.c so the shipping code can be verified on the host against
@@ -686,6 +708,31 @@ void app_request(const char *question, const char *rid) {
         }
         if (app_take_abort()) stopped = 1;
         if (stopped) break;
+    }
+    /* THE RUNTIME OWNS THE ARITHMETIC, INCLUDING IN THE PROSE.
+     *
+     * Measured on device and reproduced on host, fp32 and int8 alike:
+     *     <tool> eval<arg> 0.5*(900.0)*((800.0))^(2)</tool><res> 288000000</res>
+     *     <a> K = 229 J. From K=0.5*m*(v)^(2).<end>
+     * The call is right, the runtime result is right, and the PROSE states a different number.
+     * A44b removed the notation CONVERSION -- that arm is 0/155 -- but a residual copy error
+     * remains, because restating 288000000 means reproducing nine digits token by token. Measured
+     * by magnitude on round givens, greedy: 0.9% below 1e5, 4.3% from 1e5 to 1e7.
+     *
+     * This is not a corpus defect and no retrain fixes it: the corpus copies <res> verbatim there,
+     * and the model is ~96% reliable at copying a long digit string. But the whole premise of
+     * TOOL_SPEC is that the model does not compute and the runtime does -- so where the two
+     * disagree, the runtime is right and says so. The prose is left standing, because silently
+     * rewriting what the model said would hide the disagreement rather than report it. */
+    if (tool_ok && tool_res[0] && tool_res[0] != '!') {
+        static char full[NS_PROMPT_MAX];
+        ns_tok_decode(&TK, emitted, nemit, full, sizeof full);
+        const char *a = strstr(full, "<a>");
+        if (a && !answer_states_result(a + 3, tool_res)) {
+            app_stream_token("  [runtime result: ");
+            app_stream_token(tool_res);
+            app_stream_token("]");
+        }
     }
     /* The line that stays. Elapsed time is measured; the tool is reported only if one ran. */
     app_status_done(clock_ms_since(t_start), tool_call[0] ? tool_call : 0, tool_res, tool_ok);

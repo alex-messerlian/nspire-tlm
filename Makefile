@@ -55,7 +55,7 @@ TESTS_EVAL := test_toolrun test_prov
 # legitimate' case -- and was referenced by NO Makefile and NO gate. Its binary sat committed
 # under tools/eval/ with nothing that rebuilt it. WIRING_AUDIT records provenance.c going from
 # 'exists but is never called' to 'called but never verified'; this is the second half.
-TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck
+TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck test_ansmatch
 # STORE SUITES. These four ran as COMMITTED BINARIES that no rule rebuilt, so they could not see a
 # source change: re-adding the pre-opened `<a>` bug to assemble.c and running `make check` gave ALL
 # GATES PASS. run_gates.sh's own header claims `make check` 'BUILDS the host binaries first'; for
@@ -164,6 +164,15 @@ $(BUILD)/test_tokenizer: src/store/test_tokenizer.c src/store/tokenizer.c | $(BU
 # askparse.c is the record picker and the given parser, lifted out of app_request() in
 # device_app.c precisely so it could be compiled here. build/askcli is the same code with a
 # stdin driver, used to MEASURE retrieval rather than assert it.
+# THE PREDICATE IS EXTRACTED FROM device_app.c AT BUILD TIME, never copied into the test.
+# answer_states_result decides whether to print "[runtime result: ...]" over the model's prose, so
+# a stale copy would test a function the calculator does not run. sed lifts the shipped one.
+$(BUILD)/ansmatch_impl.h: src/store/device_app.c | $(BUILD)
+	@sed -n '/^static int answer_states_result/,/^}/p' $< > $@
+	@test -s $@ || { echo "  FATAL: answer_states_result not found in device_app.c"; exit 1; }
+$(BUILD)/test_ansmatch: tools/eval/test_ansmatch.c $(BUILD)/ansmatch_impl.h | $(BUILD)
+	$(CC) $(HOSTFLAGS) -I $(BUILD) -o $@ $< -lm
+
 $(BUILD)/test_askparse:  tools/eval/test_askparse.c src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
 $(BUILD)/askcli:         tools/eval/askcli.c       src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
