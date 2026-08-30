@@ -17,6 +17,14 @@ static int appends(char *out, int cap, int n, const char *s) {
     return n + len;
 }
 
+static int appendn(char *out, int cap, int n, const char *s, int len) {
+    if (n < 0) return -1;
+    if (n + len >= cap) return -1;
+    memcpy(out + n, s, (size_t)len);
+    out[n + len] = '\0';
+    return n + len;
+}
+
 static const char *value_for(const ns_input *in, const char *var) {
     if (!in) return 0;
     for (int i = 0; i < in->nvals; i++)
@@ -29,7 +37,28 @@ int ns_assemble(char *out, int cap, const ns_rec2 *r, const char *question, cons
     out[0] = '\0';
     int n = 0;
     n = appends(out, cap, n, "<q>");
-    n = appends(out, cap, n, question);
+    /* THE QUESTION IS CLOSED BEFORE THE GIVENS, and the givens get a LEAD-IN. Measured over the
+     * 239,838-document corpus: of the 232,758 questions carrying a value, 99.96% use one of 16
+     * lead-in frames, and the device used NONE -- it appended "  v = a, b = c." straight onto the
+     * ask. Every question the calculator has ever built was in a surface form the model saw in
+     * 0.04% of training, and those 0.04% are raw OpenStax artifacts, not the generated form.
+     *
+     * Sixth train/serve skew of this class, after units, condition, fit, missing and the <res>
+     * span -- and the one nobody diffed, because gate_record_bytes compares the RECORD span and
+     * this is the QUESTION span. gate_question_shape now covers it.
+     *
+     * The form reproduced here is corpus/generate.py compose_question()'s suffix branch:
+     *     ask.rstrip(".?") + ("?" if it ended with ? else ".") + " " + frame + "."
+     * which is 34.9% of the corpus. "Given" is one of the 16 frames, all near-uniform at ~6.3%.
+     * Example, from the corpus: "Find V. Given q = 2.66e-07, U_E = 4.47e-05." */
+    {   int qlen = (int)strlen(question);
+        while (qlen > 0 && (question[qlen-1] == ' ' )) qlen--;
+        int was_q = (qlen > 0 && question[qlen-1] == '?');
+        while (qlen > 0 && (question[qlen-1] == '.' || question[qlen-1] == '?' ||
+                            question[qlen-1] == ' ')) qlen--;
+        n = appendn(out, cap, n, question, qlen);
+        n = appends(out, cap, n, was_q ? "?" : ".");
+    }
     /* THE ENTERED VALUES GO IN THE QUESTION. The training format carries givens there
      * ("<q>Given v = 3, d = 5, find ...</q>"), and provenance requires every number in a tool
      * call to trace to the question or the record. Without this the model has nothing to compute
@@ -53,7 +82,7 @@ int ns_assemble(char *out, int cap, const ns_rec2 *r, const char *question, cons
     int nwrote = 0;
     if ((in && in->nvals > 0) || r->nvars) {
         for (int i = 0; in && i < in->nvals; i++) {
-            n = appends(out, cap, n, nwrote++ ? ", " : " ");
+            n = appends(out, cap, n, nwrote++ ? ", " : " Given ");
             n = appends(out, cap, n, in->var[i]);
             n = appends(out, cap, n, " = ");
             n = appends(out, cap, n, in->val[i]);
@@ -61,7 +90,7 @@ int ns_assemble(char *out, int cap, const ns_rec2 *r, const char *question, cons
         for (int k = 0; k < r->nvars; k++) {
             if (!r->cval[k] || !r->cval[k][0]) continue;
             if (value_for(in, r->var[k])) continue;   /* the student overrode it; theirs wins */
-            n = appends(out, cap, n, nwrote++ ? ", " : " ");
+            n = appends(out, cap, n, nwrote++ ? ", " : " Given ");
             n = appends(out, cap, n, r->var[k]);
             n = appends(out, cap, n, " = ");
             n = appends(out, cap, n, r->cval[k]);
@@ -105,6 +134,10 @@ int ns_assemble_none(char *out, int cap, const char *question) {
     out[0] = '\0';
     int n = 0;
     n = appends(out, cap, n, "<q>");
+    /* NOT given the lead-in treatment above. Form C carries no givens, so there is nothing to lead
+     * in to -- and this exact string is MEASURED: 100.0% refused, 0.0% confident answers on 88 real
+     * questions the store cannot serve. Changing a measured string for symmetry would invalidate
+     * the measurement and buy nothing. */
     n = appends(out, cap, n, question);
     n = appends(out, cap, n, "</q><r>none | missing:none | no matching relation | fit:low<a>");
     return n;

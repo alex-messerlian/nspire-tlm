@@ -28,7 +28,12 @@ int main(int argc, char **argv) {
         ns_input in = {{"d","t"},{"150","12"},2};
         int n = ns_assemble(buf, sizeof buf, &st.rec[spd], "A car goes 150 m in 12 s. Find the speed.", &in);
         ck(n > 0, "assemble returns a length");
-        ck_str(buf, "<q>A car goes 150 m in 12 s. Find the speed. d = 150, t = 12.</q><r>"
+        /* THE LEAD-IN IS PART OF THE CONTRACT. This assertion previously expected the givens
+         * appended bare -- "Find the speed. d = 150, t = 12." -- and that form occurs in 0.04% of
+         * the 232,758 training questions carrying a value, all of them raw OpenStax artifacts.
+         * 99.96% use one of 16 lead-in frames. The device therefore asked every question it has
+         * ever asked in a surface the model had effectively never seen. */
+        ck_str(buf, "<q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>"
                     "v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high",
                "exact prompt for v=d/t, with the entered values IN the question");
         ck(strstr(buf, "d = 150") != NULL,

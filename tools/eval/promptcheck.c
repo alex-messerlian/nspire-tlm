@@ -7,6 +7,10 @@
  *
  *   1. it fits the pane at F_SM with no ellipsis
  *   2. the shortlist actually finds its record, so a student who taps it sees the tool work
+ *   3. THE ASSEMBLED PROMPT IS A QUESTION. The first set failed exactly here and nothing caught
+ *      it: "hooke's law, k = 250, x = 0.08" assembles to <q>hooke's law k = 250, x = 0.08.</q>,
+ *      which names a relation and asks for nothing. The model refused correctly and it read on
+ *      the device as a model failure. Checks 1 and 2 are structural; this one reads the document.
  *
  * Prompt text on stdin, one per line, as `prompt<TAB>expected_formula`.
  */
@@ -26,7 +30,7 @@ int main(int argc, char **argv) {
     if (ns_load(&ST, argc > 1 ? argv[1] : "build/store.tns") != NS_OK) return 2;
     gfx_init();
     char line[512]; int bad = 0;
-    printf("%-46s %5s %5s  %-4s %s\n", "prompt", "px", "fits", "rank", "verdict");
+    printf("%-42s %5s %5s %-4s %5s %5s  %s\n", "prompt", "px", "fits", "rank", "shape", "asks", "verdict");
     while (fgets(line, sizeof line, stdin)) {
         line[strcspn(line, "\n")] = 0;
         char *tab = strchr(line, '\t'); if (!tab) continue;
@@ -36,11 +40,33 @@ int main(int argc, char **argv) {
         static pk_state P; pk_open(&P, &ST, q);
         int rank = -1; char b[256];
         for (int i = 0; i < P.nsug; i++) if (!strcmp(nrm(ST.rec[P.sug[i]].formula, b, sizeof b), want)) { rank = i+1; break; }
-        int ok = (w <= maxw) && rank > 0;
+        /* The assembled prompt must carry a lead-in frame -- the form 99.96% of training
+         * questions with values use -- and an interrogative or imperative verb. */
+        static char prompt[NS_PROMPT_MAX];
+        static ns_ask a; ask_build(&ST, q, &a);
+        int shape = 0, asks = 0;
+        if (P.nsug && ns_assemble(prompt, sizeof prompt, &ST.rec[P.sug[rank>0?rank-1:0]],
+                                  a.question, &a.in) > 0) {
+            shape = strstr(prompt, ". Given ") || strstr(prompt, "? Given ") ? 1 : 0;
+            static const char *V[] = {"find","calculate","compute","determine","what","how",
+                                      "estimate","give","state"};
+            for (unsigned i = 0; i < sizeof V / sizeof V[0]; i++) {
+                for (const char *h = a.question; *h; h++) {
+                    unsigned k = 0;
+                    while (V[i][k] && h[k] &&
+                           ((h[k]>='A'&&h[k]<='Z' ? h[k]-'A'+'a' : h[k]) == V[i][k])) k++;
+                    if (!V[i][k]) { asks = 1; break; }
+                }
+                if (asks) break;
+            }
+        }
+        int ok = (w <= maxw) && rank > 0 && shape && asks;
         if (!ok) bad++;
-        printf("%-46s %5d %5s  %-4s %s\n", q, w, w <= maxw ? "yes" : "NO",
+        printf("%-42s %5d %5s %-4s %5s %5s  %s\n", q, w, w <= maxw ? "yes" : "NO",
                rank > 0 ? (char[4]){'#', (char)('0'+rank), 0, 0} : "MISS",
-               ok ? "ok" : (w > maxw ? "TOO WIDE" : "not in the shortlist"));
+               shape ? "yes" : "NO", asks ? "yes" : "NO",
+               ok ? "ok" : !asks ? "ASKS FOR NOTHING" : !shape ? "not the training shape"
+                    : (w > maxw ? "TOO WIDE" : "not in the shortlist"));
     }
     printf("\n%d unusable\n", bad);
     return bad ? 1 : 0;

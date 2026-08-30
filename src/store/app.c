@@ -379,18 +379,26 @@ static int ask_index(unsigned n);
  * they ellipsised at this width -- "A car goes 150 m in 12 s. Find ..." -- so the one thing they
  * existed to do, show what a question looks like, was the one thing they could not do.
  *
- * These are vetted by tools/eval/promptcheck.c against BOTH failure modes, measured rather than
- * eyeballed: each fits the pane at F_SM with room to spare (128-144 px against 268), and each is
- * found by the shortlist at rank #1, so a student who taps one sees the tool work rather than
- * discovering the miss case first. Three families -- force, energy, electricity -- because the
- * format is what they teach: a question, then `name = value` for what you know.
+ * These are vetted by tools/eval/promptcheck.c against THREE failure modes, measured rather than
+ * eyeballed: each fits the pane at F_SM (162-183 px against 268), each is found by the shortlist
+ * at rank #1, and -- the one I missed the first time -- each ASKS FOR A QUANTITY.
+ *
+ * THE FIRST SET DID NOT. They were "hooke's law, k = 250, x = 0.08" and the assembled prompt was
+ * <q>hooke's law k = 250, x = 0.08.</q>: a relation NAME, asking for nothing. The model refused,
+ * correctly, and it read as a model failure on the device. I had vetted pixel width and shortlist
+ * rank -- two structural properties -- and never read the assembled document, which is the step
+ * the project log makes mandatory before anything ships. Training questions are VERB + QUANTITY:
+ * "Calculate frequency.", "Find path length difference.", "determine I_S".
+ *
+ * Three families -- energy, pressure, momentum -- because the format is what they teach: a
+ * question naming what you want, then `name = value` for what you know.
  *
  * Tapping one LOADS it into the box rather than sending it. The format is the lesson; sending it
  * immediately would hide the very thing being demonstrated. */
 static const char *TRY_Q[] = {
-    "hooke's law, k = 250, x = 0.08",
-    "kinetic energy, m = 2, v = 3",
-    "ohm's law, I = 0.25, R = 48",
+    "Find the kinetic energy. m = 2, v = 3",
+    "Find the pressure. F = 400, A = 0.02",
+    "Find the momentum. m = 1200, v = 15",
 };
 #define TRY_N ((int)(sizeof TRY_Q / sizeof TRY_Q[0]))
 static gfx_rect R_TRY[TRY_N];

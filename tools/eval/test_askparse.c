@@ -55,10 +55,23 @@ static void case_nvals(const char *q, int want) {
     ck(A.in.nvals == want, q, msg);
 }
 
-static void case_absent(const char *q, const char *must_not_contain) {
+/* COUNT the value, do not pattern-match the gap around it.
+ *
+ * This was `case_absent(q, "0.4 k = 500")` -- a literal that only appears when the duplicated
+ * values sit adjacent. The moment ns_assemble started closing the question before the givens
+ * ("... x = 0.4. Given k = 500, ...") the string stopped occurring, the control SURVIVED, and the
+ * duplication it guards would have shipped again. A count is what the property actually is, and
+ * no change of separator can defeat it. */
+static int count_of(const char *hay, const char *needle) {
+    int n = 0; size_t L = strlen(needle);
+    for (const char *p = hay; (p = strstr(p, needle)); p += L) n++;
+    return n;
+}
+static void case_once(const char *q, const char *val) {
     const char *p = assemble(q);
-    char msg[1100]; snprintf(msg, sizeof msg, "%s", p);
-    ck(strstr(p, must_not_contain) == 0, q, msg);
+    int c = count_of(p, val);
+    char msg[1100]; snprintf(msg, sizeof msg, "%d occurrences of \"%s\" in %s", c, val, p);
+    ck(c == 1, q, msg);
 }
 
 static void case_contains(const char *q, const char *must_contain) {
@@ -105,9 +118,10 @@ int main(int argc, char **argv) {
     case_nvals("is x = y a thing", 0);            /* '=' with no number is not a given */
 
     printf("\n-- the question must not carry the values twice ------------------------\n");
-    /* THE REGRESSION. Present in the prompt exactly once, in the list ns_assemble builds. */
-    case_absent("what is force, k = 500, x = 0.4", "0.4 k = 500");
-    case_contains("what is force, k = 500, x = 0.4", "<q>what is force");
+    /* THE REGRESSION. Each value present EXACTLY ONCE, in the list ns_assemble builds. */
+    case_once("what is force, k = 500, x = 0.4", "k = 500");
+    case_once("what is force, k = 500, x = 0.4", "x = 0.4");
+    case_contains("what is force, k = 500, x = 0.4", "<q>what is force. Given ");
     case_contains("what is force, k = 500, x = 0.4", "missing:none");
     /* A question that is ONLY values must not strip down to nothing. */
     ask_build(&ST, "k = 500, x = 0.4", &A);

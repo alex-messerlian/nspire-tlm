@@ -66,7 +66,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck $(BUILD)/devprompt
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -175,6 +175,8 @@ $(BUILD)/rankcli:        tools/eval/rankcli.c      src/store/askparse.c src/stor
 # drive the shipped pk_key and assert arrival, so it counts navigation, not a model of it.
 # promptcheck vets the empty screen's example prompts against BOTH ways they can fail: too wide
 # for the pane (they were removed once for exactly that) and not found by the shortlist.
+$(BUILD)/devprompt:      tools/eval/devprompt.c    src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
 $(BUILD)/promptcheck:    tools/eval/promptcheck.c  src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c src/store/gfx.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c src/store/gfx.c -lm
 $(BUILD)/keycost:        tools/eval/keycost.c      src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
