@@ -57,11 +57,81 @@ static int browse_to(pk_state *p, int rec, int base_row_of_family) {
     return keys + 1;
 }
 
+/* THE FILTER PATH, at its CEILING.
+ *
+ * Typing at the family list drops into search-all and appends, so a query of L characters costs L
+ * keys, then arrows to the row, then enter. An optimal user types the shortest query that gets
+ * there -- so this searches every prefix of every word of the TARGET RECORD'S OWN NAME and takes
+ * the cheapest that arrives.
+ *
+ * THAT IS AN ORACLE, AND IT IS THE POINT: it assumes the student can name a word of the record.
+ * For "Hooke's law" a student asking about a spring cannot, which is the 31.8% no-shared-word
+ * finding in RESULT_RETRIEVAL_CEILING.md. So this is a CEILING on the filter path, not a
+ * prediction of it -- the real cost lies between this and the browse figure. Reporting it is still
+ * the right move, because if even the ceiling does not close the gap the question is settled. */
+static int word_in_q(const char *q, const char *w) {          /* whole word, case-insensitive */
+    for (const char *h = q; *h; h++) {
+        if (h != q) { char p = h[-1]; if ((p>='a'&&p<='z')||(p>='A'&&p<='Z')) continue; }
+        int k = 0;
+        while (w[k] && h[k] && ((h[k]>='A'&&h[k]<='Z' ? h[k]-'A'+'a' : h[k]) == w[k])) k++;
+        if (w[k]) continue;
+        char nc = h[k];
+        if ((nc>='a'&&nc<='z')||(nc>='A'&&nc<='Z')) continue;
+        return 1;
+    }
+    return 0;
+}
+
+/* require_in_q: only consider words the student's OWN QUESTION contains. That is the plausible
+ * filter -- a word they have already written is a word they can think of typing. Without it the
+ * arm is an oracle over the record's name, which no student has. */
+static int filter_cost(const char *q, int rec, int require_in_q) {
+    const char *nm = ST.rec[rec].name;
+    if (!nm || !nm[0]) return -1;
+    int best = -1;
+    char word[48];
+    int w = 0;
+    for (const char *c = nm; ; c++) {
+        int isal = *c && ((*c >= 'a' && *c <= 'z') || (*c >= 'A' && *c <= 'Z'));
+        if (isal && w < (int)sizeof word - 1) {
+            word[w++] = (*c >= 'A' && *c <= 'Z') ? (char)(*c - 'A' + 'a') : *c;
+        } else {
+            if (w >= 1) {
+                word[w] = 0;
+                if (require_in_q && !(w >= 3 && word_in_q(q, word))) { w = 0; if (!*c) break; continue; }
+                for (int L = 1; L <= w && L <= 12; L++) {
+                    static pk_state F;
+                    pk_open(&F, &ST, "");        /* no shortlist: this measures the filter alone */
+                    int r = -1, keys = 0, ok = 1;
+                    for (int i = 0; i < L; i++) { pk_key(&F, &ST, word[i], &r); keys++; }
+                    if (F.level != PK_RECORD) ok = 0;
+                    int row = -1;
+                    if (ok) { for (int i = 0; i < F.nhit; i++) if (F.hit[i] == rec) { row = i; break; } }
+                    if (row < 0) ok = 0;
+                    if (ok) {
+                        int walk = walk_to(&F, row);
+                        if (walk < 0) ok = 0;
+                        else {
+                            keys += walk;
+                            if (pk_key(&F, &ST, K_ENTER, &r) != PK_ACT_PICKED || r != rec) ok = 0;
+                            else keys += 1;
+                        }
+                    }
+                    if (ok && (best < 0 || keys < best)) best = keys;
+                }
+            }
+            w = 0;
+            if (!*c) break;
+        }
+    }
+    return best;
+}
+
 int main(int argc, char **argv) {
     if (ns_load(&ST, argc > 1 ? argv[1] : "build/store.tns") != NS_OK) return 2;
     if (argc > 2) pk_set_max_sug(atoi(argv[2]));
     char line[2048];
-    printf("q_chars\tarmA\tarmB\tin_sug\n");
+    printf("q_chars\tbrowse\tsug\tfilter\tplaus\tin_sug\n");
     while (fgets(line, sizeof line, stdin)) {
         line[strcspn(line, "\n")] = 0;
         char *tab = strchr(line, '\t');
@@ -93,11 +163,21 @@ int main(int argc, char **argv) {
             int r = -1;
             if (w >= 0 && pk_key(&B, &ST, K_ENTER, &r) == PK_ACT_PICKED && r == rec) kb = w + 1;
             break; }
-        if (kb < 0) { pk_open(&B, &ST, q); kb = browse_to(&B, rec, B.nsug + fam); }
+        if (kb < 0) {
+            /* TAB out of the shortlist first -- one key -- then browse. That is the shipped route
+             * for a miss and it is what the legend tells the student to do. */
+            pk_open(&B, &ST, q);
+            int rr = -1;
+            pk_key(&B, &ST, K_TAB, &rr);
+            int rest = browse_to(&B, rec, B.nsug + fam);
+            kb = rest < 0 ? -1 : rest + 1;
+        }
         if (ka < 0 || kb < 0) continue;
 
+        int kf = filter_cost(q, rec, 0);      /* oracle: any word of the record name  */
+        int kp = filter_cost(q, rec, 1);      /* plausible: only words in the question */
         int typing = (int)strlen(q) + 1;          /* the question, then enter */
-        printf("%d\t%d\t%d\t%d\n", typing, typing + ka, typing + kb, in_sug);
+        printf("%d\t%d\t%d\t%d\t%d\t%d\n", typing, ka, kb, kf, kp, in_sug);
     }
     return 0;
 }

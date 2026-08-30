@@ -375,6 +375,26 @@ static void draw_composer(int x0, int w, int cy);
 static int ask_at(unsigned n);
 static int ask_index(unsigned n);
 
+/* EXAMPLE PROMPTS. The empty screen carried suggestion rows once and they were REMOVED, because
+ * they ellipsised at this width -- "A car goes 150 m in 12 s. Find ..." -- so the one thing they
+ * existed to do, show what a question looks like, was the one thing they could not do.
+ *
+ * These are vetted by tools/eval/promptcheck.c against BOTH failure modes, measured rather than
+ * eyeballed: each fits the pane at F_SM with room to spare (128-144 px against 268), and each is
+ * found by the shortlist at rank #1, so a student who taps one sees the tool work rather than
+ * discovering the miss case first. Three families -- force, energy, electricity -- because the
+ * format is what they teach: a question, then `name = value` for what you know.
+ *
+ * Tapping one LOADS it into the box rather than sending it. The format is the lesson; sending it
+ * immediately would hide the very thing being demonstrated. */
+static const char *TRY_Q[] = {
+    "hooke's law, k = 250, x = 0.08",
+    "kinetic energy, m = 2, v = 3",
+    "ohm's law, I = 0.25, R = 48",
+};
+#define TRY_N ((int)(sizeof TRY_Q / sizeof TRY_Q[0]))
+static gfx_rect R_TRY[TRY_N];
+
 static const char *ASK_ABOUT[] = {
     "motion", "velocity", "acceleration", "forces",
     "friction", "momentum", "energy", "work",
@@ -1413,7 +1433,20 @@ static void draw_main(void) {
          * exactly what they could not do here. */
         int gap = 14;
         int hh = gfx_font_h(F_BIG);
-        int blk = hh + gap + compose_field_h(w);             /* heading + gap + field */
+        /* THE EXAMPLES ARE PART OF THE EMPTY STATE, so they are inside the block that gets
+         * centred. Centring heading+field alone and then appending them below put the last row
+         * 4 px past the pane and the fit guard silently dropped ALL THREE -- the same silent
+         * truncation this file already fixed twice, in the session list and the search sheet. */
+        int lh  = gfx_font_h(F_SM) + 5;
+        /* ONLY WHILE THE BOX IS EMPTY. They are a prompt to start, not furniture -- and the
+         * geometry requires it: the composer grows UPWARD with its text and its bottom edge must
+         * not move, which holds because `bot` shrinks by exactly what the block grows. Adding a
+         * constant to that block pushed the layout into its `cy0 < top + 6` clamp at four lines,
+         * the cancellation stopped being exact, and the bottom edge started moving. test_exit
+         * caught it -- the assertion is older than this feature and names the reason. */
+        int show_try = !COMPOSE_N;
+        int tryh = show_try ? gfx_font_h(F_XS) + 4 + TRY_N * lh + 10 : 0;
+        int blk = hh + gap + compose_field_h(w) + tryh;
         int cy0 = top + (bot - top - blk) / 2;
         if (cy0 < top + 6) cy0 = top + 6;
 
@@ -1423,6 +1456,25 @@ static void draw_main(void) {
         gfx_text(x0 + (w - gfx_text_w(h1, F_BIG)) / 2, cy0, h1, F_BIG, C_INK, C_BG);
         draw_composer(x0, w, cy0 + hh + gap);
         EMPTY_COMPOSER = 1;
+
+        /* The examples sit UNDER the box, where they read as things to try rather than as the
+         * app's own suggestions about this session. Vetted to fit: no ellipsis at this width. */
+        {   int ty = cy0 + hh + gap + compose_field_h(w) + 10;
+            if (show_try && ty + gfx_font_h(F_XS) + 4 + lh * TRY_N <= bot - 2) {
+                gfx_text(x0 + 14, ty, "TRY ONE", F_XS, C_INK3, C_BG);
+                ty += gfx_font_h(F_XS) + 4;
+                for (int i = 0; i < TRY_N; i++) {
+                    int tw = gfx_text_w(TRY_Q[i], F_SM);
+                    R_TRY[i] = (gfx_rect){ x0 + 12, ty - 2, tw + 12, lh };
+                    int hot = HOVER && inside(R_TRY[i], MX, MY);
+                    if (hot) gfx_rrect(R_TRY[i].x, R_TRY[i].y, R_TRY[i].w, R_TRY[i].h, 4, C_SEL);
+                    gfx_text(x0 + 18, ty, TRY_Q[i], F_SM, C_INK2, hot ? C_SEL : C_BG);
+                    ty += lh;
+                }
+            } else {
+                for (int i = 0; i < TRY_N; i++) R_TRY[i] = (gfx_rect){0,0,0,0};
+            }
+        }
     } else {
         app_chat *c = &CHATS[CUR];
         int lh0 = gfx_font_h(F_UI) + 2, total = 6;
@@ -2003,7 +2055,9 @@ static void draw_picker(void) {
     /* The key legend, per level. Naming the exits is the whole reason esc is safe here. */
     const char *legend =
         (PK.level == PK_FAMILY && pk_row_is_sug(&PK, PK.sel))
-                                ? "enter pick   type search   esc ask anyway" :
+                                ? "enter pick   tab browse   type search   esc ask" :
+        (PK.level == PK_FAMILY && PK.nsug)
+                                ? "enter open   tab suggest  type search   esc ask" :
         (PK.level == PK_FAMILY) ? "enter open   type search   esc ask anyway" :
         (n == 0)                ? "bksp edit    esc browse    a ask anyway"   :
                                   "enter pick   type filter   esc back";
@@ -2144,6 +2198,16 @@ void app_event(const in_event *e) {
          * message was never sent -- a containment bug, not a hit-testing one, introduced the
          * moment the field became clickable at all. */
         if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) { open_picker(); return; }
+        /* An example LOADS, it does not send. The format is the lesson, so the student has to see
+         * it sitting in the box -- and can edit the numbers before asking. */
+        for (int i = 0; i < TRY_N; i++) {
+            if (!R_TRY[i].w || !inside(R_TRY[i], MX, MY)) continue;
+            compose_clear();
+            COMPOSE_N = (int)snprintf(COMPOSE, sizeof COMPOSE, "%s", TRY_Q[i]);
+            if (COMPOSE_N >= (int)sizeof COMPOSE) COMPOSE_N = (int)sizeof COMPOSE - 1;
+            FIELD_FOCUS = 1;
+            return;
+        }
         /* Clicking the box makes it the typing target. Typing already went there, but nothing on
          * screen said so, so the bar looked inert until a character appeared in it. */
         if (inside(R_FIELD, MX, MY)) { FIELD_FOCUS = 1; return; }

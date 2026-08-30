@@ -51,6 +51,7 @@ typedef struct {
      * authoritative would read as confidence the ranker has not earned. */
     int  sug[PK_MAX_SUG];
     int  nsug;
+    int  browse_row;                 /* where TAB lands in the family section                 */
     int  rows;                       /* visible rows THIS layout allows; draw and clamp share it */
     int  fam;                        /* family in scope; -1 means "searching all records"     */
     char q[PK_QMAX];

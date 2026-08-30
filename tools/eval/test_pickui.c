@@ -228,6 +228,32 @@ int main(int argc, char **argv) {
     snprintf(m, sizeof m, "sel=%d last=%d", P.sel, P.nsug + P.nfam - 1);
     ck(P.sel == P.nsug + P.nfam - 1, "down clamps to the last family, not the last suggestion", m);
 
+    /* TAB leaves the shortlist in ONE key, landing in the browse section. Measured reason: a
+     * miss cost 19 selection keys against 15 with no shortlist, and the whole difference was the
+     * walk past five rows. With TAB the miss is 15 -- the worst case is now exactly 1 key. */
+    pk_open(&P, &ST, Q);
+    a = key1(K_TAB, &r);
+    snprintf(m, sizeof m, "action=%d sel=%d nsug=%d fam=%d", a, P.sel, P.nsug, pk_row_family(&P, P.sel));
+    ck(a == PK_ACT_NONE && !pk_row_is_sug(&P, P.sel) && pk_row_family(&P, P.sel) >= 0,
+       "tab from a suggestion lands in the browse section", m);
+    /* AGAINST THE INDEPENDENTLY COMPUTED FAMILY, not against P.browse_row. Comparing sel to
+     * browse_row is self-consistent: a mutation that sets browse_row wrong moves both sides and
+     * the assertion still passes -- which is exactly how test_bubble survived its own control by
+     * calling qbubble_textw() on both sides of a comparison. */
+    {   int want = ns_family_of(&ST, P.sug[0]);
+        snprintf(m, sizeof m, "landed fam=%d want=%d (from sug[0])", pk_row_family(&P, P.sel), want);
+        ck(want > 0, "the case is LIVE: the predicted family is not 0, so a wrong landing shows", m);
+        ck(pk_row_family(&P, P.sel) == want, "and on the family the ranker predicts, not family 0", m);
+    }
+    a = key1(K_TAB, &r);
+    snprintf(m, sizeof m, "sel=%d", P.sel);
+    ck(pk_row_is_sug(&P, P.sel) && P.sel == 0, "tab again returns to the shortlist", m);
+    /* with no shortlist TAB is inert rather than doing something arbitrary */
+    pk_open(&P, &ST, "");
+    key1(K_TAB, &r);
+    snprintf(m, sizeof m, "sel=%d nsug=%d", P.sel, P.nsug);
+    ck(P.sel == 0, "tab is inert when there is no shortlist", m);
+
     /* typing still leaves for search-all, from a suggestion row */
     pk_open(&P, &ST, Q);
     keys("hooke");
