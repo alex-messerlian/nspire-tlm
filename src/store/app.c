@@ -216,7 +216,43 @@ static int COMPOSE_SEL;
  * to write something again" was. Kept in [0, COMPOSE_N] by every path that touches the buffer, and
  * reset here with the rest of the state for the reason this function exists. */
 static int COMPOSE_C;
+static int TEXT_X, TEXT_Y, TEXT_W;   /* the composer's last laid-out text origin */
+
+/* THE CHARACTER PALETTE, on the menu key.
+ *
+ * WHAT IT IS NOT: a function menu. The OS's menu key opens actions / algebra / calculus, and the
+ * temptation is to mirror that. This engine cannot honour it -- the runtime dispatches `eval` and
+ * the CORPUS TRAINS EXACTLY ONE FUNCTION, 197,608 of 197,608 calls, so the model never emits diff,
+ * integ or solve however they are offered. A menu with an integral on it would promise arithmetic
+ * this model does not do.
+ *
+ * WHAT IT IS: the characters a question needs that the keypad cannot reach. The store's own
+ * spelling decides the list -- it writes `pi`, `theta`, `Delta`, `sqrt(` as ASCII, so those are
+ * what get inserted, not glyphs the tokenizer has never seen. */
+static const char *PAL[] = {
+    "_", "^", "sqrt(", "pi",
+    "Delta", "theta", "omega", "lambda",
+    "alpha", "rho", "mu", "sigma",
+    "epsilon", "(", ")", "e",
+};
+#define SYM_N ((int)(sizeof PAL / sizeof PAL[0]))
+#define SYM_COLS 4
+static int SYM_ON, SYM_SEL;
+static gfx_rect R_SYM[SYM_N];
+
 static void compose_clear(void) { COMPOSE_N = 0; COMPOSE[0] = 0; COMPOSE_SEL = 0; COMPOSE_C = 0; }
+
+/* Insert at the caret, the one path both a keystroke and the palette use. */
+static void compose_insert_str(const char *t) {
+    int L = (int)strlen(t);
+    if (COMPOSE_N + L >= (int)sizeof COMPOSE) return;
+    if (COMPOSE_SEL) compose_clear();
+    if (COMPOSE_C < 0) COMPOSE_C = 0;
+    if (COMPOSE_C > COMPOSE_N) COMPOSE_C = COMPOSE_N;
+    memmove(COMPOSE + COMPOSE_C + L, COMPOSE + COMPOSE_C, (size_t)(COMPOSE_N - COMPOSE_C));
+    memcpy(COMPOSE + COMPOSE_C, t, (size_t)L);
+    COMPOSE_C += L; COMPOSE_N += L; COMPOSE[COMPOSE_N] = 0;
+}
 
 static void clip_paste(void) {
     if (!CLIP[0]) { toast("Clipboard is empty"); return; }
@@ -1835,6 +1871,10 @@ static void draw_composer(int x0, int w, int cy) {
         int tw = compose_textw(w);
         int total = compose_lines_total(w), shown = compose_lines(w);
         int skip = total - shown, last_w = 0;
+        /* Where the text was actually laid out, kept so a CLICK can be turned back into a byte
+         * offset by gfx_text_wrap_hit with the same origin and width the glyphs used. Recomputing
+         * it at the click site would be a second copy of the layout rule. */
+        TEXT_X = R_FIELD.x + 9; TEXT_Y = cy + 5 - skip * COMPOSE_LH; TEXT_W = tw;
         /* Clipped to the TEXT band, not to the field. Clipping to the field left the bottom 5px
          * of the line above the first visible one showing -- a row of glyph-tops with no line
          * under them, which reads as a rendering fault rather than as scrolled text. */
@@ -2007,6 +2047,27 @@ static void open_picker(void) {
     PICK_ON = 1;
 }
 
+static void draw_symbols(void) {
+    const int cw = 62, ch = 22, cols = SYM_COLS;
+    const int rows = (SYM_N + cols - 1) / cols;
+    const int W = cols * cw + 16, H = rows * ch + 40;
+    const int X = (GFX_W - W) / 2, Y = (GFX_H - H) / 2;
+    gfx_fill(0, 0, GFX_W, GFX_H, C_SCRIM);
+    gfx_rrect(X, Y, W, H, 8, C_SHEET);
+    gfx_text(X + 10, Y + 6, "INSERT", F_XS, C_INK3, C_SHEET);
+    gfx_fill(X + 8, Y + 19, W - 16, 1, C_LINE);
+    for (int i = 0; i < SYM_N; i++) {
+        int r = i / cols, c = i % cols;
+        gfx_rect b = { X + 8 + c * cw, Y + 24 + r * ch, cw - 4, ch - 3 };
+        R_SYM[i] = b;
+        int sel = (i == SYM_SEL);
+        if (sel) gfx_rrect(b.x, b.y, b.w, b.h, 4, C_SEL);
+        int tw = gfx_text_w(PAL[i], F_UI);
+        gfx_text(b.x + (b.w - tw) / 2, b.y + 3, PAL[i], F_UI, C_INK, sel ? C_SEL : C_SHEET);
+    }
+    gfx_text(X + 10, Y + H - 13, "enter insert   esc close", F_XS, C_INK3, C_SHEET);
+}
+
 static void draw_picker(void) {
     const ns_store2 *st = app_store();
     if (!st) return;
@@ -2124,6 +2185,7 @@ void app_draw(void) {
     if (SEARCH_ON) draw_search();
     if (SETTINGS_ON) draw_settings();
     if (PICK_ON) draw_picker();
+    if (SYM_ON) draw_symbols();
     draw_cursor();          /* last, so nothing occludes it */
     gfx_present();
 }
@@ -2180,6 +2242,13 @@ void app_event(const in_event *e) {
             }
             SETTINGS_ON = 0;
             return;
+        }
+        if (SYM_ON) {                          /* modal: a tile, or nothing */
+            for (int i = 0; i < SYM_N; i++)
+                if (R_SYM[i].w && inside(R_SYM[i], MX, MY)) {
+                    compose_insert_str(PAL[i]); SYM_ON = 0; return;
+                }
+            SYM_ON = 0; return;                /* a tap outside closes: nothing is pending */
         }
         if (PICK_ON) {                         /* modal: a click lands on a row or nowhere */
             const ns_store2 *st = app_store();
@@ -2263,12 +2332,42 @@ void app_event(const in_event *e) {
         }
         /* Clicking the box makes it the typing target. Typing already went there, but nothing on
          * screen said so, so the bar looked inert until a character appeared in it. */
-        if (inside(R_FIELD, MX, MY)) { FIELD_FOCUS = 1; return; }
+        if (inside(R_FIELD, MX, MY)) {
+            FIELD_FOCUS = 1;
+            /* TAP TO PLACE THE CARET.
+             *
+             * The arrow keys move it too, but on this device they may never arrive: the CX II has
+             * no separate arrow keys -- the touchpad IS the arrow ring -- and pointer_poll reads
+             * the pad with touchpad_scan(), so an edge press comes through as CONTACT rather than
+             * as KEY_NSPIRE_LEFT. Reported from the device as "the cursor moves but the icon
+             * doesn't"; the caret index was correct and the key simply never reached the app.
+             *
+             * A tap does not depend on any of that, and it is the more direct gesture anyway. The
+             * offset comes from gfx_text_wrap_hit against the origin and width the text was DRAWN
+             * with, so the caret lands under the finger rather than near it. */
+            if (COMPOSE_N && TEXT_W > 0) {
+                int off = gfx_text_wrap_hit(TEXT_X, TEXT_Y, COMPOSE, F_UI, TEXT_W, COMPOSE_LH,
+                                            MX, MY);
+                if (off >= 0 && off <= COMPOSE_N) { COMPOSE_C = off; COMPOSE_SEL = 0; }
+            }
+            return;
+        }
         return;
     }
 
     if (e->kind == IN_KEY) {
         int k = e->key;
+        if (SYM_ON) {
+            if (k == K_ESC || k == K_SYM) { SYM_ON = 0; return; }
+            if (k == K_LEFT)  { if (SYM_SEL > 0) SYM_SEL--; return; }
+            if (k == K_RIGHT) { if (SYM_SEL + 1 < SYM_N) SYM_SEL++; return; }
+            if (k == K_UP)    { if (SYM_SEL - SYM_COLS >= 0) SYM_SEL -= SYM_COLS; return; }
+            if (k == K_DOWN)  { if (SYM_SEL + SYM_COLS < SYM_N) SYM_SEL += SYM_COLS; return; }
+            if (k == K_ENTER) { compose_insert_str(PAL[SYM_SEL]); SYM_ON = 0; return; }
+            return;
+        }
+        if (k == K_SYM) { SYM_ON = !SYM_ON; SYM_SEL = 0; return; }
+
         /* THE PICKER IS MODAL AND CONSUMES EVERY KEY. It is checked before the search sheet and
          * before ESC's own chain: an ESC that reached that chain would clear the composer or go
          * home, when in the picker it means "up one level" or "ask anyway". */
@@ -2548,6 +2647,7 @@ void app_status_done(unsigned ms, const char *tool_call, const char *tool_result
 int app_hit_stop(int x, int y) { return BUSY && inside(R_SEND, x, y); }
 
 int app_hit_control(int x, int y) {
+    if (SYM_ON) return 1;                       /* modal */
     if (PICK_ON) return 1;                      /* modal, exactly like the sheet below */
     if (SEARCH_ON) return 1;                    /* the sheet is modal: any click means something */
     if (inside(R_EXIT, x, y) || inside(R_SEND, x, y)) return 1;

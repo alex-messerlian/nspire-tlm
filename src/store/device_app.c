@@ -324,6 +324,10 @@ static int keypad_poll(void) {
          * edited from the end: a typo three characters back meant deleting everything after it.
          * The touchpad's own left/right rocker reports as these. */
         { &KEY_NSPIRE_LEFT, K_LEFT }, { &KEY_NSPIRE_RIGHT, K_RIGHT },
+        /* The menu key opens the character palette. On the OS it opens the CAS function menu;
+         * inside an Ndless program it does nothing at all, so it is free -- and "this menu should
+         * do something" is exactly right. */
+        { &KEY_NSPIRE_MENU, K_SYM },
         { &KEY_NSPIRE_SPACE, ' ' },
         /* PUNCTUATION, WITHOUT WHICH THE APP CANNOT BE USED AT ALL.
          *

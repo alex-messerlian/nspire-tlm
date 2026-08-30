@@ -60,6 +60,23 @@ int main(int argc, char **argv) {
             for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c}); }
         app_draw(); goto out;
     }
+    if (!strcmp(screen, "palette")) {
+        CUR = -1; MX = 300; MY = 220; FIELD_FOCUS = 1;
+        const char *q = "Find kinetic energy. Given m = 2";
+        for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c});
+        app_event(&(in_event){.kind=IN_KEY,.key=K_SYM});
+        for (int i = 0; i < 5; i++) app_event(&(in_event){.kind=IN_KEY,.key=K_RIGHT});
+        app_draw(); goto out;
+    }
+    if (!strncmp(screen, "caret", 5)) {
+        CUR = -1; MX = 300; MY = 220; FIELD_FOCUS = 1;
+        const char *q = "Find velocity. Given v_0 = 5, a = 2";
+        for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c});
+        int back = atoi(screen + 5);              /* caretN -> N presses of LEFT */
+        for (int i = 0; i < back; i++) app_event(&(in_event){.kind=IN_KEY,.key=K_LEFT});
+        NOW_MS = 0;                                /* caret ON: (NOW_MS/500)%2 == 0 */
+        app_draw(); goto out;
+    }
     if (!strcmp(screen, "notation")) {     /* the corpus's ASCII, as a reader sees it */
         seed("Notation", "Show me the symbols.",
              "<a>Delta_p = m*Delta_v, and omega = sqrt((k)/(m)). "

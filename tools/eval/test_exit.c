@@ -372,6 +372,33 @@ int main(void) {
     compose_clear();
     T("clearing resets the caret", COMPOSE_C, 0);
 
+    /* -- the character palette on the menu key --
+     *
+     * Reported from the device: "there's no other key functions I can use... we need a main menu".
+     * It inserts the store's OWN spelling -- theta, Delta, sqrt( -- because to_display() renders
+     * those as glyphs while the model reads the ASCII it was trained on. */
+    printf("\n  -- the character palette --\n");
+    reset(); CUR = -1; compose_clear();
+    key(K_SYM);
+    T("menu opens the palette", SYM_ON, 1);
+    key(K_ENTER);
+    T("enter inserts the selected token", SYM_ON, 0);
+    T2("and it lands in the box", COMPOSE, "_");
+    T("caret sits after it", COMPOSE_C, 1);
+    /* a multi-character token, inserted AT the caret rather than appended */
+    compose_clear();
+    for (const char *c = "v = 5"; *c; c++) key(*c);
+    for (int i = 0; i < 4; i++) key(K_LEFT);
+    key(K_SYM);
+    for (int i = 0; i < 4; i++) key(K_RIGHT);   /* row 1 -> "Delta" */
+    T("arrows move the palette selection", SYM_SEL, 4);
+    key(K_ENTER);
+    T2("a multi-char token inserts at the caret", COMPOSE, "vDelta = 5");
+    T("and the caret is past all of it", COMPOSE_C, 6);
+    key(K_SYM); key(K_ESC);
+    T("esc closes without inserting", SYM_ON, 0);
+    T2("and the box is untouched", COMPOSE, "vDelta = 5");
+
     /* -- controls respond outside their drawn box --
      *
      * A 24px plate is a small target for a cursor driven by a 2 cm pad. The rect a control is
