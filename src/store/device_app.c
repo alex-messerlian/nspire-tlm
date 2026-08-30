@@ -277,6 +277,17 @@ static int keypad_poll(void) {
              * with the letter, or ctrl tapped and released and then the letter. */
             { &KEY_NSPIRE_C, K_COPY }, { &KEY_NSPIRE_V, K_PASTE },
             { &KEY_NSPIRE_A, K_SELALL },
+            /* ctrl + (-)  ->  UNDERSCORE, and it is not a convenience.
+             *
+             * MEASURED: 131 of the store's 182 variable names contain '_' -- v_0, F_net, Delta_t,
+             * T_h, x_f, omega_0. 72%. Without it a student cannot bind most of the variables the
+             * relations actually use, so "Find velocity. Given v_0 = 5, a = 2, t = 3." is not a
+             * question this calculator can be asked.
+             *
+             * It is a CHORD because the SDK has no underscore key -- there is no
+             * KEY_NSPIRE_UNDERSCORE and nothing on the keypad is printed with one. Any mapping is
+             * therefore arbitrary, so it goes on the key whose PC convention it already is. */
+            { &KEY_NSPIRE_MINUS, '_' }, { &KEY_NSPIRE_NEGATIVE, '_' },
         };
         for (unsigned i = 0; i < sizeof CH / sizeof CH[0]; i++) {
             if (isKeyPressed(*CH[i].k)) {
@@ -323,6 +334,16 @@ static int keypad_poll(void) {
         { &KEY_NSPIRE_EE,       'e' },
         { &KEY_NSPIRE_COLON,    ':' },
         { &KEY_NSPIRE_QUES,     '?' }, { &KEY_NSPIRE_PERIOD, '.' },
+        /* THE REST OF WHAT IS PRINTED ON THE KEYPAD. Chosen by measuring what the store needs, not
+         * by reading the plastic: '^' appears 28 times in the 164 formulas and '|' twice
+         * (f_beat=|f_2-f_1|), and a student reading a relation off the screen will reach for both.
+         * The comparison keys and the quotes cost nothing to map and are printed on the device, so
+         * a key that does nothing is a bug by this file's own standard. */
+        { &KEY_NSPIRE_EXP,      '^' },
+        { &KEY_NSPIRE_LTHAN,    '<' }, { &KEY_NSPIRE_GTHAN, '>' },
+        { &KEY_NSPIRE_BAR,      '|' },
+        { &KEY_NSPIRE_APOSTROPHE, '\'' }, { &KEY_NSPIRE_QUOTE, '"' },
+        { &KEY_NSPIRE_QUESEXCL, '!' },
         { &KEY_NSPIRE_0, '0' }, { &KEY_NSPIRE_1, '1' }, { &KEY_NSPIRE_2, '2' },
         { &KEY_NSPIRE_3, '3' }, { &KEY_NSPIRE_4, '4' }, { &KEY_NSPIRE_5, '5' },
         { &KEY_NSPIRE_6, '6' }, { &KEY_NSPIRE_7, '7' }, { &KEY_NSPIRE_8, '8' },
