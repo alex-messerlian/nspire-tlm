@@ -517,6 +517,13 @@ void matmul(float* xout, QuantizedTensor *x, QuantizedTensor *w, int n, int d) {
         // do the matmul in groups of GS
         int j;
         for (j = 0; j <= n - GS; j += GS) {
+#ifndef TLM_WORD_MAC
+/* DEFAULT ON. Measured on device: 3.5% end to end, bit-exact by construction (int32 accumulator,
+ * exact products, reordering cannot change the sum) and verified as an equality -- byte and word
+ * loops both produce CHAIN=1981509690cee41a. Free throughput with no quality question attached.
+ * It is NOT the 2x the isolated 8.20 cycles/MAC implied; see RESULT_WORD_MAC.md. */
+#define TLM_WORD_MAC 1
+#endif
 #if TLM_WORD_MAC
             /* ONE WORD LOAD FEEDS FOUR MACs. RESULT_COMPUTE_BOUND measures this loop at 8.20
              * cycles per MAC with both operand arrays resident in D-cache -- it is not waiting on
