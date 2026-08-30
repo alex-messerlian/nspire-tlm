@@ -263,6 +263,20 @@ static int keypad_poll(void) {
      * `armed` is set only when ctrl is released WITHOUT having been used, so holding it down for a
      * chord does not also leave it armed for the following keystroke. Any non-shortcut key clears
      * it and types normally, so a stray tap on ctrl cannot swallow the next letter. */
+    /* SHIFT, AND IT IS NOT A NICETY. Measured on the shipped store: 95 of 182 variable names
+     * contain an uppercase letter -- F_net, Delta_t, T_h, C_V, Q, K, V -- and 90 of the 164
+     * records have at least one INPUT variable that does. Without shift those 90 records cannot be
+     * bound at all, which is the same shape as the missing underscore and the missing '='.
+     *
+     * Sticky OR held, exactly like ctrl below, because the calculator's own shift is sticky and
+     * requiring it to be held is half the ways a person will reach for it. */
+    static int shift_was, shift_armed, shift_used;
+    int shift_now = isKeyPressed(KEY_NSPIRE_SHIFT);
+    if (shift_now && !shift_was) shift_used = 0;
+    if (!shift_now && shift_was && !shift_used) shift_armed = 1;
+    shift_was = shift_now;
+    const int shifted = (shift_now || shift_armed);
+
     static int ctrl_was, ctrl_armed, ctrl_used;
     int ctrl_now = isKeyPressed(KEY_NSPIRE_CTRL);
     if (ctrl_now && !ctrl_was) ctrl_used = 0;                  /* ctrl went down */
@@ -344,6 +358,14 @@ static int keypad_poll(void) {
         { &KEY_NSPIRE_BAR,      '|' },
         { &KEY_NSPIRE_APOSTROPHE, '\'' }, { &KEY_NSPIRE_QUOTE, '"' },
         { &KEY_NSPIRE_QUESEXCL, '!' },
+        /* THE CATALOG KEY IS THE UNDERSCORE, as a single press.
+         *
+         * On the OS that key opens a character catalog; inside an Ndless program there is no such
+         * popup -- the app receives the raw key and nothing else happens. So it is free, and the
+         * underscore is what it should spend itself on: '_' is in 131 of the store's 182 variable
+         * names, and a chord for the most-needed character is the wrong way round. ctrl + (-)
+         * still works for anyone who learned it first. */
+        { &KEY_NSPIRE_CAT,      '_' },
         { &KEY_NSPIRE_0, '0' }, { &KEY_NSPIRE_1, '1' }, { &KEY_NSPIRE_2, '2' },
         { &KEY_NSPIRE_3, '3' }, { &KEY_NSPIRE_4, '4' }, { &KEY_NSPIRE_5, '5' },
         { &KEY_NSPIRE_6, '6' }, { &KEY_NSPIRE_7, '7' }, { &KEY_NSPIRE_8, '8' },
@@ -366,9 +388,14 @@ static int keypad_poll(void) {
      * behaviour, without stopping the world to get it. */
     for (unsigned i = 0; i < sizeof MAP / sizeof MAP[0]; i++) {
         if (isKeyPressed(*MAP[i].k)) {
+            int c = MAP[i].c;
             held = MAP[i].k;
             ctrl_armed = 0;            /* a stray ctrl tap must not swallow this key */
-            return MAP[i].c;
+            if (shifted) {
+                shift_used = 1; shift_armed = 0;
+                if (c >= 'a' && c <= 'z') c = c - 'a' + 'A';
+            }
+            return c;
         }
     }
     return 0;
