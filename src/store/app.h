@@ -3,6 +3,7 @@
 /* The ChatTLM application: layout, state, input handling. Draws through gfx.c, so it renders
  * identically on the device and in the host harness. */
 #include "gfx.h"
+#include "loader.h"
 
 /* palette, kept in step with tools/webui/index.html */
 /* ---- palette ------------------------------------------------------------------------------------
@@ -176,7 +177,14 @@ void app_event(const in_event *e);
 void app_draw(void);
 int  app_should_quit(void);
 /* the app asks the host/device for generation; implemented separately on each side */
+/* `rid` is the record the STUDENT picked, or 0 for Form C -- "no matching relation". It is not
+ * optional and it is not a hint: at 9.5% measured retrieval the runtime does not get to guess. */
 void app_request(const char *question, const char *rid);
+
+/* The loaded relation store, for the picker. Owned by whoever loaded it (device_app.c on the
+ * calculator, the host stub otherwise) and never freed by the UI. Returns 0 if none is loaded --
+ * the picker draws that state rather than pretending to an empty store. */
+const ns_store2 *app_store(void);
 /* Where sessions are kept between runs. Set once at startup; app.c writes after every change that
  * can lose data. Passing NULL (the host harness) disables persistence entirely. */
 void app_set_persist(const char *path);

@@ -331,6 +331,15 @@ int main(void) {
     key('h'); key('i');
     key(K_ENTER);
     T("enter sends when the box has text", COMPOSE_N, 0);
+    /* ENTER NOW OPENS THE RELATION PICKER rather than sending straight away -- decision E, and
+     * the composer is emptied into PENDQ, which is why the assertion above still reads 0. The
+     * picker is MODAL, so leaving it open here swallowed every key the rest of this file sends:
+     * six later cases failed with no defect in them. Asserting the new state and then leaving it
+     * is the fix; the picker's own behaviour is covered by test_pickui. */
+    T("enter opens the relation picker", PICK_ON, 1);
+    T("and the question is held, not lost", PENDQ[0] != 0, 1);
+    key(K_ESC);                       /* family list: esc is "ask anyway" -> Form C, picker closes */
+    T("esc at the family list closes it", PICK_ON, 0);
 
     /* -- controls respond outside their drawn box --
      *

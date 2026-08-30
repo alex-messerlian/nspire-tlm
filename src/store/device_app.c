@@ -418,8 +418,9 @@ static int resolve_data_dir(ns_store2 *st, char *why, int wcap) {
     return 0;
 }
 
+const ns_store2 *app_store(void) { return ST.n ? &ST : 0; }
+
 void app_request(const char *question, const char *rid) {
-    (void)rid;
     app_begin_turn(question);
     app_draw();
 
@@ -444,16 +445,32 @@ void app_request(const char *question, const char *rid) {
     static char prompt[NS_PROMPT_MAX];
     static ns_ask ask;
     ask_build(&ST, question, &ask);
-    const int idx = ask.idx;
     const ns_input in = ask.in;
     question = ask.question;
 
-    if (ns_assemble(prompt, sizeof prompt, &ST.rec[idx], question, &in) < 0) {
+    /* `rid` IS THE STUDENT'S CHOICE, and until now nothing produced one -- both call sites passed
+     * 0 and this function ignored the parameter. That is the whole of decision E: retrieval
+     * measured 8.0% on the clean surface and 9.5% here over 200 labelled questions, so the
+     * relation is picked by the student, not ranked. app.c's picker supplies it.
+     *
+     * rid == 0 is NOT "fall back to a guess". It is FORM C: the student left the picker without
+     * choosing, which is a real and common answer -- 44% of textbook questions have no matching
+     * relation. Measured on 88 such questions: 100.0% well-formed, 100.0% refused, 0.0% confident
+     * answers. Omitting the record span instead fabricates an answer 37.5% of the time. */
+    int idx = -1;
+    if (rid) for (int r = 0; r < ST.n; r++)
+        if (ST.rec[r].rid && !strcmp(ST.rec[r].rid, rid)) { idx = r; break; }
+
+    if (idx < 0) {
+        if (ns_assemble_none(prompt, sizeof prompt, question) < 0) {
+            app_stream_token("<a> could not assemble a prompt<end>"); app_stream_end(); return;
+        }
+    } else if (ns_assemble(prompt, sizeof prompt, &ST.rec[idx], question, &in) < 0) {
         app_stream_token("<a> could not assemble a prompt<end>"); app_stream_end(); return;
     }
     clock_start();
     uint32_t t_start = clock_raw();
-    app_status("Reading", ST.rec[idx].name);
+    app_status("Reading", idx < 0 ? "no matching relation" : ST.rec[idx].name);
     app_draw();
 
     /* Checked at startup by rq_probe, so this cannot reach read_checkpoint's exit() path. */
@@ -609,7 +626,8 @@ void app_request(const char *question, const char *rid) {
             snprintf(one, sizeof one, "%s=%s ", in.var[i], in.val[i]);
             if (strlen(vals) + strlen(one) < sizeof vals) strcat(vals, one);
         }
-        app_finish_turn(ST.rec[idx].formula, vals);
+        /* idx < 0 is Form C -- there is no record, and the transcript must not claim one. */
+        app_finish_turn(idx < 0 ? "none" : ST.rec[idx].formula, vals);
     }
     app_stream_end();
     app_draw();

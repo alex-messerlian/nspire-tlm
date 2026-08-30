@@ -2,7 +2,9 @@
 #define NS_PICKER_H
 #include "loader.h"
 #define NS_MAX_FAMILIES 24
-#define NS_FAMILY_ROWS  15          /* list rows visible at 320x240 with chrome */
+/* Kept for ns_family callers. The PICKER's page size is PK_ROWS in pickui.h, which is
+ * derived from draw_picker's real geometry; this 15 was an estimate and was 2 too many. */
+#define NS_FAMILY_ROWS  15
 
 typedef struct { const char *name; int count; } ns_family;
 

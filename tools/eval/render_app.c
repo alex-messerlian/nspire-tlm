@@ -44,6 +44,22 @@ int main(int argc, char **argv) {
         CUR = 1; CHAT_SCROLL = 3; MX = 300; MY = 220;
         app_draw(); goto out;
     }
+    /* THE PICKER, at each of its three states. Rendering it here is how the layout was checked
+     * without a device round-trip -- the same draw_picker the calculator runs. */
+    if (!strncmp(screen, "pick", 4)) {
+        snprintf(COMPOSE, sizeof COMPOSE, "A 3.0 kg block accelerates at 4.5 m/s^2. What net force?");
+        COMPOSE_N = (int)strlen(COMPOSE);
+        CUR = -1; MX = 300; MY = 220;
+        open_picker();
+        if (!strcmp(screen, "pickrec"))   { PK.sel = 4; app_event(&(in_event){.kind=IN_KEY,.key=K_ENTER}); }
+        /* NOT "capacit" -- PICKER_SPEC uses it as the no-match example and this store has five
+         * capacitance records, so it renders a full list. The empty screen needs a real miss. */
+        if (!strcmp(screen, "pickempty")) { const char *q = "zzqq";
+            for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c}); }
+        if (!strcmp(screen, "pickfind"))  { const char *q = "force";
+            for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c}); }
+        app_draw(); goto out;
+    }
     if (!strcmp(screen, "notation")) {     /* the corpus's ASCII, as a reader sees it */
         seed("Notation", "Show me the symbols.",
              "<a>Delta_p = m*Delta_v, and omega = sqrt((k)/(m)). "

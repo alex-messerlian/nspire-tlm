@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "app.h"
 #include "chatstore.h"
+#include "pickui.h"
+#include "askparse.h"
 
 /* ---- state ---------------------------------------------------------------------------------- */
 static app_chat CHATS[MAX_CHATS];
@@ -1869,12 +1871,124 @@ int app_set_now(unsigned ms) {
     return moved;
 }
 
+/* ---- the relation picker ------------------------------------------------------------------
+ * Decision E, finally wired. app_request has always taken a `rid` and NOTHING ever produced one:
+ * both call sites passed 0 and the function ignored the parameter, so every question the device
+ * could ask was assembled against record 0 with no givens. E exists because retrieval is weak --
+ * 8.0% on the clean surface, reproduced on device at 9.5% over 200 labelled questions -- so the
+ * student names the relation and the runtime states fit:high by construction.
+ *
+ * The STATE MACHINE is in pickui.c and tested on the host (36 assertions, 12/12 controls). This
+ * file only draws it and routes keys, which is the split that lets the navigation be checked at
+ * all: esc-goes-up-one-level is decidable without a calculator, and how it looks is not. */
+static pk_state PK;
+static int  PICK_ON;
+static char PENDQ[sizeof COMPOSE];        /* the question, held while the relation is chosen */
+static gfx_rect R_PROW[PK_ROWS];
+
+static void picker_send(const char *rid) {
+    PICK_ON = 0;
+    app_request(PENDQ, rid);
+    PENDQ[0] = 0;
+}
+
+static void open_picker(void) {
+    const ns_store2 *st = app_store();
+    /* NO STORE IS NOT A REASON TO SWALLOW THE QUESTION. Form C is exactly the right prompt when
+     * no relation can be offered, and it is what the student would have got by pressing esc. */
+    if (!st) { snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE); compose_clear(); picker_send(0); return; }
+    snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE);
+    compose_clear();
+    /* The name-overlap picker's ONLY remaining job: start the cursor on a plausible family. */
+    static ns_ask hint;
+    ask_build(st, PENDQ, &hint);
+    pk_open(&PK, st, hint.score > 0 ? ns_family_of(st, hint.idx) : -1);
+    PICK_ON = 1;
+}
+
+static void draw_picker(void) {
+    const ns_store2 *st = app_store();
+    if (!st) return;
+    const int X = 6, Y = 4, W = GFX_W - 12, H = GFX_H - 8;
+    const int rowh = 13;
+    gfx_fill(0, 0, GFX_W, GFX_H, C_SCRIM);
+    gfx_rrect(X, Y, W, H, 8, C_SHEET);
+
+    char head[72];
+    int rows, n, top;
+    if (PK.level == PK_FAMILY) {
+        snprintf(head, sizeof head, "WHAT ARE YOU SOLVING FOR?");
+        n = PK.nfam;
+    } else if (PK.nhit == 0) {
+        snprintf(head, sizeof head, "No relation matches \"%s\"", PK.q);
+        n = 0;
+    } else if (PK.fam >= 0) {
+        snprintf(head, sizeof head, "%s", ns_family_name(PK.fam));
+        n = PK.nhit;
+    } else {
+        snprintf(head, sizeof head, "All relations  \"%s\"", PK.q);
+        n = PK.nhit;
+    }
+    gfx_text_ellipsis(X + 8, Y + 5, head, F_UIB, C_INK, C_SHEET, W - 16);
+    gfx_fill(X + 8, Y + 19, W - 16, 1, C_LINE);
+
+    /* THE QUESTION STAYS ON SCREEN. Choosing a relation for a question you can no longer see is
+     * the sort of modal that gets answered wrong, and PENDQ is the only copy while this is up. */
+    gfx_text_ellipsis(X + 8, Y + 22, PENDQ, F_XS, C_INK3, C_SHEET, W - 16);
+
+    top = Y + 36;
+    rows = (n - PK.scroll) < PK_ROWS ? (n - PK.scroll) : PK_ROWS;
+    for (int i = 0; i < PK_ROWS; i++) R_PROW[i] = (gfx_rect){0, 0, 0, 0};
+
+    if (n == 0) {
+        /* THE EMPTY SEARCH IS A SCREEN CARRYING THE BASE RATE, not an error. 44% of real textbook
+         * questions have no matching relation; a student told that moves on, a student shown an
+         * error retypes. The number is measured on the clean surface. */
+        gfx_text(X + 10, top,          "The store has 164 relations and none of", F_SM, C_INK3, C_SHEET);
+        gfx_text(X + 10, top + rowh,   "them fit this. That happens for about 4", F_SM, C_INK3, C_SHEET);
+        gfx_text(X + 10, top + 2*rowh, "questions in 10.", F_SM, C_INK3, C_SHEET);
+    } else {
+        for (int i = 0; i < rows; i++) {
+            int r = PK.scroll + i, selrow = (r == PK.sel);
+            int ry = top + i * rowh;
+            gfx_rect rr = (gfx_rect){X + 6, ry - 1, W - 12, rowh};
+            R_PROW[i] = rr;
+            if (selrow) gfx_rrect(rr.x, rr.y, rr.w, rr.h, 3, C_SEL);
+            uint16_t bg = selrow ? C_SEL : C_SHEET;
+            if (PK.level == PK_FAMILY) {
+                char cnt[8]; snprintf(cnt, sizeof cnt, "%d", PK.fams[r].count);
+                int cw = gfx_text_w(cnt, F_SM);
+                gfx_text_ellipsis(X + 12, ry, PK.fams[r].name, F_SM, C_INK, bg, W - 30 - cw);
+                gfx_text(X + W - 12 - cw, ry, cnt, F_SM, C_INK3, bg);
+            } else {
+                const ns_rec2 *rec = &st->rec[PK.hit[r]];
+                gfx_text_ellipsis(X + 12, ry, rec->name ? rec->name : rec->formula,
+                                  F_SM, C_INK, bg, W - 24);
+            }
+        }
+        if (n > PK.scroll + rows) {
+            char more[40];
+            snprintf(more, sizeof more, "%d more below", n - PK.scroll - rows);
+            gfx_text(X + 12, top + rows * rowh + 1, more, F_XS, C_INK3, C_SHEET);
+        }
+    }
+
+    /* The key legend, per level. Naming the exits is the whole reason esc is safe here. */
+    const char *legend =
+        (PK.level == PK_FAMILY) ? "enter open   type search   esc ask anyway" :
+        (n == 0)                ? "bksp edit    esc browse    a ask anyway"   :
+                                  "enter pick   type filter   esc back";
+    gfx_fill(X + 8, Y + H - 17, W - 16, 1, C_LINE);
+    gfx_text(X + 10, Y + H - 14, legend, F_XS, C_INK3, C_SHEET);
+}
+
 void app_draw(void) {
     gfx_clear(C_BG);
     if (SIDEBAR) draw_sidebar();
     draw_main();
     if (SEARCH_ON) draw_search();
     if (SETTINGS_ON) draw_settings();
+    if (PICK_ON) draw_picker();
     draw_cursor();          /* last, so nothing occludes it */
     gfx_present();
 }
@@ -1932,6 +2046,22 @@ void app_event(const in_event *e) {
             SETTINGS_ON = 0;
             return;
         }
+        if (PICK_ON) {                         /* modal: a click lands on a row or nowhere */
+            const ns_store2 *st = app_store();
+            for (int i = 0; i < PK_ROWS; i++) {
+                if (!R_PROW[i].w || !inside(R_PROW[i], MX, MY)) continue;
+                int r = PK.scroll + i, rec = -1;
+                if (PK.level == PK_FAMILY) { PK.sel = r; pk_key(&PK, st, K_ENTER, &rec); return; }
+                PK.sel = r;
+                if (pk_key(&PK, st, K_ENTER, &rec) == PK_ACT_PICKED && rec >= 0)
+                    picker_send(st->rec[rec].rid);
+                return;
+            }
+            /* A CLICK OUTSIDE DOES NOTHING. The search sheet closes on one, which is right there
+             * -- nothing is pending. Here a stray tap would discard a typed question, so leaving
+             * is by esc (up a level) or the legend's ask-anyway, both of which say what they do. */
+            return;
+        }
         if (SEARCH_ON) {                       /* the sheet is modal: it eats clicks under it */
             int rows = NSHIT - SSCROLL; if (rows > SHEET_ROWS) rows = SHEET_ROWS;
             for (int i = 0; i < rows; i++)
@@ -1982,9 +2112,7 @@ void app_event(const in_event *e) {
          * field first meant every click on the arrow was swallowed as "focus the box" and the
          * message was never sent -- a containment bug, not a hit-testing one, introduced the
          * moment the field became clickable at all. */
-        if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) {
-            app_request(COMPOSE, 0); compose_clear(); return;
-        }
+        if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) { open_picker(); return; }
         /* Clicking the box makes it the typing target. Typing already went there, but nothing on
          * screen said so, so the bar looked inert until a character appeared in it. */
         if (inside(R_FIELD, MX, MY)) { FIELD_FOCUS = 1; return; }
@@ -1993,6 +2121,17 @@ void app_event(const in_event *e) {
 
     if (e->kind == IN_KEY) {
         int k = e->key;
+        /* THE PICKER IS MODAL AND CONSUMES EVERY KEY. It is checked before the search sheet and
+         * before ESC's own chain: an ESC that reached that chain would clear the composer or go
+         * home, when in the picker it means "up one level" or "ask anyway". */
+        if (PICK_ON) {
+            const ns_store2 *st = app_store();
+            int rec = -1;
+            pk_action a = pk_key(&PK, st, k, &rec);
+            if (a == PK_ACT_PICKED && rec >= 0) picker_send(st->rec[rec].rid);
+            else if (a == PK_ACT_ASK_ANYWAY)    picker_send(0);
+            return;
+        }
         if (SEARCH_ON) {                       /* typing goes to the query, not the composer */
             if (k == K_ESC)   { SEARCH_ON = 0; return; }
             if (k == K_DOWN)  { if (SSEL + 1 < NSHIT) SSEL++; return; }   /* the sheet follows */
@@ -2070,7 +2209,7 @@ void app_event(const in_event *e) {
             return;
         }
         if (k == K_ENTER) {
-            if (COMPOSE_N && !BUSY) { app_request(COMPOSE, 0); compose_clear(); return; }
+            if (COMPOSE_N && !BUSY) { open_picker(); return; }
             /* an empty box on the home screen means "open what is selected" */
             if (CUR < 0 && NCHATS && SEL_ROW >= 0 && SEL_ROW < NCHATS) {
                 CUR = SEL_ROW; SCROLL = 0; return;
@@ -2252,6 +2391,7 @@ void app_status_done(unsigned ms, const char *tool_call, const char *tool_result
 int app_hit_stop(int x, int y) { return BUSY && inside(R_SEND, x, y); }
 
 int app_hit_control(int x, int y) {
+    if (PICK_ON) return 1;                      /* modal, exactly like the sheet below */
     if (SEARCH_ON) return 1;                    /* the sheet is modal: any click means something */
     if (inside(R_EXIT, x, y) || inside(R_SEND, x, y)) return 1;
     if (inside(R_NEW, x, y) || inside(R_SEARCH, x, y) || inside(R_TOGGLE, x, y)) return 1;
