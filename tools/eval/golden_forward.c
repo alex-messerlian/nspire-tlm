@@ -92,8 +92,8 @@ int main(int argc, char **argv) {
         step_l0[step] = logits[0]; step_l1[step] = logits[1]; step_lN[step] = logits[V - 1];
         prev_pos = pos + 1;
         chain ^= h; chain *= 1099511628211ULL;
-        printf("step=%d tok=%d pos=%d logit_hash=%016llx  l0=%.9g l1=%.9g lN=%.9g\n",
-               step, toks[step] % V, pos, (unsigned long long)h,
+        printf("step=%d tok=%d pos=%d logit_hash=%016llx argmax=%d l0=%.9g l1=%.9g lN=%.9g\n",
+               step, toks[step] % V, pos, (unsigned long long)h, step_argmax[step],
                logits[0], logits[1], logits[V - 1]);
     }
     printf("CHAIN=%016llx\n", (unsigned long long)chain);
