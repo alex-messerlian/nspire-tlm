@@ -34,6 +34,17 @@ typedef struct {
 int  ask_pick(const ns_store2 *st, const char *question, const ns_input *in, int use_vars,
               int *score_out);
 
+/* Rank ALL records and return the best `k` into out[], best first; returns how many were filled.
+ * The picker needs a SHORTLIST, not a winner: at retrieval@1 the ranker is wrong nine times in
+ * ten, but a handful of suggestions at the top of the family list is useful at a far lower bar.
+ * `mode` selects the scorer so a control and its subject are the SAME BINARY -- see ask_mode. */
+enum { ASK_PLAIN = 0,      /* one point per whole-word name term, plus supplied variables */
+       ASK_IDF   = 1,      /* the same, weighted by how RARE the term is across record names */
+       ASK_QTY   = 2,      /* IDF, plus the QUANTITY words its variables' units imply */
+       ASK_QSHUF = 3 };    /* CONTROL: the same, with the unit->family association BROKEN */
+int  ask_rank(const ns_store2 *st, const char *question, const ns_input *in, int mode,
+              int *out, int k);
+
 /* Pull `name = value` out of free text: k = 500, x = 0.4, c = 3.0e8, v = -12. */
 void ask_parse(const char *question, ns_ask *a);
 

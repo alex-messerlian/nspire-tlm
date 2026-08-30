@@ -1899,10 +1899,15 @@ static void open_picker(void) {
     if (!st) { snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE); compose_clear(); picker_send(0); return; }
     snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE);
     compose_clear();
-    /* The name-overlap picker's ONLY remaining job: start the cursor on a plausible family. */
+    /* The ranker's ONLY remaining job: start the cursor on a plausible family. ASK_QTY, because
+     * it is measured better at exactly that -- 25.0% @1 against 18.9% for name+IDF and 12.8% for
+     * the flat overlap, on the 148 items whose record is still in the store. Nothing downstream
+     * depends on it being right; a wrong family costs one esc. */
     static ns_ask hint;
-    ask_build(st, PENDQ, &hint);
-    pk_open(&PK, st, hint.score > 0 ? ns_family_of(st, hint.idx) : -1);
+    ask_parse(PENDQ, &hint);
+    int top[1];
+    int got = ask_rank(st, PENDQ, &hint.in, ASK_QTY, top, 1);
+    pk_open(&PK, st, got ? ns_family_of(st, top[0]) : -1);
     PICK_ON = 1;
 }
 

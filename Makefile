@@ -66,7 +66,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -164,10 +164,13 @@ $(BUILD)/test_tokenizer: src/store/test_tokenizer.c src/store/tokenizer.c | $(BU
 # askparse.c is the record picker and the given parser, lifted out of app_request() in
 # device_app.c precisely so it could be compiled here. build/askcli is the same code with a
 # stdin driver, used to MEASURE retrieval rather than assert it.
-$(BUILD)/test_askparse:  tools/eval/test_askparse.c src/store/askparse.c src/store/assemble.c src/store/loader.c | $(BUILD)
-	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
-$(BUILD)/askcli:         tools/eval/askcli.c       src/store/askparse.c src/store/assemble.c src/store/loader.c | $(BUILD)
-	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
+$(BUILD)/test_askparse:  tools/eval/test_askparse.c src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
+$(BUILD)/askcli:         tools/eval/askcli.c       src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
+# rankcli exists to MEASURE retrieval@k, with subject and control in one binary.
+$(BUILD)/rankcli:        tools/eval/rankcli.c      src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
 # pickui.c is the picker's STATE MACHINE, split out of app.c so its navigation can be checked
 # without a calculator. build/pickcli reports family coverage over the shipped store, which is
 # the load-bearing claim: an unmapped record is unreachable by browsing, and under E that is

@@ -17,5 +17,9 @@ int  ns_records_in_family(const ns_store2 *st, int fam, int *out, int max);
 /* Case-insensitive substring filter over record NAMES. scope<0 filters all records. */
 int  ns_filter(const ns_store2 *st, int scope_fam, const char *q, int *out, int max);
 const char *ns_family_name(int fam);
+/* The family a UNIT belongs to, -1 if unmapped. Exposed because a record's variables carry
+ * quantity information its NAME does not: "Hooke's law" contains no word a student asking for a
+ * force would type, but its F is in newtons and the newton family is called "Force & pressure". */
+int  ns_family_of_unit(const char *unit);
 int  ns_family_count(void);
 #endif

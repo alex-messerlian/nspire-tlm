@@ -32,15 +32,19 @@ static const struct { const char *unit; int fam; } UNIT_FAM[] = {
 int ns_family_count(void) { return NFAM; }
 const char *ns_family_name(int f) { return (f >= 0 && f < NFAM) ? FAMILY[f] : 0; }
 
+int ns_family_of_unit(const char *unit) {
+    if (!unit) return -1;
+    for (int k = 0; k < NUF; k++) if (strcmp(UNIT_FAM[k].unit, unit) == 0) return UNIT_FAM[k].fam;
+    return -1;
+}
+
 int ns_family_of(const ns_store2 *st, int i) {
     if (!st || i < 0 || i >= st->n) return -1;
     const ns_rec2 *r = &st->rec[i];
     const char *lu = 0;
     for (int k = 0; k < r->nvars; k++)
         if (r->var[k] && strcmp(r->var[k], r->lhs) == 0) { lu = r->unit[k]; break; }
-    if (!lu) return -1;
-    for (int k = 0; k < NUF; k++) if (strcmp(UNIT_FAM[k].unit, lu) == 0) return UNIT_FAM[k].fam;
-    return -1;
+    return ns_family_of_unit(lu);
 }
 
 int ns_families(const ns_store2 *st, ns_family *out, int max) {
