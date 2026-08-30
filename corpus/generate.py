@@ -1612,6 +1612,16 @@ def quantity_surface(r, rng):
     MEASURED, and stated because it is small: this is worth ~2 pp of the separability that
     distribution_gate reports, not the 34 pp the gate is above its floor. See RESULT_SEPARABILITY.md
     -- the dominant cause is that the generator's ENTIRE question vocabulary is 249 words."""
+    # A45. THE DEFINITE ARTICLE, which this function emitted in 0 of 3,000 draws.
+    #
+    # Measured: identical record span, identical givens, ONLY the ask surface varied --
+    #     "Find momentum."       0.0% refused
+    #     "Find the momentum."  12.2% refused
+    # A determiner carries no information and a student will type it. The corpus contained no
+    # example, and the docstring below has claimed "the gravitational potential energy" as one of
+    # the four surfaces since it was written; the code never produced it.
+    #
+    # Applied to the NOUN forms only. "the U" is not English, so the symbol surface stays bare.
     name = (r.get("name") or "").lower().strip()
     lhs  = r["f"].split("=", 1)[0].strip()
     words = name.split()
@@ -1648,7 +1658,13 @@ def quantity_surface(r, rng):
         _add(lhs, 2)
     if not forms:
         return name or lhs or "the value"
-    return rng.choices(forms, weights=weights, k=1)[0]
+    picked = rng.choices(forms, weights=weights, k=1)[0]
+    # A45. The article, on NOUN forms only -- "the U" is not English, so a symbol stays bare.
+    # 40%, because a student writes it about that often and the corpus had none at all.
+    if rng.random() < 0.40 and picked != lhs and picked[0].islower() \
+       and not picked.lower().startswith("the "):
+        picked = "the " + picked
+    return picked
 
 
 def units_field(r):
@@ -1926,6 +1942,26 @@ WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}."
 #
 # Third time this session that the fix was "call the generator's own path": _device_missing_mod for
 # the missing field, quantity_surface/ask_for for the asked quantity, and now the composition.
+def _round_like(res):
+    """4 significant figures, in the NOTATION `res` already uses. See A44."""
+    try: f = float(res)
+    except (TypeError, ValueError): return res
+    if f == 0: return "0"
+    if "e" in res or "E" in res:                     # runtime chose e-notation: copy the exponent
+        mant, _, expo = res.lower().partition("e")
+        try: m = float(mant)
+        except ValueError: return res
+        return f"{m:.4g}e{expo}"
+    # plain decimal in, plain decimal out -- %.4g would switch at 1e5 and that is the whole defect
+    import math
+    d = 4 - 1 - int(math.floor(math.log10(abs(f))))
+    v = round(f, d)
+    if d <= 0:
+        return str(int(v))
+    out = f"{v:.{d}f}".rstrip("0").rstrip(".")
+    return out if out else "0"
+
+
 def compose_question(ask, g, rng):
     """ask + givens, in the two orderings the corpus uses, with the corpus's own frames."""
     stem = rng.choice(GIVE).format(g=g)
@@ -2426,9 +2462,21 @@ def gen(n, seed=0):
         # slot where it has only ever seen 4 -- having learned that the answer is the res span
         # copied. Rounding in the ANSWER is what the sign-off asked for, and it is now the only
         # place it happens, which also gives the model the rounding step to learn.
-        a_val = res
-        try:   a_val = f"{float(res):.4g}"          # signed off: 4 significant figures, ANSWER only
-        except ValueError: pass
+        # A44. ROUND THE MANTISSA, NEVER RECOMPUTE THE EXPONENT.
+        #
+        # This was f"{float(res):.4g}", and %g switches to e-notation at exponent >= 5 -- so a
+        # <res> of 6078669.911 became "6.079e+06" and the model had to DERIVE the exponent from
+        # the digits. Measured on device and reproduced on host: it writes "6.08e+09". 1000x high,
+        # on 3.4% of answered turns, and the tool call and the runtime result are both correct.
+        #
+        # The corpus is not teaching the error -- its own exponents agree with <res> 9,420 times
+        # out of 9,420. It is teaching a CONVERSION the model cannot reliably do, and the coverage
+        # is thin exactly where it fails: 1,222 documents at 1e+04 against 370 at 1e+06.
+        #
+        # So the answer now keeps the notation <res> arrived in. If the runtime wrote plain
+        # decimal, the answer rounds in plain decimal; if it wrote e-notation, the exponent is
+        # COPIED and only the mantissa is rounded. The model never derives an exponent it can copy.
+        a_val = _round_like(res)
         a_txt = f"{a_val} {d['unit']}".strip() if d.get("unit") else a_val
         # A33. `Q` carries the article-correct form: a store name already beginning with "the"
         # supplies its own, and one that does not gets "The". The template must not add a second.
