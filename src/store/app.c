@@ -390,6 +390,14 @@ static int ask_index(unsigned n);
  * the project log makes mandatory before anything ships. Training questions are VERB + QUANTITY:
  * "Calculate frequency.", "Find path length difference.", "determine I_S".
  *
+ * AND EACH IS VERIFIED END TO END, not merely vetted for width and rank. "Find kinetic energy.
+ * m = 2, v = 3" was here and is not any more: the tool call and the runtime result are correct (9)
+ * and the prose says "9 m" -- the variable name for mass, not the record's J -- DETERMINISTICALLY,
+ * on every run, under greedy. An example that is always wrong is a bad example whatever its rank.
+ * The four that replaced or survived it are right: work 30 J, pressure 2e+04 Pa, momentum
+ * 1.8e+04 kg*m/s, density 8000 kg/m^3. Model unit accuracy overall is 98.4% (61/62) against a
+ * corpus that is 100.0% (30,824/30,824), so KE is a deterministic instance of a ~1.6% rate.
+ *
  * AND NO DEFINITE ARTICLE, which is measured and not a style choice. On 49 records, greedy, with
  * the givens and the record span held identical and ONLY the article varied:
  *
@@ -405,7 +413,7 @@ static int ask_index(unsigned n);
  * Tapping one LOADS it into the box rather than sending it. The format is the lesson; sending it
  * immediately would hide the very thing being demonstrated. */
 static const char *TRY_Q[] = {
-    "Find kinetic energy. m = 2, v = 3",
+    "Find work. F = 12, d = 2.5",
     "Find pressure. F = 400, A = 0.02",
     "Find momentum. m = 1200, v = 15",
 };
