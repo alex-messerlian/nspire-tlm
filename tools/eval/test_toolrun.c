@@ -48,6 +48,15 @@ int main(void) {
       /* refusals come back as the evaluator's own code, never as an invented number */
       { "<tool>eval<arg>1/0</tool>",                 "<res>!domain</res>" },
       { "<tool>nosuchfn<arg>1</tool>",               "<res>!name</res>" },
+      /* WHAT THE MODEL ACTUALLY EMITS. The corpus is `<tool>eval` with no space -- 16,459 of
+       * 16,459 sampled -- but the model emits TOKENS, and the tokenizer's decode reintroduces a
+       * leading space. dispatch.c trimmed the args and not the name, so this returned !name on
+       * device and the model invented "-2.4 J" from the poisoned result. */
+      { "<tool> eval<arg> 0.5*(2.0)*((3.0))^(2)</tool>", "<res>9</res>" },
+      { "<tool> eval<arg> (((400.0))/((0.02)))</tool>",  "<res>20000</res>" },
+      { "<tool>  eval  <arg> 1+1</tool>",            "<res>2</res>" },
+      /* and an unknown name must still fail, trimmed or not */
+      { "<tool> nosuchfn<arg> 1</tool>",             "<res>!name</res>" },
       { "<tool>eval<arg>((((</tool>",                "<res>!parse</res>" },
       { "",                                          "<res>!give</res>" },
     };

@@ -311,6 +311,33 @@ tb_status tool_call_text(const char *call, char *out, size_t out_sz) {
     size_t nlen = sep ? (size_t)(sep - cur) : strlen(cur);
     if (nlen == 0 || nlen >= MAX_IDENT) return fail(E_PARSE, out, out_sz);
     memcpy(name, cur, nlen); name[nlen] = 0;
+    /* TRIM THE NAME, exactly as the arguments below are trimmed.
+     *
+     * THE ARGUMENTS WERE TRIMMED AND THE NAME WAS NOT, and that one-sided normalisation is the
+     * whole of the device's "!name". TOOL_SPEC 2.2 says "no whitespace adjacent to any delimiter",
+     * and the CORPUS honours it -- 16,459 of 16,459 sampled calls are `<tool>eval` with no space.
+     * But the model does not emit corpus bytes, it emits TOKENS, and the tokenizer's decode
+     * reintroduces the leading space: `<tool> eval<arg> 0.5*(2.0)*((3.0))^(2)</tool>`. The name
+     * became " eval", arity lookup failed, and the runtime returned !name.
+     *
+     * The model is then handed <res> !name</res> and invents a number -- measured on device:
+     *   <tool> eval<arg> 0.5*(2.0)*((3.0))^(2)</tool><res> !name</res>
+     *   <a> The kinetic energy is -2.4 J. From K=0.5*m*(v)^(2).<end>
+     * The call is CORRECT and the arithmetic is the runtime's; "-2.4 J" is the best continuation
+     * of a poisoned result. One defect, reported as two.
+     *
+     * IT WAS INVISIBLE ON THE HOST because seven harnesses -- score_arms, e2e, capability,
+     * format_sweep, l2, verbatim_retest, attempt_policy -- each call `call.replace(" ", "")`
+     * before evalcli. Every one of them normalises what the runtime does not, so the graders were
+     * strictly more forgiving than the device and no host measurement could see it. The fix goes
+     * HERE, in the one path both sides share, and the harnesses stop stripping. */
+    {   char *s = name;
+        while (*s == ' ') s++;
+        size_t L = strlen(s);
+        while (L && s[L - 1] == ' ') s[--L] = 0;
+        if (s != name) memmove(name, s, L + 1);
+        if (!name[0]) return fail(E_PARSE, out, out_sz);
+    }
 
     while (sep) {
         cur = sep + 5;

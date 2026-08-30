@@ -55,7 +55,13 @@ RES, ENDT, TOOLC = (TK.token_to_id(t) for t in ("<res>", "<end>", "</tool>"))
 # inject <res>", and two of them silently omitted the injection. A harness that reimplements it can
 # reproduce Bug 5 independently, which is why the guard is executable rather than a note.
 def _run_tool(call):
-    p = subprocess.run([str(ROOT / "tools/eval/evalcli"), call.replace(" ", "")],
+    # NO .replace(" ", "") -- THE DEVICE DOES NOT STRIP, AND STRIPPING HERE HID A REAL DEFECT FOR
+    # AN ENTIRE SESSION. The model emits `<tool> eval<arg> ...` (the tokenizer's decode reintroduces
+    # the leading space the corpus never had); dispatch.c trimmed the ARGS and not the NAME, so the
+    # device returned !name and the model invented a number. Seven harnesses each stripped spaces
+    # before evalcli, so every one of them was strictly more forgiving than the runtime and none
+    # could see it. The trim now lives in dispatch.c, which both sides share.
+    p = subprocess.run([str(ROOT / "tools/eval/evalcli"), call],
                        capture_output=True, text=True)
     m = re.search(r"<res>(.*?)</res>", p.stdout, re.S)
     return (m.group(1) if m else "!give"), 0.0

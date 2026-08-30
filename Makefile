@@ -108,7 +108,7 @@ $(BUILD)/render_app: tools/eval/render_app.c $(APP_SRC) $(APP_HDR) $(BUILD)/host
 $(BUILD)/test_prov: tools/eval/test_prov.c tools/eval/provenance.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< tools/eval/provenance.c -lm
 
-$(BUILD)/test_toolrun: tools/eval/test_toolrun.c src/store/toolrun.c src/store/toolrun.h | $(BUILD)
+$(BUILD)/test_toolrun: tools/eval/test_toolrun.c src/store/toolrun.c src/store/toolrun.h $(EVAL_CORE) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/toolrun.c $(EVAL_CORE) -lm
 
 $(BUILD)/test_chatstore: tools/eval/test_chatstore.c src/store/chatstore.c src/store/chatstore.h | $(BUILD)
