@@ -517,8 +517,41 @@ void matmul(float* xout, QuantizedTensor *x, QuantizedTensor *w, int n, int d) {
         // do the matmul in groups of GS
         int j;
         for (j = 0; j <= n - GS; j += GS) {
-            for (int k = 0; k < GS; k++) {
-                ival += ((int32_t) x->q[j + k]) * ((int32_t) w->q[in + j + k]);
+#if TLM_WORD_MAC
+            /* ONE WORD LOAD FEEDS FOUR MACs. RESULT_COMPUTE_BOUND measures this loop at 8.20
+             * cycles per MAC with both operand arrays resident in D-cache -- it is not waiting on
+             * memory, it is stalling on load-use, because each MAC needs two separate byte loads.
+             * Four MACs per pair of word loads is 4x fewer loads for the same arithmetic, and it is
+             * the only lever the repo's own analysis says moves tok/s: at d352 L6 C=256 the
+             * per-layer matmuls are 66.1% of the token.
+             *
+             * BIT-EXACT BY CONSTRUCTION, not by luck: the accumulator is int32 and the products are
+             * exact, so reordering cannot change the sum. golden_forward verifies it as an equality
+             * rather than a tolerance.
+             *
+             * NOT hand-written assembly. The project log records that GCC already emits smlabb for the
+             * naive loop and that a hand-written version came out 1.7x SLOWER on register spills.
+             * This stays in C and lets the scheduler do its job.
+             *
+             * ARMv5TE cannot do unaligned word loads -- it rotates instead of faulting, which would
+             * corrupt silently. Both the group size and the pointers are checked, and anything that
+             * does not qualify falls through to the byte loop below. */
+            if (!(GS & 3) && !(((uintptr_t)(x->q + j) | (uintptr_t)(w->q + in + j)) & 3)) {
+                const uint32_t *xw = (const uint32_t *)(const void *)(x->q + j);
+                const uint32_t *ww = (const uint32_t *)(const void *)(w->q + in + j);
+                for (int k = 0; k < GS / 4; k++) {
+                    uint32_t a = xw[k], b = ww[k];
+                    ival += (int32_t)(int8_t)(a      ) * (int32_t)(int8_t)(b      );
+                    ival += (int32_t)(int8_t)(a >>  8) * (int32_t)(int8_t)(b >>  8);
+                    ival += (int32_t)(int8_t)(a >> 16) * (int32_t)(int8_t)(b >> 16);
+                    ival += (int32_t)(int8_t)(a >> 24) * (int32_t)(int8_t)(b >> 24);
+                }
+            } else
+#endif
+            {
+                for (int k = 0; k < GS; k++) {
+                    ival += ((int32_t) x->q[j + k]) * ((int32_t) w->q[in + j + k]);
+                }
             }
             val += ((float) ival) * w->s[(in + j) / GS] * x->s[j / GS];
             ival = 0;
