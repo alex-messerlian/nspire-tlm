@@ -1943,21 +1943,44 @@ WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}."
 # Third time this session that the fix was "call the generator's own path": _device_missing_mod for
 # the missing field, quantity_surface/ask_for for the asked quantity, and now the composition.
 def _round_like(res):
-    """4 significant figures, in the NOTATION `res` already uses. See A44."""
+    """4 significant figures WHERE THAT IS SAFE, and verbatim where it is not. See A44b.
+
+    A44 RAN AND FAILED, and the failure is the useful part. It replaced %g -- which switches to
+    e-notation at exponent >= 5 -- with plain decimal, on the theory that the model was getting the
+    exponent wrong because it had to DERIVE one. Measured, n=150 forced into the band:
+
+        baseline (%g, e-notation)   5/89  =  5.6%  [2.4, 12.5]
+        A44 (plain decimal)        22/150 = 14.7%  [9.9, 21.2]   Fisher p = 0.035
+
+    It made the arm 2.6x WORSE, and reading the failures says why. Baseline got the mantissa right
+    and the exponent wrong: 383375.9591 -> "3.833e+09". A44 got the DIGITS right and the number of
+    ZEROS wrong: 518940 -> "51890", 383375.9591 -> "3834000000". The same inability in both cases --
+    the model cannot track magnitude -- but e-notation spends ONE token on it and plain decimal
+    spends N. Moving to plain decimal turned a one-token decision into an N-token one.
+
+    So neither. Round only where rounding cannot go wrong, and copy where it can:
+
+      |res| in [1e-4, 1e5)  ->  4 s.f., plain. Magnitude is 1-5 digits; there is nothing to derive.
+      otherwise             ->  <res> VERBATIM. The model copies a span it has just read, which is
+                                the easiest thing it ever does, and magnitude cannot be wrong
+                                because no magnitude is computed.
+
+    THIS OVERRIDES THE 4-SIGNIFICANT-FIGURE SIGN-OFF for the outer band, and the override is
+    evidence, not preference. That decision's stated purpose (docs/RESULT_RES_SPAN.md) was that a
+    corpus restating <res> byte-for-byte never demonstrates a rounding step. True -- and the
+    measured price of demonstrating it outside [1e-4, 1e5) is between 5.6% and 14.7% of answers
+    carrying a wrong number. The rounding step is still demonstrated on the ~73% of results inside
+    the band, where it costs nothing."""
     try: f = float(res)
     except (TypeError, ValueError): return res
     if f == 0: return "0"
-    if "e" in res or "E" in res:                     # runtime chose e-notation: copy the exponent
-        mant, _, expo = res.lower().partition("e")
-        try: m = float(mant)
-        except ValueError: return res
-        return f"{m:.4g}e{expo}"
-    # plain decimal in, plain decimal out -- %.4g would switch at 1e5 and that is the whole defect
+    a = abs(f)
+    if not (1e-4 <= a < 1e5):
+        return res                                   # verbatim: no magnitude is computed
     import math
-    d = 4 - 1 - int(math.floor(math.log10(abs(f))))
+    d = 4 - 1 - int(math.floor(math.log10(a)))
     v = round(f, d)
-    if d <= 0:
-        return str(int(v))
+    if d <= 0: return str(int(v))
     out = f"{v:.{d}f}".rstrip("0").rstrip(".")
     return out if out else "0"
 
