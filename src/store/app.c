@@ -390,15 +390,24 @@ static int ask_index(unsigned n);
  * the project log makes mandatory before anything ships. Training questions are VERB + QUANTITY:
  * "Calculate frequency.", "Find path length difference.", "determine I_S".
  *
- * Three families -- energy, pressure, momentum -- because the format is what they teach: a
- * question naming what you want, then `name = value` for what you know.
+ * AND NO DEFINITE ARTICLE, which is measured and not a style choice. On 49 records, greedy, with
+ * the givens and the record span held identical and ONLY the article varied:
+ *
+ *     Find <quantity>.                     0.0% refused
+ *     Find the <quantity>.                12.2% refused
+ *     Find the <full record name>.        25.4% refused
+ *
+ * The model is brittle to a function word carrying no information -- the corpus's entire question
+ * vocabulary is 249 words, so a surface a student will produce naturally is not covered. See
+ * docs/RESULT_ASK_SURFACE.md. Three families -- energy, pressure, momentum -- because the format
+ * is what they teach: a question naming what you want, then `name = value` for what you know.
  *
  * Tapping one LOADS it into the box rather than sending it. The format is the lesson; sending it
  * immediately would hide the very thing being demonstrated. */
 static const char *TRY_Q[] = {
-    "Find the kinetic energy. m = 2, v = 3",
-    "Find the pressure. F = 400, A = 0.02",
-    "Find the momentum. m = 1200, v = 15",
+    "Find kinetic energy. m = 2, v = 3",
+    "Find pressure. F = 400, A = 0.02",
+    "Find momentum. m = 1200, v = 15",
 };
 #define TRY_N ((int)(sizeof TRY_Q / sizeof TRY_Q[0]))
 static gfx_rect R_TRY[TRY_N];
