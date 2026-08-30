@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
         pk_open(&A, &ST, "");
         {   static ns_ask a; ask_parse(q, &a);
             int top[1];
-            if (ask_rank(&ST, q, &a.in, ASK_QTY, top, 1)) {
+            if (ask_rank(&ST, q, &a.in, ASK_NOUN, top, 1)) {
                 int f = ns_family_of(&ST, top[0]);
                 if (f >= 0) { A.sel = f; }
             }

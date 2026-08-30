@@ -21,5 +21,9 @@ const char *ns_family_name(int fam);
  * quantity information its NAME does not: "Hooke's law" contains no word a student asking for a
  * force would type, but its F is in newtons and the newton family is called "Force & pressure". */
 int  ns_family_of_unit(const char *unit);
+/* The nouns a student would use for a quantity in this unit, space-separated, or 0. Finer than the
+ * family map, which is too coarse to retrieve with -- "Electricity & magnetism" contains neither
+ * "current" nor "resistance". */
+const char *ns_unit_nouns(const char *unit);
 int  ns_family_count(void);
 #endif

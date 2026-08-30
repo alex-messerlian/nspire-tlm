@@ -47,7 +47,7 @@ void pk_open(pk_state *p, const ns_store2 *st, const char *question) {
     if (question && question[0]) {
         static ns_ask a;
         ask_parse(question, &a);
-        p->nsug = MAX_SUG ? ask_rank(st, question, &a.in, ASK_QTY, p->sug, MAX_SUG) : 0;
+        p->nsug = MAX_SUG ? ask_rank(st, question, &a.in, ASK_NOUN, p->sug, MAX_SUG) : 0;
         if (p->nsug < 0) p->nsug = 0;
     }
 

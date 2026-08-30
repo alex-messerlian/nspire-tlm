@@ -29,6 +29,73 @@ static const struct { const char *unit; int fam; } UNIT_FAM[] = {
 };
 #define NUF ((int)(sizeof UNIT_FAM / sizeof UNIT_FAM[0]))
 
+/* UNIT -> THE NOUNS A STUDENT SAYS. Distinct from the family map above, and needed because the
+ * families are too coarse to retrieve with: "Electricity & magnetism" contains neither "current"
+ * nor "resistance", so a question saying either matched nothing.
+ *
+ * MEASURED, and it is the whole reason this exists: of the questions no lexical cue could reach,
+ * the dominant pattern is a student asking for a DIFFERENT VARIABLE of the relation than the one
+ * the record is named after --
+ *     v=d/t   named "average speed",     asked "how long does it take?"
+ *     P=V*I   named "electrical power",  asked "find the current"
+ *     V=I*R   named "Ohm's law",         asked "find the resistance"
+ * The record's name describes its left-hand side; a student may ask for any variable in it. So
+ * every variable contributes its own noun, not just the LHS.
+ *
+ * One row per unit actually present in the store -- 41 of them, counted, not guessed. */
+static const struct { const char *unit; const char *nouns; } UNIT_NOUN[] = {
+    {"m",        "distance length displacement height depth width radius far"},
+    {"m/s",      "speed velocity fast"},
+    {"m/s^2",    "acceleration"},
+    {"s",        "time duration period long takes"},
+    {"kg",       "mass heavy weigh"},
+    {"N",        "force weight tension push pull"},
+    {"J",        "energy work heat"},
+    {"W",        "power rate"},
+    {"Hz",       "frequency"},
+    {"1/s",      "frequency rate angular"},
+    {"1/s^2",    "angular acceleration"},
+    {"A",        "current amps"},
+    {"V",        "voltage potential emf volts battery"},
+    {"ohm",      "resistance resistor"},
+    {"C",        "charge"},
+    {"F",        "capacitance capacitor"},
+    {"T",        "field magnetic"},
+    {"V/m",      "field electric"},
+    {"Pa",       "pressure"},
+    {"K",        "temperature"},
+    {"J/K",      "entropy"},
+    {"J/(mol*K)","heat capacity molar"},
+    {"J/(kg*K)", "specific heat capacity"},
+    {"kg*m/s",   "momentum"},
+    {"kg*m^2",   "inertia moment"},
+    {"kg*m^2/s", "angular momentum"},
+    {"N*m",      "torque moment"},
+    {"N/m",      "spring constant stiffness"},
+    {"m^2",      "area"},
+    {"m^3",      "volume"},
+    {"kg/m^3",   "density"},
+    {"1/m",      "wavenumber"},
+    {"1/m^3",    "number density concentration"},
+    {"W/m^2",    "intensity"},
+    {"J*s",      "action planck"},
+    {"C/m^2",    "surface charge density"},
+    {"C^2/(N*m^2)", "permittivity"},
+    {"N*m^2/kg^2",  "gravitational constant"},
+    {"T*m/A",    "permeability"},
+    {"V*m/C",    "potential"},
+    {"1",        ""},
+};
+#define NUN ((int)(sizeof UNIT_NOUN / sizeof UNIT_NOUN[0]))
+
+const char *ns_unit_nouns(const char *unit) {
+    if (!unit) return 0;
+    for (int k = 0; k < NUN; k++)
+        if (strcmp(UNIT_NOUN[k].unit, unit) == 0)
+            return UNIT_NOUN[k].nouns[0] ? UNIT_NOUN[k].nouns : 0;
+    return 0;
+}
+
 int ns_family_count(void) { return NFAM; }
 const char *ns_family_name(int f) { return (f >= 0 && f < NFAM) ? FAMILY[f] : 0; }
 

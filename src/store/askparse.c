@@ -126,13 +126,70 @@ static void score_qty(const ns_store2 *st, int r, const char *question, struct s
     }
 }
 
+/* THE STUDENT'S OWN NOUNS, one variable at a time.
+ *
+ * The record's NAME describes its left-hand side, and a student may ask for any variable in the
+ * relation: v=d/t is named "average speed" and gets asked "how long does it take?". Scoring each
+ * variable's unit nouns is what reaches those. The LHS still counts double -- it is what the
+ * question is ASKING FOR, where the others are only what it mentions. */
+static void score_nouns(const ns_store2 *st, int r, const char *question, struct sctx *c) {
+    for (int k = 0; k < st->rec[r].nvars; k++) {
+        const char *nouns = ns_unit_nouns(st->rec[r].unit[k]);
+        if (!nouns) continue;
+        /* THE LHS NOUN IS THE EVIDENCE; the others are noise at rank 1.
+         *
+         * Measured. At (LHS 2, other 1) the nouns bought recall and cost precision: @10 53.4 ->
+         * 58.8 but @1 25.0 -> 22.3, because "energy", "time" and "distance" appear as INPUTS to
+         * dozens of records, so every one of them rose on a question that merely mentioned them.
+         * A question asks for ONE quantity, and that quantity is the left-hand side. */
+        int is_lhs = (st->rec[r].lhs && !strcmp(st->rec[r].var[k], st->rec[r].lhs));
+        if (!is_lhs) continue;
+        int w = 3;
+        char word[32]; int n = 0;
+        for (const char *p = nouns; ; p++) {
+            if (*p && *p != ' ' && n < (int)sizeof word - 1) { word[n++] = *p; }
+            else {
+                if (n >= 3) {
+                    word[n] = 0;
+                    /* CONTROL: same words, same weights, association broken by a fixed shift of
+                     * the record index -- if the gain survives it was never about the nouns. */
+                    const char *nn = nouns;
+                    if (c->mode == ASK_NSHUF) {
+                        nn = ns_unit_nouns(st->rec[(r + 41) % st->n].unit[0]);
+                        if (!nn) { n = 0; if (!*p) break; else continue; }
+                    }
+                    if (nn == nouns && word_in(question, word)) c->score += w * 16;
+                }
+                n = 0;
+                if (!*p) break;
+            }
+        }
+        if (c->mode == ASK_NSHUF) {
+            const char *nn = ns_unit_nouns(st->rec[(r + 41) % st->n].unit[0]);
+            if (nn) {
+                char w2[32]; int m2 = 0;
+                for (const char *p = nn; ; p++) {
+                    if (*p && *p != ' ' && m2 < (int)sizeof w2 - 1) w2[m2++] = *p;
+                    else { if (m2 >= 3) { w2[m2] = 0; if (word_in(question, w2)) c->score += w * 16; }
+                           m2 = 0; if (!*p) break; }
+                }
+            }
+        }
+    }
+}
+
 static int score_record(const ns_store2 *st, int r, const char *question,
                         const ns_input *in, int use_vars, int mode) {
     const char *nm = st->rec[r].name;
     if (!nm || !nm[0]) return 0;
-    struct sctx c = { question, 0, (mode == ASK_QTY || mode == ASK_QSHUF) ? ASK_IDF : mode };
+    int qty = (mode == ASK_QTY || mode == ASK_QSHUF || mode == ASK_NOUN || mode == ASK_NSHUF);
+    struct sctx c = { question, 0, qty ? ASK_IDF : mode };
     each_word(nm, score_word, &c);
-    if (mode == ASK_QTY || mode == ASK_QSHUF) { c.mode = mode; score_qty(st, r, question, &c); }
+    if (qty) {
+        c.mode = (mode == ASK_QSHUF) ? ASK_QSHUF : ASK_QTY;
+        score_qty(st, r, question, &c);
+        if (mode == ASK_NOUN || mode == ASK_NSHUF) { c.mode = mode; score_nouns(st, r, question, &c); }
+    }
     if (use_vars && in) {
         for (int v = 0; v < in->nvals; v++)
             for (int k = 0; k < st->rec[r].nvars; k++) {
