@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
         COMPOSE_N = (int)strlen(COMPOSE);
         CUR = -1; MX = 300; MY = 220;
         open_picker();
-        if (!strcmp(screen, "pickrec"))   { PK.sel = 4; app_event(&(in_event){.kind=IN_KEY,.key=K_ENTER}); }
+        if (!strcmp(screen, "pickrec"))   { PK.sel = PK.nsug + 4; app_event(&(in_event){.kind=IN_KEY,.key=K_ENTER}); }
         /* NOT "capacit" -- PICKER_SPEC uses it as the no-match example and this store has five
          * capacitance records, so it renders a full list. The empty screen needs a real miss. */
         if (!strcmp(screen, "pickempty")) { const char *q = "zzqq";

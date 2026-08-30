@@ -1,13 +1,26 @@
 #include <string.h>
 #include "pickui.h"
 
+static int MAX_SUG = PK_MAX_SUG;
+void pk_set_max_sug(int k) { MAX_SUG = (k < 0) ? 0 : (k > PK_MAX_SUG ? PK_MAX_SUG : k); }
+
+/* Model rows at the family level: the suggestions, then every family. */
+static int fam_rows(const pk_state *p) { return p->nsug + p->nfam; }
+
+int pk_row_is_sug(const pk_state *p, int row) { return row >= 0 && row < p->nsug; }
+int pk_row_family(const pk_state *p, int row) {
+    int f = row - p->nsug;
+    return (f >= 0 && f < p->nfam) ? f : -1;
+}
+
 static void clamp(pk_state *p) {
-    int n = (p->level == PK_FAMILY) ? p->nfam : p->nhit;
+    int n = (p->level == PK_FAMILY) ? fam_rows(p) : p->nhit;
     if (p->sel >= n) p->sel = n ? n - 1 : 0;
     if (p->sel < 0) p->sel = 0;
+    int rows = p->rows > 0 ? p->rows : PK_ROWS;
     if (p->sel < p->scroll) p->scroll = p->sel;
-    if (p->sel >= p->scroll + PK_ROWS) p->scroll = p->sel - PK_ROWS + 1;
-    if (p->scroll > n - PK_ROWS) p->scroll = n - PK_ROWS;
+    if (p->sel >= p->scroll + rows) p->scroll = p->sel - rows + 1;
+    if (p->scroll > n - rows) p->scroll = n - rows;
     if (p->scroll < 0) p->scroll = 0;
 }
 
@@ -20,17 +33,34 @@ static void refilter(pk_state *p, const ns_store2 *st) {
     p->sel = 0; p->scroll = 0;
 }
 
-void pk_open(pk_state *p, const ns_store2 *st, int preselect_fam) {
+void pk_open(pk_state *p, const ns_store2 *st, const char *question) {
     memset(p, 0, sizeof *p);
     p->level = PK_FAMILY;
     p->fam   = -1;
     p->nfam  = ns_families(st, p->fams, NS_MAX_FAMILIES);
     if (p->nfam < 0) p->nfam = 0;
-    /* The name-overlap picker still runs, and this is the only thing it decides: which family the
-     * cursor starts on. At 9.5% it is not allowed to choose the record -- that is the student's --
-     * but starting the cursor near the right answer costs nothing and is better than starting at
-     * zero. Nothing downstream depends on it being right. */
-    if (preselect_fam >= 0 && preselect_fam < p->nfam) p->sel = preselect_fam;
+
+    /* THE SHORTLIST, not a winner. ASK_QTY because it is the measured best of the three -- and
+     * the reason it is only a shortlist is measured too: on the 148 items whose record is still
+     * in the store, 31.8% share NO content word with their own record's name or its quantity, so
+     * no lexical ranker reaches them at all. See docs/RESULT_RETRIEVAL_CEILING.md. */
+    if (question && question[0]) {
+        static ns_ask a;
+        ask_parse(question, &a);
+        p->nsug = MAX_SUG ? ask_rank(st, question, &a.in, ASK_QTY, p->sug, MAX_SUG) : 0;
+        if (p->nsug < 0) p->nsug = 0;
+    }
+
+    /* Two section headers cost 10 px each out of the row area, and the "N more below" line needs
+     * its own 9 -- reserving ONE row for all three put "1 more below" through the key legend.
+     * Measured against draw_picker's geometry: 40 + 10 + 5*13 + 10 + 6*13 = 203, legend rule at
+     * 219. With no suggestions there are no headers and the layout is what it was. */
+    p->rows = p->nsug ? PK_ROWS - 2 : PK_ROWS;
+
+    /* The cursor starts on the top suggestion when there is one -- that is the row most likely to
+     * be wanted -- and on the first family otherwise. A wrong start costs arrow presses, nothing
+     * more: nothing downstream depends on it. */
+    p->sel = 0;
     clamp(p);
 }
 
@@ -57,7 +87,14 @@ pk_action pk_key(pk_state *p, const ns_store2 *st, int key, int *out_rec) {
          * simply omitted. The student is never stranded. */
         if (key == K_ESC)  return PK_ACT_ASK_ANYWAY;
         if (key == K_ENTER) {
-            if (p->sel < p->nfam && p->fams[p->sel].count > 0) enter_records(p, st, p->sel);
+            /* A SUGGESTION IS A RECORD, so enter on one picks it outright -- that is the whole
+             * point of the section: one keypress instead of a browse. */
+            if (pk_row_is_sug(p, p->sel)) {
+                if (out_rec) *out_rec = p->sug[p->sel];
+                return PK_ACT_PICKED;
+            }
+            int f = pk_row_family(p, p->sel);
+            if (f >= 0 && p->fams[f].count > 0) enter_records(p, st, f);
             return PK_ACT_NONE;      /* an empty family is not openable; it cannot be entered */
         }
         /* '/' is the documented key. A letter does the same thing, because a student who types
@@ -78,7 +115,7 @@ pk_action pk_key(pk_state *p, const ns_store2 *st, int key, int *out_rec) {
         if (key == K_ESC) {
             p->level = PK_FAMILY;
             p->q[0] = 0; p->qn = 0;
-            p->sel = (p->fam >= 0) ? p->fam : 0;
+            p->sel = (p->fam >= 0) ? p->nsug + p->fam : 0;
             p->scroll = 0; clamp(p);
             return PK_ACT_NONE;
         }

@@ -66,7 +66,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -171,12 +171,16 @@ $(BUILD)/askcli:         tools/eval/askcli.c       src/store/askparse.c src/stor
 # rankcli exists to MEASURE retrieval@k, with subject and control in one binary.
 $(BUILD)/rankcli:        tools/eval/rankcli.c      src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
+# keycost measures what Suggested exists to move: keystrokes launch to answer. Both arms
+# drive the shipped pk_key and assert arrival, so it counts navigation, not a model of it.
+$(BUILD)/keycost:        tools/eval/keycost.c      src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
 # pickui.c is the picker's STATE MACHINE, split out of app.c so its navigation can be checked
 # without a calculator. build/pickcli reports family coverage over the shipped store, which is
 # the load-bearing claim: an unmapped record is unreachable by browsing, and under E that is
 # unreachable at all.
-$(BUILD)/test_pickui:    tools/eval/test_pickui.c  src/store/pickui.c src/store/picker.c src/store/loader.c $(APP_HDR) | $(BUILD)
-	$(CC) $(HOSTFLAGS) -o $@ $< src/store/pickui.c src/store/picker.c src/store/loader.c -lm
+$(BUILD)/test_pickui:    tools/eval/test_pickui.c  src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
 $(BUILD)/pickcli:        tools/eval/pickcli.c      src/store/picker.c src/store/loader.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/picker.c src/store/loader.c -lm
 

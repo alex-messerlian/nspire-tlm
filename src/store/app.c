@@ -1899,15 +1899,7 @@ static void open_picker(void) {
     if (!st) { snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE); compose_clear(); picker_send(0); return; }
     snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE);
     compose_clear();
-    /* The ranker's ONLY remaining job: start the cursor on a plausible family. ASK_QTY, because
-     * it is measured better at exactly that -- 25.0% @1 against 18.9% for name+IDF and 12.8% for
-     * the flat overlap, on the 148 items whose record is still in the store. Nothing downstream
-     * depends on it being right; a wrong family costs one esc. */
-    static ns_ask hint;
-    ask_parse(PENDQ, &hint);
-    int top[1];
-    int got = ask_rank(st, PENDQ, &hint.in, ASK_QTY, top, 1);
-    pk_open(&PK, st, got ? ns_family_of(st, top[0]) : -1);
+    pk_open(&PK, st, PENDQ);      /* ranks the shortlist and places the cursor */
     PICK_ON = 1;
 }
 
@@ -1942,7 +1934,8 @@ static void draw_picker(void) {
     gfx_text_ellipsis(X + 8, Y + 22, PENDQ, F_XS, C_INK3, C_SHEET, W - 16);
 
     top = Y + 36;
-    rows = (n - PK.scroll) < PK_ROWS ? (n - PK.scroll) : PK_ROWS;
+    int page = PK.rows > 0 ? PK.rows : PK_ROWS;
+    rows = (n - PK.scroll) < page ? (n - PK.scroll) : page;
     for (int i = 0; i < PK_ROWS; i++) R_PROW[i] = (gfx_rect){0, 0, 0, 0};
 
     if (n == 0) {
@@ -1953,33 +1946,64 @@ static void draw_picker(void) {
         gfx_text(X + 10, top + rowh,   "them fit this. That happens for about 4", F_SM, C_INK3, C_SHEET);
         gfx_text(X + 10, top + 2*rowh, "questions in 10.", F_SM, C_INK3, C_SHEET);
     } else {
+        int ry = top;
         for (int i = 0; i < rows; i++) {
             int r = PK.scroll + i, selrow = (r == PK.sel);
-            int ry = top + i * rowh;
+            /* SECTION HEADERS. Drawn only when their boundary is inside the visible window, and
+             * they cost a row's worth of page size (pk_open reserves it), so the selected row can
+             * never be pushed off the bottom by one appearing. */
+            if (PK.level == PK_FAMILY && PK.nsug) {
+                if (r == 0) {
+                    /* LABELLED AS A GUESS, DELIBERATELY. The right relation is in these five about
+                     * half the time; a section that read as authoritative would spend confidence
+                     * the ranker has not earned, and a student cannot audit a ranker -- they can
+                     * read a formula. So the instruction is to check the formula, and the formula
+                     * is on the row. */
+                    gfx_text(X + 12, ry, "SUGGESTIONS  -  check the formula", F_XS, C_INK3, C_SHEET);
+                    ry += 10;
+                } else if (r == PK.nsug) {
+                    gfx_text(X + 12, ry, "OR BROWSE BY QUANTITY", F_XS, C_INK3, C_SHEET);
+                    ry += 10;
+                }
+            }
             gfx_rect rr = (gfx_rect){X + 6, ry - 1, W - 12, rowh};
             R_PROW[i] = rr;
             if (selrow) gfx_rrect(rr.x, rr.y, rr.w, rr.h, 3, C_SEL);
             uint16_t bg = selrow ? C_SEL : C_SHEET;
-            if (PK.level == PK_FAMILY) {
-                char cnt[8]; snprintf(cnt, sizeof cnt, "%d", PK.fams[r].count);
+            if (PK.level == PK_FAMILY && pk_row_is_sug(&PK, r)) {
+                /* A DIFFERENT SHAPE FROM A FAMILY ROW, at a glance: indented under its label, and
+                 * carrying the FORMULA on the right where a family carries a count. The formula is
+                 * the thing that tells a student whether the guess is right. */
+                const ns_rec2 *rec = &st->rec[PK.sug[r]];
+                int fw = gfx_text_w(rec->formula, F_XS);
+                if (fw > (W - 24) / 2) fw = (W - 24) / 2;
+                gfx_text_ellipsis(X + 20, ry, rec->name ? rec->name : rec->formula,
+                                  F_SM, C_INK, bg, W - 40 - fw);
+                gfx_text_ellipsis(X + W - 14 - fw, ry + 1, rec->formula, F_XS, C_INK3, bg, fw);
+            } else if (PK.level == PK_FAMILY) {
+                int f = pk_row_family(&PK, r);
+                char cnt[8]; snprintf(cnt, sizeof cnt, "%d", PK.fams[f].count);
                 int cw = gfx_text_w(cnt, F_SM);
-                gfx_text_ellipsis(X + 12, ry, PK.fams[r].name, F_SM, C_INK, bg, W - 30 - cw);
+                gfx_text_ellipsis(X + 12, ry, PK.fams[f].name, F_SM, C_INK, bg, W - 30 - cw);
                 gfx_text(X + W - 12 - cw, ry, cnt, F_SM, C_INK3, bg);
             } else {
                 const ns_rec2 *rec = &st->rec[PK.hit[r]];
                 gfx_text_ellipsis(X + 12, ry, rec->name ? rec->name : rec->formula,
                                   F_SM, C_INK, bg, W - 24);
             }
+            ry += rowh;
         }
         if (n > PK.scroll + rows) {
             char more[40];
             snprintf(more, sizeof more, "%d more below", n - PK.scroll - rows);
-            gfx_text(X + 12, top + rows * rowh + 1, more, F_XS, C_INK3, C_SHEET);
+            gfx_text(X + 12, ry + 1, more, F_XS, C_INK3, C_SHEET);
         }
     }
 
     /* The key legend, per level. Naming the exits is the whole reason esc is safe here. */
     const char *legend =
+        (PK.level == PK_FAMILY && pk_row_is_sug(&PK, PK.sel))
+                                ? "enter pick   type search   esc ask anyway" :
         (PK.level == PK_FAMILY) ? "enter open   type search   esc ask anyway" :
         (n == 0)                ? "bksp edit    esc browse    a ask anyway"   :
                                   "enter pick   type filter   esc back";
@@ -2056,8 +2080,10 @@ void app_event(const in_event *e) {
             for (int i = 0; i < PK_ROWS; i++) {
                 if (!R_PROW[i].w || !inside(R_PROW[i], MX, MY)) continue;
                 int r = PK.scroll + i, rec = -1;
-                if (PK.level == PK_FAMILY) { PK.sel = r; pk_key(&PK, st, K_ENTER, &rec); return; }
                 PK.sel = r;
+                /* ONE PATH for both levels: pk_key decides what the row means, so a suggestion
+                 * clicked and a suggestion entered cannot diverge. The earlier version branched on
+                 * level here and would have opened a family for a clicked suggestion. */
                 if (pk_key(&PK, st, K_ENTER, &rec) == PK_ACT_PICKED && rec >= 0)
                     picker_send(st->rec[rec].rid);
                 return;
