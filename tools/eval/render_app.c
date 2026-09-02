@@ -77,6 +77,16 @@ int main(int argc, char **argv) {
         NOW_MS = 0;                                /* caret ON: (NOW_MS/500)%2 == 0 */
         app_draw(); goto out;
     }
+    if (!strcmp(screen, "correction")) {
+        /* THE EXACT DEVICE TRANSCRIPT. It rendered and the reader did not act on it, which is the
+         * defect being fixed -- so the fix is checked by LOOKING, not by asserting it is present. */
+        seed("Kinetic energy", "Find kinetic energy. Given m = 900, v = 800",
+             "<tool> eval<arg> 0.5*(900.0)*((800.0))^(2)</tool><res> 288000000</res>"
+             "<a> K = 229 J. From K=0.5*m*(v)^(2).<end>"
+             "The sentence above misstates the number. The calculator computed 288000000 J.");
+        CUR = NCHATS - 1; MX = 300; MY = 220;
+        app_draw(); goto out;
+    }
     if (!strcmp(screen, "notation")) {     /* the corpus's ASCII, as a reader sees it */
         seed("Notation", "Show me the symbols.",
              "<a>Delta_p = m*Delta_v, and omega = sqrt((k)/(m)). "

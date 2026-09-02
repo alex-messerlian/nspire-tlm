@@ -729,9 +729,26 @@ void app_request(const char *question, const char *rid) {
         ns_tok_decode(&TK, emitted, nemit, full, sizeof full);
         const char *a = strstr(full, "<a>");
         if (a && !answer_states_result(a + 3, tool_res)) {
-            app_stream_token("  [runtime result: ");
+            /* SALIENCE, not layout. The first version appended "[runtime result: N]" and it
+             * rendered correctly -- each SP_TEXT span after <end> gets its own line -- and was
+             * still read as a footnote rather than a correction: the turn was reported as simply
+             * wrong. A note that the reader does not act on is a note that did not fire.
+             *
+             * So it now names the defect and carries the unit, because the reader is checking a
+             * physics answer and a bare number is not one. The prose is still left standing: the
+             * model said what it said, and hiding that would misrepresent what the model does. */
+            const char *unit = 0;
+            for (int k = 0; k < ST.rec[idx].nvars; k++)
+                if (ST.rec[idx].lhs && !strcmp(ST.rec[idx].var[k], ST.rec[idx].lhs)) {
+                    unit = ST.rec[idx].unit[k]; break;
+                }
+            app_stream_token("The sentence above misstates the number. The calculator computed ");
             app_stream_token(tool_res);
-            app_stream_token("]");
+            if (unit && unit[0] && strcmp(unit, "1")) {
+                app_stream_token(" ");
+                app_stream_token(unit);
+            }
+            app_stream_token(".");
         }
     }
     /* The line that stays. Elapsed time is measured; the tool is reported only if one ran. */
