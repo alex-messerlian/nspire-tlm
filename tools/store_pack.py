@@ -75,10 +75,36 @@ def pack(store):
         vs = [lhs] + [v for v in dict.fromkeys(VAR.findall(rhs)) if v not in RESV and v != lhs]
         units = r.get("units") or {}
         cvals = r.get("cval") or {}
-        for field in (r["rid"], lhs, f, r["name"], r.get("req", "standard conditions")):
+        # "REVIEWED, NO RESTRICTION" MUST BE DISTINGUISHABLE FROM "NOBODY LOOKED".
+        #
+        # This was r.get("req", "standard conditions"), and it collapsed three different states
+        # into one byte string:
+        #   key absent          -> "standard conditions"   (nobody has reviewed this record)
+        #   "req": false        -> "standard conditions"   (reviewed; the relation is general)
+        #   "req": null         -> None -> TypeError on the delimiter assert below, which is how
+        #                          a 54-agent authoring pass discovered it
+        # A condition pass produced 15 considered nulls and every one of them reached the packer
+        # as bytes identical to a record nobody had opened, so the decision survived only in review
+        # notes. The project log: a decision held by documentation alone will lapse.
+        #
+        # `false` is now the reviewed-general marker. It still EMITS the default -- the device
+        # prompt is unchanged, which is the point: this distinction is for the repo, not the model.
+        # An explicit null is a hard error naming the fix rather than a TypeError three lines down.
+        _req = r.get("req", None)
+        if _req is None and "req" in r:
+            raise AssertionError(
+                f"record {r.get('rid')!r} has \"req\": null. Use false for 'reviewed, no physical "
+                f"restriction' or omit the key for 'not yet reviewed'; null is neither and packs "
+                f"as a TypeError.")
+        if _req is False:
+            _req = "standard conditions"
+        elif _req is None:
+            _req = "standard conditions"
+        elif not isinstance(_req, str):
+            raise AssertionError(f"record {r.get('rid')!r} req must be a string or false, got {_req!r}")
+        for field in (r["rid"], lhs, f, r["name"], _req):
             assert "\t" not in field and "\n" not in field, f"field contains a delimiter: {field!r}"
-        out.append("\t".join(["R", r["rid"], lhs, f, r["name"],
-                              r.get("req", "standard conditions"), str(len(vs))]))
+        out.append("\t".join(["R", r["rid"], lhs, f, r["name"], _req, str(len(vs))]))
         for v in vs:
             out.append("\t".join(["V", v, units.get(v, "?"), str(cvals.get(v, ""))]))
     out.append(f"END\t{len(store)}")

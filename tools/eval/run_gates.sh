@@ -76,6 +76,22 @@ need_file "$PY"              "python3 -m venv .venv-tok && .venv-tok/bin/pip ins
 need_file "$STORE"           "the record store; pass a path as \$1 if it lives elsewhere"
 need_file build/store.tns    "python3 tools/store_pack.py $STORE build/store.tns"
 need_fresh build/store.tns "$STORE" "python3 tools/store_pack.py"
+# THE EVAL SPLITS BAKE THE RECORD SPAN, so a store edit silently makes every arm serve a document
+# the model was never trained on. Measured when the condition pass was scoped: 1,115 of 1,128 items
+# across these ten files embed the literal "standard conditions", so editing a single `req` moves
+# what the model TRAINS on and not one byte of what the arms SERVE.
+#
+# Until this line there was exactly ONE need_fresh in the suite, for build/store.tns. That is the
+# same propagation class as units_train.json, build/store.tns, units_holdout.json and the
+# non-physics records -- four instances already recorded -- and this is the instrument rather than
+# the artefact, which is worse: a stale split does not fail, it reports a confident number about a
+# corpus nobody trained on.
+for _sp in corpus/split_fit.json corpus/split_fit_ho.json corpus/split_fit_m.json \
+           corpus/split_d1.json corpus/split_answer_0.json corpus/split_answer_x.json \
+           corpus/split_answer_s.json corpus/split_answer_w.json \
+           corpus/split_select.json corpus/split_report.json; do
+    need_fresh "$_sp" "$STORE" "rebuild the arm splits (fit_judgement.py / answer_control.py / d1_arm.py / build_splits.py)"
+done
 need_file build/tok4096.tok  "python3 tools/tok_pack.py"
 need_file tools/eval/shapecli "make tests   # the structural call check, ARCHITECTURE.md s6"
 if [ "$prereq_missing" -ne 0 ]; then
