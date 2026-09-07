@@ -48,4 +48,22 @@ cp build/model_dev_gs.bin build/transfer/model4096.bin.tns
 $PY tools/tok_pack.py >/dev/null && cp build/tok4096.tok build/transfer/tok4096.tok.tns
 GS_HAVE=$(od -An -tu4 -j37 -N4 build/transfer/model4096.bin.tns | tr -d ' ')
 [ "$GS_HAVE" = "$GS" ] || { echo "  FATAL: checkpoint says GS=$GS_HAVE, expected $GS"; exit 1; }
+# THE DEVICE NEEDS THREE FILES AND THIS SCRIPT STAGED TWO. resolve_data_dir() in device_app.c
+# requires store.tns.tns, tok4096.tok.tns AND model4096.bin.tns, and only the last two were
+# refreshed here -- so a store correction reached build/store.tns and stopped, and the calculator
+# kept running the old one. Found by comparing the staged copy against the build: 20,010 B against
+# 20,275 B, different content, five days apart. The script's own header says "in one step that
+# cannot half-apply"; it half-applied on the file that decides which relations exist at all.
+#
+# Same class as the store cleaning that reached store_clean.json and not build/store.tns, and as
+# `need_file` checking existence rather than freshness. Rebuilt from source here rather than copied,
+# so a stale build/store.tns cannot be laundered into the transfer set either.
+# NOTE: store_pack.py IGNORES its second argument and always writes build/store.tns. The call below
+# is correct only because the paths coincide; passing any other destination would silently write to
+# build/store.tns anyway. Left as-is rather than changed under an export script, but recorded so the
+# next reader does not believe the argument does something.
+$PY tools/store_pack.py corpus/store_clean.json build/store.tns >/dev/null
+cp build/store.tns build/transfer/store.tns.tns
 echo "  model $(stat -f%z build/transfer/model4096.bin.tns) B at GS=$GS_HAVE, tokenizer repacked from the same tree"
+echo "  store $(stat -f%z build/transfer/store.tns.tns) B, rebuilt from corpus/store_clean.json"
+echo "  transfer set complete: $(ls build/transfer/*.tns | wc -l | tr -d ' ') files"
