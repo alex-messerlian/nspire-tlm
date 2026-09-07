@@ -99,6 +99,14 @@ assert not _out.exists(), (
     f"elsewhere, or move the existing checkpoint. A checkpoint is two hours of compute and the "
     f"only copy of a measured result; nothing here may clobber one silently.")
 
+# A50: the corpus fact is captured BEFORE prepare.py tokenises it and before a single step runs.
+import hashlib as _hl
+_corpus_sha = _hl.sha256(open("corpus/synth_sample.jsonl","rb").read()).hexdigest()[:16]
+_heads = {__import__("json").loads(l).get("head") for l in open("corpus/synth_sample.jsonl")}
+_heads.discard(None)
+print(f"  corpus_sha {_corpus_sha} ({len(_heads)} heads, stamped at START -- a regeneration during "
+      f"this run cannot relabel the checkpoint)", flush=True)
+
 r=subprocess.run([".venv-tok/bin/python","train/prepare.py","4096"],capture_output=True,text=True)
 assert r.returncode==0, f"prepare.py failed: {r.stderr[-300:]}"
 tr=np.fromfile("train/mix4096_train.bin",dtype=np.uint16)
@@ -135,10 +143,21 @@ for s in range(STEPS):
 # relations to 141 the stratification silently began labelling relations TRAINED that this
 # checkpoint never saw. A metric whose ground truth drifts from the artefact reports a different
 # quantity under the same name.
-import hashlib as _hl
-_corpus_sha = _hl.sha256(open("corpus/synth_sample.jsonl","rb").read()).hexdigest()[:16]
-_heads = {__import__("json").loads(l).get("head") for l in open("corpus/synth_sample.jsonl")}
-_heads.discard(None)
+# A50. STAMPED AT START, NOT AT SAVE. This read corpus/synth_sample.jsonl HERE -- after training,
+# minutes-to-hours after the data was actually consumed -- so any regeneration during a run silently
+# relabels the checkpoint with a corpus it never saw.
+#
+# MEASURED, on my own run: d416 saved at 01:16 and I regenerated the corpus at 01:12, so
+# train/cliff_d416.pt is stamped 1239d94df710be63 -- the A46 corpus, which contains an EXPLAIN class
+# that d416's own startup line shows it did not have. The corpus it DID train on is unrecoverable.
+# I then read that stamp as evidence the pre-registration's control had been violated and wrote it
+# into docs/RESULT_D416.md as a finding. The stamp exists precisely so an artefact carries the facts
+# a harness needs; computed at the wrong moment it carries a falsehood instead, which is worse than
+# carrying nothing, because nothing invites a check.
+#
+# Same class as the derived-field-goes-stale rule, with the twist that the staleness is created by
+# the run itself. A fact about an INPUT is recorded when the input is read.
+# (_corpus_sha and _heads are stamped at START -- see A50 above prepare.py)
 # STAMP THE TOKENIZER, NOT ONLY THE CORPUS. prepare.py retrains the tokenizer every run, so a
 # checkpoint is only scoreable with the one it was trained against -- 3,886 of 4,096 ids changed
 # between two consecutive runs, and the mismatch scores 0.0 on every arm rather than erroring.
