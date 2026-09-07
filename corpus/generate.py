@@ -2251,7 +2251,7 @@ def gen(n, seed=0):
         nomatch  = 0.15 <= roll < 0.18
         # A46. THE ZERO-GIVEN, RECORD-BEARING SHAPE -- see the block above EXPLAIN_ASK_REL.
         # Taken out of the ANSWER band, which is 82.2% of the corpus and can spare it.
-        explain  = 0.18 <= roll < 0.22
+        explain  = 0.18 <= roll < 0.20   # A46b: 4% -> 2%, the dose test (docs/PREREG_A46B.md)
         # The CONTROL, and it is D1 with EVERY given withheld rather than one: same answer, same
         # `missing:X`, same record, and only the given-count differs -- which is the one variable
         # the explain class also moves. 28% of D1 puts it at ~3.8% of the corpus against explain's
