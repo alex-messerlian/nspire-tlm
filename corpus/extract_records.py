@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Extract records from OpenStax Key Equations tables. Presentation MathML -> evaluator syntax,
 then gated through evalcli. The yield is the point: report what survives, not what was attempted."""
-import re, pathlib, subprocess, json, collections, unicodedata
+import re, pathlib, subprocess, json, collections, unicodedata, sys
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+# The atomic writer, which every other producer in corpus/ imports the same way. Its absence here
+# was not a style difference -- the script called _wj() on its last line and raised NameError, so
+# it did all 833 extractions, printed its yield, and wrote NOTHING. A producer whose output step
+# is unreachable reports its work in stdout and leaves no artefact.
+from atomic import write_json as _wj
 
 GREEK = {"α":"alpha","β":"beta","γ":"gamma","δ":"delta","ε":"epsilon","θ":"theta","λ":"lambda",
  "μ":"mu","ν":"nu","π":"pi","ρ":"rho","σ":"sigma","τ":"tau","φ":"phi","ω":"omega","Ω":"Omega",
