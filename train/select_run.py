@@ -65,11 +65,16 @@ print(f"  corpus size check: {tot:,} documents, within {100*_tol:.0f}% of the ex
 
 # A49. TWO ARTEFACTS THIS RUN IS ABOUT TO DESTROY, AND NEITHER LOSS ANNOUNCES ITSELF.
 #
-# 1. prepare.py RETRAINS THE TOKENIZER and overwrites train/tok4096.json. Every checkpoint trained
-#    against the old one then scores 0.0 on every arm rather than erroring -- the project log records
-#    3,886 of 4,096 ids changing between two consecutive runs. The current tokenizer pairs with the
-#    ENTIRE capability-cliff ladder (d320, d336, d352, d416), so one unarchived run would make the
-#    project's headline finding unscoreable.
+# 1. prepare.py can REPLACE train/tok4096.json. It no longer does so unconditionally -- it reuses an
+#    existing table unless the vocab size changed or an <unk> probe shows it cannot represent the
+#    corpus (train/prepare.py: "THE TOKENIZER IS REUSED WHEN AN EQUIVALENT ONE EXISTS. THIS IS THE
+#    FIX, NOT THE CONTAINMENT") -- so the common case is a no-op and this archive costs nothing.
+#    It is kept for the case that fix deliberately leaves open: a corpus that outgrows the table, or
+#    a vocab change, both of which DO retrain it. A checkpoint trained against the old table then
+#    scores 0.0 on every arm rather than erroring -- 3,886 of 4,096 ids changed between two
+#    consecutive runs, back when it always retrained -- and the current table pairs with the ENTIRE
+#    capability-cliff ladder (d320, d336, d352, d416), so the one time it does fire is the time the
+#    project's headline finding would become unscoreable.
 # 2. The checkpoint is written to train/sel_s{SEED}.pt, and SEED defaults to 1. sel_s1.pt held
 #    d416. A rerun overwrites it silently.
 #
