@@ -50,7 +50,7 @@ unless tagged `[SOURCED]` or `[ESTIMATE]`.
 | I-cache / D-cache | 16 KB / **8 KB**, 32-byte line, 4-way |
 | CPU clock | **198 MHz, then 144 MHz** — not the 396 MHz the brief assumes |
 
-### The two results the project leads with
+### The three results the project leads with
 
 1. **A capability threshold, bracketed to 6.1%.** Below ~10.3M parameters the model is healthy in
    every respect — it answers, it refuses a withheld given 100% of the time, it does not
@@ -59,8 +59,20 @@ unless tagged `[SOURCED]` or `[ESTIMATE]`.
    predicted; memory never binds.
 2. **Above the threshold, capability is flat, and the corpus is the limit.** +42% parameters buys
    +4.7 points on the primary arm ([`docs/RESULT_D416.md`](docs/RESULT_D416.md)), while a behaviour
-   the corpus never demonstrates — explaining what a relation *is* — measures **0.0% at both
-   sizes** ([`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md)).
+   the corpus never demonstrates — explaining what a relation *is* — measured **0.0% at both sizes**
+   ([`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md)). Taught it, the model reaches
+   **93.1%** on the records it trains on.
+3. **The model recalls the record; it does not read it — and that is the architecture's premise.**
+   Asked to restate a formula *printed in its own prompt*, on records it has never seen, it copies
+   the shown formula **2.5%** of the time and substitutes a memorised one **50.8%** of the time. It
+   reaches the tool call: on held-out records it refuses 67.5% outright, and **69%** of the calls it
+   does emit disagree with its own prompt, against 12% on trained records.
+   ([`docs/RESULT_RECALL_NOT_READ.md`](docs/RESULT_RECALL_NOT_READ.md))
+
+   The mechanism is a corpus property, not a capacity one: **every training document pairs a record
+   with a formula the model has also memorised, so recall and reading always agree. A corpus in
+   which they never disagree cannot teach reading.** That is the sharpest negative result here and
+   it bounds what the tool-augmented design delivers at this scale.
 
 ## Metrics
 
