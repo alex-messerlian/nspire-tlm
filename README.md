@@ -62,17 +62,19 @@ unless tagged `[SOURCED]` or `[ESTIMATE]`.
    the corpus never demonstrates — explaining what a relation *is* — measured **0.0% at both sizes**
    ([`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md)). Taught it, the model reaches
    **93.1%** on the records it trains on.
-3. **The model recalls the record; it does not read it — and that is the architecture's premise.**
-   Asked to restate a formula *printed in its own prompt*, on records it has never seen, it copies
-   the shown formula **2.5%** of the time and substitutes a memorised one **50.8%** of the time. It
-   reaches the tool call: on held-out records it refuses 67.5% outright, and **69%** of the calls it
-   does emit disagree with its own prompt, against 12% on trained records.
+3. **The model reads the record for the tool call and recalls it for prose — and the corpus
+   explains exactly why.** Rename one variable in a record's formula *in the prompt only*, on
+   records the model knows well, and ask it to restate the relation: it states the **original**
+   formula 87–90% of the time and the one it was shown **0 of 80 times.** Give the same corrupted
+   record to the *tool call* and it follows what it was shown ~10:1 over memory, on the shipped
+   model most strongly of all.
    ([`docs/RESULT_RECALL_NOT_READ.md`](docs/RESULT_RECALL_NOT_READ.md))
 
-   The mechanism is a corpus property, not a capacity one: **every training document pairs a record
-   with a formula the model has also memorised, so recall and reading always agree. A corpus in
-   which they never disagree cannot teach reading.** That is the sharpest negative result here and
-   it bounds what the tool-augmented design delivers at this scale.
+   **The corpus forces reading only where the target varies with the input.** A tool call cannot be
+   memorised — the values differ in every document — so the model learned to read the formula to
+   build one. A prose restatement of that same formula is identical in every document for a given
+   record, so recall always suffices and reading is never required. The fix is a corpus property,
+   not a capacity one, and the tool call is its own positive control.
 
 ## Metrics
 
