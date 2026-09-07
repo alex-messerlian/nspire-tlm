@@ -15,13 +15,14 @@ capacity is language.
 
 | Doc | What it is |
 |---|---|
-| [`docs/TOOL_SPEC.md`](docs/TOOL_SPEC.md) | **FROZEN v1.0.0.** The call format. Everything downstream depends on it. |
-| [`tools/eval/`](tools/eval/) | Backend 1: our own C evaluator. Built, tested, 86/86 passing. |
-| [`docs/BACKEND2_TI_MATH.md`](docs/BACKEND2_TI_MATH.md) | Backend 2 research: TI's math server. Reachable in principle, not in practice. |
+| [`docs/TOOL_SPEC.md`](docs/TOOL_SPEC.md) | **FROZEN v1.1.0.** The call format. Everything downstream depends on it. |
+| [`docs/HARDWARE.md`](docs/HARDWARE.md) | Measured device properties. Populated on hardware. |
+| [`docs/RESULT_D416.md`](docs/RESULT_D416.md) | The size question, closed: capability is flat above the threshold. |
+| [`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md) | The corpus, not the device, is the limit. |
+| [`docs/RESULT_COMPUTE_BOUND.md`](docs/RESULT_COMPUTE_BOUND.md) | The brief's bandwidth hypothesis, falsified. |
+| [`tools/eval/`](tools/eval/) | Backend 1: our own C evaluator, plus the gate suite. |
 | [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md) | What already exists. Read this before anything else. |
-| [`docs/HARDWARE.md`](docs/HARDWARE.md) | Measured device properties. Currently all `UNMEASURED`. |
-| [`docs/PHASE0.md`](docs/PHASE0.md) | Phase 0 checklist, split into device-required and host-only. |
-| [`bench/`](bench/) | The four micro-benchmarks that fill in HARDWARE.md. |
+| [`bench/`](bench/) | The micro-benchmarks that fill in HARDWARE.md. |
 
 ## Sequencing
 
@@ -33,10 +34,33 @@ capacity is language.
 
 Do not train four models before one runs on the calculator.
 
-**Current state: step 1 complete. Phase 0 hardware gate still not met** — no toolchain built, no
-device access, zero measurements. Every hardware number in this repo is either sourced from someone
-else's published work and tagged `[SOURCED]`, or derived with the arithmetic shown and tagged
-`[ESTIMATE]`.
+**Current state: Phase 0–2 met on the physical calculator; Phase 3–4 in progress.** The device
+generates text unaided, on battery, with no computer attached. Hardware numbers below are measured
+unless tagged `[SOURCED]` or `[ESTIMATE]`.
+
+### Measured, on the physical device, battery, USB out
+
+| | |
+|---|---|
+| Shipping model | **d352 — 10,908,128 parameters**, 6 layers, int8 group-quantised, 11.4 MB |
+| Throughput | **1.68 tok/s** at context 512 (1.35 at the larger context) |
+| Largest single `malloc` | 21.56 MiB bare / **4.83 MiB after ordinary use** — the gap is the finding |
+| DRAM read | 97 MB/s | 
+| Compute | 48 MMAC/s int8 — **the device is compute bound at every quantisation** |
+| I-cache / D-cache | 16 KB / **8 KB**, 32-byte line, 4-way |
+| CPU clock | **198 MHz, then 144 MHz** — not the 396 MHz the brief assumes |
+
+### The two results the project leads with
+
+1. **A capability threshold, bracketed to 6.1%.** Below ~10.3M parameters the model is healthy in
+   every respect — it answers, it refuses a withheld given 100% of the time, it does not
+   over-refuse — and it *never* declines on the grounds that the retrieved record does not apply
+   (`fit` = 0.0%). Above it, `fit` is 63–68%. The transition is not the memory cliff the brief
+   predicted; memory never binds.
+2. **Above the threshold, capability is flat, and the corpus is the limit.** +42% parameters buys
+   +4.7 points on the primary arm ([`docs/RESULT_D416.md`](docs/RESULT_D416.md)), while a behaviour
+   the corpus never demonstrates — explaining what a relation *is* — measures **0.0% at both
+   sizes** ([`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md)).
 
 ## Metrics
 

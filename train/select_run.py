@@ -7,7 +7,7 @@ top-1 on SELECT discrimination accuracy -- answered when fit:high, refused when 
 Written clean rather than patched: accumulated edits had left a stale import, an unguarded
 divergence gate and an undefined name, all three caught by a 600-step smoke test costing ~3 minutes
 against 8 x 20 minutes of seeds."""
-import os, sys, json, re, subprocess, time, statistics as st
+import os, pathlib, sys, json, re, subprocess, time, statistics as st
 import numpy as np, torch, pathlib as _pl
 sys.path.insert(0,"vendor/llama2.c"); sys.path.insert(0,"corpus"); sys.path.insert(0,"tools/eval")
 import genloop                       # THE generation loop; never reimplement it
@@ -63,6 +63,37 @@ assert abs(tot - _want) <= _tol * _want, (
 print(f"  corpus size check: {tot:,} documents, within {100*_tol:.0f}% of the expected {_want:,}",
       flush=True)
 
+# A49. TWO ARTEFACTS THIS RUN IS ABOUT TO DESTROY, AND NEITHER LOSS ANNOUNCES ITSELF.
+#
+# 1. prepare.py RETRAINS THE TOKENIZER and overwrites train/tok4096.json. Every checkpoint trained
+#    against the old one then scores 0.0 on every arm rather than erroring -- the project log records
+#    3,886 of 4,096 ids changing between two consecutive runs. The current tokenizer pairs with the
+#    ENTIRE capability-cliff ladder (d320, d336, d352, d416), so one unarchived run would make the
+#    project's headline finding unscoreable.
+# 2. The checkpoint is written to train/sel_s{SEED}.pt, and SEED defaults to 1. sel_s1.pt held
+#    d416. A rerun overwrites it silently.
+#
+# Both are converted from "remember to" into "the run refuses to". Archiving is keyed by CONTENT
+# hash, so re-archiving an already-archived tokenizer is a no-op and cannot lose one.
+import shutil as _sh, hashlib as _h0
+_tokp = pathlib.Path("train/tok4096.json")
+if _tokp.exists():
+    _sha = _h0.sha256(_tokp.read_bytes()).hexdigest()[:16]
+    _arch = pathlib.Path(f"train/tok4096_{_sha}.json")
+    if not _arch.exists():
+        _sh.copyfile(_tokp, _arch)
+        print(f"  A49: archived the outgoing tokenizer {_sha} -> {_arch.name} "
+              f"(prepare.py is about to replace it)", flush=True)
+    else:
+        print(f"  A49: outgoing tokenizer {_sha} already archived as {_arch.name}", flush=True)
+
+RUN  = os.environ.get("RUN", f"sel_s{SEED}")
+_out = pathlib.Path(f"train/{RUN}.pt")
+assert not _out.exists(), (
+    f"A49: {_out} already exists and this run would overwrite it. Set RUN=<name> to write "
+    f"elsewhere, or move the existing checkpoint. A checkpoint is two hours of compute and the "
+    f"only copy of a measured result; nothing here may clobber one silently.")
+
 r=subprocess.run([".venv-tok/bin/python","train/prepare.py","4096"],capture_output=True,text=True)
 assert r.returncode==0, f"prepare.py failed: {r.stderr[-300:]}"
 tr=np.fromfile("train/mix4096_train.bin",dtype=np.uint16)
@@ -110,7 +141,7 @@ import hashlib as _hl
 _tok_sha = _hl.sha256(open("train/tok4096.json","rb").read()).hexdigest()[:16]
 torch.save({"model":m.state_dict(),"args":args.__dict__,"seed":SEED,"steps":STEPS,
             "corpus_sha":_corpus_sha,"corpus_heads":sorted(_heads),"tok_sha":_tok_sha,},
-           f"train/sel_s{SEED}.pt")
+           str(_out))
 
 # ---- divergence gate, BEFORE metrics ----------------------------------------------------
 print("  loss: "+" ".join(f"{v:.4f}" for v in curve), flush=True)
