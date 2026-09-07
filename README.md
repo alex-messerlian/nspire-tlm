@@ -43,7 +43,7 @@ unless tagged `[SOURCED]` or `[ESTIMATE]`.
 | | |
 |---|---|
 | Shipping model | **d352 — 10,908,128 parameters**, 6 layers, int8 group-quantised, 11.4 MB |
-| Throughput | **1.68 tok/s** at context 512 (1.35 at the larger context) |
+| Throughput | **1.70 tok/s** at context 512, 1.35 at the larger context (battery, USB out) |
 | Largest single `malloc` | 21.56 MiB bare / **4.83 MiB after ordinary use** — the gap is the finding |
 | DRAM read | 97 MB/s | 
 | Compute | 48 MMAC/s int8 — **the device is compute bound at every quantisation** |
@@ -76,10 +76,33 @@ Alongside tok/s and perplexity:
 
 ---
 
-## Pushback on the brief
+## Pushback on the brief — and how the predictions scored
 
-The brief asks to be attacked. Four places where I think it is wrong or under-specified. All four are
-settled by measurement in Phase 0, not by argument, which is why Phase 0 comes first.
+The brief asks to be attacked. Four places where I thought it was wrong, **written before any
+hardware measurement existed**. They are kept below verbatim, because a prediction is only worth
+something if it was recorded before the answer was known. Here is how they did.
+
+| # | Predicted | Measured | Verdict |
+|---|---|---|---|
+| 1 | int8 roughly balanced, int4 compute bound; *M* ≈ 150 MMAC/s | **97 MB/s DRAM, 48 MMAC/s** — compute bound at **every** quantisation, and memory is cycle-locked to the CPU so the ratio is clock-invariant | **Right, and understated.** The MAC estimate was 3× too high. int4 was dropped for throughput: it halves demand on the resource with headroom |
+| 2 | Lead with the frontier, not a parameter record | The project leads with a **capability threshold** and a **flat region above it** | **Held** |
+| 3 | Report dense params; lead with the dense number | Shipped dense; `total` and `active` are equal | **Held, and followed** |
+| 4 | Capacity binds; KV quantisation and context are first-order | **Compute binds. Memory never does** — the shipping checkpoint uses 48–58% of the ceiling at every context. int8 KV was measured and bought 0.27 tok/s | **Wrong.** Two sessions went into a 21.56 MiB ceiling that never fired |
+
+The §4 estimate — "~70M params at ≈2.1 tok/s, landing on the brief's own 2 tok/s floor" — called its
+own coincidence *"either lovely or a sign that one of my estimates is off."* It was the latter, by
+about 7×: the real answer is ~10.9M at 1.70 tok/s. The floor itself was later re-examined and
+relaxed, because it had been written before anything ran and never compared against a latency anyone
+had actually watched.
+
+**The methodology correction was adopted.** Bit-exact greedy tokens at temperature 0 became the port
+oracle (`build/golden_forward`), and perplexity is reported with a tolerance rather than claimed
+bit-exact — the brief asked for something unachievable across a fp32 host and a fixed-point device.
+
+**The timer note was earned.** The SP804 wrap warning turned out to matter: reading the counter raw,
+without the LOAD/CONTROL setup `bench/common.h` does, produced a 2^32 underflow.
+
+The four arguments as originally written follow.
 
 ### 1. "Memory bandwidth bound, not compute bound" is probably wrong at int4 on *this* core
 

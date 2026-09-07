@@ -33,6 +33,19 @@ int main(int argc, char **argv) {
          "<tool>eval 2*9.8*5</tool><res>98</res><a>The gravitational potential energy is 98 J from U = mgh.<end>");
     seed("Cart on a level track", "A 4 kg cart moves at 3 m/s. Find the kinetic energy.",
          "<tool>eval 4*9/2</tool><res>18</res><a>The kinetic energy is 18 J from K = mv^2/2.<end>");
+    /* A46. AN EXPLANATION, which is the longest answer shape the device can produce and the only
+     * one with NO tool call. Seeded here because "render the screen before pushing it" is a rule
+     * this repo paid a device round-trip for -- draw_picker once drew fifteen rows straight through
+     * its own key legend, and no assertion could see it. An explanation is longer than a computed
+     * answer (a formula plus a units clause for every variable), so it is the case most likely to
+     * overflow or clip. Real text, taken verbatim from corpus/synth_sample.jsonl. */
+    seed("Explain Newton's second law",
+         "explain Newton's second law in a sentence.",
+         "<a>Newton's second law is F_net = m*a, with F_net in N, m in kg and a in m/s^2.<end>");
+    seed("What is the drag force",
+         "how is drag force related to the other quantities?",
+         "<a>F_D = ((1)/(2))*C*rho*A*(v)^(2) gives drag force, where F_D in N, C is dimensionless, "
+         "rho in kg/m^3, A in m^2 and v in m/s.<end>");
 
     if (!strcmp(screen, "full")) {          /* twelve sessions: exercises the scrollbar */
         const char *n[] = { "Terminal velocity of a sphere", "Charge on a capacitor",
@@ -142,6 +155,10 @@ int main(int argc, char **argv) {
         MX = 300; MY = 220;                 /* cursor parked off the sheet */
     } else if (!strcmp(screen, "chat")) {
         CUR = 2; MX = 300; MY = 220;
+    } else if (!strcmp(screen, "explain")) {
+        CUR = 4; MX = 300; MY = 220;          /* A46: the explanation turn */
+    } else if (!strcmp(screen, "explain2")) {
+        CUR = 5; MX = 300; MY = 220;          /* A46: the longest explanation the store can produce */
     } else if (!strcmp(screen, "actions")) {
         /* Pointer parked on the first answer, which is what reveals the action row. The transcript
          * has to be drawn once first: R_ANS is filled during the draw, and hovering is meaningless
