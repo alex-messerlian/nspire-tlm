@@ -27,12 +27,37 @@ static int word_in(const char *hay, const char *word) {
 
 /* Walk the words of `name`, lowercased, length >= 3. Returns via callback so the scorer and the
  * document-frequency count cannot disagree about what a word is -- they are the same walk. */
+/* FUNCTION WORDS CARRY NO RETRIEVAL SIGNAL, WHATEVER THEIR DOCUMENT FREQUENCY.
+ *
+ * IDF assumes rarity implies informativeness. That holds for content words and fails badly here:
+ * across 164 short record names "the" occurs in 3 and is therefore weighted 48 -- against 64 for
+ * "kinetic" and 24 for "energy". So a question containing "the" was pulled hard toward the three
+ * records whose names happen to contain it.
+ *
+ * Measured on a real user question: "find the kin energy when you have m=900 and v=800" returned
+ * "electron energy in THE nth Bohr orbit" as top-1, beating "kinetic energy" -- because it matched
+ * {energy, the} against {energy}. The same question WITHOUT the article ("kin energy m=900 v=800")
+ * ranked kinetic energy first. A stopword decided it.
+ *
+ * The list is deliberately short: articles, conjunctions and bare prepositions. Anything that could
+ * name or qualify a quantity stays in -- "per", "rate", "change" are all load-bearing here. */
+static int is_stopword(const char *w) {
+    static const char *STOP[] = {
+        "the", "and", "for", "with", "from", "its", "this", "that", "are", "was",
+        "into", "onto", "over", "under", "between", "due", "you", "your", "have",
+        "when", "what", "which", "any", "all", "one", "two",
+    };
+    for (unsigned i = 0; i < sizeof STOP / sizeof STOP[0]; i++)
+        if (!strcmp(STOP[i], w)) return 1;
+    return 0;
+}
+
 static void each_word(const char *name, void (*fn)(const char *, void *), void *ctx) {
     char word[48]; int w = 0;
     for (const char *c = name; ; c++) {
         if (*c && alpha(*c) && w < (int)sizeof word - 1) { word[w++] = (char)lc(*c); }
         else {
-            if (w >= 3) { word[w] = 0; fn(word, ctx); }
+            if (w >= 3) { word[w] = 0; if (!is_stopword(word)) fn(word, ctx); }
             w = 0;
             if (!*c) break;
         }
