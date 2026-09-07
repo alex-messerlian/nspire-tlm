@@ -108,7 +108,15 @@ _MICRO_CVAL = {
     # ion the ionisation energy is 13.6*Z^2 eV, a DISCRETE set; a continuum draw produced Z = 0.72,
     # an element that does not exist. Every other constant in these documents arrives at its true
     # value; this one alone was drawn.
-    ("E_n=-E_0*((1)/((n)^(2)))", "E_0"): (2.179872e-18, "J", "Rydberg energy, 13.6 eV (hydrogen, Z=1)"),
+    # A46b. THE STORE'S STRING, NOT THE MORE ACCURATE ONE. This read 2.179872e-18 -- closer to the
+    # true Rydberg energy (2.1798723611e-18 J) and NOT what the device emits. store_clean.json
+    # declares cval E_0 = 2.17987e-18 and src/store/assemble.c writes that string verbatim, so
+    # every document on this record carried a literal the runtime does not produce: the A7/A13
+    # class, arriving through a SECOND DECLARATION of one fact rather than through an omission.
+    # _MICRO_CVAL is consulted BEFORE the store in _const_for(), so the more accurate value won in
+    # the corpus and the store won on the device. 1 of 10 entries; asserted below so it cannot
+    # recur silently. The store is the authority because the store is what ships.
+    ("E_n=-E_0*((1)/((n)^(2)))", "E_0"): (2.17987e-18, "J", "Rydberg energy, 13.6 eV (hydrogen, Z=1)"),
     ("V=((k_e*q)/(r))", "k_e"): (8.988e9, "V*m/C", "Coulomb constant"),
     # A27. ATMOSPHERIC PRESSURE IS A CONSTANT, and the pool cannot reach it: 1.013e5 Pa is ABOVE
     # the pool's maximum of 9,800, so `p_0 = 1` Pa was drawn beside a record asserting "standard
@@ -1107,6 +1115,21 @@ _mined = {r["f"]: r for r in json.load(open("corpus/records_raw.json"))}
 # relations get a proper name with no new work.
 _store = {r["f"]: r for r in json.load(open("corpus/store_clean.json"))}
 
+# A46b. TWO DECLARATIONS OF ONE FACT MUST AGREE, and _const_for() consults _MICRO_CVAL FIRST, so a
+# disagreement is invisible: the generator uses one value and the device uses the other. Found by
+# extending gate_split_valid.py from a hardcoded pair of split files to all of them, which is how
+# the E_0 skew surfaced at all. A comment saying "keep these in sync" is the documentation-only
+# failure this repo has recorded; this is a thing the import trips on.
+_CVAL_CONFLICT = []
+for (_f, _v), (_val, _u, _why) in _MICRO_CVAL.items():
+    _sv = ((_store.get(_f, {}) or {}).get("cval") or {}).get(_v)
+    if _sv is not None and float(_sv) != float(_val):
+        _CVAL_CONFLICT.append(f"{_f} {_v}: _MICRO_CVAL={_val} store_clean.json={_sv}")
+assert not _CVAL_CONFLICT, (
+    "A46b: _MICRO_CVAL disagrees with the store's cval, and _const_for() prefers _MICRO_CVAL -- so "
+    "the corpus would carry a constant the device does not emit:\n  " + "\n  ".join(_CVAL_CONFLICT))
+
+
 
 def lhs_unit(r):
     """The unit the ANSWER must carry, read from the store first for the reason A9 documents.
@@ -1667,7 +1690,7 @@ def quantity_surface(r, rng):
     return picked
 
 
-def units_field(r):
+def _units_pairs(r):
     """The record span's units field, for ONE record. Exported because the parity gate calls it.
 
     An earlier version of tools/eval/gate_format_parity.py RE-IMPLEMENTED this rule instead of
@@ -1696,7 +1719,13 @@ def units_field(r):
         if v in ("pi", "e") or v in seen: continue
         seen.add(v); vs.append(v)
     order = ([lhs] if lhs in u else []) + [v for v in vs if v != lhs]
-    return " ".join(f"{v}:{u[v]}" for v in order if v in u)
+    return [(v, u[v]) for v in order if v in u]
+
+def units_field(r):
+    """The record span's units field as the device renders it. One line, so that _units_pairs is
+    the single source both this and A46's prose clause read -- see the docstring above for what
+    happened the last time two places carried one rule."""
+    return " ".join(f"{v}:{u}" for v, u in _units_pairs(r))
 
 for r in recs: r["cond"] = condition(r["name"])
 
@@ -1932,6 +1961,107 @@ WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}."
        "This follows from {f}.", "{f} gives it."]
 
 
+# A46. THE DEVICE EMITS A PROMPT SHAPE THE CORPUS HAS ZERO EXAMPLES OF.
+#
+# Measured over all 239,832 documents of the shipped corpus, counting questions with no
+# `x = value` in them:
+#
+#     class     n          zero-given
+#     ANSWER    197,261        0    0.0%
+#     D1         32,176        0    0.0%
+#     D2          3,155        0    0.0%
+#     D3          7,240    7,109   98.2%
+#
+# A question carrying no student-entered value occurs in exactly ONE class, so "no number ->
+# refuse, nothing matches" was a 100%-precision rule over 7,109 firings, and NO record-bearing
+# document ever had zero givens. The device produces exactly that shape whenever the picker
+# matches and the student typed no values -- "explain Newton's second law", "what is Hooke's
+# law", "find the kinetic energy" -- and src/store/assemble.c then emits `missing:<first free
+# var>`, which is the D1 shape. Measured on the shipped model:
+#
+#     Q  explain Newton's second law in a sentence
+#     A  I cannot answer that -- the record gives newton's second law, scalar form, which does
+#        not apply.
+#
+# It found the right record and then said that record does not apply. The picker is correct on
+# every probe; the supervision simply has no case for this input.
+#
+# A43f MET THIS CUE AND KEPT IT, and the reasoning is worth reading because it is sound and it
+# is scoped: "the record span already announces D3 perfectly, so a question-side cue adds
+# nothing a model could not already read off the record." True for D3. It assumed every
+# zero-given question IS a D3 -- on the device it is not, because the picker usually matches.
+#
+# Two classes close it, and they are a MATCHED PAIR by construction. Same record, same
+# zero-given question shape, same `missing:X` field, opposite correct behaviour, separable
+# only by reading what the question ASKS:
+#
+#     EXPLAIN     asks what the relation IS         -> state it from the record, no tool call
+#     D1 (bare)   asks to COMPUTE, nothing supplied -> refuse, exactly as D1 already does
+#
+# The pair is the point, not the explanations. Adding EXPLAIN alone would MOVE the cue rather
+# than remove it: the model would learn "zero givens -> explain" and stop refusing an
+# under-specified compute request. The project log's A42 entry is this failure exactly -- two guards
+# that hold the same variable constant are one guard -- so the control ships in the same change
+# and is measured in the same pass.
+#
+# CONSTANTS ARE STILL INLINED. assemble.c writes "Given g = 9.81." even when the student typed
+# nothing (it walks r->cval independently of the input), so the target shape is "no STUDENT
+# given", not "no given". 27 of 164 records carry a constant and their prompts are not empty.
+# Verified against build/devprompt before either class was written.
+EXPLAIN_ASK_REL = ["explain {s}.", "explain {s} in a sentence.", "what is {s}?", "state {s}.",
+                   "what does {s} say?", "define {s}.", "explain what {s} means.",
+                   "in one sentence, what is {s}?"]
+EXPLAIN_ASK_Q   = ["what is {s}?", "define {s}.", "explain what {s} is.", "how do you find {s}?",
+                   "what does {s} depend on?", "explain how {s} is calculated.",
+                   "how is {s} related to the other quantities?"]
+# Every field these templates read is IN THE PROMPT: the formula and the units are the first two
+# fields of the record span, the condition is the fourth, and the subject is echoed from the
+# question the student typed. Nothing here is recalled -- the record's NAME is not in the prompt
+# (assemble.c emits formula|units|missing|condition|fit and no name), so an answer may never
+# state it unless the question did.
+EXPLAIN_CLOSE_REL = ["{S} is {f}, with {u}.",
+                     "{S}: {f}. Here {u}.",
+                     "{S} states that {f} — {u}.",
+                     "{S} is the relation {f}, where {u}.",
+                     "{S} is {f}, with {u}, under {c}."]
+EXPLAIN_CLOSE_Q   = ["{S} is given by {f}, with {u}.",
+                     "{f} gives {s}, where {u}.",
+                     "To find {s}: {f}, with {u}.",
+                     "{f}. That gives {s}, with {u}.",
+                     "{S} is given by {f}, with {u}, under {c}."]
+# A46. A SYMBOL IS NOT CAPITALISED, AND THE SENTENCE MOVES RATHER THAN THE SYMBOL. quantity_surface
+# may return the bare LHS, and `f_1`/`F_1` and `v_d`/`V_d` are DIFFERENT SYMBOLS -- "F_1 is given by
+# f_1 = ((v)/(4*L))" states an identity between two of them. So a symbol subject draws only from the
+# templates that do not open with it. Found by the hand-read; no gate compares a subject to a symbol.
+EXPLAIN_CLOSE_SYM = [t for t in EXPLAIN_CLOSE_Q if not t.startswith("{S}")]
+assert EXPLAIN_CLOSE_SYM, "A46: every quantity template opens with the subject"
+
+def _mismatch_desc(r):
+    """{lhs, from} for a D2 refusal, derived from the record span the prompt actually carries.
+
+    A47. The name is NOT in the span (src/store/assemble.c), so a refusal that names the record is
+    asking the model to recall -- and on a record it has not memorised it fabricates. Everything
+    here comes from _units_pairs(), which is the same source the units field is rendered from."""
+    lhs = r["f"].split("=", 1)[0].strip()
+    rest = [v for v, _u in _units_pairs(r) if v != lhs]
+    frm = "" if not rest else (rest[0] if len(rest) == 1
+                               else ", ".join(rest[:-1]) + " and " + rest[-1])
+    return {"lhs": lhs, "from": frm}
+
+def _units_clause(r):
+    """'F_net in N, m in kg and a in m/s^2' -- read off the record span's OWN units field.
+
+    Built from units_field()'s source rather than re-parsed from the rendered string, for the
+    reason units_field's own docstring gives: a second implementation of one rule tests the copy.
+    A unit of `1` is dimensionless and "a in 1" is not English, so it is named as such -- 27 of
+    164 records have such a variable."""
+    parts = []
+    for v, u in _units_pairs(r):
+        parts.append(f"{v} is dimensionless" if u == "1" else f"{v} in {u}")
+    if len(parts) == 1: return parts[0]
+    return ", ".join(parts[:-1]) + " and " + parts[-1]
+
+
 # A42c. QUESTION COMPOSITION IS SHARED, BECAUSE THE EVAL ARM MUST NOT HAVE ITS OWN SURFACE.
 #
 # tools/eval/fit_judgement.py built its questions as `ask + " " + "v = 1, w = 2."` -- bare givens,
@@ -1987,6 +2117,15 @@ def _round_like(res):
 
 def compose_question(ask, g, rng):
     """ask + givens, in the two orderings the corpus uses, with the corpus's own frames."""
+    # A46. NO GIVENS, NO FRAME. Every GIVE frame is written around a non-empty list, so an empty
+    # one renders "Where .", "Suppose .", "You are told .", "In a setup with ,". This was
+    # unreachable until A46 -- no record-bearing document had ever had zero givens, which is the
+    # finding itself -- and it appeared on most of the first EXPLAIN batch. It matches the device:
+    # ns_assemble appends " Given ..." only when something was written (src/store/assemble.c:96),
+    # so a question with no values is sent exactly as the student typed it.
+    #
+    # Found by the required hand-read, not by a gate. Nothing in the suite reads a question.
+    if not g: return ask
     stem = rng.choice(GIVE).format(g=g)
     # Vary the ORDER as well as the wording -- givens-first and ask-first are both common in
     # real problems, and ordering moves 4-gram diversity more than the verb does.
@@ -2110,13 +2249,26 @@ def gen(n, seed=0):
         # stems excluded so training cannot contaminate clean_surface.json. 220 of 43,081 were
         # rejected. gate_d3_legitimacy re-checks every emitted document.
         nomatch  = 0.15 <= roll < 0.18
+        # A46. THE ZERO-GIVEN, RECORD-BEARING SHAPE -- see the block above EXPLAIN_ASK_REL.
+        # Taken out of the ANSWER band, which is 82.2% of the corpus and can spare it.
+        explain  = 0.18 <= roll < 0.22
+        # The CONTROL, and it is D1 with EVERY given withheld rather than one: same answer, same
+        # `missing:X`, same record, and only the given-count differs -- which is the one variable
+        # the explain class also moves. 28% of D1 puts it at ~3.8% of the corpus against explain's
+        # ~4%, so neither the base rate nor any field decides it and the question must be read.
+        bare     = withhold and rng.random() < 0.28
+        _g_before_withhold = g       # A46: the `or g` fallback below needs a stable source
         if withhold:
             # A12. WITHHOLD A FREE VARIABLE, NEVER A CONSTANT. `rng.choice(vs)` could pick g, c, h
             # or G -- values the device ALWAYS inlines (A7) -- so 111 of 11,975 documents refused
             # for want of a number the runtime would have supplied. A refusal that fires on a
             # satisfied precondition is wrong supervision: it teaches the model to refuse a
             # question it can answer.
-            drop = rng.choice(free) if free else rng.choice(vs)
+            if bare:
+                for _v in free: vals.pop(_v, None)   # nothing student-entered survives
+                drop = None                          # named from `miss` below, not chosen here
+            else:
+                drop = rng.choice(free) if free else rng.choice(vs)
             # A43h. REMOVE THE WITHHELD VARIABLE FROM THE SOURCE, NOT AT ONE CONSUMER.
             #
             # This filtered a LOCAL list to build `g` and left `drop` in `vals`. That was correct
@@ -2134,8 +2286,9 @@ def gen(n, seed=0):
             # one level up: every path that rebuilds the givens must re-decide them from a source
             # that is already correct. Filtering at a consumer survives exactly until the next
             # consumer is written.
-            vals.pop(drop, None)
-            g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown if v in vals) or g
+            if drop is not None: vals.pop(drop, None)
+            g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown if v in vals)
+            if not bare: g = g or _g_before_withhold
         # A43. A SPARE GIVEN IS ADDED INDEPENDENTLY OF THE CLASS, SO IT CARRIES NO INFORMATION.
         #
         # MEASURED ON THE A42 CORPUS: a question supplying a variable the shown record does not use
@@ -2193,7 +2346,19 @@ def gen(n, seed=0):
         # spare count and the total count uninformative in one step.
         _target_total = rng.choices((2, 3, 4, 5), weights=(0.16, 0.27, 0.30, 0.27))[0]
         _n_spare = max(0, _target_total - len(vals))
-        if not nomatch and _n_spare:
+        if explain:
+            # A46. Strip to constants, which is what assemble.c leaves when the student types no
+            # values: it walks r->cval independently of the input, so "Given g = 9.81." survives
+            # an empty question on the 27 constant-bearing records. Verified with build/devprompt
+            # before this branch was written.
+            for _v in free: vals.pop(_v, None)
+            # REBUILD `g`, do not merely pop. It was built from `shown` above, and popping the
+            # source of a string already rendered changes nothing -- measured: EXPLAIN came out
+            # 0.0% zero-given on the first run, with every free value still in the question.
+            # A43h is this same defect one class over: "every path that rebuilds the givens must
+            # re-decide them from a source that is already correct."
+            g = ", ".join(f"{v} = {_num(vals[v])}" for v in shown if v in vals)
+        if not nomatch and not explain and not bare and _n_spare:
             _added = 0
             for _ in range(12):
                 if _added >= _n_spare:
@@ -2215,7 +2380,25 @@ def gen(n, seed=0):
                 vals[_sv] = _sval
                 g = f"{g}, {_sv} = {_sval}" if g else f"{_sv} = {_sval}"
                 _added += 1
-        ask = ask_for(r, quantity_surface(r, rng), rng)
+        if explain:
+            # The SUBJECT is what the student types, and it is the only thing the answer may name:
+            # the record's name is NOT in the prompt (assemble.c emits formula|units|missing|
+            # condition|fit), so an answer that named it would be recalling, which is the A7
+            # defect. A trailing qualifier is dropped -- nobody types "Newton's second law,
+            # SCALAR FORM" -- and a record that is not a named relation is asked about by its
+            # quantity, through the same quantity_surface() every other class uses.
+            if rec_is_relation_named(r):
+                _subj = (r.get("name") or "").split(",")[0].strip().lower()
+                ask = rng.choice(EXPLAIN_ASK_REL).format(s=_subj)
+            else:
+                _subj = quantity_surface(r, rng)
+                ask = rng.choice(EXPLAIN_ASK_Q).format(s=_subj)
+        else:
+            # A47b. KEEP THE SURFACE. The answer must label the result with the words the QUESTION
+            # used, not with the record's canonical name -- see the note on `close` below. It was
+            # drawn here and thrown away, so the answer had nothing to reach for but r["name"].
+            _subj = quantity_surface(r, rng)
+            ask = ask_for(r, _subj, rng)
         q = compose_question(ask, g, rng)
         umap = units_field(r)
         # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
@@ -2416,8 +2599,28 @@ def gen(n, seed=0):
             # it is kept. The lift is therefore measured over RECORD-BEARING documents, where it is
             # +0.0 pp; including D3 it is large and intrinsic.
             q = rng.choice(_D3_STEMS)
-        docs.append({"q": q, "withhold": drop if withhold else None, "nomatch": nomatch,
-                     "mismatch": (rec_r.get("display") or rec_r.get("name","that quantity")) if mismatch else None,
+        # A46. A BARE D1 NAMES THE VARIABLE THE `missing:` FIELD NAMES, and `miss` is the one
+        # place that is derived by the device's rule from the question as composed. Choosing it
+        # here would be a second implementation that "happens to agree" -- which is the comment
+        # three lines above `miss = _device_missing(...)`, written after the other three fields
+        # drifted exactly that way.
+        docs.append({"q": q, "withhold": (miss if bare else drop) if withhold else None,
+                     "explain": _subj if explain else None, "nomatch": nomatch,
+                     # Everything an explanation is allowed to say, and each of these is a field
+                     # of the record span the prompt already carries. `fml` only spaces the `=`;
+                     # the formula itself is the store's string, byte for byte.
+                     "is_rel": rec_is_relation_named(r), "subj_is_sym": _subj == lhs,
+                     # FIRST-APPEARANCE ORDER, not sorted -- the same rule units_field() and
+                     # _device_missing_mod() already follow, and for the same reason: the record
+                     # span the student is looking at lists the variables in formula order, so a
+                     # refusal that lists them alphabetically ("Enter a, t and v_0" against
+                     # `missing:v_0`) disagrees with the line above it.
+                     "need": ([v for v, _u in _units_pairs(r) if v in free] if bare else None),
+                     "fml": r["f"].replace("=", " = ", 1),
+                     "uclause": _units_clause(r), "cond": _condition_field(r),
+                     # A47: what the SHOWN record computes, read off the record span itself, so
+                     # every word of the refusal is in the prompt. Never the record's name.
+                     "mismatch": _mismatch_desc(rec_r) if mismatch else None,
                      # A9. THE CONDITION FIELD MUST MATCH THE SHIPPED ASSEMBLER, and it did not
                      # on 81 of 141 records (57.4%). src/store/assemble.c:94 is the authority:
                      #     r->req && r->req[0] ? r->req : "standard conditions"
@@ -2434,7 +2637,13 @@ def gen(n, seed=0):
                      "rec": f"{rec_r['f']} | {umap} | missing:{miss} | "
                             f"{_condition_field(rec_r)} | fit:{band}", "lhs": lhs,
                      "name": r["name"], "head": r["f"], "unit": lhs_unit(r),
-                     "close": rng.choice(CLOSE_ANY if rec_is_relation_named(r) else CLOSE_Q), "why": rng.choice(WHY).format(f=r["f"])})
+                     "subj": _subj if not explain else None,
+                     # A47b. A BARE SYMBOL CANNOT TAKE "The ___ is". quantity_surface may return the
+                     # LHS symbol, and "The e is 4.79e-15 J" is not English -- so a symbol surface
+                     # draws from CLOSE_ANY, which writes "e = 4.79e-15 J." instead. Same rule the
+                     # explain templates follow, for the same reason.
+                     "close": rng.choice(CLOSE_ANY if (rec_is_relation_named(r)
+                                                       or _subj == lhs) else CLOSE_Q), "why": rng.choice(WHY).format(f=r["f"])})
         calls.append(f"<tool>eval<arg>{expr}</tool>")
     out = re.findall(r"<res>(.*?)</res>",
           subprocess.run(["tools/eval/evalcli","-"], input="\n".join(calls)+"\n",
@@ -2452,15 +2661,75 @@ def gen(n, seed=0):
                           "text": f"<q>{d['q']}</q><r>none | missing:none | "
                                   f"no matching relation | fit:low<a>{ans}<end>"})
             continue
+        if d.get("explain"):
+            # NO TOOL CALL, because there is nothing to compute -- and that makes this the only
+            # class that goes <r> straight to <a> without being a refusal. That is the judgement
+            # being taught: the shape does not decide it, the question does.
+            _sub = d["explain"]
+            _tpl = (EXPLAIN_CLOSE_REL if d["is_rel"]
+                    else EXPLAIN_CLOSE_SYM if d["subj_is_sym"] else EXPLAIN_CLOSE_Q)
+            ans = rng.choice(_tpl).format(
+                S=_sub[0].upper() + _sub[1:], s=_sub, f=d["fml"], u=d["uclause"], c=d["cond"])
+            built.append({"head": d["head"], "kind": "EXPLAIN", "ans": ans,
+                          "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>"})
+            continue
         if d.get("mismatch"):
-            ans=f"I cannot answer that — the record gives {d['mismatch'].lower()}, which does not apply."
+            # A47. THE REFUSAL MAY NOT NAME THE RECORD, BECAUSE THE PROMPT DOES NOT.
+            #
+            # This read "the record gives {name}, which does not apply" -- and
+            # src/store/assemble.c emits `formula | units | missing | condition | fit` and NO NAME.
+            # So the corpus trained the model to state a literal that appears nowhere in its
+            # context: the A7 defect, in the ANSWER span instead of the tool call.
+            #
+            # MEASURED on the shipped d352 checkpoint over 120 HELD-OUT records -- ones it has
+            # never trained on, so recall is impossible and anything it says is fabricated:
+            #
+            #     refusals naming a record          78 of 120
+            #     name matches the record shown      7  (9.0%)
+            #     name is a DIFFERENT record's,
+            #       memorised from training         70
+            #
+            #   P=((F)/(A))  is PRESSURE, and it said "power from force and velocity" -- it saw the
+            #   symbol P and recalled a P record. v=((s)/(t)) is LINEAR SPEED, and it said
+            #   "velocity from constant acceleration starting at rest", a string that occurs 682
+            #   times in the corpus as another record's name.
+            #
+            # It refuses correctly and describes the record falsely, which is worse than refusing
+            # bluntly: a student is told what the calculator matched, and told wrong.
+            #
+            # The replacement says only what the record span carries. Adding the name to the span
+            # is the other fix and it is worse twice over: it is a device change, and A9 measured
+            # that widening the prompt makes this model refuse MORE.
+            _mm = d["mismatch"]
+            ans = (f"I cannot answer that — the record shown computes {_mm['lhs']} from "
+                   f"{_mm['from']}, which does not apply." if _mm["from"] else
+                   f"I cannot answer that — the record shown computes {_mm['lhs']}, "
+                   f"which does not apply.")
             built.append({"head": d["head"], "kind": "D2",
                           "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>", "ans": ans})
             continue
         if d.get("withhold"):
             # Same question, same vocabulary, same record -- one given absent and a refusal answer.
+            # A46. WHEN NOTHING IS GIVEN, SAY WHAT WOULD BE ENOUGH. An ordinary D1 withholds one
+            # value and the student has the rest, so naming the one is the whole message. A bare D1
+            # withholds all of them, and "m is not given" is then true and useless -- the student
+            # has no way to know that m AND a would finish it. Every symbol named here is in the
+            # record span's units field, so nothing is recalled.
+            #
+            # STILL REFUSAL-SHAPED, deliberately: grade.REF matches "cannot" and "not given", so the
+            # d1 and refuse arms keep measuring what they measured and this change cannot flatter
+            # itself by moving a grader. An answer that ASKS instead of refusing is the better
+            # design and it needs a second device turn -- app_request builds one prompt and returns
+            # -- so it is filed rather than smuggled in here.
             ans = f"I cannot answer that — {d['withhold']} is not given."
-            built.append({"head": d["head"], "kind": "D1",
+            if d.get("need"):
+                _nd = d["need"]
+                _lst = _nd[0] if len(_nd) == 1 else ", ".join(_nd[:-1]) + " and " + _nd[-1]
+                ans += f" Enter {_lst} to compute {d['lhs']}."
+            # `bare` is DECLARED, not inferred. The arm that consumes this could tell the two
+            # apart by looking for "Enter " in the answer, which is a proxy for the property and
+            # is the pattern the project log has nine entries about. The producer knows; it says so.
+            built.append({"head": d["head"], "kind": "D1", "bare": d.get("need") is not None,
                           "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>", "ans": ans})
             continue
         if res.startswith("!"): dropped += 1; continue        # TOOL_SPEC 8.1: drop, never guess
@@ -2503,7 +2772,25 @@ def gen(n, seed=0):
         a_txt = f"{a_val} {d['unit']}".strip() if d.get("unit") else a_val
         # A33. `Q` carries the article-correct form: a store name already beginning with "the"
         # supplies its own, and one that does not gets "The". The template must not add a second.
-        _nm = d["name"].lower()
+        # A47b. THE ANSWER LABELS THE RESULT WITH THE QUESTION'S WORDS, NOT THE RECORD'S NAME.
+        #
+        # This was `d["name"].lower()` -- the store's canonical name, which src/store/assemble.c
+        # does NOT put in the prompt. Measured over 9,299 answered documents: 2,036 stated the
+        # name and **1,251 (13.5%) stated a name that appears nowhere in the prompt**:
+        #
+        #     Q  determine e.          A  The QUANTUM ENERGY is 4.7945736e-15 J.
+        #     Q  what was p?           A  The POWER FROM FORCE AND VELOCITY is 5972 W.
+        #     Q  find x.               A  The HORIZONTAL DISPLACEMENT IN PROJECTILE MOTION is 2.904 m.
+        #
+        # Same defect as A47 in D2, in the class that is 82% of the corpus. It is not harmless
+        # because the model gets it right in distribution: measured on 120 HELD-OUT records, the
+        # name it supplies is the wrong record's 89.7% of the time. The store grows -- 170 more
+        # physics records are mined and waiting -- and every one of them is a record whose name
+        # the model would be guessing while stating it as fact beside a number.
+        #
+        # The question's own surface is in the prompt by construction, so the label is sourced.
+        # EXPLAIN already worked this way and measures 0.0% on the same check.
+        _nm = (d.get("subj") or d["name"]).lower()
         _Q  = (_nm[0].upper() + _nm[1:]) if _nm.startswith("the ") else ("The " + _nm)
         ans = d["close"].format(v=d["lhs"], a=a_txt, q=_nm, Q=_Q, why=d["why"])
         built.append({"head": d["head"],

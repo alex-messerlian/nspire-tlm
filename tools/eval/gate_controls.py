@@ -78,6 +78,14 @@ CONTROLS = {
     "split_valid":     ("corpus/build_splits.py",
                         "        _cv = _RUNTIME_CONSTANTS",
                         "        _cv = set()  # mutated"),
+    # A47b. Put the record's canonical NAME back into the answer label. assemble.c never emits a
+    # name, so this is a literal the model cannot read -- it was 13.5% of answered documents, and
+    # the shipped model supplies the WRONG record's name 89.7% of the time on records it has not
+    # memorised. The subject the question used is the thing being replaced, so this names the
+    # subject gate_name_provenance asserts about.
+    "name_provenance": ("corpus/generate.py",
+                        '_nm = (d.get("subj") or d["name"]).lower()',
+                        '_nm = d["name"].lower()  # mutated'),
     "d3_legitimacy":   ("corpus/generate.py",
                         "            q = rng.choice(_D3_STEMS)",
                         "            pass  # use the record-derived question"),

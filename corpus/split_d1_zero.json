@@ -1,0 +1,962 @@
+[
+ {
+  "id": "a46-001",
+  "q": "Find the horizontal position under constant velocity.",
+  "record": "x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:x_0 | standard conditions | fit:high",
+  "shown": "x=x_0+v_x*t",
+  "asked": "x",
+  "ans": "I cannot answer that \u2014 x_0 is not given. Enter x_0, v_x and t to compute x."
+ },
+ {
+  "id": "a46-002",
+  "q": "Calculate pressure.",
+  "record": "p=((F)/(A)) | p:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+  "shown": "p=((F)/(A))",
+  "asked": "p",
+  "ans": "I cannot answer that \u2014 F is not given. Enter F and A to compute p."
+ },
+ {
+  "id": "a46-003",
+  "q": "Find W_net.",
+  "record": "W_net=K_B-K_A | W_net:J K_B:J K_A:J | missing:K_B | standard conditions | fit:high",
+  "shown": "W_net=K_B-K_A",
+  "asked": "W_net",
+  "ans": "I cannot answer that \u2014 K_B is not given. Enter K_B and K_A to compute W_net."
+ },
+ {
+  "id": "a46-004",
+  "q": "Calculate length.",
+  "record": "L=((v_w)/(4*f_1)) | L:m v_w:m/s f_1:Hz | missing:v_w | standard conditions | fit:high",
+  "shown": "L=((v_w)/(4*f_1))",
+  "asked": "L",
+  "ans": "I cannot answer that \u2014 v_w is not given. Enter v_w and f_1 to compute L."
+ },
+ {
+  "id": "a46-005",
+  "q": "What was F?",
+  "record": "F=-k*x | F:N k:N/m x:m | missing:k | restoring force, signed: negative means opposite to the displacement | fit:high",
+  "shown": "F=-k*x",
+  "asked": "F",
+  "ans": "I cannot answer that \u2014 k is not given. Enter k and x to compute F."
+ },
+ {
+  "id": "a46-006",
+  "q": "Calculate the input work.",
+  "record": "W_i=F_i*d_i | W_i:J F_i:N d_i:m | missing:F_i | standard conditions | fit:high",
+  "shown": "W_i=F_i*d_i",
+  "asked": "W_i",
+  "ans": "I cannot answer that \u2014 F_i is not given. Enter F_i and d_i to compute W_i."
+ },
+ {
+  "id": "a46-007",
+  "q": "What is v_d? In a setup with n = 8.5e+28, q = 1.602e-19.",
+  "record": "v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
+  "shown": "v_d=((I)/(n*q*A))",
+  "asked": "v_d",
+  "ans": "I cannot answer that \u2014 I is not given. Enter I and A to compute v_d."
+ },
+ {
+  "id": "a46-008",
+  "q": "Estimate velocity of a wave.",
+  "record": "v=f*lambda | v:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
+  "shown": "v=f*lambda",
+  "asked": "v",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f and lambda to compute v."
+ },
+ {
+  "id": "a46-009",
+  "q": "Compute the drift velocity. Measurements give n = 8.5e+28, q = 1.602e-19.",
+  "record": "v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
+  "shown": "v_d=((I)/(n*q*A))",
+  "asked": "v_d",
+  "ans": "I cannot answer that \u2014 I is not given. Enter I and A to compute v_d."
+ },
+ {
+  "id": "a46-010",
+  "q": "In a setup with k_e = 8988000000, determine electric potential.",
+  "record": "V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:q | standard conditions | fit:high",
+  "shown": "V=((k_e*q)/(r))",
+  "asked": "V",
+  "ans": "I cannot answer that \u2014 q is not given. Enter q and r to compute V."
+ },
+ {
+  "id": "a46-011",
+  "q": "The values are g = 9.81, p_0 = 101300. Calculate pressure at depth in a fluid.",
+  "record": "p=p_0+rho*g*h | p:Pa p_0:Pa rho:kg/m^3 g:m/s^2 h:m | missing:rho | standard conditions | fit:high",
+  "shown": "p=p_0+rho*g*h",
+  "asked": "p",
+  "ans": "I cannot answer that \u2014 rho is not given. Enter rho and h to compute p."
+ },
+ {
+  "id": "a46-012",
+  "q": "What was I_S?",
+  "record": "I_S=((N_P)/(N_S))*I_P | I_S:A N_P:1 N_S:1 I_P:A | missing:N_P | standard conditions | fit:high",
+  "shown": "I_S=((N_P)/(N_S))*I_P",
+  "asked": "I_S",
+  "ans": "I cannot answer that \u2014 N_P is not given. Enter N_P, N_S and I_P to compute I_S."
+ },
+ {
+  "id": "a46-013",
+  "q": "Compute Q.",
+  "record": "Q=Delta_E_int+W | Q:J Delta_E_int:J W:J | missing:Delta_E_int | standard conditions | fit:high",
+  "shown": "Q=Delta_E_int+W",
+  "asked": "Q",
+  "ans": "I cannot answer that \u2014 Delta_E_int is not given. Enter Delta_E_int and W to compute Q."
+ },
+ {
+  "id": "a46-014",
+  "q": "Determine the net work.",
+  "record": "W=Q_h-Q_c | W:J Q_h:J Q_c:J | missing:Q_h | standard conditions | fit:high",
+  "shown": "W=Q_h-Q_c",
+  "asked": "W",
+  "ans": "I cannot answer that \u2014 Q_h is not given. Enter Q_h and Q_c to compute W."
+ },
+ {
+  "id": "a46-015",
+  "q": "In a setup with h = 6.626e-34, calculate approximate time.",
+  "record": "Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:E | standard conditions | fit:high",
+  "shown": "Delta_t=((h)/(E))",
+  "asked": "Delta_t",
+  "ans": "I cannot answer that \u2014 E is not given. Enter E to compute Delta_t."
+ },
+ {
+  "id": "a46-016",
+  "q": "What is f?",
+  "record": "f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:k | standard conditions | fit:high",
+  "shown": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+  "asked": "f",
+  "ans": "I cannot answer that \u2014 k is not given. Enter k and m to compute f."
+ },
+ {
+  "id": "a46-017",
+  "q": "A system has c = 299800000. Compute wavelength from frequency.",
+  "record": "lambda=((c)/(f)) | lambda:m c:m/s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "lambda=((c)/(f))",
+  "asked": "lambda",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f to compute lambda."
+ },
+ {
+  "id": "a46-018",
+  "q": "What was F?",
+  "record": "F=((m*Delta_v)/(Delta_t)) | F:N m:kg Delta_v:m/s Delta_t:s | missing:m | standard conditions | fit:high",
+  "shown": "F=((m*Delta_v)/(Delta_t))",
+  "asked": "F",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m, Delta_v and Delta_t to compute F."
+ },
+ {
+  "id": "a46-019",
+  "q": "What was f_1?",
+  "record": "f_1=((v)/(4*L)) | f_1:Hz v:m/s L:m | missing:v | standard conditions | fit:high",
+  "shown": "f_1=((v)/(4*L))",
+  "asked": "f_1",
+  "ans": "I cannot answer that \u2014 v is not given. Enter v and L to compute f_1."
+ },
+ {
+  "id": "a46-020",
+  "q": "What was the time constant?",
+  "record": "tau=R*C | tau:s R:ohm C:F | missing:R | standard conditions | fit:high",
+  "shown": "tau=R*C",
+  "asked": "tau",
+  "ans": "I cannot answer that \u2014 R is not given. Enter R and C to compute tau."
+ },
+ {
+  "id": "a46-021",
+  "q": "What was the quantum number?",
+  "record": "n=((K/E_1))^(1/2) | n:1 K:J E_1:J | missing:K | standard conditions | fit:high",
+  "shown": "n=((K/E_1))^(1/2)",
+  "asked": "n",
+  "ans": "I cannot answer that \u2014 K is not given. Enter K and E_1 to compute n."
+ },
+ {
+  "id": "a46-022",
+  "q": "What is A?",
+  "record": "A=((1)/(2))*theta*(r)^(2) | A:m^2 theta:1 r:m | missing:theta | standard conditions | fit:high",
+  "shown": "A=((1)/(2))*theta*(r)^(2)",
+  "asked": "A",
+  "ans": "I cannot answer that \u2014 theta is not given. Enter theta and r to compute A."
+ },
+ {
+  "id": "a46-023",
+  "q": "In a setup with c = 299800000, determine index of refraction.",
+  "record": "n=((c)/(v)) | n:1 c:m/s v:m/s | missing:v | standard conditions | fit:high",
+  "shown": "n=((c)/(v))",
+  "asked": "n",
+  "ans": "I cannot answer that \u2014 v is not given. Enter v to compute n."
+ },
+ {
+  "id": "a46-024",
+  "q": "What was velocity?",
+  "record": "v=v_0+a*t | v:m/s v_0:m/s a:m/s^2 t:s | missing:v_0 | standard conditions | fit:high",
+  "shown": "v=v_0+a*t",
+  "asked": "v",
+  "ans": "I cannot answer that \u2014 v_0 is not given. Enter v_0, a and t to compute v."
+ },
+ {
+  "id": "a46-025",
+  "q": "The values are g = 9.81. Determine N.",
+  "record": "N=m*g*cos(theta) | N:N m:kg g:m/s^2 theta:1 | missing:m | standard conditions | fit:high",
+  "shown": "N=m*g*cos(theta)",
+  "asked": "N",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m and theta to compute N."
+ },
+ {
+  "id": "a46-026",
+  "q": "You are told R = 8.314. Find the molar heat capacity.",
+  "record": "C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
+  "shown": "C_p=C_V+R",
+  "asked": "C_p",
+  "ans": "I cannot answer that \u2014 C_V is not given. Enter C_V to compute C_p."
+ },
+ {
+  "id": "a46-027",
+  "q": "Find E. With c = 299800000.",
+  "record": "E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:Delta_m | standard conditions | fit:high",
+  "shown": "E=(Delta_m)(c)^(2)",
+  "asked": "E",
+  "ans": "I cannot answer that \u2014 Delta_m is not given. Enter Delta_m to compute E."
+ },
+ {
+  "id": "a46-028",
+  "q": "Measurements give h = 6.626e-34. Determine E.",
+  "record": "E=h*f | E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "E=h*f",
+  "asked": "E",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f to compute E."
+ },
+ {
+  "id": "a46-029",
+  "q": "Compute I_S.",
+  "record": "I_S=((N_P)/(N_S))*I_P | I_S:A N_P:1 N_S:1 I_P:A | missing:N_P | standard conditions | fit:high",
+  "shown": "I_S=((N_P)/(N_S))*I_P",
+  "asked": "I_S",
+  "ans": "I cannot answer that \u2014 N_P is not given. Enter N_P, N_S and I_P to compute I_S."
+ },
+ {
+  "id": "a46-030",
+  "q": "Determine tangential acceleration.",
+  "record": "a_t=r*alpha | a_t:m/s^2 r:m alpha:1/s^2 | missing:r | standard conditions | fit:high",
+  "shown": "a_t=r*alpha",
+  "asked": "a_t",
+  "ans": "I cannot answer that \u2014 r is not given. Enter r and alpha to compute a_t."
+ },
+ {
+  "id": "a46-031",
+  "q": "Determine the intensity.",
+  "record": "I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:P | standard conditions | fit:high",
+  "shown": "I=((P)/(A))",
+  "asked": "I",
+  "ans": "I cannot answer that \u2014 P is not given. Enter P and A to compute I."
+ },
+ {
+  "id": "a46-032",
+  "q": "Estimate the energy change associated.",
+  "record": "U_form=E_transfer+U_coul+U_ex | U_form:J E_transfer:J U_coul:J U_ex:J | missing:E_transfer | standard conditions | fit:high",
+  "shown": "U_form=E_transfer+U_coul+U_ex",
+  "asked": "U_form",
+  "ans": "I cannot answer that \u2014 E_transfer is not given. Enter E_transfer, U_coul and U_ex to compute U_form."
+ },
+ {
+  "id": "a46-033",
+  "q": "Find m.",
+  "record": "m=F_net/a | m:kg F_net:N a:m/s^2 | missing:F_net | standard conditions | fit:high",
+  "shown": "m=F_net/a",
+  "asked": "m",
+  "ans": "I cannot answer that \u2014 F_net is not given. Enter F_net and a to compute m."
+ },
+ {
+  "id": "a46-034",
+  "q": "Estimate F_net.",
+  "record": "F_net=((Delta_p)/(Delta_t)) | F_net:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "F_net=((Delta_p)/(Delta_t))",
+  "asked": "F_net",
+  "ans": "I cannot answer that \u2014 Delta_p is not given. Enter Delta_p and Delta_t to compute F_net."
+ },
+ {
+  "id": "a46-035",
+  "q": "Take h = 6.626e-34. Estimate f.",
+  "record": "f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:Delta_E_LK | standard conditions | fit:high",
+  "shown": "f=(Delta_E_LK)/h",
+  "asked": "f",
+  "ans": "I cannot answer that \u2014 Delta_E_LK is not given. Enter Delta_E_LK to compute f."
+ },
+ {
+  "id": "a46-036",
+  "q": "Find Delta_U.",
+  "record": "Delta_U=Q-W | Delta_U:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
+  "shown": "Delta_U=Q-W",
+  "asked": "Delta_U",
+  "ans": "I cannot answer that \u2014 Q is not given. Enter Q and W to compute Delta_U."
+ },
+ {
+  "id": "a46-037",
+  "q": "What is P?",
+  "record": "P=V*I | P:W V:V I:A | missing:V | standard conditions | fit:high",
+  "shown": "P=V*I",
+  "asked": "P",
+  "ans": "I cannot answer that \u2014 V is not given. Enter V and I to compute P."
+ },
+ {
+  "id": "a46-038",
+  "q": "Find acceleration.",
+  "record": "a=((F)/(m)) | a:m/s^2 F:N m:kg | missing:F | standard conditions | fit:high",
+  "shown": "a=((F)/(m))",
+  "asked": "a",
+  "ans": "I cannot answer that \u2014 F is not given. Enter F and m to compute a."
+ },
+ {
+  "id": "a46-039",
+  "q": "Determine F_net.",
+  "record": "F_net=m*a | F_net:N m:kg a:m/s^2 | missing:m | standard conditions | fit:high",
+  "shown": "F_net=m*a",
+  "asked": "F_net",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m and a to compute F_net."
+ },
+ {
+  "id": "a46-040",
+  "q": "What was the wavelength in a medium of refractive index n?",
+  "record": "lambda_n=((lambda)/(n)) | lambda_n:m lambda:m n:1 | missing:lambda | standard conditions | fit:high",
+  "shown": "lambda_n=((lambda)/(n))",
+  "asked": "lambda_n",
+  "ans": "I cannot answer that \u2014 lambda is not given. Enter lambda and n to compute lambda_n."
+ },
+ {
+  "id": "a46-041",
+  "q": "What was s_i?",
+  "record": "s_i=(((n_2)/(n_1)))*s_o | s_i:m n_2:1 n_1:1 s_o:m | missing:n_2 | flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT. | fit:high",
+  "shown": "s_i=(((n_2)/(n_1)))*s_o",
+  "asked": "s_i",
+  "ans": "I cannot answer that \u2014 n_2 is not given. Enter n_2, n_1 and s_o to compute s_i."
+ },
+ {
+  "id": "a46-042",
+  "q": "Compute momentum change.",
+  "record": "Delta_p=m*Delta_v | Delta_p:kg*m/s m:kg Delta_v:m/s | missing:m | standard conditions | fit:high",
+  "shown": "Delta_p=m*Delta_v",
+  "asked": "Delta_p",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m and Delta_v to compute Delta_p."
+ },
+ {
+  "id": "a46-043",
+  "q": "Calculate v.",
+  "record": "v=((lambda)/(T)) | v:m/s lambda:m T:s | missing:lambda | standard conditions | fit:high",
+  "shown": "v=((lambda)/(T))",
+  "asked": "v",
+  "ans": "I cannot answer that \u2014 lambda is not given. Enter lambda and T to compute v."
+ },
+ {
+  "id": "a46-044",
+  "q": "Find alpha.",
+  "record": "alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:Delta_omega | standard conditions | fit:high",
+  "shown": "alpha=((Delta_omega)/(Delta_t))",
+  "asked": "alpha",
+  "ans": "I cannot answer that \u2014 Delta_omega is not given. Enter Delta_omega and Delta_t to compute alpha."
+ },
+ {
+  "id": "a46-045",
+  "q": "Estimate output work after friction losses.",
+  "record": "W_out=W_in-W_f | W_out:J W_in:J W_f:J | missing:W_in | standard conditions | fit:high",
+  "shown": "W_out=W_in-W_f",
+  "asked": "W_out",
+  "ans": "I cannot answer that \u2014 W_in is not given. Enter W_in and W_f to compute W_out."
+ },
+ {
+  "id": "a46-046",
+  "q": "Find x.",
+  "record": "x=v_0x*t | x:m v_0x:m/s t:s | missing:v_0x | standard conditions | fit:high",
+  "shown": "x=v_0x*t",
+  "asked": "x",
+  "ans": "I cannot answer that \u2014 v_0x is not given. Enter v_0x and t to compute x."
+ },
+ {
+  "id": "a46-047",
+  "q": "Find the extension from length change.",
+  "record": "x=l-l_0 | x:m l:m l_0:m | missing:l | standard conditions | fit:high",
+  "shown": "x=l-l_0",
+  "asked": "x",
+  "ans": "I cannot answer that \u2014 l is not given. Enter l and l_0 to compute x."
+ },
+ {
+  "id": "a46-048",
+  "q": "Estimate the electric field at a charged conducting surface. If epsilon_0 = 8.854e-12.",
+  "record": "E=((sigma)/(epsilon_0)) | E:V/m sigma:C/m^2 epsilon_0:C^2/(N*m^2) | missing:sigma | standard conditions | fit:high",
+  "shown": "E=((sigma)/(epsilon_0))",
+  "asked": "E",
+  "ans": "I cannot answer that \u2014 sigma is not given. Enter sigma to compute E."
+ },
+ {
+  "id": "a46-049",
+  "q": "What is the intensity?",
+  "record": "I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:P | standard conditions | fit:high",
+  "shown": "I=((P)/(A))",
+  "asked": "I",
+  "ans": "I cannot answer that \u2014 P is not given. Enter P and A to compute I."
+ },
+ {
+  "id": "a46-050",
+  "q": "Determine acceleration from force and mass.",
+  "record": "a=((F)/(m)) | a:m/s^2 F:N m:kg | missing:F | standard conditions | fit:high",
+  "shown": "a=((F)/(m))",
+  "asked": "a",
+  "ans": "I cannot answer that \u2014 F is not given. Enter F and m to compute a."
+ },
+ {
+  "id": "a46-051",
+  "q": "What was angular velocity?",
+  "record": "omega_f=omega_0+alpha*t | omega_f:1/s omega_0:1/s alpha:1/s^2 t:s | missing:omega_0 | standard conditions | fit:high",
+  "shown": "omega_f=omega_0+alpha*t",
+  "asked": "omega_f",
+  "ans": "I cannot answer that \u2014 omega_0 is not given. Enter omega_0, alpha and t to compute omega_f."
+ },
+ {
+  "id": "a46-052",
+  "q": "Find C.",
+  "record": "C=((Q)/(V)) | C:F Q:C V:V | missing:Q | standard conditions | fit:high",
+  "shown": "C=((Q)/(V))",
+  "asked": "C",
+  "ans": "I cannot answer that \u2014 Q is not given. Enter Q and V to compute C."
+ },
+ {
+  "id": "a46-053",
+  "q": "Determine the energy change associated with ionic bonding.",
+  "record": "U_form=E_transfer+U_coul+U_ex | U_form:J E_transfer:J U_coul:J U_ex:J | missing:E_transfer | standard conditions | fit:high",
+  "shown": "U_form=E_transfer+U_coul+U_ex",
+  "asked": "U_form",
+  "ans": "I cannot answer that \u2014 E_transfer is not given. Enter E_transfer, U_coul and U_ex to compute U_form."
+ },
+ {
+  "id": "a46-054",
+  "q": "Estimate the wavelength.",
+  "record": "lambda_n=((lambda)/(n)) | lambda_n:m lambda:m n:1 | missing:lambda | standard conditions | fit:high",
+  "shown": "lambda_n=((lambda)/(n))",
+  "asked": "lambda_n",
+  "ans": "I cannot answer that \u2014 lambda is not given. Enter lambda and n to compute lambda_n."
+ },
+ {
+  "id": "a46-055",
+  "q": "Assume g = 9.81. What was height?",
+  "record": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | y:m y_0:m v_0:m/s t:s g:m/s^2 | missing:y_0 | standard conditions | fit:high",
+  "shown": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
+  "asked": "y",
+  "ans": "I cannot answer that \u2014 y_0 is not given. Enter y_0, v_0 and t to compute y."
+ },
+ {
+  "id": "a46-056",
+  "q": "In a setup with h = 6.626e-34, what was photon energy?",
+  "record": "E=h*f | E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "E=h*f",
+  "asked": "E",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f to compute E."
+ },
+ {
+  "id": "a46-057",
+  "q": "What is the equivalent resistance of two resistors in series?",
+  "record": "R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | standard conditions | fit:high",
+  "shown": "R_eqv=R_1+R_2",
+  "asked": "R_eqv",
+  "ans": "I cannot answer that \u2014 R_1 is not given. Enter R_1 and R_2 to compute R_eqv."
+ },
+ {
+  "id": "a46-058",
+  "q": "What is the total mass from rocket and propellant?",
+  "record": "m=m_R+m_g | m:kg m_R:kg m_g:kg | missing:m_R | standard conditions | fit:high",
+  "shown": "m=m_R+m_g",
+  "asked": "m",
+  "ans": "I cannot answer that \u2014 m_R is not given. Enter m_R and m_g to compute m."
+ },
+ {
+  "id": "a46-059",
+  "q": "Determine x.",
+  "record": "x=l-l_0 | x:m l:m l_0:m | missing:l | standard conditions | fit:high",
+  "shown": "x=l-l_0",
+  "asked": "x",
+  "ans": "I cannot answer that \u2014 l is not given. Enter l and l_0 to compute x."
+ },
+ {
+  "id": "a46-060",
+  "q": "Find U.",
+  "record": "U=((1)/(2))*m*(omega)^(2)*(x)^(2) | U:J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
+  "shown": "U=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "asked": "U",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m, omega and x to compute U."
+ },
+ {
+  "id": "a46-061",
+  "q": "Compute spring constant.",
+  "record": "k=((F)/(x)) | k:N/m F:N x:m | missing:F | standard conditions | fit:high",
+  "shown": "k=((F)/(x))",
+  "asked": "k",
+  "ans": "I cannot answer that \u2014 F is not given. Enter F and x to compute k."
+ },
+ {
+  "id": "a46-062",
+  "q": "A system has h = 6.626e-34. What was the energy difference?",
+  "record": "Delta_E=h*Delta_f | Delta_E:J h:J*s Delta_f:Hz | missing:Delta_f | standard conditions | fit:high",
+  "shown": "Delta_E=h*Delta_f",
+  "asked": "Delta_E",
+  "ans": "I cannot answer that \u2014 Delta_f is not given. Enter Delta_f to compute Delta_E."
+ },
+ {
+  "id": "a46-063",
+  "q": "Estimate the drag force.",
+  "record": "F_D=((1)/(2))*C*rho*A*(v)^(2) | F_D:N C:1 rho:kg/m^3 A:m^2 v:m/s | missing:C | standard conditions | fit:high",
+  "shown": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+  "asked": "F_D",
+  "ans": "I cannot answer that \u2014 C is not given. Enter C, rho, A and v to compute F_D."
+ },
+ {
+  "id": "a46-064",
+  "q": "Estimate the distance.",
+  "record": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | d:m x_2:m x_1:m y_2:m y_1:m | missing:x_2 | standard conditions | fit:high",
+  "shown": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
+  "asked": "d",
+  "ans": "I cannot answer that \u2014 x_2 is not given. Enter x_2, x_1, y_2 and y_1 to compute d."
+ },
+ {
+  "id": "a46-065",
+  "q": "Determine the pressure.",
+  "record": "p=((F)/(A)) | p:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+  "shown": "p=((F)/(A))",
+  "asked": "p",
+  "ans": "I cannot answer that \u2014 F is not given. Enter F and A to compute p."
+ },
+ {
+  "id": "a46-066",
+  "q": "What was tau?",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:r | standard conditions | fit:high",
+  "shown": "tau=r*F",
+  "asked": "tau",
+  "ans": "I cannot answer that \u2014 r is not given. Enter r and F to compute tau."
+ },
+ {
+  "id": "a46-067",
+  "q": "Estimate the equivalent resistance of two resistors in parallel.",
+  "record": "R_eqv=((1)/(1/R_1+1/R_2)) | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | standard conditions | fit:high",
+  "shown": "R_eqv=((1)/(1/R_1+1/R_2))",
+  "asked": "R_eqv",
+  "ans": "I cannot answer that \u2014 R_1 is not given. Enter R_1 and R_2 to compute R_eqv."
+ },
+ {
+  "id": "a46-068",
+  "q": "Calculate velocity of a wave.",
+  "record": "v=f*lambda | v:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
+  "shown": "v=f*lambda",
+  "asked": "v",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f and lambda to compute v."
+ },
+ {
+  "id": "a46-069",
+  "q": "Determine P.",
+  "record": "P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
+  "shown": "P=tau*omega",
+  "asked": "P",
+  "ans": "I cannot answer that \u2014 tau is not given. Enter tau and omega to compute P."
+ },
+ {
+  "id": "a46-070",
+  "q": "Starting from c = 299800000, h = 6.626e-34, find lambda.",
+  "record": "lambda=((h*c)/(E)) | lambda:m h:J*s c:m/s E:J | missing:E | standard conditions | fit:high",
+  "shown": "lambda=((h*c)/(E))",
+  "asked": "lambda",
+  "ans": "I cannot answer that \u2014 E is not given. Enter E to compute lambda."
+ },
+ {
+  "id": "a46-071",
+  "q": "Find centripetal acceleration.",
+  "record": "a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
+  "shown": "a=(v)^(2)/r",
+  "asked": "a",
+  "ans": "I cannot answer that \u2014 v is not given. Enter v and r to compute a."
+ },
+ {
+  "id": "a46-072",
+  "q": "If R = 8.314, calculate C_p.",
+  "record": "C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
+  "shown": "C_p=C_V+R",
+  "asked": "C_p",
+  "ans": "I cannot answer that \u2014 C_V is not given. Enter C_V to compute C_p."
+ },
+ {
+  "id": "a46-073",
+  "q": "What is Delta_U?",
+  "record": "Delta_U=Q-W | Delta_U:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
+  "shown": "Delta_U=Q-W",
+  "asked": "Delta_U",
+  "ans": "I cannot answer that \u2014 Q is not given. Enter Q and W to compute Delta_U."
+ },
+ {
+  "id": "a46-074",
+  "q": "Find frequency.",
+  "record": "f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:k | standard conditions | fit:high",
+  "shown": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+  "asked": "f",
+  "ans": "I cannot answer that \u2014 k is not given. Enter k and m to compute f."
+ },
+ {
+  "id": "a46-075",
+  "q": "What is total entropy change of system and surroundings?",
+  "record": "Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:Delta_S_h | standard conditions | fit:high",
+  "shown": "Delta_S_tot=Delta_S_h+Delta_S_c",
+  "asked": "Delta_S_tot",
+  "ans": "I cannot answer that \u2014 Delta_S_h is not given. Enter Delta_S_h and Delta_S_c to compute Delta_S_tot."
+ },
+ {
+  "id": "a46-076",
+  "q": "Calculate work done by a constant force.",
+  "record": "W=F*d | W:J F:N d:m | missing:F | standard conditions | fit:high",
+  "shown": "W=F*d",
+  "asked": "W",
+  "ans": "I cannot answer that \u2014 F is not given. Enter F and d to compute W."
+ },
+ {
+  "id": "a46-077",
+  "q": "What is apparent depth?",
+  "record": "s_i=(((n_2)/(n_1)))*s_o | s_i:m n_2:1 n_1:1 s_o:m | missing:n_2 | flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT. | fit:high",
+  "shown": "s_i=(((n_2)/(n_1)))*s_o",
+  "asked": "s_i",
+  "ans": "I cannot answer that \u2014 n_2 is not given. Enter n_2, n_1 and s_o to compute s_i."
+ },
+ {
+  "id": "a46-078",
+  "q": "Determine input work.",
+  "record": "W_i=F_i*d_i | W_i:J F_i:N d_i:m | missing:F_i | standard conditions | fit:high",
+  "shown": "W_i=F_i*d_i",
+  "asked": "W_i",
+  "ans": "I cannot answer that \u2014 F_i is not given. Enter F_i and d_i to compute W_i."
+ },
+ {
+  "id": "a46-079",
+  "q": "Measurements give epsilon_0 = 8.854e-12. Find C.",
+  "record": "C=epsilon_0*((A)/(d)) | C:F epsilon_0:C^2/(N*m^2) A:m^2 d:m | missing:A | standard conditions | fit:high",
+  "shown": "C=epsilon_0*((A)/(d))",
+  "asked": "C",
+  "ans": "I cannot answer that \u2014 A is not given. Enter A and d to compute C."
+ },
+ {
+  "id": "a46-080",
+  "q": "Compute rms current.",
+  "record": "I_rms=V_rms/Z | I_rms:A V_rms:V Z:ohm | missing:V_rms | standard conditions | fit:high",
+  "shown": "I_rms=V_rms/Z",
+  "asked": "I_rms",
+  "ans": "I cannot answer that \u2014 V_rms is not given. Enter V_rms and Z to compute I_rms."
+ },
+ {
+  "id": "a46-081",
+  "q": "Determine the angular acceleration.",
+  "record": "alpha=((a_t)/(r)) | alpha:1/s^2 a_t:m/s^2 r:m | missing:a_t | standard conditions | fit:high",
+  "shown": "alpha=((a_t)/(r))",
+  "asked": "alpha",
+  "ans": "I cannot answer that \u2014 a_t is not given. Enter a_t and r to compute alpha."
+ },
+ {
+  "id": "a46-082",
+  "q": "Using h = 6.626e-34, compute E_f.",
+  "record": "E_f=h*f | E_f:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "E_f=h*f",
+  "asked": "E_f",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f to compute E_f."
+ },
+ {
+  "id": "a46-083",
+  "q": "Determine heat transferred with no phase change.",
+  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:m | standard conditions | fit:high",
+  "shown": "Q=m*c*dT",
+  "asked": "Q",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m, c and dT to compute Q."
+ },
+ {
+  "id": "a46-084",
+  "q": "Using h = 6.626e-34, what was p?",
+  "record": "p=((h)/(lambda)) | p:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
+  "shown": "p=((h)/(lambda))",
+  "asked": "p",
+  "ans": "I cannot answer that \u2014 lambda is not given. Enter lambda to compute p."
+ },
+ {
+  "id": "a46-085",
+  "q": "Determine s_i.",
+  "record": "s_i=(((n_2)/(n_1)))*s_o | s_i:m n_2:1 n_1:1 s_o:m | missing:n_2 | flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT. | fit:high",
+  "shown": "s_i=(((n_2)/(n_1)))*s_o",
+  "asked": "s_i",
+  "ans": "I cannot answer that \u2014 n_2 is not given. Enter n_2, n_1 and s_o to compute s_i."
+ },
+ {
+  "id": "a46-086",
+  "q": "Calculate the uniform acceleration.",
+  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | missing:vf | standard conditions | fit:high",
+  "shown": "a=(vf-vi)/t",
+  "asked": "a",
+  "ans": "I cannot answer that \u2014 vf is not given. Enter vf, vi and t to compute a."
+ },
+ {
+  "id": "a46-087",
+  "q": "Starting from g = 9.81, determine the velocity.",
+  "record": "v=v_0-g*t | v:m/s v_0:m/s g:m/s^2 t:s | missing:v_0 | standard conditions | fit:high",
+  "shown": "v=v_0-g*t",
+  "asked": "v",
+  "ans": "I cannot answer that \u2014 v_0 is not given. Enter v_0 and t to compute v."
+ },
+ {
+  "id": "a46-088",
+  "q": "Starting from k_B = 1.381e-23, what is T_F?",
+  "record": "T_F=((E_F)/(k_B)) | T_F:K E_F:J k_B:J/K | missing:E_F | standard conditions | fit:high",
+  "shown": "T_F=((E_F)/(k_B))",
+  "asked": "T_F",
+  "ans": "I cannot answer that \u2014 E_F is not given. Enter E_F to compute T_F."
+ },
+ {
+  "id": "a46-089",
+  "q": "For c = 299800000, what was E?",
+  "record": "E=m*(c)^(2) | E:J m:kg c:m/s | missing:m | standard conditions | fit:high",
+  "shown": "E=m*(c)^(2)",
+  "asked": "E",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m to compute E."
+ },
+ {
+  "id": "a46-090",
+  "q": "In a setup with k_e = 8988000000, compute the electric potential.",
+  "record": "V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:q | standard conditions | fit:high",
+  "shown": "V=((k_e*q)/(r))",
+  "asked": "V",
+  "ans": "I cannot answer that \u2014 q is not given. Enter q and r to compute V."
+ },
+ {
+  "id": "a46-091",
+  "q": "The values are h = 6.626e-34. Estimate photon frequency.",
+  "record": "f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:Delta_E_LK | standard conditions | fit:high",
+  "shown": "f=(Delta_E_LK)/h",
+  "asked": "f",
+  "ans": "I cannot answer that \u2014 Delta_E_LK is not given. Enter Delta_E_LK to compute f."
+ },
+ {
+  "id": "a46-092",
+  "q": "What was p_abs? In a setup with p_atm = 101300.",
+  "record": "p_abs=p_g+p_atm | p_abs:Pa p_g:Pa p_atm:Pa | missing:p_g | standard conditions | fit:high",
+  "shown": "p_abs=p_g+p_atm",
+  "asked": "p_abs",
+  "ans": "I cannot answer that \u2014 p_g is not given. Enter p_g to compute p_abs."
+ },
+ {
+  "id": "a46-093",
+  "q": "Find photon frequency. Given h = 6.626e-34.",
+  "record": "f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:Delta_E_LK | standard conditions | fit:high",
+  "shown": "f=(Delta_E_LK)/h",
+  "asked": "f",
+  "ans": "I cannot answer that \u2014 Delta_E_LK is not given. Enter Delta_E_LK to compute f."
+ },
+ {
+  "id": "a46-094",
+  "q": "What is omega?",
+  "record": "omega=((Delta_theta)/(Delta_t)) | omega:1/s Delta_theta:1 Delta_t:s | missing:Delta_theta | standard conditions | fit:high",
+  "shown": "omega=((Delta_theta)/(Delta_t))",
+  "asked": "omega",
+  "ans": "I cannot answer that \u2014 Delta_theta is not given. Enter Delta_theta and Delta_t to compute omega."
+ },
+ {
+  "id": "a46-095",
+  "q": "Determine F_c.",
+  "record": "F_c=m*a_c | F_c:N m:kg a_c:m/s^2 | missing:m | standard conditions | fit:high",
+  "shown": "F_c=m*a_c",
+  "asked": "F_c",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m and a_c to compute F_c."
+ },
+ {
+  "id": "a46-096",
+  "q": "What was I?",
+  "record": "I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:P | standard conditions | fit:high",
+  "shown": "I=((P)/(A))",
+  "asked": "I",
+  "ans": "I cannot answer that \u2014 P is not given. Enter P and A to compute I."
+ },
+ {
+  "id": "a46-097",
+  "q": "You are told h = 6.626e-34. What was energy?",
+  "record": "E_f=h*f | E_f:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "E_f=h*f",
+  "asked": "E_f",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f to compute E_f."
+ },
+ {
+  "id": "a46-098",
+  "q": "Compute P.",
+  "record": "P=(((V)^(2))/(R)) | P:W V:V R:ohm | missing:V | standard conditions | fit:high",
+  "shown": "P=(((V)^(2))/(R))",
+  "asked": "P",
+  "ans": "I cannot answer that \u2014 V is not given. Enter V and R to compute P."
+ },
+ {
+  "id": "a46-099",
+  "q": "You are told g = 9.81. Find U.",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:m | standard conditions | fit:high",
+  "shown": "U=m*g*h",
+  "asked": "U",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m and h to compute U."
+ },
+ {
+  "id": "a46-100",
+  "q": "Estimate P_ave.",
+  "record": "P_ave=I_rms*V_rms | P_ave:W I_rms:A V_rms:V | missing:I_rms | standard conditions | fit:high",
+  "shown": "P_ave=I_rms*V_rms",
+  "asked": "P_ave",
+  "ans": "I cannot answer that \u2014 I_rms is not given. Enter I_rms and V_rms to compute P_ave."
+ },
+ {
+  "id": "a46-101",
+  "q": "What was V?",
+  "record": "V=((U_E)/(q)) | V:V U_E:J q:C | missing:U_E | standard conditions | fit:high",
+  "shown": "V=((U_E)/(q))",
+  "asked": "V",
+  "ans": "I cannot answer that \u2014 U_E is not given. Enter U_E and q to compute V."
+ },
+ {
+  "id": "a46-102",
+  "q": "Calculate x.",
+  "record": "x=v_0x*t | x:m v_0x:m/s t:s | missing:v_0x | standard conditions | fit:high",
+  "shown": "x=v_0x*t",
+  "asked": "x",
+  "ans": "I cannot answer that \u2014 v_0x is not given. Enter v_0x and t to compute x."
+ },
+ {
+  "id": "a46-103",
+  "q": "Determine angular acceleration.",
+  "record": "alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:Delta_omega | standard conditions | fit:high",
+  "shown": "alpha=((Delta_omega)/(Delta_t))",
+  "asked": "alpha",
+  "ans": "I cannot answer that \u2014 Delta_omega is not given. Enter Delta_omega and Delta_t to compute alpha."
+ },
+ {
+  "id": "a46-104",
+  "q": "What is velocity?",
+  "record": "v=f*lambda | v:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
+  "shown": "v=f*lambda",
+  "asked": "v",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f and lambda to compute v."
+ },
+ {
+  "id": "a46-105",
+  "q": "Determine acceleration.",
+  "record": "a=((Delta_v)/(Delta_t)) | a:m/s^2 Delta_v:m/s Delta_t:s | missing:Delta_v | standard conditions | fit:high",
+  "shown": "a=((Delta_v)/(Delta_t))",
+  "asked": "a",
+  "ans": "I cannot answer that \u2014 Delta_v is not given. Enter Delta_v and Delta_t to compute a."
+ },
+ {
+  "id": "a46-106",
+  "q": "Calculate the angular magnification m.",
+  "record": "M=((theta_image)/(theta_object)) | M:1 theta_image:1 theta_object:1 | missing:theta_image | standard conditions | fit:high",
+  "shown": "M=((theta_image)/(theta_object))",
+  "asked": "M",
+  "ans": "I cannot answer that \u2014 theta_image is not given. Enter theta_image and theta_object to compute M."
+ },
+ {
+  "id": "a46-107",
+  "q": "Determine p.",
+  "record": "p=((F)/(A)) | p:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+  "shown": "p=((F)/(A))",
+  "asked": "p",
+  "ans": "I cannot answer that \u2014 F is not given. Enter F and A to compute p."
+ },
+ {
+  "id": "a46-108",
+  "q": "Where h = 6.626e-34, determine the binding energy of an electron.",
+  "record": "E_b=h*f_O | E_b:J h:J*s f_O:Hz | missing:f_O | standard conditions | fit:high",
+  "shown": "E_b=h*f_O",
+  "asked": "E_b",
+  "ans": "I cannot answer that \u2014 f_O is not given. Enter f_O to compute E_b."
+ },
+ {
+  "id": "a46-109",
+  "q": "Determine R.",
+  "record": "R=V/I | R:ohm V:V I:A | missing:V | standard conditions | fit:high",
+  "shown": "R=V/I",
+  "asked": "R",
+  "ans": "I cannot answer that \u2014 V is not given. Enter V and I to compute R."
+ },
+ {
+  "id": "a46-110",
+  "q": "Estimate intensity.",
+  "record": "I=((((Delta_p_max))^(2))/(2*rho*v)) | I:W/m^2 Delta_p_max:Pa rho:kg/m^3 v:m/s | missing:Delta_p_max | standard conditions | fit:high",
+  "shown": "I=((((Delta_p_max))^(2))/(2*rho*v))",
+  "asked": "I",
+  "ans": "I cannot answer that \u2014 Delta_p_max is not given. Enter Delta_p_max, rho and v to compute I."
+ },
+ {
+  "id": "a46-111",
+  "q": "What was electrical power?",
+  "record": "P=V*I | P:W V:V I:A | missing:V | standard conditions | fit:high",
+  "shown": "P=V*I",
+  "asked": "P",
+  "ans": "I cannot answer that \u2014 V is not given. Enter V and I to compute P."
+ },
+ {
+  "id": "a46-112",
+  "q": "The values are g = 9.81. Find the gravitational potential energy.",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:m | standard conditions | fit:high",
+  "shown": "U=m*g*h",
+  "asked": "U",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m and h to compute U."
+ },
+ {
+  "id": "a46-113",
+  "q": "Using h = 6.626e-34, determine energy.",
+  "record": "E_f=h*f | E_f:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "E_f=h*f",
+  "asked": "E_f",
+  "ans": "I cannot answer that \u2014 f is not given. Enter f to compute E_f."
+ },
+ {
+  "id": "a46-114",
+  "q": "What is the gravitational acceleration?",
+  "record": "g=((4*(pi)^(2)*L)/((T)^(2))) | g:m/s^2 L:m T:s | missing:L | standard conditions | fit:high",
+  "shown": "g=((4*(pi)^(2)*L)/((T)^(2)))",
+  "asked": "g",
+  "ans": "I cannot answer that \u2014 L is not given. Enter L and T to compute g."
+ },
+ {
+  "id": "a46-115",
+  "q": "Determine capacitance.",
+  "record": "C=((Q)/(V)) | C:F Q:C V:V | missing:Q | standard conditions | fit:high",
+  "shown": "C=((Q)/(V))",
+  "asked": "C",
+  "ans": "I cannot answer that \u2014 Q is not given. Enter Q and V to compute C."
+ },
+ {
+  "id": "a46-116",
+  "q": "Assume g = 9.81. Compute gravitational potential energy.",
+  "record": "U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:m | standard conditions | fit:high",
+  "shown": "U=m*g*h",
+  "asked": "U",
+  "ans": "I cannot answer that \u2014 m is not given. Enter m and h to compute U."
+ },
+ {
+  "id": "a46-117",
+  "q": "Determine the time of flight. In a setup with g = 9.81.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | T_tof:s v_0:m/s theta_0:1 g:m/s^2 | missing:v_0 | standard conditions | fit:high",
+  "shown": "T_tof=((2(v_0*sin(theta_0)))/(g))",
+  "asked": "T_tof",
+  "ans": "I cannot answer that \u2014 v_0 is not given. Enter v_0 and theta_0 to compute T_tof."
+ },
+ {
+  "id": "a46-118",
+  "q": "Calculate acceleration.",
+  "record": "a=((Delta_v)/(Delta_t)) | a:m/s^2 Delta_v:m/s Delta_t:s | missing:Delta_v | standard conditions | fit:high",
+  "shown": "a=((Delta_v)/(Delta_t))",
+  "asked": "a",
+  "ans": "I cannot answer that \u2014 Delta_v is not given. Enter Delta_v and Delta_t to compute a."
+ },
+ {
+  "id": "a46-119",
+  "q": "Estimate the output work.",
+  "record": "W_o=F_o*d_o | W_o:J F_o:N d_o:m | missing:F_o | standard conditions | fit:high",
+  "shown": "W_o=F_o*d_o",
+  "asked": "W_o",
+  "ans": "I cannot answer that \u2014 F_o is not given. Enter F_o and d_o to compute W_o."
+ },
+ {
+  "id": "a46-120",
+  "q": "Calculate the velocity.",
+  "record": "v=a*t | v:m/s a:m/s^2 t:s | missing:a | standard conditions | fit:high",
+  "shown": "v=a*t",
+  "asked": "v",
+  "ans": "I cannot answer that \u2014 a is not given. Enter a and t to compute v."
+ }
+]

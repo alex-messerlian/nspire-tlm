@@ -1,8 +1,9 @@
 [
  {
   "id": "REP-001",
-  "q": "Determine f_B. Take lambda = 7.88e-07, f_2 = 8, rho = 113.5, p = 2.72e-27, f_1 = 345.24.",
-  "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:none | standard conditions | fit:high",
+  "q": "Consider a case where F = 81, A = 0.068, x_0 = 177.5. What is the pressure?",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "answer",
   "calls": [
    "x"
@@ -10,8 +11,9 @@
  },
  {
   "id": "REP-002",
-  "q": "What is centripetal acceleration? Take r = 790, k = 159.68, v = 2.108, f = 5.4e+18.",
-  "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
+  "q": "Determine length. Suppose lambda = 3.45e-07, v = 465, f_1 = 453.59.",
+  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
   "expect": "answer",
   "calls": [
    "x"
@@ -19,8 +21,9 @@
  },
  {
   "id": "REP-003",
-  "q": "Measurements give N_P = 144, F_net = 6500, n = 1.234, lambda_0 = 1.26e-08. What was measuring the refractive index?",
-  "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:none | standard conditions | fit:high",
+  "q": "Estimate the wave speed. Assume K = 5.95e-17, f = 570, Delta_E_LK = 3.25e-18, Delta_theta = 6.58, lambda = 1.698.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -28,8 +31,9 @@
  },
  {
   "id": "REP-004",
-  "q": "Starting from v_0 = 21.8, t = 1705, Delta_S_h = -0.00188, find (from worked example).",
-  "record": "x_1=((3)/(2))*v_0*t | t:s v_0:m/s | missing:none | standard conditions | fit:high",
+  "q": "Calculate v. Measurements give f = 223000000, t = 652, s = 100.",
+  "record": "v=((s)/(t)) | s:m t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -37,8 +41,9 @@
  },
  {
   "id": "REP-005",
-  "q": "The values are d_i = 22.33, C_V = 35.7, v = 645, f_1 = 54. Calculate L.",
-  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:none | standard conditions | fit:high",
+  "q": "Suppose rho = 82.5, Delta_p = 13, v_w = 3. What was I?",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "sound intensity",
   "expect": "answer",
   "calls": [
    "x"
@@ -46,8 +51,9 @@
  },
  {
   "id": "REP-006",
-  "q": "You are told s = 0.01, t = 56.8. Estimate linear speed.",
-  "record": "v=((s)/(t)) | s:m t:s | missing:none | standard conditions | fit:high",
+  "q": "You are told omega = 191.6, m = 519, r = 0.015. Calculate v.",
+  "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -55,8 +61,9 @@
  },
  {
   "id": "REP-007",
-  "q": "Find sound intensity. You are told rho = 81.13, v_w = 3, Delta_p = 41, m = 1764, d_i = 21.9.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:none | standard conditions | fit:high",
+  "q": "Where Delta_p = 6, Delta_t = 971.17, lambda = 8.61e-07, estimate F.",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "answer",
   "calls": [
    "x"
@@ -64,8 +71,9 @@
  },
  {
   "id": "REP-008",
-  "q": "What is (from worked example)? Using m = 860, vi = 878, I_1 = 0.35, v_c = 49.4, t_1 = 5.85.",
-  "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:none | standard conditions | fit:high",
+  "q": "Given k = 8, n_2 = 1.05, vf = 20.7, x = 0.08, what is F?",
+  "record": "F=k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "answer",
   "calls": [
    "x"
@@ -73,8 +81,9 @@
  },
  {
   "id": "REP-009",
-  "q": "What was resulting efficiency of a carnot cycle? For T_h = 61.1, T_c = 101, Q = 1.82e-08.",
+  "q": "If T_c = 24, T_h = 2.2, what was e?",
   "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "answer",
   "calls": [
    "x"
@@ -82,8 +91,9 @@
  },
  {
   "id": "REP-010",
-  "q": "Take F_o = 18.58, x = 0.293, m = 2.48, I = 11.1, k = 6000. Find F.",
-  "record": "F=k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "q": "Consider a case where F = 140, lambda = 2.7e-10, K = 6.47e-18, A = 0.66, Delta_theta = 7.16. What is P?",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "answer",
   "calls": [
    "x"
@@ -91,8 +101,9 @@
  },
  {
   "id": "REP-011",
-  "q": "Calculate (from worked example). For v = 81, t_2 = 0.167, x_0 = 177.5.",
-  "record": "x_2=v*t_2 | t_2:s v:m/s | missing:none | standard conditions | fit:high",
+  "q": "Given v = 764, f_1 = 92.3, rho = 680, estimate length.",
+  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
   "expect": "answer",
   "calls": [
    "x"
@@ -100,8 +111,9 @@
  },
  {
   "id": "REP-012",
-  "q": "Using E = 5.33e-15, Delta_p = 15, Delta_t = 441, estimate calculating force: venus williams\u2019 tennis serve.",
-  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "q": "Where lambda = 97.7, R = 0.031, a = 0.057, f = 278, r = 5.73, calculate v.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -109,8 +121,9 @@
  },
  {
   "id": "REP-013",
-  "q": "Measurements give Delta_theta = 6.58, F_o = 71.8, f_2 = 4, f_1 = 55.6. Find f_B.",
-  "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:none | standard conditions | fit:high",
+  "q": "Determine v. In a setup with m1 = 6.87e+20, s = 3, t = 110.98, x_2 = 7.68, R_1 = 580.",
+  "record": "v=((s)/(t)) | s:m t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -118,8 +131,9 @@
  },
  {
   "id": "REP-014",
-  "q": "Compute a_C. Take r = 0.673, F_net = 1633.33, v = 77.6, lambda = 0.266.",
-  "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
+  "q": "A system has rho = 78.452, v_w = 570.2, l = 0.867, Delta_p = 808. Compute the sound intensity.",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "sound intensity",
   "expect": "answer",
   "calls": [
    "x"
@@ -127,8 +141,9 @@
  },
  {
   "id": "REP-015",
-  "q": "Calculate measuring the refractive index of a gas. Suppose a_t = 502, n = 2.345, lambda_0 = 4.22e-07.",
-  "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:none | standard conditions | fit:high",
+  "q": "If r = 3.59, vi = 1.698, v_0 = 26.45, omega = 274.8, x_2 = 1100, compute v.",
+  "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -136,8 +151,9 @@
  },
  {
   "id": "REP-016",
-  "q": "Measurements give v = 166000, v_0 = 273.15, m = 4700, t = 541, a_t = 462. Calculate (from worked example).",
-  "record": "x_1=((3)/(2))*v_0*t | t:s v_0:m/s | missing:none | standard conditions | fit:high",
+  "q": "Compute average force. Using d = 6, Delta_p = 2.7, v = 57.8, P = 450, Delta_t = 27.3.",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "answer",
   "calls": [
    "x"
@@ -145,8 +161,9 @@
  },
  {
   "id": "REP-017",
-  "q": "If f_1 = 114.1, R = 7970, v = 559, estimate L.",
-  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:none | standard conditions | fit:high",
+  "q": "Compute F. Using k = 1.5, m = 30.13, x = 0.081.",
+  "record": "F=k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "answer",
   "calls": [
    "x"
@@ -154,8 +171,9 @@
  },
  {
   "id": "REP-018",
-  "q": "Given C_V = 16.4, s = 13, t = 197.8, calculate v.",
-  "record": "v=((s)/(t)) | s:m t:s | missing:none | standard conditions | fit:high",
+  "q": "With T_h = 852, T_c = 8.156, calculate the resulting efficiency of a carnot cycle.",
+  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "answer",
   "calls": [
    "x"
@@ -163,8 +181,9 @@
  },
  {
   "id": "REP-019",
-  "q": "Assume Delta_v = 43.6, x_f = 0.041, Delta_p = 3.96, rho = 344.08, v_w = 95. Estimate sound intensity.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:none | standard conditions | fit:high",
+  "q": "Consider a case where W_in = 25.1, R = 9.5, F = 32.1, A = 1.358. Calculate P.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "answer",
   "calls": [
    "x"
@@ -172,8 +191,9 @@
  },
  {
   "id": "REP-020",
-  "q": "Suppose t_1 = 3.41, v_c = 0.752, lambda = 2.7e-10, m_2 = 116. What is (from worked example)?",
-  "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:none | standard conditions | fit:high",
+  "q": "Calculate length. Measurements give l = 72.71, v = 390.8, f_1 = 611, x_2 = 91.7.",
+  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
   "expect": "answer",
   "calls": [
    "x"
@@ -181,8 +201,9 @@
  },
  {
   "id": "REP-021",
-  "q": "Given T_h = 60.2, F = 206.8, K = 2.07e-17, T_c = 2.2, compute resulting efficiency.",
-  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "q": "Where lambda = 13.8, f = 235.3, find wave speed.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -190,8 +211,9 @@
  },
  {
   "id": "REP-022",
-  "q": "Given x = 0.163, k = 60, calculate F.",
-  "record": "F=k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "q": "Given T_c = 263.1, s = 2.5, omega_0 = 23.9, t = 407, determine linear speed.",
+  "record": "v=((s)/(t)) | s:m t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -199,8 +221,9 @@
  },
  {
   "id": "REP-023",
-  "q": "If t_2 = 5.73, F = 196, omega = 22, v = 0.155, C_V = 35.7, what was x_2?",
-  "record": "x_2=v*t_2 | t_2:s v:m/s | missing:none | standard conditions | fit:high",
+  "q": "Find I. Starting from rho = 1.38, v_w = 15, Delta_p = 0.96.",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "sound intensity",
   "expect": "answer",
   "calls": [
    "x"
@@ -208,8 +231,9 @@
  },
  {
   "id": "REP-024",
-  "q": "What is F? Starting from Delta_p = 16, x = 0.985, Delta_t = 14.787, n_1 = 2.599.",
-  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "q": "Determine v. Assume r = 0.702, omega = 335, k = 0.71, m = 14.8, R = 1.36.",
+  "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -217,8 +241,9 @@
  },
  {
   "id": "REP-025",
-  "q": "Using I_1 = 1.618, f_1 = 81.2, f_2 = 2, find f_B.",
-  "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:none | standard conditions | fit:high",
+  "q": "In a setup with x_2 = 5.4, Delta_t = 1180, Delta_p = 3, Delta_v = 16.3, determine average force.",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "answer",
   "calls": [
    "x"
@@ -226,8 +251,9 @@
  },
  {
   "id": "REP-026",
-  "q": "Given v = 20.22, r = 1.698, compute centripetal acceleration.",
-  "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
+  "q": "Starting from k = 1, x = 0.075, v = 2490000, m = 300, find F.",
+  "record": "F=k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "answer",
   "calls": [
    "x"
@@ -235,8 +261,9 @@
  },
  {
   "id": "REP-027",
-  "q": "What was measuring the refractive index? Using a_t = 4.12, v_0 = 207, lambda_0 = 0.000507, n = 3.21, d = 0.01.",
-  "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:none | standard conditions | fit:high",
+  "q": "Where T_h = 1615, x = 5.291, m_R = 3.81, T_c = 6.93, theta = 0.86, what was the resulting efficiency of a carnot cycle?",
+  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "answer",
   "calls": [
    "x"
@@ -244,8 +271,9 @@
  },
  {
   "id": "REP-028",
-  "q": "What was x_1? Using t = 0.84, m = 30.13, v_0 = 1.95.",
-  "record": "x_1=((3)/(2))*v_0*t | t:s v_0:m/s | missing:none | standard conditions | fit:high",
+  "q": "Take m = 0.025, F = 1.61, d = 237.9, vf = 46.8, A = 60.5. What is the pressure?",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:none | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "answer",
   "calls": [
    "x"
@@ -253,8 +281,9 @@
  },
  {
   "id": "REP-029",
-  "q": "Consider a case where Delta_omega = 7.19, f_1 = 1014, v = 405, V_0 = 0.8. Find strategy.",
+  "q": "Consider a case where v = 416, f_1 = 58.08, R = 0.156. Find length of a closed tube from its fundamental frequency.",
   "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
   "expect": "answer",
   "calls": [
    "x"
@@ -262,8 +291,9 @@
  },
  {
   "id": "REP-030",
-  "q": "The values are t = 24.2, s = 17, Delta_S_h = -4660, a = 57.82, m = 0.577. What was linear speed?",
-  "record": "v=((s)/(t)) | s:m t:s | missing:none | standard conditions | fit:high",
+  "q": "Measurements give m = 129.1, f = 756.9, Delta_E = 4.37e-13, lambda = 81.56. Compute v.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:none | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -271,8 +301,9 @@
  },
  {
   "id": "REP-031",
-  "q": "If Delta_p = 401, v_w = 5, rho = 69, Delta_t = 32.2, determine sound intensity.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:none | standard conditions | fit:high",
+  "q": "A system has s = 10.37, K = 0.277, t = 17.5, F_i = 2.41. Compute v.",
+  "record": "v=((s)/(t)) | s:m t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -280,8 +311,9 @@
  },
  {
   "id": "REP-032",
-  "q": "Determine (from worked example). In a setup with v_c = 4.4, t_1 = 1.417.",
-  "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:none | standard conditions | fit:high",
+  "q": "If v_w = 2401, Delta_p = 7.56, rho = 9.4, calculate sound intensity.",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:none | standard conditions | fit:high",
+  "asked_name": "sound intensity",
   "expect": "answer",
   "calls": [
    "x"
@@ -289,8 +321,9 @@
  },
  {
   "id": "REP-033",
-  "q": "Starting from T_h = 8.66, m = 460, T_c = 4.29, F_i = 0.312, determine resulting efficiency.",
-  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "q": "Determine tangential speed. Starting from omega = 109.9, r = 2.67, vi = 50.2, P = 2.45, lambda = 0.05.",
+  "record": "v=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "answer",
   "calls": [
    "x"
@@ -298,8 +331,9 @@
  },
  {
   "id": "REP-034",
-  "q": "If k = 6, x = 0.308, f_s = 2140000000000, q = 4.31e-07, determine hooke's law.",
-  "record": "F=k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "q": "Compute average force. You are told Delta_t = 439.3, L = 4.508, Delta_p = 49.2, lambda = 163.",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "answer",
   "calls": [
    "x"
@@ -307,8 +341,9 @@
  },
  {
   "id": "REP-035",
-  "q": "Find x_2. Take v = 266, theta = 2.32, B = 0.5, t_2 = 7.",
-  "record": "x_2=v*t_2 | t_2:s v:m/s | missing:none | standard conditions | fit:high",
+  "q": "With x = 0.328, lambda = 0.035, k = 1820, f = 1470000000000, determine F.",
+  "record": "F=k*x | k:N/m x:m | missing:none | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "answer",
   "calls": [
    "x"
@@ -316,8 +351,9 @@
  },
  {
   "id": "REP-036",
-  "q": "The values are Delta_p = 8, Delta_t = 98.7. What was F?",
-  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+  "q": "A system has T_h = 378.103, f = 102, T_c = 20.4, P = 0.889, Delta_E_int = 1180. What is the resulting efficiency of a carnot cycle?",
+  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:none | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "answer",
   "calls": [
    "x"
@@ -325,269 +361,289 @@
  },
  {
   "id": "REP-037",
-  "q": "Starting from f_1 = 3120, f_2 = 1, theta_image = 3.13, F = 347, x_2 = 5800, find f_B.",
-  "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:none | standard conditions | fit:high",
-  "expect": "answer",
-  "calls": [
-   "x"
-  ]
+  "q": "Assume Delta_s = 34.1, F = 1.4, W_in = 16.2, A = 7.79, f = 0.75. Calculate length.",
+  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:v | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
+  "expect": "refuse",
+  "calls": []
  },
  {
   "id": "REP-038",
-  "q": "If r = 1.62, x = 5.291, v = 117.44, estimate measuring the refractive index.",
-  "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "q": "If f_1 = 52.5, v = 453, what was the wave speed?",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:lambda | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-039",
-  "q": "Determine (from worked example). Given lambda_0 = 9.01e-08, f = 2.75, v = 513.",
-  "record": "x_1=((3)/(2))*v_0*t | t:s v_0:m/s | missing:v_0 | standard conditions | fit:high",
+  "q": "Consider a case where f = 95.83, lambda = 26.46, R = 0.063, V_0 = 0.556. What is v?",
+  "record": "v=((s)/(t)) | s:m t:s | missing:s | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-040",
-  "q": "Suppose v_0 = 126, t = 1080. Find L.",
-  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:v | standard conditions | fit:high",
+  "q": "Given y_0 = 970, s = 8, v_0 = 17.37, t = 0.494, what is F?",
+  "record": "F=m*g | g:m/s^2 m:kg | missing:m | standard conditions | fit:high",
+  "asked_name": "weight",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-041",
-  "q": "Suppose v = 416, f_1 = 756.9, R = 0.156. Find linear speed.",
-  "record": "v=((s)/(t)) | s:m t:s | missing:s | standard conditions | fit:high",
+  "q": "What is tangential speed? Suppose Delta_p = 76, v_w = 19, omega_0 = 62.5, rho = 17.1.",
+  "record": "v=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-042",
-  "q": "Determine I. Consider a case where Delta_E = 4.37e-13, m = 129.1, y_0 = 75.05, s = 83, t = 304.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
+  "q": "Estimate average force from a change in momentum. You are told lambda = 0.026, omega = 221, f = 1.82e+17, r = 1.835, n = 8.",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-043",
-  "q": "A system has rho = 169.98, Delta_p = 8.62, E = 1.61e-17, v_w = 0.8. Compute (from worked example).",
-  "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:v_c | standard conditions | fit:high",
+  "q": "Determine F. Take Delta_t = 1900, Delta_p = 4, m = 432, q = 2.99e-06.",
+  "record": "F=k*x | k:N/m x:m | missing:k | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-044",
-  "q": "Starting from k = 258.36, t_1 = 1.387, v_c = 5.514, v = 735, determine resulting efficiency.",
+  "q": "A system has x = 0.292, F = 30.6, d_i = 0.23, k = 1. Estimate e.",
   "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-045",
-  "q": "Take T_c = 35.8, T_h = 9.25, r = 6.173. Compute hooke's law.",
-  "record": "F=k*x | k:N/m x:m | missing:k | standard conditions | fit:high",
+  "q": "What is the pressure? A system has T_c = 3.052, T_h = 12.49, m = 285.83.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:F | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-046",
-  "q": "You are told lambda = 163, K = 453, x = 0.275, k = 90. What is F?",
-  "record": "F=m*g | g:m/s^2 m:kg | missing:m | standard conditions | fit:high",
+  "q": "Where A = 7.6, R_1 = 138.57, F = 21.66, calculate length of a closed tube from its fundamental frequency.",
+  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:v | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-047",
-  "q": "Suppose t_2 = 64.7, m = 50, vf = 50.1, v = 18.2. Estimate calculating force: venus williams\u2019 tennis serve.",
-  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "q": "Suppose r = 1.027, v_w = 283, v = 405.5, Delta_v = 0.933, f_1 = 967.15. What was the wave speed?",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:lambda | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-048",
-  "q": "Take Delta_t = 8450, Delta_p = 60, V = 6.3, f = 102, lambda = 6.19e-07. Compute beat frequency.",
-  "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
+  "q": "Find v. Take n = 1.99, lambda = 97.2, f = 8.67.",
+  "record": "v=((s)/(t)) | s:m t:s | missing:s | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-049",
-  "q": "Measurements give I = 90.7, v_0 = 19.2, f_2 = 8, f_1 = 73. Estimate a_C.",
-  "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:v | standard conditions | fit:high",
+  "q": "Where s = 5, t = 0.042, what is weight?",
+  "record": "F=m*g | g:m/s^2 m:kg | missing:m | standard conditions | fit:high",
+  "asked_name": "weight",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-050",
-  "q": "Find measuring the refractive index of a gas. For r = 0.161, f = 19500000000, v = 39.9, F = 2219, V_0 = 0.179.",
-  "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "q": "Given Delta_p = 100.8, vf = 0.413, rho = 3.08, v_w = 2, estimate v.",
+  "record": "v=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-051",
-  "q": "What was x_1? Consider a case where n_2 = 2.18, vi = 530.93, lambda_0 = 4.61e-06.",
-  "record": "x_1=((3)/(2))*v_0*t | t:s v_0:m/s | missing:v_0 | standard conditions | fit:high",
+  "q": "With v = 183000000, x_2 = 140.8, W = 92.094, r = 0.094, omega = 501.5, find average force.",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-052",
-  "q": "Assume Delta_p = 1800, Delta_omega = 4040, v_0 = 113, t = 0.376. What is strategy?",
-  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:v | standard conditions | fit:high",
+  "q": "Measurements give Q = 8.57e-09, Delta_t = 154.7, Delta_p = 50. Estimate F.",
+  "record": "F=k*x | k:N/m x:m | missing:k | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-053",
-  "q": "In a setup with r = 8.55, f = 0.036, v = 523, f_1 = 96.2, what is linear speed?",
-  "record": "v=((s)/(t)) | s:m t:s | missing:s | standard conditions | fit:high",
+  "q": "Estimate resulting efficiency. Consider a case where x = 0.103, k = 12, Delta_theta = 2.45.",
+  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-054",
-  "q": "In a setup with t = 81.6, v = 0.46, s = 2.5, determine sound intensity.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
+  "q": "In a setup with T_h = 530.93, m = 6895, C_V = 13.45, I = 23.2, T_c = 21.78, calculate the pressure.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:F | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-055",
-  "q": "Starting from Delta_p = 7.7, v_w = 0.2, R_1 = 3.94, F = 1738, rho = 375.5, find (from worked example).",
-  "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:v_c | standard conditions | fit:high",
+  "q": "With F = 0.183, A = 48.4, lambda = 21.6, Delta_E = 1e-12, find length.",
+  "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:v | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-056",
-  "q": "Consider a case where n = 11, I = 65, t_1 = 19.6, m = 346.9, v_c = 101.3. Determine resulting efficiency.",
-  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
+  "q": "The values are Delta_theta = 6.7, m = 70.6, f_1 = 5471, v = 413. Find v.",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:lambda | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-057",
-  "q": "You are told T_c = 3.16, theta = 0.195, v = 458, v_w = 769, T_h = 2.46. Determine F.",
-  "record": "F=k*x | k:N/m x:m | missing:k | standard conditions | fit:high",
+  "q": "In a setup with lambda = 9.18, Delta_theta = 2.94, f = 59.7, x = 0.447, r = 0.235, calculate linear speed.",
+  "record": "v=((s)/(t)) | s:m t:s | missing:s | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-058",
-  "q": "Using k = 46, omega_0 = 106.86, x = 0.058, C = 0.285, theta = 2.26, estimate (from worked example).",
+  "q": "Calculate the weight. With s = 160, t = 4.19.",
   "record": "F=m*g | g:m/s^2 m:kg | missing:m | standard conditions | fit:high",
+  "asked_name": "weight",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-059",
-  "q": "A system has v_w = 283, r = 1.027, F_net = 1540, t_2 = 30.1, v = 3.9. Calculate F.",
-  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "q": "Given v_w = 286, rho = 9.14, Delta_p = 81.6, calculate tangential speed.",
+  "record": "v=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-060",
-  "q": "You are told Delta_p = 5, d_i = 0.617, Delta_t = 439.3. What was beat frequency?",
-  "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
+  "q": "With r = 1.4, m = 8.13e-28, v = 32.9, omega = 1.19, calculate average force from a change in momentum.",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-061",
-  "q": "What is centripetal acceleration? For vi = 6.052, f_2 = 5, f_1 = 197.8.",
-  "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:v | standard conditions | fit:high",
+  "q": "Given Delta_p = 9, m = 0.72, Delta_t = 46.6, vi = 366, r = 0.29, what is the hooke's law?",
+  "record": "F=k*x | k:N/m x:m | missing:k | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-062",
-  "q": "Consider a case where v = 277, C_V = 26.97, L = 23.5, y_0 = 103, r = 71. What was measuring the refractive index?",
-  "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "q": "Calculate e. A system has v = 154000000, k = 13, x = 0.016, sigma = 6.62e-07, m = 3.89.",
+  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-063",
-  "q": "Take E = 3.92e-16, m = 0.43, lambda_0 = 5.32e-08, W = 92.094, v = 183000000. Estimate x_1.",
-  "record": "x_1=((3)/(2))*v_0*t | t:s v_0:m/s | missing:v_0 | standard conditions | fit:high",
+  "q": "Starting from R = 279, T_c = 5.385, T_h = 4.94, I = 4.63, theta = 1.92, determine P.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:F | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-064",
-  "q": "Determine L. Consider a case where v_0 = 3.64, Q = 178, t = 998, E_F = 5.09e-18.",
+  "q": "Assume A = 26.7, F = 3220, d = 6, tau = 0.64, V_0 = 47.1. Compute the length of a closed tube from its fundamental frequency.",
   "record": "L=((v)/(4*f_1)) | f_1:Hz v:m/s | missing:v | standard conditions | fit:high",
+  "asked_name": "length of a closed tube from its fundamental frequency",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-065",
-  "q": "If f_1 = 808, m = 58.4, theta_i = 0.693, v = 675, estimate v.",
-  "record": "v=((s)/(t)) | s:m t:s | missing:s | standard conditions | fit:high",
+  "q": "Starting from v = 680, C = 4.77e-09, f_1 = 253.7, what was v?",
+  "record": "v=lambda*f | f:Hz lambda:m | missing:lambda | standard conditions | fit:high",
+  "asked_name": "wave speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-066",
-  "q": "Calculate I. Where t = 20.4, s = 458, I_0 = 9.81.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
+  "q": "The values are f = 3.95, lambda = 1.09, T = 35.5, Delta_p = 22.29. Calculate the linear speed.",
+  "record": "v=((s)/(t)) | s:m t:s | missing:s | standard conditions | fit:high",
+  "asked_name": "linear speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-067",
-  "q": "Given f = 2800000000000000, rho = 974, Delta_p = 0.034, v_w = 10, what was (from worked example)?",
-  "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:v_c | standard conditions | fit:high",
+  "q": "For t = 379, s = 2, determine weight.",
+  "record": "F=m*g | g:m/s^2 m:kg | missing:m | standard conditions | fit:high",
+  "asked_name": "weight",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-068",
-  "q": "With E = 178.7, t_1 = 28.4, v_c = 20.93, what was resulting efficiency of a carnot cycle?",
-  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
+  "q": "A system has Delta_p = 33.7, rho = 357.8, k = 4040, v_w = 60, Delta_v = 109.7. What was v?",
+  "record": "v=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
+  "asked_name": "tangential speed",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-069",
-  "q": "A system has I_2 = 54.4, E_transfer = 3.12e-19, T_c = 8.844, T_h = 983. Find F.",
-  "record": "F=k*x | k:N/m x:m | missing:k | standard conditions | fit:high",
+  "q": "Suppose omega = 0.277, Delta_E_LK = 2.36e-16, m = 27.29, f = 164000000000000, r = 0.157. What is F?",
+  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "asked_name": "average force from a change in momentum",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-070",
-  "q": "Consider a case where W = 5.76, x = 0.225, k = 50. Compute F.",
-  "record": "F=m*g | g:m/s^2 m:kg | missing:m | standard conditions | fit:high",
+  "q": "Calculate the hooke's law. For f = 0.367, lambda = 11.49, r = 1.698, Delta_t = 140.8, Delta_p = 12.5.",
+  "record": "F=k*x | k:N/m x:m | missing:k | standard conditions | fit:high",
+  "asked_name": "Hooke's law",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-071",
-  "q": "Determine F. Suppose t_2 = 159.68, E = 1690, v = 1.07.",
-  "record": "F=((Delta_p)/(Delta_t)) | Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "q": "Estimate resulting efficiency. With k = 1, n = 2, x = 0.018.",
+  "record": "e=1-((T_c)/(T_h)) | T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
+  "asked_name": "Resulting efficiency of a Carnot cycle",
   "expect": "refuse",
   "calls": []
  },
  {
   "id": "REP-072",
-  "q": "Assume Delta_t = 17.96, Delta_p = 98.9. What is beat frequency?",
-  "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-073",
-  "q": "Compute a_C. You are told f_2 = 286, f_1 = 58.693.",
-  "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:v | standard conditions | fit:high",
-  "expect": "refuse",
-  "calls": []
- },
- {
-  "id": "REP-074",
-  "q": "If f = 2, r = 341, v = 67.6, estimate measuring the refractive index.",
-  "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "q": "What was pressure? Starting from v_0x = 86.7, T_h = 1551, theta = 0.228, T_c = 26.99.",
+  "record": "P=((F)/(A)) | A:m^2 F:N | missing:F | standard conditions | fit:high",
+  "asked_name": "pressure",
   "expect": "refuse",
   "calls": []
  }

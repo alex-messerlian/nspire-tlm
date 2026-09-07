@@ -156,6 +156,7 @@ if ! _skip record_derivatives; then $PY tools/eval/audit_record_derivatives.py >
 if ! _skip split_heldout; then $PY tools/eval/gate_split_heldout.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "split_heldout" || { printf "  %-20s FAIL\n" "split_heldout"; fail=1; }; fi
 if ! _skip split_valid; then $PY tools/eval/gate_split_valid.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "split_valid" || { printf "  %-20s FAIL\n" "split_valid"; fail=1; }; fi
 if ! _skip no_repo_symlink; then $PY tools/eval/gate_no_repo_symlink.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_repo_symlink" || { printf "  %-20s FAIL\n" "no_repo_symlink"; fail=1; }; fi
+if ! _skip name_provenance; then $PY tools/eval/gate_name_provenance.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "name_provenance" || { printf "  %-20s FAIL\n" "name_provenance"; fail=1; }; fi
 if ! _skip d3_legitimacy; then $PY tools/eval/gate_d3_legitimacy.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "d3_legitimacy" || { printf "  %-20s FAIL\n" "d3_legitimacy"; fail=1; }; fi
 if ! _skip decl_siblings; then $PY tools/eval/gate_declaration_siblings.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "decl_siblings" || { printf "  %-20s FAIL\n" "decl_siblings"; fail=1; }; fi
 if ! _skip ascii_boundary; then $PY tools/eval/gate_ascii_boundary.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ascii_boundary" || { printf "  %-20s FAIL\n" "ascii_boundary"; fail=1; }; fi

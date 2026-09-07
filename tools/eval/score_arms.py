@@ -106,6 +106,49 @@ CANON_REFUSAL = "<a>I cannot answer that — the record gives something else, wh
 CANON_ANSWER = "<tool>eval<arg>(1.0)*(2.0)</tool><res>2.0</res><a>The result is 2.0.<end>"
 
 
+_SQ = lambda t: re.sub(r"\s+", "", t)
+
+def explain_ok(prompt, generation):
+    """A46. AN EXPLANATION IS: well-formed, NOT a refusal, NO tool call, and it STATES THE RELATION.
+
+    The last clause is what makes this a measurement instead of a vibe check, and it is the only
+    one that cannot be satisfied by saying nothing. The record's formula is the first field of the
+    prompt; an answer that explains the relation must contain it. Compared with whitespace removed
+    because the corpus renders `F_net=m*a` as `F_net = m*a` -- spacing the `=` is the only edit the
+    answer templates make to the store's string.
+
+    prov_clean last, on the FULL DOCUMENT, per its own docstring: given the generation alone it
+    reports every prompt-sourced number as invented. An explanation should carry no number the
+    record does not, and a formula like `E=((1)/(2))*m*(v)^(2)` carries several."""
+    if not grade.well_formed(generation): return False
+    if grade.is_refusal(generation): return False
+    if "<tool>" in generation: return False          # nothing to compute; a call is a wrong shape
+    formula = prompt.split("</q><r>", 1)[1].split(" | ", 1)[0]
+    if _SQ(formula) not in _SQ(generation): return False
+    return grade.prov_clean(prompt + generation)
+
+
+def explain_control(items, label):
+    """A ZERO AND A BROKEN GRADER LOOK IDENTICAL -- the same reason control() exists below, and the
+    same three directions. A canonical explanation of the item's OWN record must pass; a refusal
+    must not; and a computed answer must not, because the failure this arm exists to detect is the
+    model refusing, and a grader that also accepted a refusal would report the bug as a pass."""
+    pos = neg = tool = 0
+    for i in items:
+        pr = f"<q>{i['q']}</q><r>{i['record']}"
+        f = i["record"].split(" | ", 1)[0]
+        pos  += explain_ok(pr, f"<a>The relation is {f}, with the units as listed.<end>")
+        neg  += explain_ok(pr, CANON_REFUSAL)
+        tool += explain_ok(pr, f"<tool>eval<arg>(1)</tool><res>1</res><a>It is {f}.<end>")
+    assert pos == len(items), (
+        f"{label}: a canonical explanation of the item's own record scores as an explanation on "
+        f"only {pos}/{len(items)} items -- the arm cannot register a success, so any low score "
+        f"from it is an instrument artefact and not a model result")
+    assert neg == 0, f"{label}: a refusal scores as an explanation on {neg} items"
+    assert tool == 0, f"{label}: a tool call scores as an explanation on {tool} items"
+    return {"positive": pos, "negative": neg, "tool": tool, "n": len(items)}
+
+
 def control(items, label):
     """A ZERO AND A BROKEN GRADER LOOK IDENTICAL. The primary outcome of this whole experiment is a
     0/120, so before believing it, prove the grader CAN return True on these exact prompts and does
@@ -134,7 +177,8 @@ def score_multi(ck_path, seeds=(1234, 5678, 9012)):
             out[nm] = {"k_mean": sum(r[nm]["k"] for r in runs) / len(runs),
                        "refused_mean": sum(r[nm]["refused"] for r in runs) / len(runs),
                        "n": runs[0][nm]["n"]}
-    for arm in ("answer", "refuse", "d1", "fit", "fit_ho", "fit_m"):
+    for arm in ("answer", "refuse", "d1", "d1_zero", "fit", "fit_ho", "fit_m",
+                "explain", "explain_ho"):
         if arm not in runs[0]:
             continue
         ks = [r[arm]["k"] for r in runs if r[arm]["k"] is not None]
@@ -229,7 +273,14 @@ def score(ck_path, seed=1234):
     for name, path in (("fit", "corpus/split_fit.json"),
                        ("fit_ho", "corpus/split_fit_ho.json"),
                        ("fit_m", "corpus/split_fit_m.json"),
-                       ("d1", "corpus/split_d1.json")):
+                       ("d1", "corpus/split_d1.json"),
+                       # A46. THE CONTROL FOR THE EXPLAIN ARMS: same record, same zero-given
+                       # question, same `missing:X`, and the question asks to COMPUTE -- so the
+                       # correct behaviour is the refusal d1 already measures. Reported beside
+                       # explain and never without it: a model that explains everything scores
+                       # 100% on explain and 0% here, and one that refuses everything does the
+                       # reverse. Either number alone is satisfied by a constant.
+                       ("d1_zero", "corpus/split_d1_zero.json")):
         f = ROOT / path
         if not f.exists():
             res[name] = {"k": None, "n": 0, "note": "arm absent -- NOT a pass"}
@@ -268,6 +319,32 @@ def score(ck_path, seed=1234):
                      "n_records": len({i["shown"] for i in items}),
                      "symbol": {"k": sym_k, "n": sym_n},
                      "worded": {"k": wrd_k, "n": wrd_n}}
+
+    # A46. EXPLAIN: the question asks what the relation IS, and the record answers it.
+    for name, path in (("explain", "corpus/split_explain.json"),
+                       ("explain_ho", "corpus/split_explain_ho.json")):
+        f = ROOT / path
+        if not f.exists():
+            res[name] = {"k": None, "n": 0, "note": "arm absent -- NOT a pass"}
+            continue
+        items = json.loads(f.read_text())
+        res[name + "_control"] = explain_control(items, name)
+        ok = ref = tl = 0; misses = []; hit_records = set()
+        for it in items:
+            pr, gn = generate(m, f"<q>{it['q']}</q><r>{it['record']}")
+            e = explain_ok(pr, gn)
+            ok += e
+            # WHY IT FAILED IS THE RESULT HERE, not a diagnostic. The shipped model's failure is a
+            # REFUSAL to a question its own record answers, so the refusal count is the number the
+            # finding is about; a wrong-shaped tool call is a different failure entirely.
+            ref += grade.is_refusal(gn)
+            tl  += ("<tool>" in gn)
+            if e: hit_records.add(it["shown"])
+            elif len(misses) < 3:
+                misses.append({"q": it["q"][:70], "shown": it["shown"], "gen": gn[:90]})
+        res[name] = {"k": ok, "n": len(items), "refused": ref, "tooled": tl, "misses": misses,
+                     "k_records": len(hit_records),
+                     "n_records": len({i["shown"] for i in items})}
     return res
 
 
@@ -277,7 +354,8 @@ if __name__ == "__main__":
     r = score_multi(ROOT / ck if not os.path.isabs(ck) else ck)
     print(f"  checkpoint {r['checkpoint']}   corpus {str(r['corpus_sha'])[:16]}")
     print(f"  seeds {r['seeds']}  -- strict refusal (a tool call is not a refusal)")
-    for arm in ("answer", "refuse", "d1", "fit", "fit_ho", "fit_m"):
+    for arm in ("answer", "refuse", "d1", "d1_zero", "fit", "fit_ho", "fit_m",
+                "explain", "explain_ho"):
         if arm not in r:
             print(f"    {arm:8s} ABSENT -- not a pass"); continue
         a = r[arm]

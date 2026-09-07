@@ -62,14 +62,74 @@ norm=lambda x: re.sub(r"[()\s]","",x)
 # one builder is exactly what the previous two instances looked like.
 _LEIBNIZ = re.compile(r"\(d\*[A-Za-z_]")
 _FUSED   = re.compile(r"^[A-Z]\*[A-Z][A-Za-z0-9_]*=")
+# A48. A RECORD WHOSE NAME IS NOT A QUANTITY PRODUCES A QUESTION THAT ASKS FOR NOTHING.
+#
+# Every arm builds its question with _gen.quantity_surface(), which is the record's NAME and its
+# truncations. units_holdout.json was mined and never cleaned -- the project log records that as an open
+# item -- and 10 of its 26 names are not quantities:
+#
+#     seven   '(from worked example)'
+#     one     'Tangential speed:'                          a section heading, colon and all
+#     one     'Calculating Force: Venus Williams' Tennis Serve'
+#     one     'Measuring the Refractive Index of a Gas'     a verb phrase
+#
+# Substituted blind, they produce items like
+#     "Consider a case where I = 65.9, r_1 = 0.2, r_2 = 868.8. What is (from worked example)?"
+# labelled `expect: answer`. MEASURED: 13 of 74 SELECT items (17.6%), 22 of 74 REPORT (29.7%),
+# 26 of 120 explain_ho (21.7%) -- 61 items in total, all of them unanswerable.
+#
+# This is A6 -- mined surfaces substituted blind -- in the eval set, which the project log already
+# records as applying here after the SELECT invalidation. gate_split_well_posed could not see it:
+# it asserts an item NAMES ITS RECORD'S QUANTITY, and '(from worked example)' IS the record's
+# name, so a junk name satisfies the predicate. Another proxy for the property.
+#
+# Dropped rather than renamed: naming these ten is physics judgement, not a mechanical repair, and
+# inventing a name silently is worse than losing a record. The count is PRINTED, so "excluded" and
+# "unexamined" do not share an exit status -- repairing the names in units_holdout.json recovers
+# them with no code change.
+# DECLARED, NOT PATTERN-MATCHED. A chain of heuristics over names is the quantity_range() mistake:
+# my first filter caught '(from worked example)' and a colon and MISSED 'Strategy', 'Curiosity
+# Rover', 'Drag Force on a Barge' and 'V=B*l*v_d' -- the formula string used as a name. Every
+# widening added a rule and left another shape uncovered, which is the shape of that whole class.
+# corpus/holdout_names.json declares a name per record with the reasoning attached, and anything
+# undeclared with an unusable mined name is dropped and listed.
+_HN = json.load(open("corpus/holdout_names.json"))
+_HN_NAMES, _HN_DROP = _HN["names"], _HN["dropped"]
+_hn_keys = set(_HN_NAMES) | set(_HN_DROP)
+_hn_have = {r.get("f") for r in json.load(open("corpus/units_holdout.json"))}
+# A DECLARATION THAT MATCHES NO RECORD READS AS COVERAGE AND DOES NOTHING -- asserted, per the
+# _SCALE lesson, because two of those keys were my own formula spellings rather than the store's.
+assert not (_hn_keys - _hn_have), (
+    f"holdout_names.json declares records that do not exist: {sorted(_hn_keys - _hn_have)}")
+
+_NOT_A_QUANTITY = re.compile(r"^\s*\(|:|[=*/^]"
+                             r"|^\s*(calculating|deriving|using|finding|measuring|strategy)\b", re.I)
+def _name_usable(r):
+    f = r.get("f")
+    if f in _HN_DROP:
+        return False
+    if f in _HN_NAMES:
+        r["name"] = _HN_NAMES[f]["name"]        # authored; see holdout_names.json for the reasoning
+        return True
+    n = (r.get("name") or "").strip()
+    return bool(n) and not _NOT_A_QUANTITY.search(n)
+
 def _clean(r):
     f = r.get("f", "")
-    return bool(r.get("units")) and not _LEIBNIZ.search(f) and not _FUSED.match(f)
+    return (bool(r.get("units")) and not _LEIBNIZ.search(f) and not _FUSED.match(f)
+            and _name_usable(r))
 _raw = json.load(open("corpus/units_holdout.json"))
 hold = [r for r in _raw if _clean(r)]
 _dropped = [r["f"] for r in _raw if not _clean(r)]
+_unnamed = [(r.get("f"), r.get("name")) for r in _raw if not _name_usable(r)]
 if _dropped:
     print(f"  holdout cleaned: dropped {len(_dropped)} of {len(_raw)} -> {_dropped}")
+if _unnamed:
+    print(f"  A48: {len(_HN_NAMES)} holdout names AUTHORED from formula+units "
+          f"(corpus/holdout_names.json), {len(_unnamed)} of {len(_raw)} dropped as unnameable:")
+    for _f, _n in sorted(_unnamed):
+        _why = _HN_DROP.get(_f, "mined name is not a quantity and no name is declared")
+        print(f"       {str(_f)[:30]:32} {str(_n)[:26]!r:28} {_why[:64]}")
 # Deduplicate BEFORE splitting: the same exercise sentence appears in several modules,
 # so disjoint index slices are not disjoint sets. Caught by the build-time assertion.
 stems=sorted({s for s in json.load(open("corpus/stems_all.json"))
@@ -223,7 +283,14 @@ def build(name, n_match=40, n_mismatch=40):
         miss = _gen._device_missing_mod(src, set(vals))
         rec=(f"{src['f']} | {um} | missing:{miss} | "
              f"{src.get('req','standard conditions')} | fit:high")
+        # A48b. THE ITEM CARRIES THE NAME THE QUESTION WAS BUILT FROM. gate_split_well_posed
+        # recomputed it by re-reading units_holdout.json, which still holds the MINED name --
+        # so once holdout_names.json started overriding them, the gate compared the question
+        # against a name no producer had used and reported three well-posed items as broken.
+        # The project log: an artefact under test must carry the facts a harness needs, and the harness
+        # must READ them rather than recompute them. Same class as corpus_sha and tok_sha.
         out.append({"id":f"{name[:3]}-{len(out)+1:03d}","q":q,"record":rec,
+                    "asked_name": (src.get("name") or ""),
                     "expect":"answer" if matched else "refuse","calls":["x"] if matched else []})
     return out
 
@@ -248,3 +315,84 @@ print(f"  REPORT {len(R):>3} items  ({sum(1 for x in R if x['expect']=='answer')
       f"{sum(1 for x in R if x['expect']=='refuse')} refuse)  {len(rf)} formulas  hash {h(R)}")
 print(f"  assertions: disjoint formulas, disjoint questions, disjoint stem slices, no DEV overlap,")
 print(f"              every item in-distribution under the current record format -- all passed")
+
+
+# ---- A46 ARMS: the zero-given, record-bearing shape ---------------------------------------------
+#
+# BUILT BY RUNNING THE SHIPPING GENERATOR, not by a second implementation of it.
+#
+# The project log records EIGHT instrument defects in this file and every one has the same root: it
+# constructs eval items independently of corpus/generate.py, so the two drift and the drift is
+# invisible from inside the metric. The worst of them -- SELECT pairing a shuffled slice of raw
+# OpenStax sentences with a record by `i % len(st)` -- made every answer number it ever produced
+# meaningless, and the model that IMPROVED scored worse. These three arms therefore call
+# _gen.gen() and read the documents it emits, so an item is an item the corpus could contain.
+#
+# The pair is the point:
+#   explain     record-bearing, no student given, question asks what the relation IS -> explain
+#   d1_zero     record-bearing, no student given, question asks to COMPUTE          -> refuse
+# Same shape, same `missing:X`, opposite correct behaviour. Reporting either alone measures
+# nothing: a model that explains everything scores 100% on explain and 0% on d1_zero, and a model
+# that refuses everything does the reverse. Both numbers, always, or neither.
+#
+# explain_ho runs the same arm over HELD-OUT records, which is the fit_ho question one class over:
+# can it state a relation it was never trained on, reading it off the prompt.
+def _arm_from_gen(pool, seed, want, n=6000, cap=120):
+    """Run the shipping generator over `pool` and keep the documents `want` selects.
+
+    `pool` is swapped into the module global that gen() draws from. Restored in a finally, because
+    a harness that leaves a module mutated is the same defect as a mutation harness that leaves a
+    file mutated -- and this repo has paid for that one twice."""
+    saved = _gen.recs
+    _gen.recs = pool
+    try:
+        docs, _dropped = _gen.gen(n, seed=seed)
+    finally:
+        _gen.recs = saved
+    out = []
+    for d in docs:
+        if not want(d):
+            continue
+        t = d["text"]
+        q = t[3:].split("</q>", 1)[0]
+        rec = t.split("</q><r>", 1)[1].split("<a>", 1)[0]
+        _shown = rec.split(" | ", 1)[0]
+        out.append({"id": f"a46-{len(out)+1:03d}", "q": q, "record": rec, "shown": _shown,
+                    # `asked` is the quantity the record computes, which is what the existing
+                    # refusal arms stratify on: a question naming it as a bare SYMBOL is the easy
+                    # case and one naming it in words is not. Same field, same meaning.
+                    "asked": _shown.split("=", 1)[0].strip(), "ans": d["ans"]})
+        if len(out) >= cap:
+            break
+    return out
+
+_TRAIN_POOL = list(_gen.recs)
+_EX_TRAIN = _arm_from_gen(_TRAIN_POOL, 4601, lambda d: d.get("kind") == "EXPLAIN")
+_EX_HO    = _arm_from_gen(hold,        4602, lambda d: d.get("kind") == "EXPLAIN")
+_D1_ZERO  = _arm_from_gen(_TRAIN_POOL, 4603, lambda d: d.get("kind") == "D1" and d.get("bare"))
+_BY_F = {r["f"]: r for r in _TRAIN_POOL + hold}
+
+# EVERY ITEM MUST ACTUALLY HAVE THE SHAPE THE ARM CLAIMS, asserted rather than assumed -- an arm
+# whose items are not the shape it is named for is the SELECT failure exactly.
+_STUDENT_GIVEN = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)\s*=\s*-?[\d.]")
+for _nm, _xs in (("explain", _EX_TRAIN), ("explain_ho", _EX_HO), ("d1_zero", _D1_ZERO)):
+    assert _xs, f"{_nm}: arm is EMPTY -- an absent arm is not a pass"
+    for _x in _xs:
+        assert " missing:" in _x["record"] and "fit:high" in _x["record"], (
+            f"{_nm} {_x['id']}: not the record-bearing shape: {_x['record'][:70]}")
+        # A STUDENT given would make this an ordinary question and the arm would measure nothing.
+        # A record CONSTANT may appear -- assemble.c walks r->cval independently of the input, so
+        # "Given g = 9.81." survives an empty question -- so the check is that every given the
+        # question carries is one the RECORD supplies, never one a student typed. Written as a
+        # real predicate: an assertion that cannot fail is the no-op-wearing-coverage pattern.
+        _r = _BY_F.get(_x["shown"])
+        assert _r is not None, f"{_nm} {_x['id']}: record {_x['shown']} is in no pool"
+        for _v in _STUDENT_GIVEN.findall(_x["q"]):
+            assert _gen._const_for(_r, _v) is not None, (
+                f"{_nm} {_x['id']}: question supplies {_v}, which is not a record constant -- "
+                f"the arm is not the zero-given shape it is named for: {_x['q'][:70]}")
+_wj("corpus/split_explain.json",    _EX_TRAIN, indent=1)
+_wj("corpus/split_explain_ho.json", _EX_HO,    indent=1)
+_wj("corpus/split_d1_zero.json",    _D1_ZERO,  indent=1)
+print(f"  A46    explain {len(_EX_TRAIN):>3}   explain_ho {len(_EX_HO):>3}   "
+      f"d1_zero {len(_D1_ZERO):>3}   (matched pair: same shape, opposite answer)")

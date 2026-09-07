@@ -18,6 +18,9 @@ Two invariants, both source-side and needing no model:
 """
 import json, pathlib, re, sys
 
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[2] / 'corpus'))
+from recfmt import formula as _rf_formula  # " | " separates fields; a formula may hold a bare pipe
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SPLITS = ("corpus/split_select.json", "corpus/split_report.json")
 
@@ -46,7 +49,12 @@ def main():
                 continue
             n += 1
             rec = it["record"]
-            lhs = rec.split("|", 1)[0].split("=", 1)[0].strip()
+            # " | " IS THE SEPARATOR AND A FORMULA MAY CONTAIN A BARE PIPE. `rec.split("|", 1)`
+            # truncates `f_B=|f_1-f_2|` to `f_B=`, so the record lookup missed and a well-posed
+            # item read as unnamed. tools/../recfmt exists for exactly this; gate_split_valid
+            # already uses it and this gate did not.
+            _f  = _rf_formula(rec)
+            lhs = _f.split("=", 1)[0].strip()
             q = it["q"]
             # \b DOES NOT WORK ON A SYMBOL ENDING IN A NON-WORD CHARACTER. `U(x)` ends in ')',
             # so \bU\(x\)\b can never match and the gate flagged "estimate U(x)." as not naming
@@ -55,7 +63,11 @@ def main():
                    else re.escape(lhs))
             named = re.search(pat, q) is not None
             if not named:
-                hw = head_words((byf.get(rec.split("|", 1)[0].strip(), {}) or {}).get("name"))
+                # PREFER THE NAME THE PRODUCER STAMPED ON THE ITEM. Falling back to a lookup
+                # is a second implementation of "what did the question ask for", and the two
+                # disagreed the moment holdout_names.json began overriding the mined names.
+                _nm = it.get("asked_name") or (byf.get(_f, {}) or {}).get("name")
+                hw = head_words(_nm)
                 named = bool(hw & head_words(q))
             if not named:
                 bad_ask.append((it.get("id", "?"), q[:70], lhs))

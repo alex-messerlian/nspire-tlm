@@ -1,0 +1,23 @@
+{
+  "_doc": "A48. units_holdout.json was mined and never cleaned, and 16 of its 26 records carry a NAME that is not a quantity -- section headings ('Strategy'), worked-example titles ('Curiosity Rover'), the formula itself ('V=B*l*v_d'), and seven literal '(from worked example)'. Every arm builds its question with quantity_surface(), which is the record's NAME, so those produce items asking for nothing: 'What is (from worked example)?', labelled expect:answer. DECLARED, not pattern-matched, because a chain of heuristics over names is the quantity_range() mistake -- see the project log. Each entry is AUTHORED BY READING the formula and its units and is written to be read: a wrong name here is as damaging as a wrong record. A record with no entry here and an unusable mined name is DROPPED and listed on every build.",
+  "names": {
+    "L=((v)/(4*f_1))":          {"name": "length of a closed tube from its fundamental frequency", "why": "L = v/(4*f_1) is the quarter-wavelength resonator; store_clean.json carries this exact name for the same relation. Mined name was 'Strategy'."},
+    "a=((v_c)/(t_1))":          {"name": "acceleration from a speed reached in a given time",      "why": "a:m/s^2 from v_c:m/s over t_1:s. Mined name was '(from worked example)'."},
+    "v=r*omega":                {"name": "tangential speed",                                       "why": "Mined name was 'Tangential speed:' -- the trailing colon is a MathML heading artefact. No judgement, punctuation only."},
+    "v_CM=r*omega":             {"name": "speed of the centre of mass of a rolling object",        "why": "Rolling without slipping, v_CM = r*omega. Mined name was 'Curiosity Rover', the worked example's subject."},
+    "v=lambda*f":               {"name": "wave speed",                                             "why": "CORRECTS A PHYSICS ERROR: the mined name was 'speed of light'. v = lambda*f is the general wave relation and holds for any wave, not only light."},
+    "x_2=v*t_2":                {"name": "distance travelled at constant speed",                   "why": "x:m from v:m/s and t:s. Mined name was '(from worked example)'."},
+    "lambda=lambda_0/n":        {"name": "wavelength in a medium",                                 "why": "lambda_0 is the vacuum wavelength, n the refractive index (unit 1). Mined name was the section title 'Measuring the Refractive Index of a Gas'."},
+    "F=((Delta_p)/(Delta_t))":  {"name": "average force from a change in momentum",                 "why": "F:N = Delta_p:kg*m/s over Delta_t:s -- the impulse-momentum theorem. Mined name was the worked-example title 'Calculating Force: Venus Williams' Tennis Serve'."},
+    "v_w=f*lambda":             {"name": "wave speed from frequency and wavelength",               "why": "Same relation as v=lambda*f with the wave-speed symbol. Mined name was 'Strategy FOR (B)'."},
+    "F=m*g":                    {"name": "weight",                                                 "why": "F:N = m:kg * g:m/s^2. Mined name was '(from worked example)'."},
+    "V=B*l*v_d":                {"name": "motional emf",                                           "why": "V:V = B:T * l:m * v:m/s is the motional emf of a rod moving through a field. The mined 'name' was the formula string itself."}
+  },
+  "dropped": {
+    "d_1=((2*A)/(d_2))":        "NON-PHYSICS. A = (1/2)*d_1*d_2 is the area of a kite from its diagonals. Its sibling `d_2 = 2A/d_1` was group 1 of the store cleaning's deletions for exactly this reason.",
+    "x_1=((3)/(2))*v_0*t":      "The 3/2 factor belongs to one worked example's setup, not to a general relation. Naming it would assert a relation that is not one.",
+    "F_app=F_x+F_y":            "A scalar sum of two force components is valid only in the worked example's geometry (two tow ropes whose perpendicular components cancel). A general name would misrepresent it.",
+    "r=r_1+r_2":                "AMBIGUOUS: all three are metres, so this is a sum of lengths -- radii, distances or segments. Nothing in the record distinguishes them.",
+    "lambda=((2*h*c)/(E_0))":   "The factor 2 is not the standard lambda = h*c/E. Without the source context I cannot say what relation this is, and naming it would assert physics I have not verified."
+  }
+}
