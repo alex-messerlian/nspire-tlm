@@ -5,6 +5,7 @@ Token count is the wrong instrument: 310k documents from 27 record heads is 27 p
 and the token count looks identical to a genuinely varied corpus. Everything here is reported
 alongside three diversity measures, never alone."""
 import json
+import os
 import pathlib
 import math
 import sys as _sys, pathlib as _pl
@@ -2134,6 +2135,10 @@ def compose_question(ask, g, rng):
             stem.strip().rstrip(",").rstrip(".") + "."
     return stem + (ask[0].lower() + ask[1:] if stem.endswith(", ") else ask)
 
+# A51. Fraction of documents whose record variables are renamed consistently. 0 disables.
+# docs/PREREG_A51_READING.md
+A51_SCRAMBLE = float(os.environ.get("A51_SCRAMBLE", "0.25"))
+
 def gen(n, seed=0):
     rng = random.Random(seed)
     docs, calls = [], []
@@ -2796,6 +2801,85 @@ def gen(n, seed=0):
         built.append({"head": d["head"],
                       "text": f"<q>{d['q']}</q><r>{d['rec']}{c}<res>{res}</res><a>{ans}<end>",
                       "ans": ans})
+    # A51. MAKE RECALL AND READING DISAGREE, WITHOUT SHRINKING THE STORE.
+    #
+    # RESULT_RECALL_NOT_READ: rename one variable in the prompt of a record the model knows and it
+    # states the ORIGINAL formula 87-90% of the time and the shown one 0 of 80 times. The tool call
+    # reads (~10:1 over memory) because its VALUES differ in every document, so recall is
+    # impossible there. The prose does not, because a record's formula string is identical in every
+    # document that shows it -- recall always suffices and reading is never required.
+    #
+    # So: rename the record's variables CONSISTENTLY across the whole document in a fraction of
+    # documents. Same relation, same arithmetic, same store -- but "the formula for this record" is
+    # no longer one memorisable string, and recall now returns the WRONG SYMBOLS while reading
+    # returns the right ones. The tool call is the existing positive control for this working.
+    #
+    # The alternative design -- hold records out of every other class -- also works and costs 20 of
+    # the 164 records the DEVICE ships. This costs nothing outside the corpus.
+    #
+    # Replacements are drawn from symbols the corpus already uses, so they tokenise normally, and a
+    # candidate is rejected unless it is ABSENT FROM THE WHOLE DOCUMENT as a substring. That is
+    # deliberately conservative: `m` is both a variable and the unit metre, so a rename that merely
+    # avoided identifier collisions would corrupt the units field.
+    if A51_SCRAMBLE > 0:
+        _pool = ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "kappa",
+                 "mu", "nu", "xi", "rho", "sigma", "tau", "phi", "chi", "psi", "omega"]
+        _nscr = 0
+        for _d in built:
+            if rng.random() >= A51_SCRAMBLE:
+                continue
+            _t = _d["text"]
+            if "</q><r>" not in _t:
+                continue
+            _rec = _t.split("</q><r>", 1)[1].split("<a>", 1)[0]
+            _f = _rec.split(" | ", 1)[0]
+            # A VARIABLE WHOSE NAME IS ALSO A UNIT MUST NOT BE RENAMED. Found by reading three
+            # generated documents: `C=((Q)/(V)) | C:F Q:C V:V` became `chi:F sigma:chi alpha:alpha`
+            # -- renaming the variable C also renamed the coulomb, and V the volt. `m` is mass and
+            # metre, `N` normal force and newton, `T` period and tesla, `s` displacement and second.
+            # The "absent from the document" test guarded the NEW symbols; nothing guarded the old
+            # ones. Units are load-bearing -- the answer states them and dim_gate checks them.
+            _unit_toks = set()
+            for _u in (_rec.split(" | ")[1] if " | " in _rec else "").split():
+                _unit_toks.update(re.findall(r"[A-Za-z_]+", _u.split(":", 1)[-1]))
+            _vs = [v for v in dict.fromkeys(VAR.findall(_f))
+                   if v not in ("pi", "e") and v not in _unit_toks]
+            if not _vs:
+                continue
+            _cand = [c for c in _pool if c not in _t]      # substring, not identifier: see above
+            if len(_cand) < len(_vs):
+                continue
+            rng.shuffle(_cand)
+            _map = dict(zip(_vs, _cand[:len(_vs)]))
+            # THE PROTOCOL TAGS MUST SURVIVE THE RENAME. Found by reading document 5 of a sample:
+            # a variable named `q` renamed to `eta` turned `<q>...</q>` into `<eta>...</eta>`,
+            # because `<` and `>` are not word characters and the lookarounds happily matched
+            # inside the tag. `r` (radius) and `a` (acceleration) are two of the commonest variable
+            # names in physics and collide with <r> and <a>, so this would have corrupted a large
+            # share of the corpus -- silently, since the text still looks like a document.
+            #
+            # Tags are masked to sentinels for the substitution and restored afterwards, which
+            # keeps `r` and `a` renameable rather than excluding them and losing the coverage.
+            _TAGS = ["</tool>", "<tool>", "<arg>", "</res>", "<res>", "</q>", "<q>", "<r>",
+                     "<a>", "<end>"]
+            def _ren(txt, _m=_map, _tags=_TAGS):
+                for _i, _tg in enumerate(_tags):
+                    txt = txt.replace(_tg, f"\x00{_i}\x00")
+                for _a, _b in sorted(_m.items(), key=lambda kv: -len(kv[0])):
+                    txt = re.sub(rf"(?<![A-Za-z0-9_]){re.escape(_a)}(?![A-Za-z0-9_])", _b, txt)
+                for _i, _tg in enumerate(_tags):
+                    txt = txt.replace(f"\x00{_i}\x00", _tg)
+                return txt
+            _d["text"] = _ren(_t)
+            if _d.get("ans"):
+                _d["ans"] = _ren(_d["ans"])
+            # `head` deliberately keeps the ORIGINAL formula: it is the stratification key and the
+            # corpus_heads stamp, and a scrambled document is still a document ABOUT that record.
+            _d["scrambled"] = True
+            _nscr += 1
+        if _nscr:
+            print(f"  A51: scrambled symbols in {_nscr:,} of {len(built):,} documents "
+                  f"({100*_nscr/len(built):.1f}%) -- recall now returns the wrong symbols")
     return built, dropped
 
 # ---- diversity metrics -------------------------------------------------------
