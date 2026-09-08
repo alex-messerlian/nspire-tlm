@@ -50,6 +50,77 @@ unless tagged `[SOURCED]` or `[ESTIMATE]`.
 | I-cache / D-cache | 16 KB / **8 KB**, 32-byte line, 4-way |
 | CPU clock | **198 MHz, then 144 MHz** — not the 396 MHz the brief assumes |
 
+### The four results the project leads with
+
+1. **We measured our own measurement error, and most of our comparisons were inside it.** Three
+   training runs identical except the random seed score `fit` at **67.8 / 47.5 / 37.8** — a
+   **30-point** range, sd 15.3. Every `fit` value this project ever quoted falls inside that band,
+   including the ones that looked like clean effects. At this variance, resolving a 10-point
+   difference needs ~37 runs per arm (~48 h per side); **anything under ~20 points is unaffordable
+   on this hardware**, so the project claims 20+ point effects and no smaller ones.
+   ([`docs/RESULT_NOISE.md`](docs/RESULT_NOISE.md))
+
+   The trap is worth naming: every arm reports a tight *within-run* range, and that is **decoding**
+   noise across sampling seeds on one model. Quoted beside a number it reads exactly like an error
+   bar, and it is an error bar on the wrong quantity — training noise here is 15× larger.
+
+2. **A capability threshold.** Below ~10.3M parameters the model is healthy in every respect — it
+   answers, it refuses a withheld given 100% of the time, it does not over-refuse — and it *never*
+   declines on the grounds that the retrieved record does not apply (`fit` = **0.0%**). A 0.0% draw
+   is 3.3 sd from the mean of a converged run, so the cliff survives replication even though the
+   exact bracket does not. The transition is **not** the memory cliff the brief predicted; memory
+   never binds — compute does.
+   ([`docs/RESULT_COMPUTE_BOUND.md`](docs/RESULT_COMPUTE_BOUND.md))
+
+3. **Teaching the model to explain works, and it is the one large effect here.** The corpus
+   contained **0 of 239,832** record-bearing documents with no student-supplied value — the exact
+   prompt the device builds for *"explain Newton's second law"* — so the shipped model answered that
+   question with a self-contradiction. Adding the class takes `explain` from **0.0% to 80.0%**
+   (sd 3.9). Eighty points against an 8-point range.
+   ([`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md))
+
+4. **The model reads the record for the tool call and recalls it for prose — and the corpus explains
+   why.** Rename one variable in a record's formula *in the prompt only*, on records the model knows
+   well, and ask it to restate the relation: it gives the **original** formula 87–90% of the time and
+   the one it was shown **0 of 80 times**. Give the same corrupted record to the *tool call* and it
+   follows what it was shown ~10:1 over memory.
+   ([`docs/RESULT_RECALL_NOT_READ.md`](docs/RESULT_RECALL_NOT_READ.md))
+
+   **The corpus forces reading only where the target varies with the input.** A tool call cannot be
+   memorised — the values differ in every document — so the model learned to read the formula to
+   build one. A prose restatement of that same formula is identical in every document for a given
+   record, so recall always suffices. These probes are deterministic corruptions, not arm means, so
+   they are unaffected by result 1.
+
+**Unresolved, and stated as such:** whether d352 (10.9M) or d416 (15.4M) is better. On an identical
+corpus they differ by 2.9 points on `fit` — inside the band. The size question is open, not closed.
+
+## Sequencing
+
+1. ~~Tool interface spec + host evaluator~~ — **done**, no hardware needed.
+2. Data generation, **algebra only**.
+3. Train **one** model. Prove the full loop on host.
+4. Port to device.
+5. Only then add domains 2–4.
+
+Do not train four models before one runs on the calculator.
+
+**Current state: Phase 0–2 met on the physical calculator; Phase 3–4 in progress.** The device
+generates text unaided, on battery, with no computer attached. Hardware numbers below are measured
+unless tagged `[SOURCED]` or `[ESTIMATE]`.
+
+### Measured, on the physical device, battery, USB out
+
+| | |
+|---|---|
+| Shipping model | **d352 — 10,908,128 parameters**, 6 layers, int8 group-quantised, 11.4 MB |
+| Throughput | **1.70 tok/s** at context 512, 1.35 at the larger context (battery, USB out) |
+| Largest single `malloc` | 21.56 MiB bare / **4.83 MiB after ordinary use** — the gap is the finding |
+| DRAM read | 97 MB/s | 
+| Compute | 48 MMAC/s int8 — **the device is compute bound at every quantisation** |
+| I-cache / D-cache | 16 KB / **8 KB**, 32-byte line, 4-way |
+| CPU clock | **198 MHz, then 144 MHz** — not the 396 MHz the brief assumes |
+
 ### The three results the project leads with
 
 1. **A capability threshold, bracketed to 6.1%.** Below ~10.3M parameters the model is healthy in
