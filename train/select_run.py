@@ -10,6 +10,7 @@ against 8 x 20 minutes of seeds."""
 import os, pathlib, sys, json, re, subprocess, time, statistics as st
 import numpy as np, torch, pathlib as _pl
 sys.path.insert(0,"vendor/llama2.c"); sys.path.insert(0,"corpus"); sys.path.insert(0,"tools/eval")
+sys.path.insert(0,"train")
 import genloop                       # THE generation loop; never reimplement it
 from model import Transformer, ModelArgs
 from tokenizers import Tokenizer
@@ -32,12 +33,9 @@ torch.manual_seed(SEED); np.random.seed(SEED)
 
 # ---- pre-run checklist ------------------------------------------------------------------
 import collections
-docs=[json.loads(l) for l in open("corpus/synth_sample.jsonl")]
-kinds=collections.Counter(d.get("kind","answer") for d in docs); tot=sum(kinds.values())
-for kind,(lo,hi) in {"D1":(0.08,0.12),"D2":(0.03,0.07)}.items():
-    share=kinds.get(kind,0)/tot
-    assert lo<=share<=hi, f"corpus: {kind} is {share:.1%}, expected {lo:.0%}-{hi:.0%}"
-assert any("fit:low" in d["text"] for d in docs), "corpus has no fit:low documents"
+import corpus_check                  # ONE implementation of the composition check
+docs, kinds = corpus_check.check()
+tot=sum(kinds.values())
 SEL=json.load(open("corpus/split_select.json"))
 for i in SEL:
     assert "fit:" in i["record"] and "missing:" in i["record"], f"{i['id']} out of distribution"
