@@ -2138,8 +2138,106 @@ def compose_question(ask, g, rng):
 # A51. Fraction of documents whose record variables are renamed consistently. 0 disables.
 # docs/PREREG_A51_READING.md
 A51_SCRAMBLE = float(os.environ.get("A51_SCRAMBLE", "0.25"))
+
+# ---- THE KNOWLEDGE TIER ------------------------------------------------------------------------
+# 1,443 OpenStax glossary definitions packed as K-TEXT store records (A66), taught by three classes
+# (corpus/knowledge_docs.py). KNOWLEDGE=0 disables the tier entirely, which is what every arm
+# measured before it existed used, so a comparison across that boundary is possible.
+#
+# `kterms` IS THE PUBLISHED CONTRACT. tools/eval/gate_store_coverage.py reads it to decide whether
+# a knowledge record in the packed store has been trained on -- its rule is R_train superseteq
+# R_store, measured at 12.2% correct on an untrained retrievable record against 41.0% on a trained
+# one. It must therefore be the terms this module ACTUALLY EMITS, never the input file: reading
+# definitions_train.json there was a false green, because slated for training is not trained.
+import knowledge_docs as _KD
+
+KNOWLEDGE = float(os.environ.get("KNOWLEDGE", "1"))
+_KPATH = pathlib.Path(__file__).resolve().parent / "knowledge/definitions_train.json"
+_KDEFS = json.load(open(_KPATH)) if (_KPATH.exists() and KNOWLEDGE > 0) else []
+kterms = []          # filled by gen_knowledge(); see above for why it is not _KDEFS
+
+
+def gen_knowledge(rng):
+    """K1 explain-hit, K2 explain-miss, K3 compute-on-definition.
+
+    Returned as ordinary `built` entries so everything downstream -- the diversity metrics, the
+    case jitter, the writer -- treats them the same. They carry no tool call and no <res>, which is
+    correct: a definition computes nothing, and A22's rule is that a class whose runtime produces no
+    result must not train one.
+    """
+    global kterms
+    import asks_explain as _AE
+    out = []
+    seen = set()
+    for d in _KDEFS:
+        term, mean = d["term"], d["meaning"]
+        seen.add(term)
+        elab = ""
+        # K1, dosed by stratum
+        n1 = _KD.DOSE[_KD.stratum(term)]
+        for _ in range(n1):
+            q, _reg = _AE.ask(term, rng, mangle_rate=0.55)
+            q = _KD.ask_agrees(q, term)
+            a = _KD.k1_answer(term, mean, elab, rng)
+            out.append({"head": term, "kind": "K1", "q": q, "ans": a,
+                        "rec": _KD.span(term, mean)})
+        # K2, the record defines something else
+        for _ in range(8):
+            other = _KDEFS[rng.randrange(len(_KDEFS))]
+            if other["term"] == term:
+                continue
+            q, _reg = _AE.ask(term, rng, mangle_rate=0.55)
+            q = _KD.ask_agrees(q, term)
+            out.append({"head": term, "kind": "K2", "q": q,
+                        "ans": _KD.k2_answer(term, other["term"], rng),
+                        "rec": _KD.span(other["term"], other["meaning"])})
+        # K3, a compute request against a definition
+        for _ in range(10):
+            q = rng.choice(_KD.K3_ASK).format(t=term)
+            out.append({"head": term, "kind": "K3", "q": q,
+                        "ans": _KD.k3_answer(term, rng),
+                        "rec": _KD.span(term, mean)})
+    # A SPARE GIVEN AT THE SAME RATE IN ALL THREE CLASSES, drawn AFTER the class is fixed but from
+    # a distribution that does not depend on it, so P(a number is present | class) is constant and
+    # the feature carries zero bits. RESULT_A42_SHAPE_CUE is what happens when it does not: a spare
+    # given appeared in 0 of 197,562 ANSWER documents and 99.7% of D2, making it a perfect cue.
+    for o in out:
+        if rng.random() < _KD.SPARE_GIVEN:
+            v = rng.choice(["x", "m", "v", "t", "r", "E", "F", "T"])
+            val = round(rng.uniform(0.5, 500), 2)
+            o["q"] = o["q"].rstrip() + f" Given {v} = {val}."
+    kterms = sorted(seen)
+    return out
+
 # Upper edge of the explain roll band; 0.18 is the lower edge. See gen().
 EXPLAIN_HI   = float(os.environ.get("EXPLAIN_HI", "0.20"))
+
+def case_jitter(items, rng):
+    """Flip the first letter of a question, both directions, independently of its class.
+
+    One implementation for every class. The knowledge tier's documents are built separately, and a
+    second copy of this loop would be the two-implementations hazard that gave this app two rankers
+    and left A54/A55/A56 in one of them.
+    """
+    n = 0
+    for d in items:
+        q = d.get("q")
+        if not q:
+            continue
+        i = next((j for j, ch in enumerate(q) if ch.isalpha()), -1)
+        if i < 0:
+            continue
+        # Never touch a leading VARIABLE: "F_net is the ..." must keep its symbol.
+        w = q[i:].split(" ", 1)[0].strip(".,?:;")
+        if "_" in w or any(c.isdigit() for c in w) or (len(w) <= 3 and w.isupper()):
+            continue
+        want_lower = rng.random() < 0.5
+        new = q[i].lower() if want_lower else q[i].upper()
+        if new != q[i]:
+            d["q"] = q[:i] + new + q[i + 1:]
+            n += 1
+    return n
+
 
 def gen(n, seed=0):
     rng = random.Random(seed)
@@ -2683,29 +2781,7 @@ def gen(n, seed=0):
     # live inside the question string here -- "Given F = 12" would become "given f = 12" while the
     # record span still says `F:N`, which is precisely the self-contradiction A65 just removed from
     # assemble.c. The cue that was measured is the first character, and that is what is destroyed.
-    _jit = 0
-    for _d in docs:
-        _q = _d.get("q")
-        if not _q:
-            continue
-        _i = next((j for j, ch in enumerate(_q) if ch.isalpha()), -1)
-        if _i < 0:
-            continue
-        # Never touch a leading VARIABLE: "F_net is the ..." must keep its symbol. A first word that
-        # is short and not all-lowercase-able English is left alone.
-        _w = _q[_i:].split(" ", 1)[0].strip(".,?:;")
-        if "_" in _w or any(c.isdigit() for c in _w) or (len(_w) <= 3 and _w.isupper()):
-            continue
-        # BOTH DIRECTIONS. The first version only LOWERED, which killed "lowercase -> EXPLAIN"
-        # (100% -> 3.6%) and left "UPPERCASE -> not explain" at ~99.7%, because the EXPLAIN
-        # templates are authored lowercase and nothing ever raised them. A cue removed in one
-        # direction is a cue moved, not a cue removed -- RESULT_CANNOT_EXPLAIN is this repo's
-        # record of closing a coverage hole with one class and relocating the signal.
-        _want_lower = rng.random() < 0.5
-        _new = _q[_i].lower() if _want_lower else _q[_i].upper()
-        if _new != _q[_i]:
-            _d["q"] = _q[:_i] + _new + _q[_i + 1:]
-            _jit += 1
+    _jit = case_jitter(docs, rng)
     print(f"  case jitter: flipped the first letter of {_jit:,} of {len(docs):,} questions "
           f"({100*_jit/max(1,len(docs)):.1f}%), both directions, drawn independently of class")
 
@@ -2936,9 +3012,32 @@ def gen(n, seed=0):
         if _nscr:
             print(f"  A51: scrambled symbols in {_nscr:,} of {len(built):,} documents "
                   f"({100*_nscr/len(built):.1f}%) -- recall now returns the wrong symbols")
+    # ---- THE KNOWLEDGE TIER, appended -------------------------------------------------------
+    # Built separately because a definition has no givens, no tool call and no <res>, so it does not
+    # fit the per-record loop above. It goes through the SAME case_jitter, and its documents are
+    # ordinary `built` entries from here on, so the diversity metrics and the writer see one corpus.
+    if KNOWLEDGE > 0 and _KDEFS:
+        kdocs = gen_knowledge(rng)
+        if KNOWLEDGE < 1:                      # a fraction, for a dose experiment across runs
+            rng.shuffle(kdocs)
+            kdocs = kdocs[:int(len(kdocs) * KNOWLEDGE)]
+        kj = case_jitter(kdocs, rng)
+        for d in kdocs:
+            built.append({"head": d["head"], "kind": d["kind"], "ans": d["ans"],
+                          "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{d['ans']}<end>"})
+        import collections as _c
+        km = _c.Counter(d["kind"] for d in kdocs)
+        print(f"  knowledge tier: {len(kdocs):,} documents over {len(kterms):,} terms  {dict(km)}")
+        print(f"    case jitter flipped {kj:,} of them ({100*kj/max(1,len(kdocs)):.1f}%)")
+        _kex = km.get("K1", 0); _kre = km.get("K2", 0) + km.get("K3", 0)
+        print(f"    explain is {100*_kex/max(1,_kex+_kre):.1f}% of the text-record cell "
+              f"-- a cell far from the formula cell's rate makes RECORD TYPE decide the answer")
     return built, dropped
 
 # ---- diversity metrics -------------------------------------------------------
+_RELHEADS = {r["f"] for r in recs}
+
+
 def ngrams(s, n=4):
     w = s.split()
     return [tuple(w[i:i+n]) for i in range(max(0, len(w)-n+1))]
@@ -2973,8 +3072,17 @@ def diversity(docs):
         tot = sum(c.values())
         ent.append(-sum((v/tot)*math.log2(v/tot) for v in c.values()) if tot > 1 else 0.0)
     return {"distinct_4gram_ratio": len(set(allg))/max(1, len(allg)),
-            "head_coverage": len(heads)/len(recs),
-            "heads_used": len(heads),
+            # TWO TIERS, TWO DENOMINATORS. `heads` now contains compute formulas AND knowledge
+            # terms, and dividing the union by the 164 compute records printed "head coverage
+            # 979.9%". A rate above 100% is an instrument fault on its face, and this repo's rule
+            # is to fix the instrument before believing anything the figure implies. Reported per
+            # tier, because an aggregate over two populations of very different size is dominated
+            # by the larger one -- the same defect as summing the given-side and result-side
+            # declaration coverage into one 99.7%.
+            "head_coverage": len(set(heads) & _RELHEADS) / max(1, len(_RELHEADS)),
+            "heads_used": len(set(heads) & _RELHEADS),
+            "k_head_coverage": (len(set(heads) & set(kterms)) / len(kterms)) if kterms else None,
+            "k_heads_used": len(set(heads) & set(kterms)),
             "mean_phrasing_entropy_bits": sum(ent)/max(1, len(ent))}
 
 if __name__ == "__main__":
@@ -2989,7 +3097,11 @@ if __name__ == "__main__":
     print(f"  tokens @4.15    {chars/4.15/1e6:.2f}M from this run")
     print(f"\n  DIVERSITY  (never report the token count without these)")
     print(f"    composite (RETIRED)          {D['distinct_4gram_ratio']:.4f} @{len(docs):,} docs")
-    print(f"    head coverage                {D['head_coverage']*100:.1f}%  ({D['heads_used']} heads)")
+    print(f"    head coverage  compute       {D['head_coverage']*100:.1f}%  "
+          f"({D['heads_used']} of {len(recs)} relations)")
+    if D.get("k_head_coverage") is not None:
+        print(f"    head coverage  knowledge     {D['k_head_coverage']*100:.1f}%  "
+              f"({D['k_heads_used']} of {len(kterms)} terms)")
     print(f"    mean phrasing entropy        {D['mean_phrasing_entropy_bits']:.2f} bits/head")
     SP = diversity_by_span(docs)
     # Corpus size is stamped on every diversity figure: these ratios fall with document count, so

@@ -120,19 +120,43 @@ def _determined(meaning):
     return bool(m) and (bool(_DETERMINED.match(m)) or m[0].isupper() or m[0].isdigit())
 
 
+# WHY THERE ARE THIS MANY. The first banks had four frames each, which for a given term collapsed
+# to about two distinct strings: 26,424 K1 documents carried 2,743 distinct answers, so the model
+# saw one string 8 to 16 times per term. That teaches recitation of a frame, which is the failure
+# docs/PHRASING.md exists about, and it is measurable before training rather than after.
+#
+# Content variety still comes from the 1,443 meanings; these vary the WRAPPER so the wrapper is not
+# what gets learned. Each bank is checked for duplicates by test_knowledge_docs.
+
 # Frames that require the meaning to follow "X is" grammatically.
 K1_FRAMES_IS = [
     "{T} {v} {m}.",
     "{T} {v} {m}. {E}",
-    "{T} {v} {m}.",
     "Short version: {T} {v} {m}.",
+    "In plain terms, {t} {v} {m}.",
+    "{T} {v} {m}. That is the whole of it.",
+    "Here is the idea: {t} {v} {m}.",
+    "{T} {v} {m}, and that is what the term covers.",
+    "The short answer: {t} {v} {m}.",
+    "{T} {v} {m}. Worth knowing: {E}",
+    "When someone says {t}, they mean {m}.",
+    "{T} {v} {m}, and that is the definition physicists use.",
+    "Put simply, {t} {v} {m}.",
 ]
 # Frames that work after ANY noun phrase, used when the meaning is a bare one.
 K1_FRAMES_NP = [
     "{T}: {m}.",
     "{T}: {m}. {E}",
     "{T} means {m}.",
-    "{T}: {m}.",
+    "{T} refers to {m}.",
+    "The term {t} means {m}.",
+    "{T}: {m}. That is the whole of it.",
+    "Here is the idea. {T}: {m}.",
+    "{T} describes {m}.",
+    "When someone says {t}, they mean {m}.",
+    "{T}: {m}. Worth knowing: {E}",
+    "Short version. {T}: {m}.",
+    "{T} is the name for {m}.",
 ]
 
 # K2. The record defines something else, so the answer must NAME what it does define and decline.
@@ -155,6 +179,14 @@ K3_FRAMES = [
     "evaluate.",
     "I cannot answer that: the record gives the meaning of {t}, not an equation, so I cannot "
     "work out a number.",
+    "I cannot answer that: what I have is what {t} means, not a way to calculate it.",
+    "I cannot answer that: the record explains {t}. It does not give a relation to put numbers "
+    "into.",
+    "I cannot answer that: there is no formula here, only the definition of {t}.",
+    "I cannot answer that: this record says what {t} is, so there is no quantity to work out "
+    "from it.",
+    "I cannot answer that: computing {t} needs a relation, and the record I have is a definition.",
+    "I cannot answer that: the record defines {t}. Nothing in it can be evaluated.",
 ]
 
 def ask_agrees(question, term):
