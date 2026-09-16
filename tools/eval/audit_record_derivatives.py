@@ -42,6 +42,13 @@ EXPECTED = {
                                  "point -- refusing it cannot be done by having memorised the pair. "
                                  "docs/PREREG_FIT_RETRAIN.md sec 2.",
     "corpus/split_report.json":  "built from the holdout by construction",
+    # A46. The HELD-OUT explain arm: it asks the model to state a relation it was never
+    # trained on, so every one of its records is deliberately outside the shipped store --
+    # same construction and same reason as split_select and split_report above. It is the
+    # arm that produced RESULT_RECALL_NOT_READ, and it only works BECAUSE these records are
+    # absent from the store.
+    "corpus/split_explain_ho.json": "built from the holdout by construction -- the arm's "
+                                    "whole purpose is records the model never trained on",
     # --- raw mined inputs to the cleaning, not outputs of it --------------------------------------
     "corpus/records_raw.json":   "raw mined input to the cleaning",
     "corpus/units_raw.json":     "raw mined input",
