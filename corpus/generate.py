@@ -2154,7 +2154,16 @@ import knowledge_docs as _KD
 KNOWLEDGE = float(os.environ.get("KNOWLEDGE", "1"))
 _KPATH = pathlib.Path(__file__).resolve().parent / "knowledge/definitions_train.json"
 _KDEFS = json.load(open(_KPATH)) if (_KPATH.exists() and KNOWLEDGE > 0) else []
-kterms = []          # filled by gen_knowledge(); see above for why it is not _KDEFS
+# PUBLISHED AT IMPORT, ASSERTED AT EMIT. gate_store_coverage IMPORTS this module; it cannot run a
+# full generation, so a list filled only inside gen_knowledge() reads as empty and every packed
+# knowledge record is reported untrained. Publishing it here is a CLAIM about what this module
+# emits, and gen_knowledge asserts the claim against what it actually emitted -- so a filter added
+# later that drops terms fails loudly instead of leaving the gate quietly wrong.
+#
+# It is still not "read definitions_train.json in the gate". That file is the INPUT and says
+# nothing about KNOWLEDGE=0 or about any future filter; this is the generator's own statement,
+# checked against its own output.
+kterms = sorted({d["term"] for d in _KDEFS})
 
 
 def gen_knowledge(rng):
@@ -2165,7 +2174,6 @@ def gen_knowledge(rng):
     correct: a definition computes nothing, and A22's rule is that a class whose runtime produces no
     result must not train one.
     """
-    global kterms
     import asks_explain as _AE
     out = []
     seen = set()
@@ -2206,7 +2214,13 @@ def gen_knowledge(rng):
             v = rng.choice(["x", "m", "v", "t", "r", "E", "F", "T"])
             val = round(rng.uniform(0.5, 500), 2)
             o["q"] = o["q"].rstrip() + f" Given {v} = {val}."
-    kterms = sorted(seen)
+    emitted = sorted(seen)
+    assert emitted == kterms, (
+        f"gen_knowledge emitted {len(emitted)} terms but the module published {len(kterms)}. "
+        f"kterms is what gate_store_coverage trusts to decide whether a packed knowledge record "
+        f"has been trained on; a silent divergence would ship untrained retrievable records, "
+        f"measured at 12.2% correct against 41.0%. "
+        f"missing={sorted(set(kterms)-set(emitted))[:5]} extra={sorted(set(emitted)-set(kterms))[:5]}")
     return out
 
 # Upper edge of the explain roll band; 0.18 is the lower edge. See gen().

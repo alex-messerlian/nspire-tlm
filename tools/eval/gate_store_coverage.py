@@ -22,6 +22,7 @@ the store matters. It verifies the containment, which is the rule.
 DIRECTION MATTERS. R_train may exceed R_store (the corpus may teach relations the device cannot
 retrieve; harmless). The failure is a store record with no training, and only that.
 """
+import os
 import importlib.util, io, contextlib, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -70,7 +71,11 @@ if __name__ == "__main__":
     # Same class as the three propagation failures already recorded, mirrored: there a fix to the
     # JSON never reached the packed store, here a record in the packed store was invisible to the
     # check. Ask the ARTEFACT THE DEVICE READS, every time.
-    store = read_packed(ROOT / "build/store.tns")
+    # STORE points this at a store other than the shipped one, mirroring store_pack.py's
+    # STORE_OUT. It exists so a knowledge store can be CHECKED without being packed over the
+    # shipped path, which would leave a window where any concurrent reader sees a store nobody
+    # intended to ship. The default is the real one, so a plain run always asks about what ships.
+    store = read_packed(pathlib.Path(os.environ.get("STORE", ROOT / "build/store.tns")))
     if store is None:
         print("CANNOT CHECK: build/store.tns absent -- run tools/store_pack.py. Not a pass.")
         sys.exit(2)
