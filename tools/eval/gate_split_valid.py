@@ -134,6 +134,38 @@ def main():
                                 f"supplies {var} = {val}, but the runtime inlines "
                                 f"{var} = {declared[var]} -- scoring a model on this penalises it "
                                 f"for being right"))
+    # A53. THE DEVICE INLINES CONSTANTS AND THE SPLITS DO NOT -- reported every run, enforced the
+    # moment it reaches zero, which is the pattern gate_split_heldout already uses for a known gap.
+    #
+    # src/store/assemble.c walks r->cval independently of what the student typed, so a question
+    # about a constant-bearing record ALWAYS arrives with "Given g = 9.81." The splits exclude
+    # constant symbols from the drawn givens -- correct, since supplying `c = 2` for the speed of
+    # light was an earlier defect -- and then never inline the right value. So the model is asked to
+    # FABRICATE the constant, and tlm_shape_check has nothing to verify against: measured on the
+    # shipped a46b, 30 of 120 calls came back `unchecked` and ALL 30 were constant-bearing records.
+    #
+    # Consequence for anything already published: the shape-ok and mismatch rates measured on these
+    # splits UNDERSTATE the device, which does supply the constant. Ninth instrument defect in the
+    # split builders, same root as the other eight -- the split emits a shape the device cannot.
+    missing_const = []
+    for name in sorted(p.name for p in (ROOT / "corpus").glob("split_*.json")):
+        for it in json.loads((ROOT / "corpus" / name).read_text()):
+            if it.get("expect", "answer") != "answer":
+                continue
+            f = _rf_formula(it["record"])
+            for var, val in (cval.get(f) or {}).items():
+                if not re.search(rf"(?<![A-Za-z0-9_]){re.escape(var)}\s*=", it["q"]):
+                    missing_const.append((name, var, f))
+    if missing_const:
+        import collections as _c
+        _b = _c.Counter(nm for nm, _, _ in missing_const)
+        print(f"  A53 OPEN: {len(missing_const)} answerable items omit a constant the DEVICE inlines "
+              f"({', '.join(f'{k.removeprefix(chr(115)+chr(112)+chr(108)+chr(105)+chr(116)+chr(95)).removesuffix(chr(46)+chr(106)+chr(115)+chr(111)+chr(110))} {v}' for k, v in sorted(_b.items()))})")
+        print( "           the model must fabricate it and tlm_shape_check reports `unchecked`;")
+        print( "           shape rates measured on these splits UNDERSTATE the device.")
+    else:
+        print("  A53: every answerable item inlines the constants the device would -- now enforceable")
+
     print(f"  split items checked: {n} across {len(USES_CONSTANT)} splits")
     if skipped:
         import collections as _c
