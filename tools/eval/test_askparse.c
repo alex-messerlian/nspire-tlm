@@ -127,6 +127,23 @@ int main(int argc, char **argv) {
     ask_build(&ST, "k = 500, x = 0.4", &A);
     ck(A.question && A.question[0], "values-only question survives stripping", A.question);
 
+    printf("\n-- A52: removing the values must not leave the words that introduced them ---\n");
+    /* THE REGRESSION. "find the kinetic energy when you have m=900 and v=800" stripped to
+     * "find the kinetic energy when you have and", and ns_assemble appended a period, so the model
+     * was handed "...when you have and." -- a student's exact phrasing made ungrammatical by our
+     * own stripper. Found by running the planned DEVICE turns on the host; no gate reads a
+     * question, so nothing else could have caught it. */
+    case_contains("find the kinetic energy when you have m=900 and v=800",
+                  "<q>find the kinetic energy. Given ");
+    case_contains("kinetic energy where m = 5 and v = 3", "<q>kinetic energy. Given ");
+    case_contains("work with F = 12 and d = 2.5", "<q>work. Given ");
+    /* THE CONTROL, in the other direction: the trim walks only a TRAILING run and must stop at the
+     * first content word. A question whose real text ends in a content word is untouched, and
+     * "when you have" INSIDE a sentence is not a trailing run at all. */
+    case_contains("A 3.0 kg block accelerates. What net force?", "What net force?");
+    ask_build(&ST, "m = 2, v = 3", &A);
+    ck(A.question && A.question[0], "a values-only question still survives the trim", A.question);
+
     printf("\n%s  %d/%d\n", fails ? "FAIL" : "PASS", ran - fails, ran);
     return fails ? 1 : 0;
 }

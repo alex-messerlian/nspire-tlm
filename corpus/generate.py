@@ -2138,6 +2138,8 @@ def compose_question(ask, g, rng):
 # A51. Fraction of documents whose record variables are renamed consistently. 0 disables.
 # docs/PREREG_A51_READING.md
 A51_SCRAMBLE = float(os.environ.get("A51_SCRAMBLE", "0.25"))
+# Upper edge of the explain roll band; 0.18 is the lower edge. See gen().
+EXPLAIN_HI   = float(os.environ.get("EXPLAIN_HI", "0.20"))
 
 def gen(n, seed=0):
     rng = random.Random(seed)
@@ -2256,7 +2258,9 @@ def gen(n, seed=0):
         nomatch  = 0.15 <= roll < 0.18
         # A46. THE ZERO-GIVEN, RECORD-BEARING SHAPE -- see the block above EXPLAIN_ASK_REL.
         # Taken out of the ANSWER band, which is 82.2% of the corpus and can spare it.
-        explain  = 0.18 <= roll < 0.19   # A46c: 2% -> 1%, third dose point (docs/PREREG_A46C.md)
+        # A46/b/c: the explain band is parameterised so every dose is reproducible from
+        # one command. 0.22 = 4% (A46), 0.20 = 2% (A46b, SHIPPED), 0.19 = 1% (A46c).
+        explain  = 0.18 <= roll < EXPLAIN_HI
         # The CONTROL, and it is D1 with EVERY given withheld rather than one: same answer, same
         # `missing:X`, same record, and only the given-count differs -- which is the one variable
         # the explain class also moves. 28% of D1 puts it at ~3.8% of the corpus against explain's

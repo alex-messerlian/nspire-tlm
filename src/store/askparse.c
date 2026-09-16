@@ -349,6 +349,37 @@ static void ask_strip(const char *question, ns_ask *a) {
     }
     while (o && (a->qstrip[o-1] == ' ' || a->qstrip[o-1] == ',')) o--;
     a->qstrip[o] = 0;
+
+    /* A52. REMOVING THE VALUES LEAVES THE WORDS THAT INTRODUCED THEM DANGLING.
+     *
+     * "find the kinetic energy when you have m=900 and v=800" stripped to
+     * "find the kinetic energy when you have and", and ns_assemble then appended a period, so the
+     * model was handed "...when you have and." -- the exact phrasing a student types, made
+     * ungrammatical by our own stripper. Found by running the planned device turns on the host
+     * before the device session, not by any gate: no gate reads a question.
+     *
+     * Trailing FILLER words only, and the walk stops at the first content word, so a question that
+     * legitimately ends in one of these is the only thing at risk and none of the ASK frames does.
+     * Leading and interior text is never touched -- "when you have" mid-sentence is fine, it is
+     * only a trailing run with nothing after it that reads as broken. */
+    static const char *FILL[] = { "and", "with", "where", "when", "you", "have", "has", "given",
+                                  "for", "at", "of", "if", "using", "take", "suppose", "are",
+                                  "is", "to", "from", "in", "on", "by", "that", "we", "there" };
+    for (;;) {
+        while (o && (a->qstrip[o-1] == ' ' || a->qstrip[o-1] == ',')) o--;
+        int e = o;
+        while (e && idch(a->qstrip[e-1])) e--;          /* start of the trailing word */
+        if (e == o) break;                              /* not a word -- punctuation, stop */
+        int hit = 0;
+        for (unsigned i = 0; i < sizeof FILL / sizeof FILL[0]; i++) {
+            int L = (int)strlen(FILL[i]);
+            if (o - e == L && !strncasecmp(a->qstrip + e, FILL[i], (size_t)L)) { hit = 1; break; }
+        }
+        if (!hit) break;
+        o = e;
+    }
+    while (o && (a->qstrip[o-1] == ' ' || a->qstrip[o-1] == ',')) o--;
+    a->qstrip[o] = 0;
 }
 
 void ask_build(const ns_store2 *st, const char *question, ns_ask *a) {
