@@ -1,0 +1,1806 @@
+[
+ {
+  "formula": "F=-k*x",
+  "name": "Hooke's law",
+  "grounded": true,
+  "anchor": "OpenStax spring section: k as stiffness in N/m, the small-deformation limit where it stops being true, x measured from the relaxed position",
+  "variants": [
+   "Stretch a spring and it pulls back. Go twice as far and it pulls twice as hard: F = -k*x. The minus sign means the pull always aims back toward the relaxed position. A big k is a stiff spring.",
+   "Every solid deforms a little under force, even a brick wall. For small pushes the deformation tracks the force exactly, and that is F = -k*x. Push far enough and it bends for good, and the law quits.",
+   "Here x is not the length of the spring, it is how far you dragged it off its rest position. F = -k*x is the force it spends undoing that. k is in N/m, so it reads as newtons per meter pulled."
+  ]
+ },
+ {
+  "formula": "W=Q_h-Q_c",
+  "name": "net work of a heat engine per cycle",
+  "grounded": true,
+  "anchor": "OpenStax heat engines: internal energy unchanged over a full cycle, the second law forbidding Q_c from being zero, and a car radiator",
+  "variants": [
+   "An engine swallows heat Q_h, dumps some of it as Q_c, and keeps the gap as work: W = Q_h - Q_c. Nothing hides inside, because after a full cycle the engine sits exactly where it started.",
+   "You would love Q_c to be nothing and turn all the heat into work. The second law of thermodynamics says no. So every engine pays the cold side something, and W = Q_h - Q_c is what is left for you.",
+   "Burning fuel delivers Q_h, the exhaust and the coolant carry off Q_c, and only the gap between them turns the wheels: W = Q_h - Q_c. That is why a car needs a radiator."
+  ]
+ },
+ {
+  "formula": "Delta_p=m*Delta_v",
+  "name": "momentum change from a velocity change",
+  "grounded": true,
+  "anchor": "OpenStax impulse-momentum theorem: the tennis racquet and the goalie catching a puck, plus force acting over time",
+  "variants": [
+   "Momentum is mass times velocity, so with the mass fixed only the velocity change counts: Delta_p = m*Delta_v. Velocity, not speed: a ball sent straight back has a big Delta_v even at the same speed.",
+   "A goalie catching a puck has to absorb all of its momentum. Delta_p = m*Delta_v says how much: double the mass, or double the change in speed, and the catch gets twice as hard to make.",
+   "Force times the time you apply it is what changes momentum, and Delta_p = m*Delta_v is that change. Stretch the time and the force drops for the same Delta_p, which is why braking early is gentler than late."
+  ]
+ },
+ {
+  "formula": "E_f=h*f",
+  "name": "Energy of a photon",
+  "grounded": true,
+  "anchor": "OpenStax photoelectric effect: Einstein's light quanta, energy set by frequency alone, one visible photon being a tiny fraction of a joule",
+  "variants": [
+   "Light arrives in packets, and a packet's energy is set by its color alone: E_f = h*f. Brightness only counts how many turn up. Dim blue light can knock electrons loose where bright red light cannot.",
+   "Einstein explained the photoelectric effect by saying a light beam is a stream of particles, each one carrying E_f = h*f, where h is Planck's constant. Frequency fixes the energy. Nothing else about the beam does.",
+   "One photon of visible light carries a tiny sliver of a joule, which is why you never feel them land one by one. E_f = h*f, with f the frequency in Hz and h Planck's constant, is where that smallness comes from."
+  ]
+ },
+ {
+  "formula": "I_0=((V_0)/(Z))",
+  "name": "AC version of Ohm's law",
+  "grounded": true,
+  "anchor": "OpenStax impedance section: Z combining R, X_L and X_C so they partly cancel rather than add, and resonance in a radio tuner",
+  "variants": [
+   "Same shape as ordinary Ohm's law, with impedance Z standing in for resistance: I_0 = V_0/Z. The twist is that Z shifts with frequency, so one circuit can wave some tones through and choke others.",
+   "A radio tuner lives on this. I_0 = V_0/Z turns peak voltage into peak current, and at one frequency the coil and the capacitor cancel, Z drops to just the resistance, and that station comes through loud.",
+   "Coils and capacitors impede current in opposite ways, so they partly cancel and their ohms refuse to simply add. Whatever total Z falls out, the peak current follows from I_0 = V_0/Z."
+  ]
+ },
+ {
+  "formula": "P=(((V)^(2))/(R))",
+  "name": "electrical power from voltage and resistance",
+  "grounded": true,
+  "anchor": "OpenStax power in electric circuits: bulbs of different wattage on the same fixed supply voltage, and electron collisions leaving as heat and light",
+  "variants": [
+   "At a wall outlet the voltage is fixed, so the only thing setting how bright a bulb burns is its own resistance: P = V^2/R. Lower R, more power, hotter filament. That is the whole difference between bulbs.",
+   "Notice the square. Double the voltage across the same resistor and the power does not double, it goes up fourfold: P = V^2/R. A small mistake in voltage can cook a component that would have been fine.",
+   "The power is not lost, it is converted. Electrons bang into the metal and give up what they gained, and it leaves as heat and light. P = V^2/R is how much, every second, for voltage V across resistance R."
+  ]
+ },
+ {
+  "formula": "P=((1)/(f))",
+  "name": "Optical power",
+  "grounded": true,
+  "anchor": "OpenStax vision correction: diopters on a real glasses prescription, negative power for a diverging lens, and lens powers adding where focal lengths do not",
+  "variants": [
+   "Your glasses prescription is this number. P = 1/f, with the focal length f written in meters, gives the optical power in diopters. A short focal length bends light hard, so it earns a big P.",
+   "A negative P means a diverging lens, thin in the middle, what a nearsighted person wears. Positive means converging and thick in the middle. Since P = 1/f, the sign comes straight off the focal length.",
+   "Opticians work in P = 1/f rather than f because the powers of lenses sitting close together simply add, while focal lengths do not. Your cornea and your eye lens team up exactly that way."
+  ]
+ },
+ {
+  "formula": "Delta_t=((h)/(E))",
+  "name": "Approximate time for exchange of a virtual particle between two other particles",
+  "grounded": false,
+  "anchor": "no evidence paragraphs supplied; written from the uncertainty principle and the short range of a force carried by a massive particle, with h declared by the record's own cval",
+  "variants": [
+   "Quantum rules let a particle flicker into being with energy E so long as it disappears fast enough. Delta_t = h/E is that deadline, with h Planck's constant. Borrow more energy, get less time to repay it.",
+   "Forces are carried by particles nobody sees directly. A heavier carrier costs more energy E and so lives a shorter time: Delta_t = h/E. Short life means short reach, which is why some forces stop at the nucleus.",
+   "Here h is Planck's constant, and it is minuscule, so Delta_t = h/E comes out minuscule as well. Even a modest energy E buys the particle nothing more than the barest flicker before it has to vanish."
+  ]
+ },
+ {
+  "formula": "Delta_U=Q-W",
+  "name": "first law of thermodynamics",
+  "grounded": true,
+  "anchor": "metabolism as energy bookkeeping, plus the chemistry-vs-physics sign flip on W from the req field",
+  "variants": [
+   "Nothing is lost, only moved. Delta_U = Q - W says the heat Q you put in that does not leave as work W stays behind as internal energy. Watch the minus: W is work done BY the system, not on it.",
+   "Eat a burrito and your internal energy climbs; do work and it drops. That is Delta_U = Q - W, heat in minus work out, and the leftover is what you keep. It never asks how messy the middle was.",
+   "Chemists write this law with a plus and physicists with a minus, and both are right because they mean different W. Here W is work the system does, so it subtracts: Delta_U = Q - W. Check whose W you have."
+  ]
+ },
+ {
+  "formula": "E=m*(c)^(2)",
+  "name": "energy-mass conversion",
+  "grounded": true,
+  "anchor": "the sun turning a little mass into the light you feel, and electron-positron annihilation",
+  "variants": [
+   "Mass is energy that is sitting still. E = m*c^2 is the exchange rate, and since c is the speed of light it is a brutal one: the sun loses a little mass and you feel it on your face.",
+   "Let an electron meet a positron and both stop existing, leaving light behind. Nothing was destroyed, only converted, and E = m*c^2 is the receipt: the mass that vanished fixes the energy that shows up.",
+   "Almost every bit of energy you have ever used traces back to mass disappearing somewhere. E = m*c^2 sets the rate, and squaring the speed of light makes it enormous, so a tiny m buys a huge E."
+  ]
+ },
+ {
+  "formula": "Delta_x=x_f-x_i",
+  "name": "Displacement",
+  "grounded": true,
+  "anchor": "the pacing professor who ends one step from where she began, and walking there and back",
+  "variants": [
+   "Walk to the fridge and back and your displacement is zero, whatever your legs think. Delta_x = x_f - x_i only looks at the two endpoints, and the path you took between them appears nowhere in it.",
+   "Displacement has a direction, not just a size. Pick which way counts as positive first, then Delta_x = x_f - x_i comes out negative when you finish behind where you started. That minus is information.",
+   "A professor can pace all lecture and end one step left of the board. Delta_x = x_f - x_i counts that step and nothing else. Distance walked is a different number, and never the smaller of the two."
+  ]
+ },
+ {
+  "formula": "f=(Delta_E_LK)/h",
+  "name": "photon frequency from an energy-level difference",
+  "grounded": false,
+  "anchor": "an electron falling between two levels and paying out one whole photon; line spectra as element fingerprints",
+  "variants": [
+   "An electron drops from the L level to the K level and the leftover energy leaves as one photon. f = Delta_E_LK / h fixes its frequency: a wider gap buys a higher f, never a faster photon. h is Planck's constant.",
+   "Atoms glow in fixed colors because their levels sit at fixed heights. The gap Delta_E_LK between two of them sets the frequency exactly, f = Delta_E_LK / h, which is how you tell elements apart by light.",
+   "Light comes in whole photons, so a jump cannot pay out half of one. Divide the energy gap by Planck's constant, f = Delta_E_LK / h, and that jump can emit one frequency and no other."
+  ]
+ },
+ {
+  "formula": "L=((v_w)/(4*f_1))",
+  "name": "length of a closed tube from its fundamental",
+  "grounded": false,
+  "anchor": "blowing across a bottle, and the sealed end forcing exactly a quarter wave into the tube",
+  "variants": [
+   "Blow across a bottle and the air inside picks one note. A tube closed at one end holds a quarter of a wave, so L = v_w / (4*f_1), and the longer the column the lower its fundamental f_1.",
+   "You can measure a pipe you cannot see into. Hear its lowest note f_1, know the speed of sound v_w, and L = v_w / (4*f_1) hands you the length, no ruler and nothing put inside the tube.",
+   "Air cannot move at the sealed end, so the wave has to be still there and swinging hardest at the mouth. That fits exactly a quarter wavelength, which is the 4 in L = v_w / (4*f_1)."
+  ]
+ },
+ {
+  "formula": "Eff_C=1-((T_c)/(T_h))",
+  "name": "Carnot efficiency",
+  "grounded": true,
+  "anchor": "the heat you must dump to reset, and efficiency collapsing as the two reservoirs close together",
+  "variants": [
+   "No engine beats this. Eff_C = 1 - (T_c/T_h) is a ceiling set by the two temperatures alone, not by how clever the machine is, and you only climb toward it by heating T_h or chilling T_c.",
+   "You never get all the heat as work, because the engine must dump some into the cold side to be ready for the next stroke. Eff_C = 1 - (T_c/T_h) is the most you could keep. Put both temperatures in kelvin.",
+   "Push the two reservoirs together and the whole thing collapses: as T_c creeps up toward T_h, Eff_C = 1 - (T_c/T_h) fades to nothing. Only a cold side at absolute zero would hand you everything."
+  ]
+ },
+ {
+  "formula": "p=((F)/(A))",
+  "name": "Pressure",
+  "grounded": true,
+  "anchor": "the same force through a thumbtack versus a palm; snowshoes; pressure on the nerve behind the eye",
+  "variants": [
+   "Lean on a wall with your palm and nothing happens. Lean the same way on a thumbtack and it sinks in. Same force F, much smaller area A, and p = F/A is the entire difference between the two.",
+   "Force is what you apply; pressure is what the surface feels. Since p = F/A, shrinking the area is just another way of pushing harder. Snowshoes run it backwards: same weight, more A, and you stay on top.",
+   "In a fluid the pressure pushes on every surface it touches, and p = F/A turns it back into a force. Let the pressure in your eye build and that force on the nerve behind it is what does the damage."
+  ]
+ },
+ {
+  "formula": "a_CM=R*alpha",
+  "name": "Acceleration of center of mass of rolling object",
+  "grounded": false,
+  "anchor": "the burnout, where the wheel spins and the car does not, because rolling contact has been lost",
+  "variants": [
+   "A wheel that is not slipping cannot cheat. Its contact patch is momentarily at rest on the road, so spinning up harder drags the whole center along: a_CM = R*alpha, and a bigger R covers more road per turn.",
+   "The link breaks the moment the tire slips. In a burnout alpha is huge while a_CM is nearly nothing, the wheel spinning and the car going nowhere, so a_CM = R*alpha holds only while rubber grips road.",
+   "Spin and travel are two different motions, and rolling contact is what locks them together through the radius: a_CM = R*alpha. Give a big wheel and a small one the same alpha, the big one wins."
+  ]
+ },
+ {
+  "formula": "epsilon=B*l*v",
+  "name": "Motionally induced emf",
+  "variants": [
+   "Slide a wire sideways through a magnetic field and a voltage shows up across its ends. That is epsilon = B*l*v: move faster, use a longer wire, or find a stronger field and you get more of it.",
+   "No battery anywhere. Motion alone shoves charge along a wire that cuts across a magnetic field, and epsilon = B*l*v says how much: field times length times speed. Stop moving and it dies at once.",
+   "The v is the catch. A wire sitting still in a magnetic field makes nothing, and one drifting along the field makes nothing either. It has to cut across. Then epsilon = B*l*v and your bike light glows."
+  ],
+  "grounded": false,
+  "anchor": "generator / bike light; a still wire makes nothing"
+ },
+ {
+  "formula": "E_n=-E_0*((1)/((n)^(2)))",
+  "name": "electron energy in the nth Bohr orbit",
+  "variants": [
+   "An electron in an atom cannot sit just anywhere. Its energy is E_n = -E_0*(1/n^2), one rung per whole number n. The minus sign means bound: you have to pay energy to pull the electron loose.",
+   "Square the rung number and divide, that is the whole rule. E_n = -E_0*(1/n^2), so the low rungs sit far apart while the high ones crowd together near zero, where the electron stops belonging to the atom.",
+   "Starlight carries hydrogen's fingerprint. An electron falling from one n to a lower one dumps the gap as light, and E_n = -E_0*(1/n^2) fixes the rungs, so the same colors show up in a lamp and in a star."
+  ],
+  "grounded": false,
+  "anchor": "rungs crowding toward zero; neon sign colors"
+ },
+ {
+  "formula": "omega=sqrt(((k)/(m)))",
+  "name": "Angular frequency of a mass-spring system in SHM",
+  "variants": [
+   "Two things set the wobble rate and nothing else gets a vote. Stiffness speeds it up, mass drags it down, and omega = sqrt(k/m) is that tug of war. The root means mass has to grow a lot to slow it much.",
+   "Pull the mass further out and it still takes the same time to come back. Amplitude drops out of the answer completely. What is left is omega = sqrt(k/m), the spring's stiffness fighting the load's inertia.",
+   "Bounce a car on its suspension: a stiffer spring makes it quicker, a heavier load makes it slower. omega = sqrt(k/m) is that rate in radians per second, so it runs higher than the bounces you could count."
+  ],
+  "grounded": false,
+  "anchor": "stiffness against inertia; amplitude drops out"
+ },
+ {
+  "formula": "tau=R*C",
+  "name": "Time constant",
+  "variants": [
+   "Your camera flash takes ages to charge and empties in an instant. Same capacitor, different R. tau = R*C is the clock of the circuit: raise either the resistance or the capacitance and everything slows.",
+   "Multiply an ohm by a farad and you get a second, which is the surprise in it. tau = R*C is how long a capacitor takes to mostly fill or mostly empty. It never quite finishes, it just keeps closing in.",
+   "A lamp that blinks by itself is a capacitor filling until a neon tube breaks down and dumps it, over and over. tau = R*C sets the pace, so swapping the resistor or the capacitor changes the blink rate."
+  ],
+  "grounded": true,
+  "anchor": "camera flash charges slow and dumps fast; blinking neon lamp"
+ },
+ {
+  "formula": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+  "name": "Frequency of a mass-spring system in SHM",
+  "variants": [
+   "Pluck a guitar string gently or hard and the note does not change. Amplitude is nowhere in f = (1/(2*pi))*sqrt(k/m). Only the stiffness k and the mass m are, and nothing else gets a say.",
+   "Stiffen a diving board and it vibrates faster. Put a heavier person on it and it slows right down. That trade is f = (1/(2*pi))*sqrt(k/m), stiffness on top of the fraction, mass underneath.",
+   "The 2*pi is bookkeeping, turning radians per second into bounces per second. The physics is the ratio under the root in f = (1/(2*pi))*sqrt(k/m). Stiff and light is quick, floppy and heavy is slow."
+  ],
+  "grounded": true,
+  "anchor": "guitar string plucked hard or gently; stiffer diving board"
+ },
+ {
+  "formula": "C=((Q)/(V))",
+  "name": "Capacitance",
+  "variants": [
+   "Push charge onto a capacitor and the voltage climbs to match, so the ratio C = Q/V never budges. It tells you how much charge one volt buys, and that holds right up to the voltage where the gap arcs over.",
+   "Here is the odd part. C = Q/V, yet C does not depend on Q or on V. It is fixed by the plates, their spacing and whatever material sits between them. Charge and voltage just move together.",
+   "You cannot get a bigger C by charging harder. C = Q/V is decided by how the thing is built, so you shove the plates closer or slide an insulator between them, and then the same volts hold more charge."
+  ],
+  "grounded": true,
+  "anchor": "C fixed by plates and spacing, not by charge; dielectric"
+ },
+ {
+  "formula": "g=((4*(pi)^(2)*L)/((T)^(2)))",
+  "name": "gravitational acceleration from a pendulum period",
+  "variants": [
+   "String, a weight, a stopwatch: that is a gravity meter. Time the swing, measure the length, and g = 4*pi^2*L/T^2 hands you gravity. The mass of the bob never appears, and that is not an oversight.",
+   "Run the pendulum period T = 2*pi*sqrt(L/g) backwards and gravity falls out of it. Because T sits squared underneath in g = 4*pi^2*L/T^2, sloppy timing costs you more than a sloppy ruler does.",
+   "Keep the swings narrow. Open the arc up wide and the period creeps longer, and g = 4*pi^2*L/T^2 quietly stops being true. Stay inside that small-swing limit and string can weigh a planet."
+  ],
+  "grounded": true,
+  "anchor": "string and stopwatch as a gravimeter; small-swing limit"
+ },
+ {
+  "formula": "V_rms=((V_0)/(sqrt(2)))",
+  "name": "rms voltage",
+  "variants": [
+   "An outlet's voltage swings up and down all day, so the peak V_0 is not the number anyone quotes. V_rms = V_0/sqrt(2) is the steady DC voltage that would heat the same toaster just as fast.",
+   "Average an AC voltage over a cycle and you get nothing, since it spends as long negative as positive. So you square it, average that, then take the root. For a sine wave it lands on V_rms = V_0/sqrt(2).",
+   "The number printed on the outlet is the rms one, not the top of the swing. V_rms = V_0/sqrt(2), so the real peak V_0 runs higher than the label, and the insulation has to survive that peak."
+  ],
+  "grounded": true,
+  "anchor": "the wall outlet is quoted rms; average of AC is zero"
+ },
+ {
+  "formula": "P_ave=I_rms*V_rms",
+  "name": "average AC power from rms current and voltage",
+  "variants": [
+   "An AC current swings both ways, so its plain average is zero. Root mean square is the fix: square it, average, take the root. Then P_ave = I_rms*V_rms, exactly like a DC circuit.",
+   "The volts printed on a wall socket are V_rms, not the peak the wire actually reaches. rms values are the DC equivalents, so power stays simple: P_ave = I_rms*V_rms.",
+   "AC power pulses as the current reverses, and nobody cares about the pulsing, only what is left after you average it. That is P_ave = I_rms*V_rms, the wattage on the back of a microwave."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax: rms values are the equivalent DC values, and ratings are quoted as rms, not peak"
+ },
+ {
+  "formula": "n=((c)/(v))",
+  "name": "Index of refraction",
+  "variants": [
+   "Light crawls through glass or water because it keeps bumping into atoms. n = c/v is just how much it slows: c in empty space over v in the stuff. Nothing beats c, so n is never below one.",
+   "n = c/v compares light's speed in vacuum to its speed inside a material. Air hardly slows it, so air sits near one. Water and glass slow it more, so their n is bigger.",
+   "Push a mower off the path onto grass: one wheel drags and it turns. Light bends the same way where v drops, and n = c/v measures the drop. n shifts with color, so a prism splits white light."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax: the lawn-mower-onto-grass analogy, n >= 1 always, n near 1 for gases, prism from wavelength shift"
+ },
+ {
+  "formula": "f_1=((v)/(4*L))",
+  "name": "fundamental frequency of a closed tube",
+  "variants": [
+   "Blow across a tube closed at one end and the longest wave that fits is four tube lengths: air is pinned still at the closed end, free at the open one. That lowest note is f_1 = v/(4*L).",
+   "f_1 = v/(4*L) is the lowest note a tube closed at one end can hold. Double the length L and the pitch drops an octave, which is why the long pipes on an organ are the low ones.",
+   "The v in f_1 = v/(4*L) is the speed of sound, and sound moves faster in warm air. So a closed pipe goes sharp as it warms, and players blow through a wind instrument to settle it first."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax: node at the closed end, fundamental has lambda = 4L, organs in cold cathedrals and warming instruments"
+ },
+ {
+  "formula": "M=((theta_image)/(theta_object))",
+  "name": "Angular magnification M of a simple magnifier",
+  "variants": [
+   "A magnifier makes nothing bigger. It makes things cover more of your view. M = theta_image/theta_object is the angle the image fills over the angle it filled before, and your eye reads that as size.",
+   "Hold your thumb at arm's length, then near your nose. Same thumb, wider angle, looks bigger. That is all magnifying is, and M = theta_image/theta_object is the angle you get over the angle you had.",
+   "M = theta_image/theta_object is one angle over another, so it carries no units at all. A magnifier earns a big M by letting you hold something right up to your eye and still see it sharp."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax: ratio of the angle subtended by the image to that subtended by the object; long objective, short eyepiece"
+ },
+ {
+  "formula": "P=(I)^(2)*R",
+  "name": "power dissipated in a resistor",
+  "variants": [
+   "Push current through a resistor and it warms up. P = I^2*R says how fast. The square is what bites: double the current and the heat quadruples. That is how a toaster wire gets to glowing.",
+   "Every resistor is a small heater. Energy leaves the circuit as heat at the rate P = I^2*R, and resistors in a row all carry the same current, so the one with the biggest R runs hottest.",
+   "P = I^2*R falls out of two rules you already have. Power is current times voltage, and Ohm's law turns that voltage into I times R. Multiply, and you are left with watts: joules every second."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax: Joule's law with Ohm's law substituted in; series resistors all carry the same full current"
+ },
+ {
+  "formula": "f_beat=|f_2-f_1|",
+  "name": "beat frequency from two waves that differ in frequency",
+  "variants": [
+   "Play two notes almost in tune and the loudness throbs. They drift in and out of step, and f_beat = |f_2 - f_1| is how often. Nudge them closer and the throbbing slows right down.",
+   "A tuner does not listen for the right pitch, they listen for the beating to stop. f_beat = |f_2 - f_1| sets its rate, so slower beating means the two strings have got closer together.",
+   "f_beat = |f_2 - f_1| is the gap between two frequencies, and the bars mean take it positive: it makes no difference which tone is higher. When f_2 and f_1 meet, the beating dies away."
+  ],
+  "grounded": false,
+  "anchor": "NO EVIDENCE AND NO GLOSSARY in the record; written from the physics of two tones drifting in and out of phase"
+ },
+ {
+  "formula": "m=rho*V",
+  "name": "mass from density and volume",
+  "variants": [
+   "Density says how much mass is crammed into each cubic meter, so the mass is that times how many cubic meters you have: m = rho*V. Same size lump, bigger rho, heavier in your hand.",
+   "Archimedes could test a crown without melting it. Dunk it, read the volume V it pushes aside, and m = rho*V gives the mass a solid gold one that size would have. Mismatch, and the metal is wrong.",
+   "m = rho*V is rho = m/V rearranged, nothing more. V you can get by dunking the thing in water and watching the level. Multiply by the density of whatever it is made of and the mass drops out."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax: the king of Syracuse's crown, and the silver coin whose volume is found by water displacement"
+ },
+ {
+  "formula": "p_abs=p_g+p_atm",
+  "name": "Absolute pressure",
+  "variants": [
+   "A flat tire still has air in it. The gauge reads zero because it only counts what is above the air around it, and p_abs = p_g + p_atm adds that air back to give the real pressure.",
+   "A gauge starts counting from the atmosphere it sits in, not from nothing. p_abs = p_g + p_atm puts the atmosphere back on. Pump a vacuum chamber and p_g goes negative while p_abs stays positive.",
+   "p_g is what your gauge shows, p_atm is the air already pressing on everything, and p_abs = p_g + p_atm is the total. Fluids push and never pull, so p_abs cannot drop below zero, though p_g can."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax: a tire gauge reads only above atmospheric, a vacuum chamber gauge reads negative, fluids push so p_abs >= 0"
+ },
+ {
+  "formula": "lambda=((h*c)/(E))",
+  "name": "photon wavelength from energy",
+  "grounded": true,
+  "anchor": "Compton's X-ray scattering; a single visible photon too faint to sense",
+  "variants": [
+   "Ask a photon how much energy it carries and you have asked its wavelength too: lambda = (h*c)/E locks the two together. Violet carries more energy per photon than red, so violet's wave is the shorter one.",
+   "Give a photon more energy and its wave gets shorter, not taller. lambda = (h*c)/E. X-rays sit way up at the energy end, so their wavelength is tiny, which is how Compton caught them knocking electrons loose.",
+   "Light has no mass you can weigh, so you size a photon by its energy instead. lambda = (h*c)/E converts one to the other. Planck's constant h is so small that a single photon of light is far too faint to feel."
+  ]
+ },
+ {
+  "formula": "m=F_net/a",
+  "name": "mass from net force and acceleration",
+  "grounded": true,
+  "anchor": "OpenStax basketball vs car under the same net external force",
+  "variants": [
+   "Mass is really just how stubborn something is. Push with a known force, watch how fast it picks up speed, divide: m = F_net/a. Shove a basketball and a car equally hard and the car barely notices.",
+   "Mass here gets measured, not looked up. The same force gives a light thing a big acceleration and a heavy thing a small one, so m = F_net/a reads the mass straight off that difference.",
+   "Newton's second law, turned around to hand you the mass. m = F_net/a, and net is the word that bites: add up every force on the thing, with friction pulling the other way. Miss one and the mass comes out wrong."
+  ]
+ },
+ {
+  "formula": "U_E=((1)/(2))*C*(V)^(2)",
+  "name": "energy stored in a capacitor",
+  "grounded": true,
+  "anchor": "OpenStax defibrillator and camera flash; average voltage is V/2 while charging",
+  "variants": [
+   "A capacitor starts empty, so the first charge slips in free and the last one fights full voltage. Average those and you get the half: U_E = (1/2)*C*V^2. Double the voltage and you store four times as much.",
+   "A defibrillator dumps this into a chest and a camera flash burns it in a blink. U_E = (1/2)*C*V^2, so cranking the voltage buys far more energy than fitting a bigger capacitor does.",
+   "Charge two plates and the energy is not sitting on the charge, it is out in the field between them. U_E = (1/2)*C*V^2. Cut the battery away and the plates keep it until you let a bulb drain them."
+  ]
+ },
+ {
+  "formula": "F_net=m*a",
+  "name": "Newton's second law, scalar form",
+  "grounded": true,
+  "anchor": "OpenStax: net EXTERNAL force, and the law rests on experiment not derivation",
+  "variants": [
+   "Nothing speeds up, slows down or turns on its own. Something has to push it. F_net = m*a sizes that push, and net is the catch: it is every force added together, friction included, not just yours.",
+   "Acceleration is not only going faster. Braking counts. So does rounding a corner at steady speed. Each one leaves the acceleration nonzero, so F_net = m*a says a force is acting even if you cannot see what.",
+   "Nobody derived F_net = m*a on paper. It is a claim about the world that experiments kept agreeing with, which is what makes it a law. Scalar form means you want how big the force is, not where it points."
+  ]
+ },
+ {
+  "formula": "v_t=r*omega",
+  "name": "Tangential speed",
+  "grounded": true,
+  "anchor": "OpenStax CD and car tire: same omega, larger r, larger speed",
+  "variants": [
+   "Stand on the equator and Earth's spin carries you along quickly; stand near a pole and it hardly moves you, though the whole planet turns together. v_t = r*omega, and r is your distance from the axis.",
+   "Fit bigger wheels and the car covers more ground per turn of the axle. v_t = r*omega: omega is how fast the wheel spins, r is its radius, and the product is how fast the car actually travels.",
+   "Everyone on a merry-go-round sweeps the same angle, but the rider on the outside covers a longer arc doing it. v_t = r*omega is that sentence in symbols. Same omega, bigger r, more meters per second."
+  ]
+ },
+ {
+  "formula": "x=v_0x*t",
+  "name": "horizontal displacement in projectile motion",
+  "grounded": true,
+  "anchor": "OpenStax fireworks shell; sideways acceleration is zero when air is negligible",
+  "variants": [
+   "Sideways, nothing is pushing a thrown ball, so it keeps whatever sideways speed you gave it. x = v_0x*t is just distance equals speed times time. Gravity is busy with the vertical part and leaves this alone.",
+   "Drop one ball and fire another sideways at the same instant and they land together. The sideways motion does not care what gravity is doing: x = v_0x*t, steady speed for the whole flight.",
+   "Air resistance is what breaks this one. Ignore the air and v_0x never changes, so x = v_0x*t. Throw a beach ball instead of a stone and the air eats the sideways speed and it lands well short."
+  ]
+ },
+ {
+  "formula": "a=((m_2)/(m_1+m_2))*g",
+  "name": "acceleration of two blocks connected over a pulley",
+  "grounded": true,
+  "anchor": "OpenStax two attached blocks: m_1 on a frictionless table, m_2 hanging on a string",
+  "variants": [
+   "Gravity pulls on both blocks, but the table holds m_1 up, so only the hanging block's weight is left to pull, and the string drags m_1 along anyway. a = (m_2/(m_1+m_2))*g, one weight moving two masses.",
+   "The pair always falls slower than a free drop, because m_2/(m_1+m_2) is less than one. a = (m_2/(m_1+m_2))*g. Pile mass onto m_1 and it barely creeps; take m_1 away and you are back to plain g.",
+   "Pull comes from one block, inertia comes from both, and a = (m_2/(m_1+m_2))*g splits the difference. It assumes a frictionless table and a weightless pulley, so a real bench setup runs slower."
+  ]
+ },
+ {
+  "formula": "C_p=C_V+R",
+  "name": "Molar heat capacity at constant pressure",
+  "grounded": false,
+  "anchor": "no evidence paragraphs supplied; glossary only restates constant pressure",
+  "variants": [
+   "Heat a gas in a sealed box and every joule goes into the gas. Let it expand at steady pressure and some of it goes into shoving the atmosphere out of the way, so you need more: C_p = C_V + R.",
+   "The gap between the two heat capacities is exactly R, the gas constant. C_p = C_V + R, because at constant pressure a mole of gas does R worth of work per degree just making room for itself.",
+   "Water in a pan hardly swells when you heat it, so its two heat capacities are nearly the same. A gas has to shove the air back to make room, and for a mole that costs R per degree: C_p = C_V + R."
+  ]
+ },
+ {
+  "formula": "s=r*theta",
+  "name": "arc length",
+  "grounded": true,
+  "anchor": "OpenStax CD pits: same angle swept, different ground covered",
+  "variants": [
+   "Two dots on a spinning CD sweep the same angle, but the outer one covers far more ground. The distance it actually travels is s = r*theta. Double the radius and you double the arc.",
+   "Arc length is ordinary distance, only measured along a curve. s = r*theta is how you get it: the radius is what turns an angle into meters. Go all the way around and s is the circumference.",
+   "An angle on its own tells you nothing about how far anything traveled. Multiply it by the radius and now it does: s = r*theta. That is also why theta carries no unit, and s comes out in meters."
+  ]
+ },
+ {
+  "formula": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))",
+  "name": "Acceleration of an object rolling without slipping",
+  "grounded": true,
+  "anchor": "OpenStax: rolling is slower than a frictionless slide, and depends on I_CM",
+  "variants": [
+   "Race a can down a ramp against a block sliding with no friction, and the can loses. Some of the pull goes into spinning it up instead. a_CM = ((m*g*sin(theta))/(m+(I_CM/r^2))), and I_CM is the tax.",
+   "Look at the bottom of a_CM = ((m*g*sin(theta))/(m+(I_CM/r^2))). That I_CM/(r)^(2) acts like extra mass the slope has to shift, so mass parked out at the rim costs you the most.",
+   "Two cans of the same mass, same ramp, and the hollow one comes last every time. That is all I_CM: a_CM = ((m*g*sin(theta))/(m+(I_CM/r^2))). If it ever slips instead of rolling, throw this out."
+  ]
+ },
+ {
+  "formula": "C_V=((d)/(2))*R",
+  "name": "Molar heat capacity at constant volume for an ideal gas with d degrees of freedom",
+  "grounded": true,
+  "anchor": "OpenStax degrees of freedom: energy splits equally over each independent motion",
+  "variants": [
+   "Heat gets split evenly over every independent way a molecule can move, and d counts those ways. Each one is worth half of R, so C_V = (d/2)*R. More ways to move, more heat per degree.",
+   "Why does one gas warm up faster than another, mole for mole, on the same burner? Its molecules have fewer places to put the energy. That count is d, and C_V = (d/2)*R turns it into heat capacity.",
+   "C_V = (d/2)*R holds the volume fixed on purpose. Let the gas expand instead and some of your heat leaves as work on the surroundings, and the number you need goes up."
+  ]
+ },
+ {
+  "formula": "I_2=I_1*((((r_1)/(r_2))))^(2)",
+  "name": "Intensity at a second distance as a spherical wave expands",
+  "grounded": false,
+  "anchor": "no evidence paragraphs supplied; written from inverse-square spreading over a sphere",
+  "variants": [
+   "Step twice as far from a lamp and it is a quarter as bright, not half. The light is spread over a sphere, and a sphere's area grows with the square of its radius: I_2 = I_1*(r_1/r_2)^2.",
+   "Nothing is lost as the wave travels out. The same power just thins across a bigger and bigger shell: I_2 = I_1*(r_1/r_2)^2. Back away and the drop is brutal, since it is squared.",
+   "I_2 = I_1*(r_1/r_2)^2 assumes the source throws energy out in every direction. A laser barely spreads, so it holds up far better than this. A room full of echoes breaks it too."
+  ]
+ },
+ {
+  "formula": "F=q*v*B*sin(theta)",
+  "name": "Magnitude of magnetic force",
+  "grounded": true,
+  "anchor": "OpenStax Magnetic Force: theta sits between v and B, and the force stays perpendicular to v",
+  "variants": [
+   "A charge sitting still feels nothing from a magnet. Get it moving across the field and it does: F = q*v*B*sin(theta), where theta is the angle between v and B. Line v up with B and it dies.",
+   "This force always shoves sideways, square to wherever the charge is headed, so it bends the path instead of speeding the charge up. F = q*v*B*sin(theta). Curl your right fingers from v to B; your thumb is F.",
+   "Everything in F = q*v*B*sin(theta) has to show up at once: some charge q, some motion v, a field B, and an angle between the last two. Knock out any one of them and you are left with nothing."
+  ]
+ },
+ {
+  "formula": "v_CM=R*omega",
+  "name": "Velocity of center of mass of rolling object",
+  "grounded": false,
+  "anchor": "no evidence paragraphs supplied; written from the no-slip contact point being instantaneously at rest",
+  "variants": [
+   "Roll a wheel without letting it skid and the bottom of it is, for that instant, not moving at all. That pins the middle to v_CM = R*omega. Same spin, bigger wheel, more ground covered.",
+   "v_CM = R*omega is less a formula than the definition of not slipping. Spin your tires on ice and the car crawls along slower than R*omega. Lock the brakes and it slides along faster.",
+   "One full turn of a wheel carries it forward by exactly one circumference, which locks spin rate to forward speed: v_CM = R*omega. Fit bigger tires and the speedometer reads low, since it only counts turns."
+  ]
+ },
+ {
+  "formula": "E=(Delta_m)(c)^(2)",
+  "name": "Binding energy",
+  "grounded": true,
+  "anchor": "OpenStax mass defect: the nucleus weighs less than its nucleons, and the curve peaks at iron",
+  "variants": [
+   "Weigh a nucleus, then weigh its protons and neutrons separately, and the loose parts come out heavier. That missing mass is Delta_m, and E = Delta_m*c^2 is the energy holding the thing together.",
+   "c is the speed of light, so squaring it turns a Delta_m far too small to weigh into a huge E = Delta_m*c^2. Coal fires shed mass the same way, just far too little for anyone to measure.",
+   "Nothing is bound tighter than iron, which is where fusion inside a star finally gives up. E = Delta_m*c^2 is the bill for pulling a nucleus apart, and Delta_m is the mass it was short."
+  ]
+ },
+ {
+  "formula": "Delta_theta=((Delta_s)/(r))",
+  "name": "Angle of rotation",
+  "grounded": true,
+  "anchor": "OpenStax clock hand: hand length cancels out, which is what defines the radian",
+  "variants": [
+   "Take how far you moved along the curve and divide by how far out you were: Delta_theta = (Delta_s/r). Both are meters, so they cancel and the angle is a bare number. That is what a radian is.",
+   "A long clock hand and a stubby one sweep the same angle from noon to three, but the long tip travels much further. Delta_theta = (Delta_s/r) divides that hand length straight back out.",
+   "Measure the angle this way and you get radians, never degrees. Delta_theta = (Delta_s/r), so going once around makes Delta_s the whole circumference. Use degrees in a later formula and it breaks."
+  ]
+ },
+ {
+  "formula": "U=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "name": "Potential-energy function of a harmonic oscillator",
+  "grounded": true,
+  "anchor": "marble settling in a bowl; turning points; the lopsided Lennard-Jones bond well",
+  "variants": [
+   "Picture a marble in a bowl. It settles at the bottom, where x is zero, and climbing the sides costs energy. U = (1/2)*m*omega^2*x^2 is that bowl: go twice as far out, store four times as much.",
+   "Stretch an oscillator and the energy has to sit somewhere. It sits here, U = (1/2)*m*omega^2*x^2. At the turning point the mass stops dead and every bit of its motion is parked in this term.",
+   "Two atoms in a bond sit in an energy well and jiggle near the bottom. Down there the well looks like U = (1/2)*m*omega^2*x^2. Pull them far out and the real well goes lopsided and this stops working."
+  ]
+ },
+ {
+  "formula": "I=((P)/(4*pi*(r)^(2)))",
+  "name": "Intensity for a spherical wave",
+  "grounded": true,
+  "anchor": "speaker on a post getting quieter as the sphere's area 4*pi*r^2 grows with r",
+  "variants": [
+   "Walk away from a speaker and it gets quieter, but no sound went missing. The same power P is smeared over a bigger sphere, and a sphere has area 4*pi*r^2. So I = P/(4*pi*r^2).",
+   "Stand twice as far from a source and it hits you a quarter as hard. That is I = P/(4*pi*r^2). The power never changed; the sphere carrying it has four times the area, so it is thinner everywhere.",
+   "Energy leaving a source spreads over a growing sphere, so I = P/(4*pi*r^2) with r your distance out. It assumes nothing soaks up the wave on the way and the source radiates evenly in all directions."
+  ]
+ },
+ {
+  "formula": "I=((((Delta_p_max))^(2))/(2*rho*v))",
+  "name": "Intensity of sound",
+  "grounded": true,
+  "anchor": "pressure amplitude in air; rho and v are the medium; the ear's range is why decibels exist",
+  "variants": [
+   "Sound is air being squeezed and let go. Delta_p_max is the hardest squeeze in the wave, and doubling it makes the sound four times as intense, not twice: I = (Delta_p_max)^2/(2*rho*v).",
+   "A microphone feels pressure, not power, and this turns one into the other: I = (Delta_p_max)^2/(2*rho*v). The rho and v are the air itself, so the same squeeze carries differently under water.",
+   "Your ear spans a brutal range of intensities, which is why we quote decibels instead. Underneath the decibels sits this: I = (Delta_p_max)^2/(2*rho*v), the pressure swing and the air it travels in."
+  ]
+ },
+ {
+  "formula": "I_rms=((I_0)/(sqrt(2)))",
+  "name": "rms current",
+  "grounded": true,
+  "anchor": "AC's plain average is zero; rms is the equivalent DC value; breakers and nameplates quote rms",
+  "variants": [
+   "AC current swings both ways, so its plain average is zero and tells you nothing. Square it, average that, take the root: I_rms = I_0/sqrt(2). It is the steady DC current that would heat the same.",
+   "A breaker trips on I_rms, not on the peak, and the peak is always the larger one: I_rms = I_0/sqrt(2). The current on an AC nameplate is rms too, so the real current does swing past that number.",
+   "Root two is not a law of nature. It is just what a smooth sine wave gives you: I_rms = I_0/sqrt(2). Square off that wave instead and the rms comes out equal to the peak, with no factor at all."
+  ]
+ },
+ {
+  "formula": "a_t=r*alpha",
+  "name": "Tangential acceleration",
+  "grounded": true,
+  "anchor": "Ferris wheel riders: same alpha, but rim and hub get different pushes",
+  "variants": [
+   "A Ferris wheel starting up shoves you along your seat. How hard depends on how far out you sit: a_t = r*alpha. Build a smaller wheel, spin it up just as hard, and the riders get the gentler push.",
+   "Two accelerations act on you in a turn. a_t = r*alpha is the one that speeds you up along your path, not the one hauling you inward. Spin at a steady rate and alpha is zero, so a_t vanishes.",
+   "Turn the axle faster and a point out at radius r must cover more arc in the same time, so it has to accelerate harder to keep up. That is all a_t = r*alpha says. Double r and you double the push."
+  ]
+ },
+ {
+  "formula": "p=((h)/(lambda))",
+  "name": "momentum of a photon (deBroglie relation)",
+  "grounded": true,
+  "anchor": "comet tails always point away from the Sun; Compton's x-rays recoiling off electrons",
+  "variants": [
+   "A comet's dust tail points away from the Sun, never behind the comet. Sunlight is shoving it. Light carries momentum with no mass at all, and p = h/lambda says shorter wavelength means a harder shove.",
+   "Compton fired x-rays at electrons and the x-rays came back with less energy, recoiling like billiard balls. That works only if a photon has momentum, and it does: p = h/lambda, h = 6.626e-34 J*s.",
+   "Momentum usually means mass times velocity, and a photon has no mass, so that road is closed. Use its wavelength instead: p = h/lambda. Blue light hits harder per photon than red for that reason."
+  ]
+ },
+ {
+  "formula": "v=v_0+a*t",
+  "name": "Velocity",
+  "grounded": true,
+  "anchor": "the velocity-vs-time graph: slope is a, intercept is v_0; velocity carries direction",
+  "variants": [
+   "Draw velocity against time and a steady acceleration gives a straight line. Its slope is a, where it starts is v_0, so v = v_0 + a*t. You begin with some speed and add a bit more each second.",
+   "Acceleration is how much velocity you pick up each second, so holding it for t seconds adds a*t to whatever you had: v = v_0 + a*t. Braking is the same line with a negative a, sloping down.",
+   "Velocity now is velocity then plus whatever the acceleration added: v = v_0 + a*t. Two catches: a has to hold steady the whole time, and v_0 and a each carry a sign, so a can point against the motion."
+  ]
+ },
+ {
+  "formula": "omega=v/r",
+  "name": "angular velocity from tangential speed",
+  "grounded": true,
+  "anchor": "spinning CD, rim travels further than centre for one shared omega; tire spinning on ice",
+  "variants": [
+   "On a spinning CD every point finishes a turn together, so they share one omega, but the outer edge travels much further to do it. Divide that speed by how far out you are: omega = v/r.",
+   "A rolling tire turns spin into speed. Bigger tire at the same omega covers more road. Read it the other way and omega = v/r hands you how fast the wheel spins from how fast the car is going.",
+   "Spin rate is rim speed shared out over the radius: omega = v/r. The same speed closer in to the axis means a faster spin. Careful on ice, though: a tire can have a big omega while the car barely moves."
+  ]
+ },
+ {
+  "formula": "a=((Delta_v)/(Delta_t))",
+  "name": "Acceleration",
+  "grounded": true,
+  "anchor": "OpenStax: braking is still acceleration, and a constant-speed turn accelerates",
+  "variants": [
+   "Acceleration is just how fast your velocity is changing: a = Delta_v/Delta_t. Hit the brakes and a points backward, against your motion. Physics still calls that acceleration, not its own thing.",
+   "Round a corner at a steady speed and you are still accelerating. Velocity carries a direction, so turning hands you a Delta_v even at a fixed speed, and a = Delta_v/Delta_t follows it.",
+   "Acceleration is velocity gained per second, nothing more: a = Delta_v/Delta_t. The unit m/s^2 reads exactly that way, meters per second, per second. A big Delta_v in a small Delta_t is a hard shove."
+  ]
+ },
+ {
+  "formula": "theta_2=asin(((n_1*sin(theta_1))/(n_2)))",
+  "name": "Law of refraction (Snell's law)",
+  "grounded": true,
+  "anchor": "OpenStax: pencil bent in a glass, Ibn Sahl before Snell, one fish seen twice",
+  "variants": [
+   "Stand a pencil in a glass of water and it looks snapped in two. Light kinks when it changes speed, and theta_2 = asin((n_1*sin(theta_1))/n_2) says by how much. Raise n_2 and the ray tips toward the perpendicular.",
+   "Snell got his name on it, but Ibn Sahl had the rule centuries earlier, working on burning mirrors and lenses. theta_2 = asin((n_1*sin(theta_1))/n_2): the indices and theta_1 together fix where the ray goes.",
+   "Look into a fish tank and one fish can seem to sit in two places. Rays bend as they leave the water, and theta_2 = asin((n_1*sin(theta_1))/n_2) tracks that bend from theta_1 and the indices on each side."
+  ]
+ },
+ {
+  "formula": "k=((F)/(x))",
+  "name": "spring constant from force and extension",
+  "grounded": false,
+  "anchor": "no usable evidence (one tier-words score-1 paragraph, about elastic PE); measuring k from a hung load",
+  "variants": [
+   "k is stiffness boiled down to one number. Hang a force on a spring, measure the stretch, divide: k = F/x. Its unit N/m reads exactly that way, newtons per meter of stretch.",
+   "Two springs, same pull, different stretch? The one that moves less has the bigger k. That is the whole of k = F/x: force per unit of extension. Stiff means a lot of F buys you very little x.",
+   "You do not look k up, you measure it. Pull with F, note the extension x, take k = F/x. Stretch further and you should get the same k back. If you do not, you have pulled the spring past where it recovers."
+  ]
+ },
+ {
+  "formula": "K=(n)^(2)*E_1",
+  "name": "energy of the nth level of a particle in a box",
+  "grounded": false,
+  "anchor": "no evidence, no glossary; standing waves in a box, rungs spreading as the square",
+  "variants": [
+   "Trap a particle between two walls and only certain standing waves fit, so its energy comes in rungs: K = n^2*E_1. E_1 is the bottom rung and n counts which one you are on. Nothing in between is allowed.",
+   "A guitar string sings only certain notes because both ends are pinned. A boxed particle is the same story. K = n^2*E_1 numbers the allowed modes, with E_1 setting the size of the lowest one.",
+   "K = n^2*E_1 says the ladder is not evenly spaced: double n and the energy goes up fourfold, so the rungs spread out as you climb. The particle cannot rest at the floor either; E_1 is already above it."
+  ]
+ },
+ {
+  "formula": "L=I*omega",
+  "name": "Angular momentum of a rotating rigid body",
+  "grounded": true,
+  "anchor": "OpenStax: twin of linear momentum, right-hand rule, flywheels and planets (skater anchor is standard physics, not in the evidence)",
+  "variants": [
+   "Spin is momentum with a pivot. L = I*omega is the rotational twin of mass times velocity: I is mass counted by how far it sits from the axis, omega how fast it turns. A flywheel holds its mass out at the rim.",
+   "Pull your arms in on a spinning stool and you speed up. L = I*omega does not change, so shrinking I has to raise omega. Hauling mass toward the axis is the whole trick, and skaters know it.",
+   "L = I*omega points along the axis, not along any moving piece of the body. Curl your right hand the way it turns and your thumb shows you where L aims. Planets carry it from spinning and from orbiting."
+  ]
+ },
+ {
+  "formula": "P=F*v",
+  "name": "power from force and velocity",
+  "grounded": false,
+  "anchor": "no evidence, no glossary; a car running out of force near top speed at fixed P",
+  "variants": [
+   "Power is not force, it is force kept up at speed. P = F*v: push twice as hard at the same pace, or push the same at twice the pace, and either way you are working twice as fast.",
+   "Here is why a car quits accelerating near top speed. The engine holds P about fixed, so P = F*v leaves less and less F as v climbs, until what is left only just balances the drag.",
+   "P = F*v is work per second with the clock hidden inside v, which is already meters per second. Shove a wall and nothing moves: no v, so no P, however hard you strain."
+  ]
+ },
+ {
+  "formula": "Q=((omega_0)/(Delta_omega))",
+  "name": "Quality factor of a circuit",
+  "grounded": false,
+  "anchor": "no evidence, no glossary; resonance width, a struck bell versus a thud",
+  "variants": [
+   "Q says how picky a resonant circuit is. Q = omega_0/Delta_omega sets where it peaks against how wide the peak is, so a narrow Delta_omega gives a big Q and a tuner that hears one station, not its neighbors.",
+   "A struck bell is high Q, a thud is low Q. Q = omega_0/Delta_omega measures it: losses widen Delta_omega and blur the peak, so the more a circuit dumps into heat, the smaller its Q.",
+   "Two frequencies divided, so the units cancel and Q is a bare number. Q = omega_0/Delta_omega is the resonance over its width. High Q keeps ringing after you stop driving it; low Q dies out fast."
+  ]
+ },
+ {
+  "formula": "I=((P)/(A))",
+  "name": "Intensity",
+  "grounded": true,
+  "anchor": "OpenStax glossary power per unit area, plus the ear's range quoted in decibels",
+  "variants": [
+   "Same power, spread thinner. I = P/A is watts divided by the area they land on, which is why a lens can scorch paper without adding any energy at all. It only shrinks A, and I climbs.",
+   "Walk away from a speaker and it goes quiet even though the speaker is doing the same work. The sound is spread over a bigger A, so I = P/A drops. Intensity is power per square meter, W/m^2.",
+   "Your ear spans an absurd range of I, whisper to jet engine, which is why sound gets quoted in decibels instead of raw numbers. Underneath the scale it is just I = P/A, power landing per square meter."
+  ]
+ },
+ {
+  "formula": "v=v_0-g*t",
+  "name": "velocity in free fall, upward positive",
+  "variants": [
+   "Toss a ball straight up and gravity takes the same bite out of its velocity every second, climbing or falling. That is v = v_0 - g*t, and g is how big the bite is. Up counts as positive, so it subtracts.",
+   "Gravity does not care which way you are moving. v = v_0 - g*t runs straight through the top of the arc, where v passes through zero and turns negative on the way down. One line, whole flight.",
+   "Free fall means nothing is touching the ball, not even air. Only then does v = v_0 - g*t hold. The instant it hits the ground its acceleration is no longer g and the line stops being true."
+  ],
+  "grounded": true,
+  "anchor": "ball tossed up; sign of g; free fall ends at contact"
+ },
+ {
+  "formula": "W_o=F_o*d_o",
+  "name": "output work",
+  "variants": [
+   "Output work is what a machine hands you: the force it puts out times how far that force pushes. W_o = F_o*d_o. The d_o is how far the load moves, not how far you moved your hand, and the two are rarely equal.",
+   "Shove a lever a long way with a small force and the far end moves a short way with a big one. What comes out the other side is W_o = F_o*d_o, and friction keeps it under what you put in.",
+   "W_o = F_o*d_o is the useful work leaving a machine, output force times the distance it acts through. Divide it by the work you fed in and you have the machine's efficiency, always under one."
+  ],
+  "grounded": true,
+  "anchor": "crowbar and lever trading force for distance; efficiency"
+ },
+ {
+  "formula": "m=m_R+m_g",
+  "name": "total mass from rocket and propellant",
+  "variants": [
+   "Weigh a loaded rocket and you get two things at once: the rocket itself and the propellant still in its tanks. m = m_R + m_g. Burn fuel and m_g falls, so m keeps shrinking as it climbs.",
+   "m = m_R + m_g splits a rocket into the part that stays, m_R, and the part it throws away, m_g. The split matters because only the thrown part is what shoves the rocket forward.",
+   "On the pad, most of a rocket is fuel and not rocket. m = m_R + m_g names both halves, and it is a snapshot: at liftoff m_g dominates, at burnout it is gone and m is just m_R."
+  ],
+  "grounded": false,
+  "anchor": "rocket on the pad is mostly fuel; mass falls as it burns"
+ },
+ {
+  "formula": "theta=((s)/(r))",
+  "name": "Angular position",
+  "variants": [
+   "Walk along a curve of radius r and cover arc length s. The angle you swept is theta = s/r. That is what a radian is, and since it is a length over a length, theta has no units at all.",
+   "One radian is the angle whose arc is exactly as long as the radius. theta = s/r counts how many of those you have turned through, so a wider circle needs a longer arc for the same theta.",
+   "theta = s/r is why a point at the rim of a spinning wheel and a point near the hub share one angle but not one distance. Same theta, bigger r, longer arc s. The angle is what they have in common."
+  ],
+  "grounded": true,
+  "anchor": "radian as arc over radius; rim and hub of a spinning wheel"
+ },
+ {
+  "formula": "f=((d_i*d_o)/(d_o+d_i))",
+  "name": "lens/mirror equation (solved version)",
+  "variants": [
+   "Set an object at d_o, find where its image lands at d_i, and the optics tell you their own focal length: f = (d_i*d_o)/(d_o+d_i). It is the lens/mirror equation rearranged to hand you f.",
+   "Signs do the real work here. A convex security mirror puts the image behind the glass and closer in than you are, so d_i is negative but d_o+d_i stays positive, and f = (d_i*d_o)/(d_o+d_i) comes out negative.",
+   "One relation covers lenses and curved mirrors both. f = (d_i*d_o)/(d_o+d_i) turns two measured distances into a focal length, and it only holds for rays that stay close to the axis."
+  ],
+  "grounded": true,
+  "anchor": "virtual image behind a convex mirror makes d_i and f negative"
+ },
+ {
+  "formula": "f=((R)/(2))",
+  "name": "Focal length for a spherical mirror",
+  "variants": [
+   "A spherical mirror is a slice off a sphere of radius R, and parallel light crosses the axis halfway to that sphere's center. f = R/2. Flatten the mirror, R grows, and the focus runs away with it.",
+   "f = R/2 is an approximation, not a law. It holds for rays that stay near the axis; rays far off-axis miss the focus, which is why a serious telescope uses a parabola and not a sphere.",
+   "You need one measurement to find a spherical mirror's focus. Measure the curvature radius R, halve it, that is f. A tightly curved shaving mirror has small R, so its focus sits close in."
+  ],
+  "grounded": true,
+  "anchor": "focus halfway to the sphere's center; parabola beats sphere off-axis"
+ },
+ {
+  "formula": "F=((m*Delta_v)/(Delta_t))",
+  "name": "force from rate of momentum change",
+  "variants": [
+   "Force is about how fast momentum changes: F = (m*Delta_v)/(Delta_t). Same mass, same change in speed, but spread over a longer Delta_t and F drops. That is the entire job of an airbag.",
+   "A racquet does not change a ball's speed instantly, it needs contact time. F = (m*Delta_v)/(Delta_t) gives the average force over that contact, so a short, sharp hit means an enormous F.",
+   "F = (m*Delta_v)/(Delta_t) assumes m holds still while the velocity changes. With m fixed out front it is just Newton's second law. For something shedding mass, like a rocket, do not use it."
+  ],
+  "grounded": true,
+  "anchor": "airbag stretching Delta_t; racquet contact time; constant-mass caveat"
+ },
+ {
+  "formula": "n=((K/E_1))^(1/2)",
+  "name": "quantum number from energy, particle in a box",
+  "variants": [
+   "Trap a particle in a box and its energy can only sit on rungs, each one n^2 times the lowest. Read that backwards and n = (K/E_1)^(1/2) tells you which rung an energy K is sitting on.",
+   "n = (K/E_1)^(1/2) counts levels, not energy. The rungs climb as n^2, so they spread further apart the higher you go, and it takes a big jump in K to move n up by even one.",
+   "Every energy the box allows is E_1 times a perfect square, so n = (K/E_1)^(1/2) has to come out a whole number. If it lands between two of them, the box has no level at that K."
+  ],
+  "grounded": false,
+  "anchor": "energy rungs in a box climbing as n^2 above E_1"
+ },
+ {
+  "formula": "v=((lambda)/(T))",
+  "name": "wave speed from wavelength and period",
+  "variants": [
+   "A wave moves forward exactly one wavelength every period. That is all v = lambda/T says. Watch a gull on the swell: it bobs once while the crest under it slides to where the next crest was.",
+   "Crest to crest is lambda. Crest to crest in time is T. Divide and you have how fast the shape travels, v = lambda/T. The water itself goes almost nowhere; only the pattern moves along.",
+   "v = lambda/T holds for ripples, sound and light alike. Hold v steady and a shorter lambda just means crests arriving sooner. How tall the wave is never enters into it."
+  ],
+  "grounded": true,
+  "anchor": "seagull bobbing once on an ocean swell"
+ },
+ {
+  "formula": "lambda=((h)/(m*v))",
+  "name": "de Broglie wavelength from mass and speed",
+  "variants": [
+   "Anything with momentum also behaves like a wave, and lambda = h/(m*v) is how long that wave is. Momentum sits on the bottom, so heavy or fast means short. You have one. It is hopelessly small.",
+   "Divide h by momentum m*v and what comes out is a length. That length is how smeared out the thing acts: lambda = h/(m*v). Slow an electron down and its wave grows until crystals can diffract it.",
+   "de Broglie guessed that matter ripples the way light does. lambda = h/(m*v) says nothing big is ever wavy, because h is minute and momentum is not. Shrink m*v and the wave side shows up."
+  ],
+  "grounded": false,
+  "anchor": "a slowed electron until crystals diffract it"
+ },
+ {
+  "formula": "Delta_S=((Q)/(T))",
+  "name": "Entropy change of a system in a reversible isothermal process",
+  "variants": [
+   "Pour heat into something and its disorder rises by Delta_S = Q/T. The same joule buys more of it in a cold body than a hot one, which is why heat drifts from hot to cold. T is in kelvin.",
+   "Entropy is bookkeeping for how spread out energy is. Move Q in at a steady T and the ledger shifts by Q/T. Take heat out and Q goes negative, so that body's entropy falls while the other climbs.",
+   "Delta_S = Q/T needs two things: the temperature must not budge while the heat moves, and it must move slowly enough to run backward. Rush it and the real entropy change comes out bigger."
+  ],
+  "grounded": false,
+  "anchor": "the same joule buys more disorder when cold"
+ },
+ {
+  "formula": "d_CM=R*theta",
+  "name": "Displacement of center of mass of rolling object",
+  "variants": [
+   "Roll a wheel without letting it skid and the tread it lays down is exactly how far the axle traveled: d_CM = R*theta. Chalk the rim and the floor marks sit one full circumference apart.",
+   "theta has to be in radians here, because R*theta is arc length, the strip of rim that actually touched the ground. Spin the wheel on ice and it turns while going nowhere, and d_CM = R*theta dies.",
+   "The middle of a rolling body keeps pace with the rim unwinding beneath it, so d_CM = R*theta. Same turn on a bigger R covers more ground, which is why wheel size is worth arguing about."
+  ],
+  "grounded": false,
+  "anchor": "chalk mark on a rolling rim, and ice"
+ },
+ {
+  "formula": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))",
+  "name": "Relativistic Doppler effect for frequency",
+  "variants": [
+   "Light from something running away arrives lower in frequency. f_obs = f_s*sqrt((1-v/c)/(1+v/c)), and v counts positive for receding, so the bracquet drops under one and the color slides red.",
+   "An ambulance siren drops as it passes, and light does the same. c is the same for everyone, but the frequency and the wavelength both shift: f_obs = f_s*sqrt((1-v/c)/(1+v/c)). Negative v means blue.",
+   "Astronomers run this backward. A known line arrives shifted, and f_obs = f_s*sqrt((1-v/c)/(1+v/c)) hands back v. The far galaxies all come out red, all running away from us."
+  ],
+  "grounded": true,
+  "anchor": "red-shifted galaxies running away from us"
+ },
+ {
+  "formula": "P=tau*omega",
+  "name": "Rotational power",
+  "variants": [
+   "It is the straight-line power rule turned sideways: swap the push for a twist and the speed for a spin rate, and you get P = tau*omega. Hold the power fixed and you trade one for the other.",
+   "P = tau*omega is how you get shaft torque out of an engine rating. You know the watts, you know the revs, the twist falls out. Gearing only trades them: at the wheels, big tau comes with small omega.",
+   "Twist harder or spin faster and either way you deliver more power: P = tau*omega. Keep omega in radians per second. The radian is a bare ratio, so it never shows up in the units."
+  ],
+  "grounded": true,
+  "anchor": "engine gearing, torque traded against revs"
+ },
+ {
+  "formula": "v=a*t",
+  "name": "velocity from constant acceleration starting at rest",
+  "variants": [
+   "Acceleration is how much speed you pick up each second, so after t seconds of a steady a you have picked up a*t. Start from rest and that gain is the whole speed: v = a*t. A dragster is this.",
+   "v = a*t has rest baked into it. It is the full rule with the starting speed set to zero, so the moment the clock starts while you are already rolling, it is wrong and you must add what you had.",
+   "Plot speed against time a*t constant a and you get a straight line out of the origin with slope a. Read any point off it and that is v = a*t. Let a wander during the run and the line bends."
+  ],
+  "grounded": true,
+  "anchor": "a dragster leaving the line from rest"
+ },
+ {
+  "formula": "s_i=(((n_2)/(n_1)))*s_o",
+  "name": "apparent depth of an object seen through a flat refracting surface",
+  "variants": [
+   "A coin on the pool floor looks nearer the surface than it is. s_i = (n_2/n_1)*s_o, with n_1 the stuff the coin sits in and n_2 the stuff your eye is in. Water under air, and it rises.",
+   "Light bends on its way out of the water, so your eye traces it back to the wrong place. That mistake is s_i = (n_2/n_1)*s_o. Spearing a fish means aiming under where you can see it.",
+   "Depth is the only thing that changes here. A flat surface magnifies nothing sideways, so the fish keeps its true width and just sits too shallow: s_i = (n_2/n_1)*s_o, measured straight down, not across."
+  ],
+  "grounded": false,
+  "anchor": "coin on a pool floor; spearing a fish"
+ },
+ {
+  "formula": "f=((1)/(T))",
+  "name": "Relationship between frequency and period",
+  "grounded": true,
+  "anchor": "paycheck twice a month; waves per second vs seconds per wave",
+  "variants": [
+   "Count how many waves go past each second and you have f. Time one single wave and you have T. Same fact, flipped over: f = 1/T. Double how often it repeats and the period is cut in half.",
+   "Get paid twice a month and your pay frequency is two per month, or the period between checks is half a month. Waves work the same way, f = 1/T. Hz just means cycles per second.",
+   "A plucked guitar string repeats the same trip over and over. T is how long one trip takes, f is how many trips per second, and f = 1/T ties them. Halve T and you double f."
+  ]
+ },
+ {
+  "formula": "Delta_l=d*sin(theta)",
+  "name": "Path length difference for waves from two slits to a common point on a screen",
+  "grounded": true,
+  "anchor": "one slit is farther from the spot than the other",
+  "variants": [
+   "Light from two slits lands on the same spot, but one path was slightly longer. That extra travel is Delta_l = d*sin(theta). Straight ahead theta is zero, the paths tie, and the waves arrive in step.",
+   "Delta_l = d*sin(theta) is how much farther the light from one slit had to go. If that extra distance is a whole number of wavelengths the waves add up; half a wavelength off and they cancel.",
+   "Look off to the side and one slit is now farther from you than the other. The gap is d*sin(theta), and every bright and dark band in a double slit comes from it. Needs a far away screen."
+  ]
+ },
+ {
+  "formula": "x=x_0+v_x*t",
+  "name": "horizontal position under constant velocity",
+  "grounded": false,
+  "anchor": "projectile coasting sideways; the one evidence paragraph is about vertical free fall and never teaches this relation",
+  "variants": [
+   "Nothing pushes it sideways, so it just keeps going. Start at x_0, add v_x for every second that passes: x = x_0 + v_x*t. This is the horizontal half of a projectile, coasting the whole flight.",
+   "Roll a ball across a smooth floor and it covers the same distance each second. That is x = x_0 + v_x*t. There is no acceleration term because constant velocity means v_x is not changing.",
+   "x_0 is where you started, v_x*t is how far you have coasted since, so add them for where you are now. The moment friction or a push changes v_x, x = x_0 + v_x*t stops being true."
+  ]
+ },
+ {
+  "formula": "omega_f=omega_0+alpha*t",
+  "name": "Angular velocity from constant angular acceleration",
+  "grounded": true,
+  "anchor": "merry-go-round, CD slowing to a halt, fishing reel",
+  "variants": [
+   "Push a merry-go-round at a steady rate and its spin climbs at a steady rate. omega_f = omega_0 + alpha*t. Take the spin it already had, then add alpha for every second you keep pushing.",
+   "Switch off a CD player and the disk slows smoothly to a stop. That is alpha with a minus sign, eating into omega_0 until nothing is left: omega_f = omega_0 + alpha*t. Only true if alpha holds steady.",
+   "A fish runs and the reel spins up. alpha is how fast the spin rate itself changes, so alpha*t is the spin gained in time t, and omega_f = omega_0 + alpha*t adds it to what you started with."
+  ]
+ },
+ {
+  "formula": "theta_r=theta_i",
+  "name": "Law of reflection",
+  "grounded": true,
+  "anchor": "angles measured from the normal; mirrors beat lenses in telescopes",
+  "variants": [
+   "Light leaves a mirror at the same angle it arrived, theta_r = theta_i. The catch is where you measure from: not the surface, but the line perpendicular to it. Miss that and the whole problem tilts.",
+   "Whatever angle light hits a mirror at, it leaves at the same one: theta_r = theta_i. That holds for every color, which is why big telescopes use mirrors. A lens bends blue more than red and smears the image.",
+   "Squint at sunlight glinting off a lake and you are watching theta_r = theta_i. Angle in equals angle out, measured from the normal, so the glare reaches you from just one strip of water."
+  ]
+ },
+ {
+  "formula": "lambda_n=((lambda)/(n))",
+  "name": "Wavelength in a medium of refractive index n",
+  "grounded": true,
+  "anchor": "frequency is unchanged across a boundary, so the wave bunches up",
+  "variants": [
+   "Light entering glass slows down but still arrives just as often, so the waves have to bunch up. lambda_n = lambda/n is that squeezed wavelength inside, where lambda is the vacuum value.",
+   "n says how much a medium slows light, and the wavelength shrinks by the same factor: lambda_n = lambda/n. A red laser stays red underwater, because color follows frequency and frequency is untouched.",
+   "Same wave, tighter spacing. In a medium of index n the wavelength is lambda/n, shorter than it was in vacuum. Bigger n, bigger squeeze. Send it back out to air and it stretches right back."
+  ]
+ },
+ {
+  "formula": "N=m*g*cos(theta)",
+  "name": "normal force on an object on an inclined plane",
+  "grounded": true,
+  "anchor": "a surface can only push straight out of itself; weight split by coordinate rotation",
+  "variants": [
+   "A surface can only push straight out of itself. On a ramp just part of the weight presses that way, so N = m*g*cos(theta), and the leftover part is what slides the object down the slope.",
+   "On flat ground cos(theta) is at its largest and the surface carries the full weight m*g. Tilt the ramp and cos(theta) shrinks, so N = m*g*cos(theta) drops. Stand it upright and it carries nothing.",
+   "Turn your axes to line up with the ramp and the weight splits in two. The part pressing into the surface is N = m*g*cos(theta). The rest runs down along the slope, and unless friction holds it, you slide."
+  ]
+ },
+ {
+  "formula": "W_net=K_B-K_A",
+  "name": "Work-energy theorem",
+  "grounded": true,
+  "anchor": "net work shows up as motion, so you never track the force step by step",
+  "variants": [
+   "Do net work on something and it speeds up. The work does not vanish, it turns into motion, and W_net = K_B - K_A says how much: the kinetic energy at the end minus the kinetic energy at the start.",
+   "Push a crate while friction drags back on it. Add up the work from every force, not just yours, and that total is W_net = K_B - K_A. If friction wins it goes negative and the crate ends up slower.",
+   "You never have to follow the force step by step. Take the kinetic energy at B, subtract what it was at A, and that difference is the net work: W_net = K_B - K_A, whatever route it took to get there."
+  ]
+ },
+ {
+  "formula": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+  "name": "Drag force",
+  "grounded": true,
+  "anchor": "cyclist tucking, C measured in a wind tunnel, slow dust falls as v not v^2",
+  "variants": [
+   "Move through air or water and it pushes back, harder the faster you go. Drag is F_D = (1/2)*C*rho*A*v^2, so doubling your speed quadruples the push. That is why a cyclist tucks.",
+   "Drag climbs with the square of speed: F_D = (1/2)*C*rho*A*v^2. You can measure A and rho, but C is the penalty for your shape, and it comes out of a wind tunnel, not out of theory.",
+   "Air does not just slow you down, it fights harder the faster you shove. F_D = (1/2)*C*rho*A*v^2, always opposing the motion. For dust drifting slowly, though, drag goes as v, not v^2."
+  ]
+ },
+ {
+  "formula": "T=((2*pi*m)/(q*B))",
+  "name": "Period of a particle's motion in a magnetic field",
+  "grounded": false,
+  "anchor": "speed cancels out of the period, which is what lets a cyclotron use one fixed rate",
+  "variants": [
+   "Fling a charge into a magnetic field and it circles. The surprise is in T = (2*pi*m)/(q*B): no speed appears. Go faster and you just carve a wider circle in exactly the same time.",
+   "Magnetic force turns a charge without speeding it up, so the path closes into a loop. One lap takes T = (2*pi*m)/(q*B). Cyclotrons live on that: one fixed kick rate fits every lap, slow or fast.",
+   "Only m, q and B set the timing here: T = (2*pi*m)/(q*B). Heavier particle, slower lap. Crank up B and the loops tighten and quicken. How hard you threw it in never enters."
+  ]
+ },
+ {
+  "formula": "A=((1)/(2))*theta*(r)^(2)",
+  "name": "area of a sector",
+  "grounded": false,
+  "anchor": "pizza slice, radians not degrees, a full turn hands back the whole disc",
+  "variants": [
+   "Picture a pizza slice. Its area is A = (1/2)*theta*r^2, so the same angle off a bigger pizza wins you much more: stretch r and the slice grows with r^2, not with r.",
+   "Cut a wedge from a disk and you keep a fraction of it, set by how far the wedge opens. That is A = (1/2)*theta*r^2. One catch: theta has to be in radians. Feed it degrees and you get junk.",
+   "Open the wedge wider and the area rises straight with theta; push the rim out and it rises with r^2. Both sit in A = (1/2)*theta*r^2. Let theta swing a full turn and you get the whole disc."
+  ]
+ },
+ {
+  "formula": "W_out=W_in-W_f",
+  "name": "output work after friction losses",
+  "grounded": false,
+  "anchor": "warm drill bit, crate up a ramp, the lost work is heat and not destruction",
+  "variants": [
+   "Work does not vanish, it gets skimmed. Put W_in into a machine, friction takes W_f as heat, and you keep W_out = W_in - W_f. Feel a drill bit after a long cut: that is the missing part.",
+   "Shove a crate up a ramp and some of your effort never reaches the top. W_out = W_in - W_f. The lost work is not destroyed, it warms the ramp. Every real machine leaks some this way.",
+   "W_out = W_in - W_f is bookkeeping. What you put in either does the job or heats the rubbing surfaces, nothing else. Polish the contact and W_out climbs toward W_in, but never past it."
+  ]
+ },
+ {
+  "formula": "R=V/I",
+  "name": "resistance from voltage and current",
+  "grounded": true,
+  "anchor": "current shoving past atoms and heating them, a tired battery going flat",
+  "variants": [
+   "Resistance is how stubborn a path is. Push V across it, see how much current I squeezes through, and R = V/I is the score. Same push, less current through, higher resistance.",
+   "R = V/I, and nothing exotic is going on: the current has to shove past the atoms of the material, and they heat up taking the hits. Your charger going warm is R doing its work.",
+   "Every piece of a circuit has an R = V/I, even the inside of a battery. As a battery wears out its own resistance climbs, so it can no longer push much current, and it reads as flat."
+  ]
+ },
+ {
+  "formula": "N=m*g",
+  "name": "normal force on an object on a horizontal surface",
+  "grounded": true,
+  "anchor": "bathroom scale reads the push, not a third-law pair, and it fails on a ramp",
+  "variants": [
+   "The table pushes back. Sit still on a flat surface and your weight pulls down while the surface holds you up just as hard, so N = m*g. Tilt that surface and it stops being true.",
+   "N = m*g is not Newton's third law, it comes from the second. You are not accelerating, so the upward push has to cancel the downward pull exactly. Gravity and the floor are not a pair.",
+   "Your bathroom scale reads the floor pushing up on you, not gravity pulling down. On level ground those match, so N = m*g. Ride an elevator, or stand on a ramp, and the reading shifts."
+  ]
+ },
+ {
+  "formula": "f=((c)/(lambda))",
+  "name": "frequency from wavelength",
+  "grounded": true,
+  "anchor": "a band across a stadium staying in step, one family from radio to visible light",
+  "variants": [
+   "Waves trade length for rate: f = c/lambda. If speed depended on pitch, a band across a stadium would reach you out of step, bass lagging the treble. One speed for all, so short waves arrive more often.",
+   "Count the crests going past you each second and that is f. Pack them closer and more arrive: f = c/lambda. Halve lambda and f doubles, because c does not budge to make room.",
+   "Radio waves, microwaves, visible light: one family, all running at c, told apart only by lambda. f = c/lambda swaps one label for the other. Long waves count slowly, short ones count fast."
+  ]
+ },
+ {
+  "formula": "Delta_S_tot=Delta_S_h+Delta_S_c",
+  "name": "total entropy change of system and surroundings",
+  "grounded": false,
+  "anchor": "the second law as bookkeeping, reversible limit of zero, heat not running uphill",
+  "variants": [
+   "Entropy is not conserved, it piles up. Take the change at the hot end, add the change at the cold end: Delta_S_tot = Delta_S_h + Delta_S_c. For anything that really happens the total is positive.",
+   "Push heat from hot to cold and the cold side gains more entropy than the hot side loses, because it is colder. So Delta_S_tot = Delta_S_h + Delta_S_c leans positive, and that lean is the second law itself.",
+   "Delta_S_tot = Delta_S_h + Delta_S_c watches both ends of a heat flow at once. Only a reversible step holds it at zero; a real temperature gap always pushes it up. Heat will not run back uphill."
+  ]
+ },
+ {
+  "formula": "alpha=((Delta_omega)/(Delta_t))",
+  "name": "Angular acceleration",
+  "variants": [
+   "Spin a bike wheel up by hand and it takes a few seconds; grab the brake and it stops fast. Angular acceleration is that difference: alpha = (Delta_omega)/(Delta_t), how quickly the spin rate changes.",
+   "A skater pulls her arms in and speeds up. How fast a spin rate changes is alpha = (Delta_omega)/(Delta_t). Same idea as everyday acceleration, just for turning. Braking makes alpha oppose the spin.",
+   "Angular acceleration asks how fast a spin is changing, not how fast it spins. alpha = (Delta_omega)/(Delta_t). A disk coasting down has a small alpha; a wheel caught by a brake has a big one, the other way."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax 'Angular Acceleration': bicycle wheel spun from rest then braked (large negative alpha), skater pulling arms in, hard disk slowing to a halt"
+ },
+ {
+  "formula": "alpha=((a_t)/(r))",
+  "name": "angular acceleration from tangential acceleration",
+  "variants": [
+   "Every point on a spinning disk shares one alpha, but a point out on the rim gains speed faster than one near the axle. Divide out how far out you are and you get the shared number back: alpha = (a_t)/(r).",
+   "Stand at the edge of a merry-go-round as it starts and you get shoved harder than someone near the middle. Their a_t differs, alpha does not. alpha = (a_t)/(r) recovers the one alpha the whole ride shares.",
+   "Speeding up along the circle and speeding up the spin are one event described two ways. They differ only by how far out you measure it, so alpha = (a_t)/(r). The radius has to stay fixed for that to hold."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax 'Angular Acceleration': 'the tangential acceleration a_t is the radius times the angular acceleration', for a point at distance r on a rotating body, r held constant"
+ },
+ {
+  "formula": "F_net=((Delta_p)/(Delta_t))",
+  "name": "net force from rate of momentum change",
+  "variants": [
+   "A force is really a delivery rate for momentum. F_net = (Delta_p)/(Delta_t), so the same momentum change spread over a longer time takes less force. That is what an airbag and a bent knee are buying you.",
+   "A racquet turns a tennis ball around in a few thousandths of a second, so the force is enormous. F_net = (Delta_p)/(Delta_t) says force is momentum change per time. Short contact, big force.",
+   "Newton wrote his second law this way first. F_net = (Delta_p)/(Delta_t). Hold mass steady and it becomes force equals mass times acceleration, but this version survives when mass is leaving, as in a rocket."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax 'Momentum and Force': Venus Williams serve worked as force on a tennis ball; 'net external force on a system is equal to the rate of change of the momentum'; form survives changing mass, as with rockets"
+ },
+ {
+  "formula": "V=((U_E)/(q))",
+  "name": "definition of electric potential",
+  "variants": [
+   "Voltage is energy per unit charge, not energy. V = (U_E)/(q) divides out how much charge you brought, so what is left describes the spot itself, and any charge dropped there gets that much per coulomb.",
+   "Two charges at one spot hold different energies if one carries more charge. Divide by the charge and that difference goes away: V = (U_E)/(q). It is why a battery is rated in volts and not in joules.",
+   "Think of potential as what the field charges per coulomb. V = (U_E)/(q), so U_E depends on what you carry and V does not. Bring a charge q to that spot and the energy it holds is q times V."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax 'Voltage and Electric Field': 'Applying our definition of potential (V=U/q) to this potential energy'; energy of a test charge q at a point divided by the charge"
+ },
+ {
+  "formula": "v_toty=v_wy+v_p",
+  "name": "resultant velocity from component velocities",
+  "variants": [
+   "Velocities along the same line just add. Your own v_p plus the air or water moving with you, v_wy, gives v_toty = v_wy + v_p. A tailwind gets you home early; a headwind is the same sum with v_wy negative.",
+   "Swim downstream and the current is free speed. Along one axis your speed over the ground is v_toty = v_wy + v_p, the push you ride plus your own. Turn upstream and v_p goes negative, so the sum shrinks.",
+   "You add velocities one axis at a time. Point a plane due north and all of its own speed lands there: v_toty = v_wy + v_p. The sideways wind gets its own separate sum, and that is what drifts it off course."
+  ],
+  "grounded": false,
+  "anchor": "NO evidence paragraphs on this entry (evidence list empty, no glossary); written from the physics of adding velocity components along a single axis, w read as wind/current and p as the craft"
+ },
+ {
+  "formula": "a=((F)/(m))",
+  "name": "acceleration from force and mass",
+  "variants": [
+   "Push a basketball and push an SUV with the same force and only one of them goes anywhere. a = (F)/(m) says acceleration climbs with force and falls with mass. Mass is just how stubborn a thing is.",
+   "Newton's second law, solved for the part you usually want. a = (F)/(m). Double the push and the acceleration doubles; double the mass and it halves. F is the net force, everything pushing and dragging added up.",
+   "Motion does not need force; changing motion does. a = (F)/(m), and a points wherever F points. Push a mower along at steady speed and friction is cancelling you, so F is zero and so is a."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax 'Force and Acceleration': same net force on a basketball versus an SUV; lawn mower push minus friction; 'the magnitude of the acceleration a is a=F_net/m'; a is in the direction of the net force"
+ },
+ {
+  "formula": "U_form=E_transfer+U_coul+U_ex",
+  "name": "Energy change associated with ionic bonding",
+  "variants": [
+   "Making table salt costs energy to hand an electron from sodium to chlorine, E_transfer, and pays it back when the two ions pull together, U_coul. Add the close-in push-back U_ex: U_form = E_transfer + U_coul + U_ex.",
+   "An ionic bond is a three-line ledger. U_form = E_transfer + U_coul + U_ex: the price of moving the electron, the payoff from opposite charges attracting, and the shove back when the ions crowd too close.",
+   "Why does sodium stick to chlorine at all? U_form = E_transfer + U_coul + U_ex. The Coulomb term is the payoff, U_ex keeps the ions from collapsing together, and a negative total means the bond is worth making."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax 'Types of Bonds': NaCl formed by electron transfer from Na to Cl plus electrostatic potential energy at equilibrium separation; 'formation of a NaCl formula unit by ionic bonding is energetically favorable'. Its numbers (1.52 eV, 0.236 nm, 4.26 eV) were deliberately NOT quoted, per the no-numbers-outside-the-record rule"
+ },
+ {
+  "formula": "d=d_0+v_0*t+((1)/(2))*a*(t)^(2)",
+  "name": "position under constant acceleration",
+  "variants": [
+   "Where you end up is where you started, plus where steady speed carries you, plus whatever the acceleration adds: d = d_0+v_0*t+(1/2)*a*t^2. Both d and d_0 are measured from the same origin.",
+   "Throw a rock off a cliff and this tracks it the whole way down: d = d_0+v_0*t+(1/2)*a*t^2. The squared term is why falling gets dramatic late. It holds only while a stays constant.",
+   "Three pieces, and the last one is the one to watch. In d = d_0+v_0*t+(1/2)*a*t^2 that term grows with time squared: nothing early, everything later. And d is a position, not a distance covered."
+  ],
+  "grounded": true,
+  "anchor": "OpenStax 'Notation: t, x, v, a' (subscript 0 is the initial position, 'we now make the important assumption that acceleration is constant') and 'One-Dimensional Motion Involving Gravity' (rock thrown from a cliff, position at successive times); the record's own req states d is a POSITION from the same origin as d_0"
+ },
+ {
+  "formula": "I_rms=V_rms/Z",
+  "name": "rms current from impedance",
+  "grounded": false,
+  "anchor": "no evidence and no glossary; rms as the DC-equivalent heating value",
+  "variants": [
+   "The rms numbers are the ones that act like DC: an rms amp heats a resistor exactly as a steady amp would. That is why I_rms = V_rms/Z is written in them, with Z the circuit's total opposition.",
+   "Swap resistance for impedance and Ohm's law still works on alternating current: I_rms = V_rms/Z. Unlike a resistor, Z depends on how fast the current alternates, so the same voltage drives a different current.",
+   "A coil fights a current that is changing, and a capacitor blocks one that is steady. Roll all of that opposition into a single number Z and the old rule comes straight back: I_rms = V_rms/Z."
+  ]
+ },
+ {
+  "formula": "Delta_p=F_net*Delta_t",
+  "name": "impulse-momentum theorem",
+  "grounded": true,
+  "anchor": "OpenStax: bend your knees when jumping, car crumple zones, racket hitting a ball",
+  "variants": [
+   "Bend your knees when you land and you stretch the stop over more time. Same change in momentum, much smaller force, because Delta_p = F_net*Delta_t. A force only counts for as long as it acts.",
+   "A racquet hits a ball hard for an instant. A gentle shove does the same job if you keep pushing. Both give the same Delta_p = F_net*Delta_t, so what changes motion is force multiplied by time.",
+   "Newton wrote his second law this way first: Delta_p = F_net*Delta_t. It is why cars are built to crumple. The stop takes longer, so the force on you drops while your momentum change is fixed."
+  ]
+ },
+ {
+  "formula": "R_eqv=((1)/(1/R_1+1/R_2))",
+  "name": "equivalent resistance of two resistors in parallel",
+  "grounded": true,
+  "anchor": "OpenStax: reduce the pair to one resistor so Ohm's law gives the circuit current",
+  "variants": [
+   "Give the current two paths and more of it gets through, so the pair resists less than either one alone. R_eqv = 1/(1/R_1 + 1/R_2). Collapse them to that number and Ohm's law handles the rest.",
+   "Add a resistor in parallel and the resistance goes down, not up, because you have opened another lane. R_eqv = 1/(1/R_1 + 1/R_2), and it always lands below the smaller of R_1 and R_2.",
+   "The trick is that conductances add, not resistances. Flip each one, add them, flip back: R_eqv = 1/(1/R_1 + 1/R_2). Now the branch is a single resistor and you can get the current through it."
+  ]
+ },
+ {
+  "formula": "lambda=((h)/(p))",
+  "name": "The de Broglie wavelength",
+  "grounded": true,
+  "anchor": "OpenStax: de Broglie's thesis and Einstein's backing; electron diffraction off crystals",
+  "variants": [
+   "A graduate student guessed that nature is symmetric: if light can act like a particle, matter should act like a wave. Einstein read the thesis and backed him. The guess was lambda = h/p, and it held up.",
+   "Every moving thing has a wavelength, lambda = h/p. You never notice yours because h is tiny and your momentum is not, so the wavelength comes out far too small to measure. Shrink p to an electron and it shows.",
+   "Fire electrons at a crystal and they land in a diffraction pattern, which is what waves do. The wavelength that fits is lambda = h/p, h being Planck's constant and p the momentum. Matter is wavy too."
+  ]
+ },
+ {
+  "formula": "E=K+U",
+  "name": "total mechanical energy",
+  "grounded": true,
+  "anchor": "OpenStax: roller coaster trading height for speed, and the closed-system friction caveat",
+  "variants": [
+   "On a roller coaster the car trades height for speed the whole way round. E = K + U is the running total, K for the motion and U for the height. With no friction that total never changes.",
+   "Energy a thing has from moving, plus energy it has from where it sits: E = K + U. The sum is what makes it useful, because in a closed system K and U keep swapping while E stays put.",
+   "E = K + U only holds a fixed value while nothing rubs. Friction and air drag leak energy off as heat and the mechanical total drops. The closed-system wording is a real condition, not a formality."
+  ]
+ },
+ {
+  "formula": "F_c=m*a_c",
+  "name": "Centripetal force",
+  "grounded": true,
+  "anchor": "OpenStax list: rope tension, road friction, gravity on the Moon; glossary's perpendicular component",
+  "variants": [
+   "Centripetal force is not a new kind of force. It is the name for whatever is already pulling you inward: rope tension, road friction, Earth's pull on the Moon. Whatever does the job, F_c = m*a_c.",
+   "Rounding a bend is accelerating even at steady speed, because your direction keeps changing. Something has to supply that, and F_c = m*a_c says how much. For a car it is friction on the tires.",
+   "The part of the net force pointing sideways to your motion turns you instead of speeding you up. That part is F_c = m*a_c. Take it away, as on ice, and you stop turning and carry straight on."
+  ]
+ },
+ {
+  "formula": "T_F=((E_F)/(k_B))",
+  "name": "Fermi temperature",
+  "grounded": false,
+  "anchor": "no evidence paragraphs; one-line glossary only, so written from the physics",
+  "variants": [
+   "Divide the Fermi energy by Boltzmann's constant and an energy becomes a temperature: T_F = E_F/k_B. It is how hot you would have to get an ordinary particle to make it move as fast as those electrons do.",
+   "Warm a metal wire and the electrons inside barely notice. The Fermi energy written as a temperature, T_F = E_F/k_B, sits far above anything you could heat the wire to, so heating hardly stirs them.",
+   "Electrons in a metal cannot all sit still, so the top ones carry the Fermi energy E_F even at absolute zero. Ask what temperature would give a normal particle that much, and you get T_F = E_F/k_B."
+  ]
+ },
+ {
+  "formula": "I_1=I_2+I_3",
+  "name": "Kirchhoff junction rule",
+  "grounded": true,
+  "anchor": "OpenStax: water-pipe junction analogy; a junction is three or more wires; one equation per junction",
+  "variants": [
+   "Charge does not pile up at a wire joint, any more than water piles up in a pipe tee. What flows in flows out: I_1 = I_2 + I_3. That is conservation of charge, written for one junction.",
+   "A junction is where three or more wires meet, and the current has to split there. I_1 = I_2 + I_3 says the branches carry off everything the one wire brought in. The joint stores nothing.",
+   "Each junction hands you one equation, which is what makes the rule worth having: I_1 = I_2 + I_3. Collect enough of them and you can solve for currents you cannot reach with a meter."
+  ]
+ },
+ {
+  "formula": "W_i=F_i*d_i",
+  "name": "input work",
+  "grounded": true,
+  "anchor": "OpenStax lever example: effort arm travels far under a small force; friction wastes the rest as heat",
+  "variants": [
+   "Shove a crate up a ramp and the work you put in is your push times how far you pushed: W_i = F_i*d_i. Push half as hard and you walk twice as far. A machine trades force for distance, never for free.",
+   "Feed a machine energy and this is the bill: effort force times the distance you move it, W_i = F_i*d_i. You never get all of it back out. Friction skims some off as heat in every moving joint.",
+   "On a lever you press the long arm down a long way with a gentle force. That product is the input work, W_i = F_i*d_i, and the load rises a short way instead. That swap is why it feels easy."
+  ]
+ },
+ {
+  "formula": "Q=Delta_E_int+W",
+  "name": "heat from internal energy change and work",
+  "grounded": true,
+  "anchor": "OpenStax first law: heat and work are both energy in transit, neither stored as such",
+  "variants": [
+   "Heat poured into something has two places to go: it can raise the energy stored inside, or the thing can push on the world. Q = Delta_E_int + W is the whole ledger. Energy has nowhere else to hide.",
+   "Trap a gas in a cylinder and warm it, and two things happen at once. It gets hotter inside and it shoves the piston out. Q = Delta_E_int + W splits the heat between them, and that split is engine design.",
+   "You cannot tell, from a warm object, whether it was heated or worked on. Both are energy in transit. Q = Delta_E_int + W splits heat going in between the part that stays and the work that leaves."
+  ]
+ },
+ {
+  "formula": "E=P*t",
+  "name": "energy from power and time",
+  "grounded": true,
+  "anchor": "OpenStax energy consumption: the meter charges for the product, billed in kilowatt hours",
+  "variants": [
+   "Power is the rate, energy is the total. Leave something running twice as long and it uses twice as much: E = P*t. A kilowatt hour on your bill is nothing but that product, priced.",
+   "A bright lamp for a moment can cost you the same as a dim one left on all night. E = P*t is why. The meter only ever sees the product, so watts alone never tell you what you owe.",
+   "Halve the power and run it twice as long and the same energy arrives, because E = P*t and only the product counts. A trickle charger fills the same battery as a fast one; it just takes all night."
+  ]
+ },
+ {
+  "formula": "omega=((theta)/(t))",
+  "name": "angular speed",
+  "grounded": true,
+  "anchor": "OpenStax spinning CD: every point shares one omega, and a radian is a ratio of two lengths",
+  "variants": [
+   "Angular speed asks one thing: how fast is the angle changing. Sweep an angle theta in time t and omega = theta/t. Every point on a spinning disk shares that omega, even the rim that travels furthest.",
+   "Forget distance and count turning instead. omega = theta/t is the rate the angle grows, in radians per second. A radian is a ratio of two lengths, so theta carries no units of its own.",
+   "A clock's second hand holds a perfectly steady omega = theta/t: the same angle, every second, forever. Angular speed is about turning, and it says nothing at all about how long the hand is."
+  ]
+ },
+ {
+  "formula": "x=l-l_0",
+  "name": "extension from length change",
+  "grounded": false,
+  "anchor": "no evidence supplied; extension as displacement away from natural length",
+  "variants": [
+   "A spring does not care how long it is, only how much longer than it likes to be. x = l - l_0 is that difference: length now, minus its natural resting length. Squash it instead and x goes negative.",
+   "Measure the bar now, subtract what it measured before you pulled, and the stretch itself is what is left: x = l - l_0. Spring laws want x, not l, because a rest length is not a deformation.",
+   "Hang a mass on a spring and the pointer drops. That drop is x = l - l_0, the new length minus the old one. When x is zero the spring sits at its natural length and pushes back on nothing at all."
+  ]
+ },
+ {
+  "formula": "I_S=((N_P)/(N_S))*I_P",
+  "name": "Transformer equation with current",
+  "grounded": false,
+  "anchor": "supplied paragraph is mutual inductance, not the current ratio; written from ideal-transformer power conservation and a welder's thick secondary",
+  "variants": [
+   "Wind more turns on one side and you trade current away for voltage. I_S = (N_P/N_S)*I_P, so the coil with fewer turns carries the bigger current. A transformer reshapes power, it cannot make it.",
+   "The fat cable on a welder gives the game away. Few turns on that side, so I_S = (N_P/N_S)*I_P makes its current enormous while the voltage across it falls to almost nothing.",
+   "Voltage and current move opposite ways across a transformer. I_S = (N_P/N_S)*I_P flips the turns ratio upside down, because whatever power goes into the primary has to come back out the secondary."
+  ]
+ },
+ {
+  "formula": "Delta_y=x*lambda/d",
+  "name": "fringe spacing in double-slit interference",
+  "grounded": false,
+  "anchor": "no evidence supplied; Young's double-slit geometry",
+  "variants": [
+   "Shine a laser through two close slits and the wall lights up in evenly spaced bands. Delta_y = x*lambda/d is the gap between them. Squeeze the slits closer and the pattern spreads wider apart.",
+   "Red bands sit further apart than blue ones, and that is all Delta_y = x*lambda/d is saying. Longer lambda, wider spacing. Back the screen away and they spread too, which is why x sits on top.",
+   "Young split one beam in two and let the halves overlap again. Where crest meets crest you get a bright band, spaced by Delta_y = x*lambda/d. Light that does this is light behaving like a wave."
+  ]
+ },
+ {
+  "formula": "E=((h*c)/(lambda))",
+  "name": "photon energy from wavelength",
+  "grounded": true,
+  "anchor": "OpenStax quantization: one visible photon is a tiny fraction of a joule, and Planck was reluctant to accept his own idea",
+  "variants": [
+   "Shorter wavelength, fatter lump of energy. That is all E = (h*c)/lambda says. Blue photons hit harder than red ones, which is why ultraviolet burns your skin and radio waves never will.",
+   "Squeeze the wavelength and the energy in one photon climbs: E = (h*c)/lambda. A single photon of visible light is a tiny sliver of a joule, which is why you never notice them landing one by one.",
+   "Planck explained glowing hot objects only by assuming energy comes in packets, and he disliked his own idea. Einstein carried it to light itself. E = (h*c)/lambda sizes one packet: color alone sets it."
+  ]
+ },
+ {
+  "formula": "rho=((m)/(V))",
+  "name": "density from mass and volume",
+  "variants": [
+   "Pack more mass into the same box and it gets denser. That is all rho = m/V is. Archimedes was handed the job of checking whether a king's crown was really gold, and this is the number that answers it.",
+   "Weigh an old coin, measure the water it pushes aside, divide: rho = m/V. Pure silver gives one number and a fake gives another. Density does not care how big the piece is, only what it is made of.",
+   "A solid steel block sinks. Beat the same steel into a hull and it floats, because the V in rho = m/V is now the whole boat, air included. Same mass, far more volume, so the average density drops."
+  ],
+  "grounded": true,
+  "anchor": "Archimedes testing the king's crown; the counterfeit silver coin"
+ },
+ {
+  "formula": "V=I*R",
+  "name": "Common expression of Ohm's law",
+  "variants": [
+   "Voltage is the push, current is the flow, resistance is how much the wire fights back. V = I*R ties the three together: same push against more resistance, and less current gets through.",
+   "Double the voltage across a resistor and you double the current. That is all Ohm's law says, V = I*R. It is not a law of nature though. Plenty of parts, a diode for one, ignore it completely.",
+   "Think of water in a pipe. V = I*R says the pressure you need is the flow you want times how narrow the pipe is. Narrow it, and pushing the same current through suddenly costs a lot more voltage."
+  ],
+  "grounded": false,
+  "anchor": "no evidence supplied at all; water-in-a-pipe and the diode caveat written from physics"
+ },
+ {
+  "formula": "E=h*f",
+  "name": "photon energy from frequency",
+  "variants": [
+   "Light does not arrive in a smooth stream. It comes in packets, and E = h*f says a packet's energy is set by its frequency alone. Planck guessed it for hot glowing objects; Einstein saw what it meant.",
+   "Violet light hits harder per photon than red does, because E = h*f and violet has the higher frequency. Turning the lamp up sends more photons, not stronger ones. One is enough to fire a cell in your eye.",
+   "A molecule only swallows a photon whose energy matches a step it can climb, and E = h*f fixes that energy by frequency. Violet flowers soak up the red and throw the violet back. So they look violet."
+  ],
+  "grounded": true,
+  "anchor": "Planck's blackbody quanta and Einstein's photoelectric effect; violet flowers reflecting violet"
+ },
+ {
+  "formula": "P=((W)/(t))",
+  "name": "power",
+  "variants": [
+   "Power is not how much work you do, it is how fast. P = W/t. Carry the boxes upstairs in one trip or in ten and the work is the same, but do it in half the time and you needed twice the power.",
+   "A watt is one joule every second, and that is all P = W/t says: the work divided by the time it took. A light bulb quietly spends joules the whole time it is on, and that steady rate is its power.",
+   "Same job, less time, more power, and P = W/t is the bookkeeping. It is why a car that accelerates hard drinks fuel. It does a lot of work in a few seconds, and the engine has to deliver it that fast."
+  ],
+  "grounded": true,
+  "anchor": "a watt is one joule per second; the hard-accelerating car burning fuel fast"
+ },
+ {
+  "formula": "v=d/t",
+  "name": "average speed",
+  "variants": [
+   "Drive to the store and back and your average velocity is zero, but your average speed is not. v = d/t uses the ground your odometer counted, not where you ended up. Speed carries no direction.",
+   "Your speedometer tells you about right now. v = d/t tells you about the whole trip: total distance over total time, every red light included. It is an average, so it hides the speeding up and slowing down.",
+   "A winding road covers more ground than the map shows. The d in v = d/t is the path you actually drove, every curve of it, not the straight line between the ends. Speed counts detours; velocity does not."
+  ],
+  "grounded": true,
+  "anchor": "the round trip to the store, where the odometer moves but average velocity is zero"
+ },
+ {
+  "formula": "F=m*a",
+  "name": "Newton's second law",
+  "variants": [
+   "Push two things with the same force and the heavier one barely budges. F = m*a says it straight: acceleration is what the force buys you, and mass is the price. Mass is a measure of that stubbornness.",
+   "F = m*a is a trade. A given force, divided by however much mass you are shoving. It assumes the mass holds steady, so it quietly fails on a rocket, which is busy burning away a good part of itself.",
+   "Nothing speeds up on its own. Something has to push, and F = m*a says how much you get for the push. Drop a rock and gravity is the only push worth counting, so it keeps gaining speed the whole way down."
+  ],
+  "grounded": true,
+  "anchor": "mass as a measure of inertia; the rocket that breaks the law by burning away its own mass"
+ },
+ {
+  "formula": "K=0.5*m*(v)^(2)",
+  "name": "kinetic energy",
+  "variants": [
+   "Double your speed and you carry four times the energy, not twice. That squared v in K = 0.5*m*v^2 is the whole story. Mass counts too, but speed is the one that punishes you for it.",
+   "K = 0.5*m*v^2 is the energy a thing has purely because it is moving. It is not the last word. Get a particle near the speed of light and the true answer runs away from this one. At normal speeds they agree.",
+   "A helicopter flying along has kinetic energy, and so do the blades whirling overhead, but K = 0.5*m*v^2 only covers the first. Every point on a blade moves at its own speed, so blades need their own version."
+  ],
+  "grounded": true,
+  "anchor": "the squared v; the relativistic and rotational limits where the formula stops holding"
+ },
+ {
+  "formula": "U=m*g*h",
+  "name": "gravitational potential energy",
+  "variants": [
+   "Lifting something is a loan. U = m*g*h is what you handed over, and gravity collects it on the way down. Let go and it comes back as speed. Hang it in a cuckoo clock and it comes back as ticking.",
+   "There is no true height. In U = m*g*h you pick where h starts from, so a hiker down at sea level ends up with a negative number if you measured from the trailhead. Only the change between two spots is real.",
+   "Twice the mass, or twice the height, twice the stored energy: U = m*g*h. The g is in there because nothing gets stored unless something is pulling back down on you the whole way up."
+  ],
+  "grounded": true,
+  "anchor": "the arbitrary zero for h (the hiker at sea level goes negative); the cuckoo clock weight"
+ },
+ {
+  "formula": "p=m*v",
+  "name": "momentum",
+  "grounded": true,
+  "anchor": "Newton called it quantity of motion in the Principia; racket hitting a tennis ball",
+  "variants": [
+   "Momentum is how hard a thing is to stop. p = m*v, so a slow truck can carry more of it than a sprinting person. Newton wrote his second law this way first and called it the quantity of motion.",
+   "Two things make you hard to stop: being heavy and being fast. p = m*v folds both into one number. It has a direction too, and in a crash the total before and after comes out the same.",
+   "A racquet touches a ball for a blink and sends it flying. What it changed was p = m*v. To change it you need a force, and the longer that force acts, the more of it you change."
+  ]
+ },
+ {
+  "formula": "W=F*d",
+  "name": "work done by a constant force",
+  "grounded": true,
+  "anchor": "carrying a briefcase horizontally does zero work; the lawn mower pushed at an angle",
+  "variants": [
+   "Carry a heavy bag across a room and you do no work on it. Work is W = F*d, force times the distance moved along that force. You pull up, the bag goes sideways, so none of it counts.",
+   "Push a mower and only the part of your push that points where it rolls does anything. That is W = F*d. Shove at an angle and some of the effort never turns into work at all.",
+   "W = F*d is the energy a force hands over. Push something along and you give it energy. Push against the motion, the way gravity does on a ball going up, and the work comes out negative."
+  ]
+ },
+ {
+  "formula": "a=(v)^(2)/r",
+  "name": "centripetal acceleration",
+  "grounded": true,
+  "anchor": "centripetal is Latin for center seeking; the square means twice the speed is four times the acceleration",
+  "variants": [
+   "Round a curve at steady speed and you are still accelerating, because your direction keeps changing. a = v^2/r points straight at the center. Centripetal is Latin for center seeking.",
+   "Take a bend twice as fast and the car has to haul you inward four times as hard. That is the square in a = v^2/r. Speed dominates, and a tight curve, meaning a small r, makes it worse again.",
+   "Nothing pulls you outward in a turn. a = v^2/r is the acceleration aimed inward that keeps you on the circle, and what you feel is the seat shoving you toward the center to supply it."
+  ]
+ },
+ {
+  "formula": "P=V*I",
+  "name": "electrical power",
+  "grounded": true,
+  "anchor": "electricity bills are sold in kilowatt-hours, power multiplied by time",
+  "variants": [
+   "Voltage is energy per charge, current is charge per second. Multiply and the charge cancels, leaving energy per second, which is power: P = V*I. Same watts from a big V or a big I.",
+   "Your electric bill is P = V*I stretched over hours. That is what a kilowatt hour is. Double the current at the same voltage and the appliance eats energy twice as fast.",
+   "P = V*I is the rate a device drains energy, not the amount it holds. A kettle pulls a heavy current from the wall and boils fast. A phone charger sips at the same voltage."
+  ]
+ },
+ {
+  "formula": "tau=r*F",
+  "name": "torque",
+  "grounded": true,
+  "anchor": "push the merry-go-round as far from the center as possible for the largest lever arm",
+  "variants": [
+   "Push a merry-go-round near the middle and little happens. Push at the rim and it spins. Same force, bigger r. tau = r*F is twisting effort, and distance from the pivot counts as much as push.",
+   "A long wrench beats a short one on the same bolt, because tau = r*F grows with r. You cannot always push harder, but you can push farther out. That is the whole idea behind handles.",
+   "Torque is force plus leverage: tau = r*F. Push straight in at the pivot and nothing turns however hard you shove. The push has to cut across the arm, and a longer arm wins."
+  ]
+ },
+ {
+  "formula": "v_d=E/B",
+  "name": "drift velocity in crossed electric and magnetic fields",
+  "grounded": false,
+  "anchor": "no evidence and no glossary in the file; written from the velocity selector, where the electric and magnetic forces balance at one speed",
+  "variants": [
+   "Cross an electric field with a magnetic one and a charge gets two opposite shoves. They cancel at exactly one speed, v_d = E/B. Go faster or slower and you get bent out of the beam.",
+   "v_d = E/B is a speed filter. The charge cancels out of it, so every particle obeys the same number whatever it is. Mass spectrometers use this to pick one speed before sorting by mass.",
+   "A charge sitting still here feels only the electric push. Start it moving and the magnetic force fights back, growing with speed, until at v_d = E/B the two balance and it sails straight."
+  ]
+ },
+ {
+  "formula": "p=p_0+rho*g*h",
+  "name": "pressure at depth in a fluid",
+  "grounded": true,
+  "anchor": "pressure depends only on depth and not on the shape of the container; constant density fails in the atmosphere",
+  "variants": [
+   "Your ears hurt at the deep end because a column of water is sitting on you. p = p_0 + rho*g*h adds that weight to the air already pressing down. Only the depth h matters, not the pool shape.",
+   "Pressure under water is what the air pushes plus what the water above adds: p = p_0 + rho*g*h. Swim sideways and nothing changes. Go down and it climbs steadily the whole way.",
+   "Sink twice as deep and the water share of the pressure doubles. p = p_0 + rho*g*h works because water barely squashes, so rho holds still. Air does squash, so the sky needs other math."
+  ]
+ },
+ {
+  "formula": "F=q*v*B",
+  "name": "magnetic force on a moving charge",
+  "grounded": true,
+  "anchor": "this relation is what defines the tesla, named after Nikola Tesla; zero force when moving along the field",
+  "variants": [
+   "Park a charge in a magnetic field and nothing happens to it. Give it a speed across the field and it feels F = q*v*B. That is why a magnet ignores a still charge but grabs a wire carrying current.",
+   "The magnetic force pushes sideways to the motion, so F = q*v*B steers a charge rather than speeding it up. Paths bend into circles. That is how an accelerator holds a beam on its ring.",
+   "F = q*v*B is the full force only when the charge cuts straight across the field. Fly along the field lines instead and you feel nothing. This relation is what defines the tesla, named for Nikola Tesla."
+  ]
+ },
+ {
+  "formula": "V=((k_e*q)/(r))",
+  "name": "electric potential of a point charge",
+  "grounded": true,
+  "anchor": "OpenStax Electric Potential: pressure-in-a-pipe analogy, scalar superposition",
+  "variants": [
+   "Think of it as pressure in a pipe: a loose positive charge slides from high potential toward low. Near a point charge q that pressure is V = k_e*q/r, falling off steadily as you back away.",
+   "It is the energy per coulomb needed to haul a test charge in from far away and park it a distance r from q. V = k_e*q/r. Per unit charge, so it does not care what you bring to probe it.",
+   "Potentials add as plain numbers, with no arrows to chase. Each nearby charge kicks in its own V = k_e*q/r and you total them, which is why voltage is friendlier to work with than the field."
+  ]
+ },
+ {
+  "formula": "E=((sigma)/(epsilon_0))",
+  "name": "electric field at a charged conducting surface",
+  "grounded": true,
+  "anchor": "OpenStax: field at one plate depends only on that plate's sigma; air sparks",
+  "variants": [
+   "Pack charge onto a conductor and the field just outside its skin depends only on how densely the charge sits there: E = sigma/epsilon_0. No distance in it, no size of the object either.",
+   "Here is the odd part. Face two oppositely charged plates and the field at one surface still cares only about that plate's own charge density, E = sigma/epsilon_0. The other plate does not enter.",
+   "Crowd charge onto a surface and E = sigma/epsilon_0 climbs until the air itself quits insulating and sparks. sigma is charge per square meter; epsilon_0 sets how stiffly empty space pushes back."
+  ]
+ },
+ {
+  "formula": "F=G*m1*m2/(r)^(2)",
+  "name": "Newton's law of universal gravitation",
+  "grounded": true,
+  "anchor": "OpenStax: apple and Moon obey one rule, Cavendish measured G a century later",
+  "variants": [
+   "You and this calculator are pulling on each other right now. F = G*m1*m2/r^2 says every pair of masses does, and the pull dies fast: back off to twice the distance, get a quarter the force.",
+   "Newton's leap was that the falling apple and the orbiting Moon obey one rule, with the same G everywhere in the universe. F = G*m1*m2/r^2. Cavendish only measured G a century later.",
+   "Your weight is this force with Earth as one of the masses. F = G*m1*m2/r^2, so haul yourself to the Moon and the pull shrinks even though the matter in you has not changed one bit."
+  ]
+ },
+ {
+  "formula": "Q=m*c*dT",
+  "name": "heat transferred with no phase change",
+  "grounded": true,
+  "anchor": "OpenStax Phase Change: temperature stays flat while melting, so it quits there",
+  "variants": [
+   "Heat something and the energy it soaks up is Q = m*c*dT: more mass or a bigger temperature swing costs more joules. It quits at the melting point, where heat pours in and dT stays flat.",
+   "c is how stubborn the substance is. Water demands a lot of energy per degree, most metals almost none. Q = m*c*dT scales that by how much you have and how far you moved the temperature.",
+   "Why beach sand scorches your feet while the sea stays cold: same sun, but Q = m*c*dT and water's c is huge, so the same heat buys the water a far smaller dT than it buys the sand."
+  ]
+ },
+ {
+  "formula": "a=(vf-vi)/t",
+  "name": "uniform acceleration",
+  "grounded": true,
+  "anchor": "OpenStax Constant Acceleration: falling objects; non-constant force breaks it",
+  "variants": [
+   "Acceleration is how fast your speed is changing. a = (vf-vi)/t: the speed you ended with, minus the one you started with, over the time it took. Slow down instead and a comes out negative.",
+   "Drop something and it gains the same chunk of speed every second. That sameness is what uniform means, and a = (vf-vi)/t only tells the truth while it holds. A car in traffic breaks it constantly.",
+   "The shove that pins you into a car seat is this. a = (vf-vi)/t spreads the whole change in velocity evenly across t, so it is the real acceleration only if the rate never wavered in between."
+  ]
+ },
+ {
+  "formula": "d=vi*t+0.5*a*(t)^(2)",
+  "name": "displacement under uniform acceleration",
+  "grounded": false,
+  "anchor": "no evidence paragraphs; written from the two-term structure of the formula",
+  "variants": [
+   "Two trips added together: how far you would coast a*t vi, plus the extra the acceleration piles on. d = vi*t+0.5*a*t^2. That second piece grows with t squared, so it takes over quickly.",
+   "Start from rest and the vi*t term vanishes, leaving only the 0.5*a*(t)^(2) half. Double the time and you cover four times the ground, which is why a dropped ball seems to cheat near the end.",
+   "It tells you where you ended up, not how far you drove. Brake hard from vi and a turns negative in d = vi*t+0.5*a*t^2, so the second term eats into the first instead of adding to it."
+  ]
+ },
+ {
+  "formula": "C=epsilon_0*((A)/(d))",
+  "name": "Capacitance of a parallel-plate capacitor",
+  "grounded": true,
+  "anchor": "OpenStax Parallel Plate Capacitor: bigger A spreads charge, farad is huge",
+  "variants": [
+   "Capacitance is how much charge two plates hold per volt. Wide plates give charge room to spread out, close plates tug harder on each other, so C = epsilon_0*(A/d). Nothing else gets a say.",
+   "A farad is a monstrous unit. epsilon_0 is tiny and C = epsilon_0*(A/d), so plates the size of a desk barely register, which is why real capacitors are long thin foils rolled up tight.",
+   "Pull the plates apart and the capacitance drops, because d sits underneath in C = epsilon_0*(A/d). Only geometry appears, so it is settled long before any battery ever gets wired up."
+  ]
+ },
+ {
+  "formula": "d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2))",
+  "name": "Distance",
+  "grounded": true,
+  "anchor": "OpenStax Distance: professor paces a long path, ends near her start; no sign",
+  "variants": [
+   "It is Pythagoras wearing a coat. Go x_2-x_1 across and y_2-y_1 up, and the straight line closing that right triangle is d = sqrt((x_2-x_1)^2+(y_2-y_1)^2). Works on any flat map.",
+   "A teacher pacing the front of a room all lecture walks a long way and still finishes a stride from where she began. d = sqrt((x_2-x_1)^2+(y_2-y_1)^2) measures that gap, not the path.",
+   "Swap the two points and nothing changes: squaring wipes out the minus signs, so d = sqrt((x_2-x_1)^2+(y_2-y_1)^2) has no direction and never comes out negative. The two legs combine, they do not add."
+  ]
+ },
+ {
+  "formula": "v=((omega)/(k))",
+  "name": "Wave speed",
+  "grounded": true,
+  "anchor": "guitar string: the medium bobs, the pattern travels",
+  "variants": [
+   "Watch a wave cross a rope. The rope never travels, the shape does, and v = omega/k is how fast that shape moves. omega is the cycling in time, k the cycling in space, and speed is the ratio.",
+   "How hard you pluck changes nothing about how fast a wave crosses. Its speed is the cycling in time, omega, over how tightly it repeats in space, k: v = omega/k. The string decides that, not you.",
+   "The bit of string in front of you only bobs up and down; the pattern is what moves, at v = omega/k. Thick heavy strings carry it slower, which is why they sound lower than thin ones."
+  ]
+ },
+ {
+  "formula": "Delta_E=h*Delta_f",
+  "name": "energy difference from a frequency difference",
+  "grounded": true,
+  "anchor": "Planck disbelieving his own h; the K/L shell X-ray gap",
+  "variants": [
+   "Energy in light comes in lumps, not a smooth stream. Step up in frequency by Delta_f and the energy step is Delta_E = h*Delta_f. Planck got h from glowing hot objects and did not believe it himself.",
+   "The steps are so small that energy looks perfectly smooth to you, because h is a tiny number. Delta_E = h*Delta_f turns a gap in frequency into a gap in energy. Widen the jump, the photon carries more.",
+   "Two shells in an atom sit some energy apart, and the photon bridging them carries exactly that gap. Delta_E = h*Delta_f. Deep shells are far apart, so what they emit comes out as X-rays."
+  ]
+ },
+ {
+  "formula": "v_d=((I)/(n*q*A))",
+  "name": "Drift velocity",
+  "grounded": true,
+  "anchor": "the light comes on instantly while electrons crawl",
+  "variants": [
+   "Flip a switch and the light comes on at once, but the electrons themselves barely crawl. v_d = I/(n*q*A) is that crawl. More carriers n or a fatter wire A, and each charge can go slower for the same I.",
+   "A*n electron in a wire ricochets around fast and nearly at random. Underneath the chaos is a slow average drift, v_d = I/(n*q*A). Copper packs in so many free charges that the drift is slower than a snail.",
+   "Current is charge per second. Take the charge sitting in each cubic meter, n*q, times the wire's area A, then divide the current by it: v_d = I/(n*q*A). A*n average over a crowd, not one electron's dash."
+  ]
+ },
+ {
+  "formula": "lambda=((c)/(f))",
+  "name": "wavelength from frequency",
+  "grounded": true,
+  "anchor": "measuring c with a microwave and a slice of bread",
+  "variants": [
+   "Speed is set by the medium, so frequency and wavelength trade off: lambda = c/f. Raise f and the crests bunch up. It is why an AM aerial is the size of a tower and a wifi one fits in a laptop.",
+   "You can check this with a microwave and a slice of bread. The scorched spots sit half a wavelength apart, the frequency is printed on the back, and lambda = c/f gives you the speed in your kitchen.",
+   "A band in a stadium stays in cadence however far off you stand, because in one medium every pitch shares a speed. Call it c and lambda = c/f follows: the higher the note, the shorter its wave."
+  ]
+ },
+ {
+  "formula": "w=m*g",
+  "name": "Definition of weight, scalar form",
+  "grounded": false,
+  "anchor": "no evidence and no glossary in the record; written from physics",
+  "variants": [
+   "Mass is how much of you there is. Weight is how hard a planet pulls on that. w = m*g, so fly to the Moon and m does not budge, but g drops, and the reading on the scale drops with it.",
+   "Your bathroom scale never measures you. It measures the push it takes to hold you up, w = m*g. Change g and the number changes. That is why weight is in newtons while mass stays in kilograms.",
+   "A feather and an anvil feel the same g, so w = m*g rides entirely on mass. The heavy one is pulled harder but has more mass to move, so with the air taken away they fall side by side."
+  ]
+ },
+ {
+  "formula": "T=((1)/(f))",
+  "name": "period",
+  "grounded": true,
+  "anchor": "the OpenStax paycheck analogy, twice a month",
+  "variants": [
+   "Period and frequency are one fact said two ways, T = 1/f. Paid twice a month? That is the frequency. The half month of waiting between checks is the period. Count the events, or count the wait.",
+   "Count how many swings land in a second and you have f. Ask instead how long a single swing takes and you have T = 1/f. Quick repeats mean a short wait, and there is nothing more to it than that.",
+   "Hang a mass on a spring and each bounce takes the same time whether you pull it far or barely at all. That time is T, and T = 1/f: counts per second one way, seconds per count the other."
+  ]
+ },
+ {
+  "formula": "omega=((Delta_theta)/(Delta_t))",
+  "name": "angular speed from angular displacement",
+  "grounded": true,
+  "anchor": "flywheel energy storage on near frictionless bearings",
+  "variants": [
+   "Angular speed is plain speed with angle swapped in for distance: omega = Delta_theta/Delta_t. A spinning wheel has one omega everywhere, and the rim still outruns the hub, having farther to go.",
+   "A clock's second hand sweeps the same slice of the circle every second, so its omega = Delta_theta/Delta_t holds steady. Angle is a bare number with no unit of its own, so omega is a plain per second.",
+   "A flywheel banks energy by holding a big omega = Delta_theta/Delta_t. Set it on near frictionless bearings and it keeps sweeping the same angle every second for a very long time."
+  ]
+ },
+ {
+  "formula": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
+  "name": "Height of free fall",
+  "grounded": true,
+  "anchor": "Galileo: feather and anvil fall together without air",
+  "variants": [
+   "Begin where it left your hand, add how far the throw alone would carry it, then subtract what gravity claws back: y = y_0 + v_0*t - (1/2)*g*t^2. The minus sign is why g goes in as a size, not a direction.",
+   "Gravity pulls just as hard per kilogram on a feather as on an anvil, so mass never shows up here: y = y_0 + v_0*t - (1/2)*g*t^2. Galileo was right. Let air drag matter and it stops holding.",
+   "The throw part grows steadily, the gravity part grows faster and faster, and when the two match, the ball is back at the height it left. y = y_0 + v_0*t - (1/2)*g*t^2 covers the whole arc."
+  ]
+ },
+ {
+  "formula": "B=((mu_0*I)/(2*pi*R))",
+  "name": "magnetic field due to a long straight wire",
+  "variants": [
+   "Push current down a wire and the space around it starts shoving on magnets. The field wraps the wire in circles, B = ((mu_0*I)/(2*pi*R)). Right thumb along the current, fingers curl the way B points.",
+   "Stand twice as far from the wire and the field is half as strong. B = ((mu_0*I)/(2*pi*R)), and that 2*pi*R underneath is the circle you are standing on: one current spread round a longer path.",
+   "Good only close to a wire that is long compared with R, and mu_0 is just a constant of empty space. B = ((mu_0*I)/(2*pi*R)). Bend the wire and you must add up every little piece instead."
+  ],
+  "grounded": true,
+  "anchor": "right-hand rule; field circles the wire; bent wire needs summing segments"
+ },
+ {
+  "formula": "E_b=h*f_O",
+  "name": "binding energy of an electron",
+  "variants": [
+   "Shine dim blue light on sodium and electrons jump off. Shine bright red light and nothing comes out at all. There is a threshold frequency f_O, and E_b = h*f_O is how tightly that electron was held.",
+   "Photons arrive whole, one photon to one electron, so turning the lamp up only sends more of them. The lowest frequency that frees anything, f_O, measures the grip: E_b = h*f_O.",
+   "E_b = h*f_O is the bill for prying one electron off a surface. Light right at f_O pays it exactly, so the electron crawls out with no speed to spare. Redder light never pays, however long you wait."
+  ],
+  "grounded": true,
+  "anchor": "photoelectric threshold: bright red light frees nothing, dim blue does"
+ },
+ {
+  "formula": "v=f*lambda",
+  "name": "Velocity of a wave",
+  "variants": [
+   "A wave travels one whole wavelength in one cycle, so v = f*lambda is really just how far over how long. Count f crests going past you each second, and they arrive lambda apart.",
+   "Watch a gull ride the swell: it bobs in place while the wave rolls on past it. v = f*lambda is the speed of the shape, not of the water. The water itself goes nowhere.",
+   "The stuff it travels through fixes v, so f and lambda have to trade off: v = f*lambda. That is why a band's low notes and high notes reach the back of the room together."
+  ],
+  "grounded": true,
+  "anchor": "the gull bobbing in place while the swell passes under it"
+ },
+ {
+  "formula": "y=y_0+((1)/(2))(v_0y+v_y)t",
+  "name": "vertical position from average vertical velocity",
+  "variants": [
+   "Speed up steadily and your average is just the halfway point between the start and the end. That is all this is: y = y_0+(1/2)(v_0y+v_y)t, halfway speed times t, on top of where you began.",
+   "Nothing about how hard it speeds up appears here, which is the point. Know the speed at both ends and y = y_0+(1/2)(v_0y+v_y)t hands you the height, with no rate to work out first.",
+   "Halving the sum of the two end speeds is an honest average only while the speed changes at a steady rate. Add air drag and y = y_0+(1/2)(v_0y+v_y)t quietly stops being true."
+  ],
+  "grounded": false,
+  "anchor": "the midpoint of the two end speeds IS the average, but only under steady gain"
+ },
+ {
+  "formula": "E=n*h*f",
+  "name": "quantum energy",
+  "variants": [
+   "Energy here comes in whole steps, never slices. E = n*h*f says a wave of frequency f can carry one lump h*f, or two, or n of them, and nothing at all in between.",
+   "n is a count, so it runs in whole numbers only: E = n*h*f. A blue flame is more dangerous than a red one because each of its steps is bigger, not because it takes more of them.",
+   "Planck put the n in to rescue a broken account of glowing hot metal, and it worked. E = n*h*f. The step h*f is so tiny that we see a ramp; only something atom sized feels the stairs."
+  ],
+  "grounded": true,
+  "anchor": "a blue flame is more dangerous than a red one, bigger step not more steps"
+ },
+ {
+  "formula": "R_eqv=R_1+R_2",
+  "name": "equivalent resistance of two resistors in series",
+  "variants": [
+   "In series there is one path only, so the same current goes through both and their voltage drops add. Hence R_eqv = R_1+R_2. Add more bulbs to a series string and every one of them dims.",
+   "Picture one long wire made of two poor stretches joined end to end: R_eqv = R_1+R_2. Wire that same pair side by side instead and you get less resistance than either one alone.",
+   "True only while nothing branches off between them. Same current through both, so R_eqv = R_1+R_2. Untangling a messy circuit is mostly spotting such pairs and collapsing them one at a time."
+  ],
+  "grounded": true,
+  "anchor": "one path, so the voltage drops add; collapsing a messy circuit pair by pair"
+ },
+ {
+  "formula": "a_c=(((v)^(2))/(r))",
+  "name": "Centripetal acceleration",
+  "variants": [
+   "Your speed can hold perfectly steady round a bend and you are still being pulled, because your direction keeps changing. a_c = ((v^2)/r), aimed at the center of the turn, never along it.",
+   "The v is squared, which catches people out. Take the same curve at twice the speed and the pull on you is four times harder, not twice as hard: a_c = ((v^2)/r).",
+   "The outward shove you feel in a turning car is just your body trying to keep going straight. The real pull is inward, a_c = ((v^2)/r), and tightening r makes it bite harder."
+  ],
+  "grounded": true,
+  "anchor": "same curve at twice the speed pulls four times harder; the outward shove is fictitious"
+ },
+ {
+  "formula": "T_tof=((2(v_0*sin(theta_0)))/(g))",
+  "name": "Time of flight",
+  "variants": [
+   "Only the upward part of the launch matters. v_0*sin(theta_0) is the kick straight up, and gravity takes it away then hands it back, so T_tof = ((2(v_0*sin(theta_0)))/g): rise equals fall.",
+   "Launch and land at the same height and this is exact: T_tof = ((2(v_0*sin(theta_0)))/g). Let it come down on a roof or in the stands and it breaks, since the fall no longer mirrors the rise.",
+   "g sits on the bottom, so the same throw on the Moon hangs far longer. T_tof = ((2(v_0*sin(theta_0)))/g). Aim flatter and sin(theta_0) shrinks with it: a line drive is down long before a pop fly."
+  ],
+  "grounded": true,
+  "anchor": "the tennis ball landing up in the stands, where the flat-surface assumption breaks"
+ },
+ {
+  "formula": "T=2*pi*sqrt(((m)/(k)))",
+  "name": "Period of a mass-spring system in SHM",
+  "variants": [
+   "Pluck a guitar string gently or hard and you get the same note. A mass bouncing on a spring is just as stubborn: T = 2*pi*sqrt(m/k) has no amplitude in it. More m, slower. Stiffer k, faster.",
+   "A heavy person on a diving board bounces up and down more slowly than a light one. That is T = 2*pi*sqrt(m/k). Mass sits on top and stretches the period, stiffness k sits underneath and shortens it.",
+   "Time one wobble of a mass on a spring: T = 2*pi*sqrt(m/k). Look at what is missing. How far you pulled it. Pull it twice as far and it still takes the same time. Overstretching the spring breaks that."
+  ],
+  "grounded": true,
+  "anchor": "guitar string plucked gently or hard, and the heavy vs light diver on a diving board, both taken from the OpenStax SHM section"
+ },
+ {
+  "formula": "m=Delta_E/(c)^(2)",
+  "name": "mass from energy equivalence",
+  "variants": [
+   "Energy can be cashed in for matter. Smash particles hard enough and brand new ones come out of the wreck, and m = Delta_E/c^2 says how much you get for the energy you paid.",
+   "The famous equation, read backwards. m = Delta_E/c^2 takes energy in and hands you mass out. Because c is the speed of light and it gets squared, a huge Delta_E buys only a tiny scrap of m.",
+   "Nothing appears for free. Put in energy Delta_E and m = Delta_E/c^2 is the mass you can get out, but conservation of charge and momentum still decides which particles are allowed to appear."
+  ],
+  "grounded": true,
+  "anchor": "accelerators aiming a beam at a target and creating new matter in the collision, with conservation laws limiting what can appear"
+ },
+ {
+  "formula": "r=((m*v)/(q*B))",
+  "name": "Radius of a particle's path in a magnetic field",
+  "variants": [
+   "Fire a charged particle across a magnetic field and it bends into a circle. r = m*v/(q*B). Heavy or fast, it swings wide. More charge or a stronger field, and it curls in tight.",
+   "Mass spectrometers weigh atoms by bending them. Hold v, q and B fixed and r = m*v/(q*B) leaves the radius proportional to m, so where the ion lands on the detector tells you its mass.",
+   "A track curling in a bubble chamber is not decoration, it is data. r = m*v/(q*B) turns the size of the arc into m*v, and which way it curls tells you the sign of the charge q."
+  ],
+  "grounded": true,
+  "anchor": "the mass spectrometer fixing v, q and B so radius reads off mass at the detector, plus curling tracks in a bubble chamber"
+ },
+ {
+  "formula": "Delta_E=h*f",
+  "name": "Energy quantum of radiation",
+  "variants": [
+   "Light does not arrive as a smooth stream. It comes in lumps, and Delta_E = h*f is the size of one lump at frequency f. Bluer light hits harder per lump. Brighter light just sends more of them.",
+   "Planck found that a hot object sheds energy in whole chunks, never a trickle. Delta_E = h*f gives the size of one chunk, h being Planck's constant. Einstein used it to explain the photoelectric effect.",
+   "Picture a car allowed only certain speeds, nothing in between. Energy behaves that way here. Delta_E = h*f is the smallest bite of radiation at frequency f, and you cannot have half a bite."
+  ],
+  "grounded": true,
+  "anchor": "the OpenStax car-that-can-only-travel-at-certain-speeds analogy, and Planck's blackbody chunks feeding Einstein's photoelectric effect"
+ }
+]

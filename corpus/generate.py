@@ -2152,6 +2152,14 @@ A51_SCRAMBLE = float(os.environ.get("A51_SCRAMBLE", "0.25"))
 import knowledge_docs as _KD
 
 KNOWLEDGE = float(os.environ.get("KNOWLEDGE", "1"))
+
+# WRITTEN EXPLANATIONS for the 164 compute records, keyed by formula. Three variants each, every
+# one under 215 chars, pure ASCII, using only variables the record declares, grounded in that
+# record's own OpenStax section where evidence existed (127 of 164). See docs/RESULT_F1_PROSE.md.
+_EXPL_PATH = pathlib.Path(__file__).resolve().parent / "knowledge/explanations.json"
+_EXPL = ({e["formula"]: e["variants"] for e in json.load(open(_EXPL_PATH))}
+         if _EXPL_PATH.exists() else {})
+_EXPL_USED, _EXPL_FALL = [0], [0]
 _KPATH = pathlib.Path(__file__).resolve().parent / "knowledge/definitions_train.json"
 _KDEFS = json.load(open(_KPATH)) if (_KPATH.exists() and KNOWLEDGE > 0) else []
 # PUBLISHED AT IMPORT, ASSERTED AT EMIT. gate_store_coverage IMPORTS this module; it cannot run a
@@ -2817,10 +2825,26 @@ def gen(n, seed=0):
             # class that goes <r> straight to <a> without being a refusal. That is the judgement
             # being taught: the shape does not decide it, the question does.
             _sub = d["explain"]
-            _tpl = (EXPLAIN_CLOSE_REL if d["is_rel"]
-                    else EXPLAIN_CLOSE_SYM if d["subj_is_sym"] else EXPLAIN_CLOSE_Q)
-            ans = rng.choice(_tpl).format(
-                S=_sub[0].upper() + _sub[1:], s=_sub, f=d["fml"], u=d["uclause"], c=d["cond"])
+            # A73. A WRITTEN EXPLANATION WHERE ONE EXISTS. The templates below produce
+            # "Newton's second law is F_net = m*a, with F_net in N, m in kg and a in m/s^2", which
+            # is the answer the device test came back calling cheap: "No one cares about the
+            # formula. What we want to know is like an actual explanation ... or some backstory or
+            # something real." corpus/knowledge/explanations.json carries three written variants for
+            # each of the 164 records, grounded in that record's own OpenStax section.
+            #
+            # The template is the FALLBACK, not the default, and the count of documents that fall
+            # back is printed, because a silently-empty explanation file would otherwise restore the
+            # old behaviour with nothing saying so.
+            _w = _EXPL.get(d["head"])
+            if _w:
+                ans = rng.choice(_w)
+                _EXPL_USED[0] += 1
+            else:
+                _tpl = (EXPLAIN_CLOSE_REL if d["is_rel"]
+                        else EXPLAIN_CLOSE_SYM if d["subj_is_sym"] else EXPLAIN_CLOSE_Q)
+                ans = rng.choice(_tpl).format(
+                    S=_sub[0].upper() + _sub[1:], s=_sub, f=d["fml"], u=d["uclause"], c=d["cond"])
+                _EXPL_FALL[0] += 1
             built.append({"head": d["head"], "kind": "EXPLAIN", "ans": ans,
                           "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>"})
             continue
@@ -3030,6 +3054,12 @@ def gen(n, seed=0):
     # Built separately because a definition has no givens, no tool call and no <res>, so it does not
     # fit the per-record loop above. It goes through the SAME case_jitter, and its documents are
     # ordinary `built` entries from here on, so the diversity metrics and the writer see one corpus.
+    if _EXPL_USED[0] or _EXPL_FALL[0]:
+        _t = _EXPL_USED[0] + _EXPL_FALL[0]
+        print(f"  F1 explanations: {_EXPL_USED[0]:,} of {_t:,} used a WRITTEN answer "
+              f"({100*_EXPL_USED[0]/_t:.1f}%), {_EXPL_FALL[0]:,} fell back to the formula template "
+              f"({len(_EXPL):,} records have written prose)")
+
     if KNOWLEDGE > 0 and _KDEFS:
         kdocs = gen_knowledge(rng)
         if KNOWLEDGE < 1:                      # a fraction, for a dose experiment across runs
