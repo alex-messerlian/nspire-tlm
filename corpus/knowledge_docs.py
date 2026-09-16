@@ -71,20 +71,68 @@ def _clean(s):
     return s[:-1] if s.endswith(".") else s
 
 
+# Singular nouns that end in -s. "zeroth law of thermodynamics ARE the law that states" was
+# generated because the head test looks only at the last character. -ics is the big family;
+# the rest are the ones the glossary actually contains.
+_SINGULAR_S = ("ics", "ss", "us", "sis", "ies", "ness", "eous", "ous")
+
+
 def _art(term):
     """`is` or `are`, because "kinetic energies is" reads as broken English to a reader and the
     corpus is what teaches the register."""
     t = term.strip().lower()
-    return "are" if (t.endswith("s") and not t.endswith("ss") and not t.endswith("us")) else "is"
+    t = re.sub(r"\s*\([^)]*\)\s*$", "", t).strip()      # "alpha (alpha) rays" -> "alpha rays"
+    if not t.endswith("s"):
+        return "is"
+    return "is" if t.endswith(_SINGULAR_S) else "are"
 
 
-K1_FRAMES = [
+# THE FRAME IS CHOSEN TO SUIT THE MEANING; NO ARTICLE IS EVER INSERTED.
+#
+# OpenStax writes a glossary meaning as a BARE NOUN PHRASE, because it is read after "term:" in a
+# two-column table. Splicing that after "X is" is broken English on 884 of 1,443 entries:
+#
+#   "Dielectric constant is factor by which capacitance increases when a dielectric is inserted"
+#
+# The first fix inserted "the" when the meaning looked like a bare noun. That is a heuristic about
+# English, and it misfired the way heuristics in this repo always do -- three ways at once, on four
+# entries, found by READING them:
+#
+#   "is THE DEFINED AS B=(mu_0I)/(2pir)"      the meaning starts with a past participle
+#   "are the law that states ..."             "thermodynamics" read as a plural
+#   and the four extra characters pushed three of them past the cap, so the trimmer ate the
+#   definition those documents exist to carry.
+#
+# So the heuristic is gone. A meaning that already begins with a determiner or a verb takes the
+# "X is ..." frames; a bare noun phrase takes the COLON frame, which is grammatical after anything.
+# Nothing is guessed and nothing is inserted.
+_DETERMINED = re.compile(
+    r"^(a|an|the|any|all|each|every|one|two|three|no|not|when|where|how|what|which|that|this|"
+    r"those|these|its|it|in|on|at|for|to|of|by|from|with|"
+    r"is|are|was|were|has|have|can|will|must|refers|describes|measures|occurs|equals|"
+    r"defined|derived|given|measured|expressed|found|calculated|stated|written|represented|"
+    r"used|equal|same|half|twice|either|both|such)\b", re.I)
+
+
+def _determined(meaning):
+    """True when the meaning can follow "X is" as written."""
+    m = meaning.strip()
+    return bool(m) and (bool(_DETERMINED.match(m)) or m[0].isupper() or m[0].isdigit())
+
+
+# Frames that require the meaning to follow "X is" grammatically.
+K1_FRAMES_IS = [
     "{T} {v} {m}.",
     "{T} {v} {m}. {E}",
-    "{m}, and that {v} what {t} means.",
-    "{T} {v} {m}. {E}",
+    "{T} {v} {m}.",
     "Short version: {T} {v} {m}.",
-    "{T} {v} {m}.",
+]
+# Frames that work after ANY noun phrase, used when the meaning is a bare one.
+K1_FRAMES_NP = [
+    "{T}: {m}.",
+    "{T}: {m}. {E}",
+    "{T} means {m}.",
+    "{T}: {m}.",
 ]
 
 # K2. The record defines something else, so the answer must NAME what it does define and decline.
@@ -109,6 +157,26 @@ K3_FRAMES = [
     "work out a number.",
 ]
 
+def ask_agrees(question, term):
+    """Fix subject-verb agreement in a question frame for a PLURAL term.
+
+    "what is beta rays?" was generated for 153 of 1,443 terms. The frames in asks_explain.py are
+    written for a singular noun because most terms are one, and substituting a plural into them
+    produces a question no student would type -- which teaches the model that this is how students
+    write. Cheap to fix, invisible to every structural check.
+    """
+    if _art(term) != "are":
+        return question
+    for a, b in (("what is ", "what are "), ("What is ", "What are "),
+                 ("what's ", "what are "), ("whats ", "what are "),
+                 ("what exactly is ", "what exactly are "),
+                 ("what is the definition of ", "what is the definition of "),
+                 ("{t} is ", "{t} are ")):
+        if question.startswith(a):
+            return b + question[len(a):]
+    return question
+
+
 # Compute-intent question frames for K3. Hand-written for the same reason asks_explain.py is: A6.
 K3_ASK = [
     "find {t}.", "calculate {t}.", "work out {t}.", "compute {t}.",
@@ -117,18 +185,57 @@ K3_ASK = [
 ]
 
 
-def k1_answer(term, meaning, elaboration, rng, cap=215):
+# SOFT target and HARD ceiling. The device caps an answer at 90 tokens (device_app.c:524), which is
+# about 230 characters at the measured 2.564 chars/token, so the hard ceiling sits just under it.
+SOFT_CAP = 215
+HARD_CAP = 228
+
+
+def k1_answer(term, meaning, elaboration, rng, cap=SOFT_CAP):
+    """One K1 answer. THE MEANING IS NEVER DROPPED.
+
+    The first version returned out[:cap], which silently truncated 80 of 1,443 answers mid-phrase
+    and removed the definition from the document whose whole job is to carry it -- and the gate's
+    HIT leg looks for rare words OF THE MEANING, so those 80 could never have passed. Now the
+    ELABORATION is what goes when space runs out, and a meaning longer than the soft cap gets the
+    bare frame and the hard ceiling. Nothing is cut mid-word: `_fit` trims at a word boundary and
+    only as a last resort, and the count of answers that reach it is reported by the caller.
+    """
     v = _art(term)
     T = term[0].upper() + term[1:] if term[:1].islower() else term
-    f = rng.choice(K1_FRAMES)
+    m = _clean(meaning)
+    det = _determined(m)
+    bank = K1_FRAMES_IS if det else K1_FRAMES_NP
+    bare = "{T} {v} {m}." if det else "{T}: {m}."
+    f = rng.choice(bank)
     e = (elaboration or "").strip()
     if "{E}" in f and not e:
-        f = "{T} {v} {m}."
-    out = f.format(T=T, t=term, v=v, m=_clean(meaning), E=e)
-    out = re.sub(r"\s+", " ", out).strip()
-    if len(out) > cap:                       # the elaboration is what goes, never the definition
-        out = f"{T} {v} {_clean(meaning)}."
-    return out[:cap]
+        f = bare
+    out = re.sub(r"\s+", " ", f.format(T=T, t=term, v=v, m=m, E=e)).strip()
+    if len(out) > cap:
+        out = re.sub(r"\s+", " ", bare.format(T=T, t=term, v=v, m=m)).strip()
+    if len(out) > HARD_CAP:
+        out = _fit(out, HARD_CAP)
+    return out
+
+
+def _fit(s, cap):
+    """Trim at a CLAUSE boundary where one exists, else a word boundary. Never mid-word.
+
+    Trimming at a word boundary alone left "... from m_i down." and "... converted into mechanical
+    work in the." -- a dangling fragment, which is the defect this repo already recorded as
+    "Where ." and fixed once in the GIVE frames. A comma or semicolon is a place a sentence can
+    legitimately stop; the middle of a prepositional phrase is not.
+    """
+    if len(s) <= cap:
+        return s
+    cut = s[:cap - 1]
+    for sep in (";", ", ", " "):
+        i = cut.rfind(sep)
+        if i > cap // 2:
+            cut = cut[:i]
+            break
+    return cut.rstrip(" ,;:-") + "."
 
 
 def k2_answer(term, other, rng):
