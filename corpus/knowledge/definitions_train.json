@@ -21,13 +21,6 @@
   "section": "Thermometers and Temperature Scales"
  },
  {
-  "term": "absolute zero",
-  "meaning": "the lowest possible temperature; the temperature at which all molecular motion ceases",
-  "module": "m42214",
-  "level": "college",
-  "section": "Temperature"
- },
- {
   "term": "absorber",
   "meaning": "any object that absorbs radiation",
   "module": "m58761",
@@ -96,13 +89,6 @@
   "module": "m58274",
   "level": "university",
   "section": "Significant Figures"
- },
- {
-  "term": "acoustic impedance",
-  "meaning": "property of medium that makes the propagation of sound waves more difficult",
-  "module": "m42298",
-  "level": "college",
-  "section": "Ultrasound"
  },
  {
   "term": "action-at-a-distance force",
@@ -203,13 +189,6 @@
   "section": "AC Sources"
  },
  {
-  "term": "ammeter",
-  "meaning": "an instrument that measures current",
-  "module": "m42360",
-  "level": "college",
-  "section": "DC Voltmeters and Ammeters"
- },
- {
   "term": "ampere",
   "meaning": "unit for electric current; one ampere is one coulomb per second (1 A=1 C/s)",
   "module": "m54437",
@@ -259,13 +238,6 @@
   "section": "The Electromagnetic Spectrum"
  },
  {
-  "term": "analog meter",
-  "meaning": "a measuring instrument that gives a readout in the form of a needle movement over a marked gauge",
-  "module": "m42360",
-  "level": "college",
-  "section": "DC Voltmeters and Ammeters"
- },
- {
   "term": "analytical method",
   "meaning": "the method of determining the magnitude and direction of a resultant vector using the Pythagorean theorem and trigonometric identities",
   "module": "m54147",
@@ -306,13 +278,6 @@
   "module": "m54176",
   "level": "hs",
   "section": "Angle of Rotation and Angular Velocity"
- },
- {
-  "term": "angular acceleration",
-  "meaning": "the rate of change of angular velocity with time",
-  "module": "m54180",
-  "level": "hs",
-  "section": "Rotational Motion"
  },
  {
   "term": "angular frequency",
@@ -392,13 +357,6 @@
   "section": "Nuclear Decay and Conservation Laws"
  },
  {
-  "term": "antielectrons",
-  "meaning": "another term for positrons",
-  "module": "m58610",
-  "level": "university",
-  "section": "Nuclear Reactions"
- },
- {
   "term": "antimatter",
   "meaning": "matter constructed of antiparticles; antimatter shares most of the same properties of regular matter, with charge being the only difference between many particles and their antiparticle analogues",
   "module": "m54595",
@@ -462,39 +420,11 @@
   "section": "Approximation"
  },
  {
-  "term": "arc length",
-  "meaning": "(Delta_s) the distance traveled by an object along a circular path",
-  "module": "m54176",
-  "level": "hs",
-  "section": "Angle of Rotation and Angular Velocity"
- },
- {
-  "term": "Archimedes' principle",
-  "meaning": "the buoyant force on an object equals the weight of the fluid it displaces",
-  "module": "m42196",
-  "level": "college",
-  "section": "Archimedes' Principle"
- },
- {
-  "term": "area vector",
-  "meaning": "vector with magnitude equal to the area of a surface and direction perpendicular to the surface",
-  "module": "m58423",
-  "level": "university",
-  "section": "Electric Flux"
- },
- {
   "term": "associative",
   "meaning": "terms can be grouped in any fashion",
   "module": "m58277",
   "level": "university",
   "section": "Scalars and Vectors"
- },
- {
-  "term": "astigmatism",
-  "meaning": "the result of an inability of the cornea to properly focus an image onto the retina",
-  "module": "m42484",
-  "level": "college",
-  "section": "Vision Correction"
  },
  {
   "term": "atom",
@@ -523,13 +453,6 @@
   "module": "m42631",
   "level": "college",
   "section": "Substructure of the Nucleus"
- },
- {
-  "term": "atomic mass unit",
-  "meaning": "unit used to express the mass of an individual nucleus, where 1u=1.66054 * 10^(-27) kg",
-  "module": "m58607",
-  "level": "university",
-  "section": "Properties of Nuclei"
  },
  {
   "term": "atomic nucleus",
@@ -735,25 +658,11 @@
   "section": "Beats"
  },
  {
-  "term": "becquerel",
-  "meaning": "SI unit for rate of decay of a radioactive material",
-  "module": "m63183",
-  "level": "hs",
-  "section": "Half Life and Radiometric Dating"
- },
- {
   "term": "becquerel (Bq)",
   "meaning": "SI unit for the decay rate of a radioactive material, equal to 1 decay/second",
   "module": "m58609",
   "level": "university",
   "section": "Radioactive Decay"
- },
- {
-  "term": "Bernoulli's equation",
-  "meaning": "the equation resulting from applying conservation of energy to an incompressible frictionless fluid: P + 1/2 pv 2 + pgh = constant, through the fluid",
-  "module": "m42206",
-  "level": "college",
-  "section": "Bernoulli's Equation"
  },
  {
   "term": "Bernoulli's principle",
@@ -903,13 +812,6 @@
   "section": "Bohr's Model of the Hydrogen Atom"
  },
  {
-  "term": "Boltzmann constant",
-  "meaning": "k_B, a physical constant that relates energy to temperature and appears in the ideal gas law; k_B=1.38 * 10^(-23) J/K",
-  "module": "m58391",
-  "level": "university",
-  "section": "Molecular Model of an Ideal Gas"
- },
- {
   "term": "Born interpretation",
   "meaning": "states that the square of a wave function is the probability density",
   "module": "m58576",
@@ -943,13 +845,6 @@
   "module": "m58764",
   "level": "university",
   "section": "Bohr's Model of the Hydrogen Atom"
- },
- {
-  "term": "Bragg planes",
-  "meaning": "families of planes within crystals that can give rise to X-ray diffraction",
-  "module": "m58664",
-  "level": "university",
-  "section": "X-Ray Diffraction"
  },
  {
   "term": "braking radiation",
@@ -1020,13 +915,6 @@
   "module": "m42522",
   "level": "college",
   "section": "Polarization"
- },
- {
-  "term": "bridge device",
-  "meaning": "a device that forms a bridge between two branches of a circuit; some bridge devices are used to make null measurements in circuits",
-  "module": "m42362",
-  "level": "college",
-  "section": "Null Measurements"
  },
  {
   "term": "Brownian motion",
@@ -1106,13 +994,6 @@
   "section": "DC Circuits Containing Resistors and Capacitors"
  },
  {
-  "term": "capillary action",
-  "meaning": "the tendency of a fluid to be raised or lowered in a narrow tube",
-  "module": "m42197",
-  "level": "college",
-  "section": "Cohesion and Adhesion in Liquids: Surface Tension and Capillary Action"
- },
- {
   "term": "carbon-14 dating",
   "meaning": "method to determine the age of formerly living tissue using the ratio ^14C/^12C",
   "module": "m58609",
@@ -1146,13 +1027,6 @@
   "module": "m58406",
   "level": "university",
   "section": "The Carnot Cycle"
- },
- {
-  "term": "carrier particle",
-  "meaning": "a fundamental particle of nature that is surrounded by a characteristic force field; photons are carrier particles of the electromagnetic force",
-  "module": "m42137",
-  "level": "college",
-  "section": "Extended Topic: The Four Basic Forces, An Introduction"
  },
  {
   "term": "carrier wave",
@@ -1337,20 +1211,6 @@
   "section": "Electrical Current"
  },
  {
-  "term": "circuit diagram",
-  "meaning": "schematic drawing of an electrical circuit including all circuit elements, such as resistors, capacitors, batteries, and so on",
-  "module": "m54435",
-  "level": "hs",
-  "section": "Series Circuits"
- },
- {
-  "term": "circular motion",
-  "meaning": "the motion of an object along a circular path",
-  "module": "m54176",
-  "level": "hs",
-  "section": "Angle of Rotation and Angular Velocity"
- },
- {
   "term": "classical (Galilean) velocity addition",
   "meaning": "method of adding velocities when v v is the velocity between two observers, u is the velocity of an object relative to one observer, and u' is the velocity relative to the other observer",
   "module": "m58569",
@@ -1421,25 +1281,11 @@
   "section": "Young's Double Slit Experiment"
  },
  {
-  "term": "coherent light",
-  "meaning": "light that consists of photons of the same frequency and phase",
-  "module": "m62593",
-  "level": "university",
-  "section": "Lasers"
- },
- {
   "term": "coherent waves",
   "meaning": "waves are in phase or have a definite phase relationship",
   "module": "m58537",
   "level": "university",
   "section": "Young's Double-Slit Interference"
- },
- {
-  "term": "cohesive forces",
-  "meaning": "the attractive forces between molecules of the same type",
-  "module": "m42197",
-  "level": "college",
-  "section": "Cohesion and Adhesion in Liquids: Surface Tension and Capillary Action"
  },
  {
   "term": "cold reservoir",
@@ -1547,13 +1393,6 @@
   "section": "Microscopes"
  },
  {
-  "term": "compressibility",
-  "meaning": "reciprocal of the bulk modulus",
-  "module": "m58342",
-  "level": "university",
-  "section": "Stress, Strain, and Elastic Modulus"
- },
- {
   "term": "compressive strain",
   "meaning": "strain that occurs when forces are contracting an object, causing its shortening",
   "module": "m58342",
@@ -1566,13 +1405,6 @@
   "module": "m58342",
   "level": "university",
   "section": "Stress, Strain, and Elastic Modulus"
- },
- {
-  "term": "Compton effect",
-  "meaning": "the change in wavelength when an X-ray is scattered by its interaction with some materials",
-  "module": "m58763",
-  "level": "university",
-  "section": "The Compton Effect"
  },
  {
   "term": "Compton shift",
@@ -1643,13 +1475,6 @@
   "module": "m42290",
   "level": "college",
   "section": "*Extended Topic* Microscopy Enhanced by the Wave Characteristics of Light"
- },
- {
-  "term": "conservation laws",
-  "meaning": "require that energy and charge be conserved in a system",
-  "module": "m42359",
-  "level": "college",
-  "section": "Kirchhoff's Rules"
  },
  {
   "term": "conservation of mechanical energy",
@@ -1827,13 +1652,6 @@
   "section": "Wave Functions"
  },
  {
-  "term": "Copernican model",
-  "meaning": "the model of the solar system where the sun is at the center of the solar system and all the planets orbit around it; this is also called the heliocentric model",
-  "module": "m54192",
-  "level": "hs",
-  "section": "Kepler's Laws of Planetary Motion"
- },
- {
   "term": "Coriolis force",
   "meaning": "the fictitious force causing the apparent deflection of moving objects when viewed in a rotating frame of reference",
   "module": "m42142",
@@ -1853,13 +1671,6 @@
   "module": "m58509",
   "level": "university",
   "section": "The Law of Reflection"
- },
- {
-  "term": "correspondence principle",
-  "meaning": "in the limit of large energies, the predictions of quantum mechanics agree with the predictions of classical mechanics",
-  "module": "m58576",
-  "level": "university",
-  "section": "Wave Functions"
  },
  {
   "term": "cosmic microwave background",
@@ -1965,13 +1776,6 @@
   "module": "m58602",
   "level": "university",
   "section": "Superconductivity"
- },
- {
-  "term": "critical mass",
-  "meaning": "minimum mass required of a given nuclide in order for self-sustained fission to occur",
-  "module": "m58611",
-  "level": "university",
-  "section": "Fission"
  },
  {
   "term": "critical point",
@@ -2107,13 +1911,6 @@
   "section": "Applying Gauss's Law"
  },
  {
-  "term": "Dalton's law of partial pressures",
-  "meaning": "the physical law that states that the total pressure of a gas is the sum of partial pressures of the component gases",
-  "module": "m42218",
-  "level": "college",
-  "section": "Phase Changes"
- },
- {
   "term": "damping",
   "meaning": "the reduction in amplitude over time as the energy of an oscillation dissipates",
   "module": "m54335",
@@ -2210,13 +2007,6 @@
   "module": "m42100",
   "level": "college",
   "section": "Acceleration"
- },
- {
-  "term": "decibel",
-  "meaning": "a unit used to describe sound intensity levels",
-  "module": "m54333",
-  "level": "hs",
-  "section": "Sound Intensity and Sound Level"
  },
  {
   "term": "dees",
@@ -2471,13 +2261,6 @@
   "section": "Electric Dipoles"
  },
  {
-  "term": "direct current",
-  "meaning": "(DC) the flow of electric charge in only one direction",
-  "module": "m42348",
-  "level": "college",
-  "section": "Alternating Current versus Direct Current"
- },
- {
   "term": "direct current (dc)",
   "meaning": "flow of electric charge in only one direction",
   "module": "m58484",
@@ -2562,13 +2345,6 @@
   "section": "Types of Molecular Bonds"
  },
  {
-  "term": "distance",
-  "meaning": "the length of the path actually traveled between an initial and a final position",
-  "module": "m54108",
-  "level": "hs",
-  "section": "Relative Motion, Distance, and Displacement"
- },
- {
   "term": "distance traveled",
   "meaning": "the total length of the path traveled between two positions",
   "module": "m42033",
@@ -2616,13 +2392,6 @@
   "module": "m42368",
   "level": "college",
   "section": "Ferromagnets and Electromagnets"
- },
- {
-  "term": "donor impurity",
-  "meaning": "atom substituted for another in a semiconductor that results in a free electron hole",
-  "module": "m58600",
-  "level": "university",
-  "section": "Semiconductors and Doping"
  },
  {
   "term": "doping",
@@ -2835,13 +2604,6 @@
   "section": "Molecular Spectra"
  },
  {
-  "term": "electric eye",
-  "meaning": "group of devices that use the photoelectric effect for detection",
-  "module": "m54559",
-  "level": "hs",
-  "section": "Einstein and the Photoelectric Effect"
- },
- {
   "term": "electric field",
   "meaning": "a vector quantity (E); the lines of electric force per unit charge, moving radially outward from a positive charge and in toward a negative charge",
   "module": "m42440",
@@ -2968,13 +2730,6 @@
   "section": "Introduction to Electric Charge and Electric Field"
  },
  {
-  "term": "electromagnetic induction",
-  "meaning": "the process of inducing an emf (voltage) with a change in magnetic flux",
-  "module": "m42390",
-  "level": "college",
-  "section": "Induced Emf and Magnetic Flux"
- },
- {
   "term": "electromagnetic radiation (EMR)",
   "meaning": "radiant energy that consists of oscillating electric and magnetic fields",
   "module": "m54342",
@@ -3010,25 +2765,11 @@
   "section": "Electromotive Force: Terminal Voltage"
  },
  {
-  "term": "electron",
-  "meaning": "particle surrounding the nucleus of an atom and carrying the smallest unit of negative charge",
-  "module": "m58412",
-  "level": "university",
-  "section": "Electric Charge"
- },
- {
   "term": "electron affinity",
   "meaning": "energy associated with an accepted (bound) electron",
   "module": "m58592",
   "level": "university",
   "section": "Types of Molecular Bonds"
- },
- {
-  "term": "electron capture",
-  "meaning": "the process in which a proton-rich nuclide absorbs an inner atomic electron and simultaneously emits a neutrino",
-  "module": "m42633",
-  "level": "college",
-  "section": "Nuclear Decay and Conservation Laws"
  },
  {
   "term": "electron capture equation",
@@ -3150,13 +2891,6 @@
   "section": "Introduction to Particle Physics"
  },
  {
-  "term": "electroweak theory",
-  "meaning": "theory showing connections between EM and weak forces",
-  "module": "m54588",
-  "level": "hs",
-  "section": "The Unification of Forces"
- },
- {
   "term": "emf",
   "meaning": "rate at which energy is drawn from a source per unit current flowing through a circuit",
   "module": "m54456",
@@ -3248,13 +2982,6 @@
   "section": "Photoelectric Effect"
  },
  {
-  "term": "energy quantum number",
-  "meaning": "index that labels the allowed energy states",
-  "module": "m58580",
-  "level": "university",
-  "section": "The Quantum Particle in a Box"
- },
- {
   "term": "energy spectrum of hydrogen",
   "meaning": "set of allowed discrete energies of an electron in a hydrogen atom",
   "module": "m58764",
@@ -3267,13 +2994,6 @@
   "module": "m42420",
   "level": "college",
   "section": "Inductance"
- },
- {
-  "term": "energy-level diagram",
-  "meaning": "a diagram used to analyze the energy levels of electrons in the orbits of an atom",
-  "module": "m54582",
-  "level": "hs",
-  "section": "The Structure of the Atom"
  },
  {
   "term": "energy-time uncertainty principle",
@@ -3302,13 +3022,6 @@
   "module": "m58407",
   "level": "university",
   "section": "Entropy"
- },
- {
-  "term": "environment",
-  "meaning": "outside of the system being studied",
-  "module": "m58395",
-  "level": "university",
-  "section": "Thermodynamic Systems"
  },
  {
   "term": "equal vectors",
@@ -3381,13 +3094,6 @@
   "section": "Resistors in Series and Parallel"
  },
  {
-  "term": "equivalent resistor",
-  "meaning": "resistance of a single resistor that is the same as the combined resistance of a group of resistors",
-  "module": "m54435",
-  "level": "hs",
-  "section": "Series Circuits"
- },
- {
   "term": "escape velocity",
   "meaning": "initial velocity an object needs to escape the gravitational pull of another; it is more accurately defined as the velocity of an object with zero total mechanical energy",
   "module": "m58347",
@@ -3407,13 +3113,6 @@
   "module": "m54280",
   "level": "hs",
   "section": "Postulates of Special Relativity"
- },
- {
-  "term": "even function",
-  "meaning": "in one dimension, a function symmetric with the origin of the coordinate system",
-  "module": "m58576",
-  "level": "university",
-  "section": "Wave Functions"
  },
  {
   "term": "event",
@@ -3519,13 +3218,6 @@
   "module": "m58594",
   "level": "university",
   "section": "Bonding in Crystalline Solids"
- },
- {
-  "term": "Fahrenheit scale",
-  "meaning": "temperature scale in which the freezing point of water is 32 degrees F and the boiling point of water is 212 degrees F",
-  "module": "m54287",
-  "level": "hs",
-  "section": "Temperature and Thermal Energy"
  },
  {
   "term": "far point",
@@ -3689,13 +3381,6 @@
   "section": "First law of Thermodynamics: Thermal Energy and Work"
  },
  {
-  "term": "first postulate of special relativity",
-  "meaning": "the idea that the laws of physics are the same and can be stated in their simplest form in all inertial frames of reference",
-  "module": "m42528",
-  "level": "college",
-  "section": "Einstein's Postulates"
- },
- {
   "term": "fission",
   "meaning": "splitting of a nucleus",
   "module": "m58611",
@@ -3815,13 +3500,6 @@
   "section": "Semiconductor Devices"
  },
  {
-  "term": "fossil fuels",
-  "meaning": "oil, natural gas, and coal",
-  "module": "m42154",
-  "level": "college",
-  "section": "World Energy Use"
- },
- {
   "term": "frame of reference",
   "meaning": "the point or collection of points arbitrarily chosen, which motion is measured in relation to",
   "module": "m54280",
@@ -3906,13 +3584,6 @@
   "section": "Newton's Second Law of Motion"
  },
  {
-  "term": "freezing",
-  "meaning": "phase change from liquid to solid",
-  "module": "m54292",
-  "level": "hs",
-  "section": "Phase Change and Latent Heat"
- },
- {
   "term": "frequency",
   "meaning": "the number of complete wave cycles (up-down-up) passing a given point within one second (cycles/second)",
   "module": "m42440",
@@ -3955,13 +3626,6 @@
   "section": "DC Voltmeters and Ammeters"
  },
  {
-  "term": "fundamental",
-  "meaning": "the lowest-frequency resonance",
-  "module": "m54335",
-  "level": "hs",
-  "section": "Sound Interference and Resonance"
- },
- {
   "term": "fundamental force",
   "meaning": "one of four forces that act between bodies of matter: the strong nuclear, electromagnetic, weak nuclear, and gravitational forces",
   "module": "m58768",
@@ -3995,13 +3659,6 @@
   "module": "m42091",
   "level": "college",
   "section": "Physical Quantities and Units"
- },
- {
-  "term": "Galilean relativity",
-  "meaning": "if an observer measures a velocity in one frame of reference, and that frame of reference is moving with a velocity past a second reference frame, an observer in the second frame measures the original velocity as the vector sum of these velocities",
-  "module": "m58556",
-  "level": "university",
-  "section": "Invariance of Physical Laws"
  },
  {
   "term": "Galilean transformation",
@@ -4158,13 +3815,6 @@
   "section": "Introduction to Particle Physics"
  },
  {
-  "term": "graphical method",
-  "meaning": "drawing vectors on a graph to add them using the head-to-tail method",
-  "module": "m54165",
-  "level": "hs",
-  "section": "Vector Addition and Subtraction: Graphical Methods"
- },
- {
   "term": "gravitational constant",
   "meaning": "the proportionality constant in Newton's law of universal gravitation",
   "module": "m54189",
@@ -4205,27 +3855,6 @@
   "module": "m42689",
   "level": "college",
   "section": "General Relativity and Quantum Gravity"
- },
- {
-  "term": "gravitationally bound",
-  "meaning": "two object are gravitationally bound if their orbits are closed; gravitationally bound systems have a negative total mechanical energy",
-  "module": "m58347",
-  "level": "university",
-  "section": "Gravitational Potential Energy and Total Energy"
- },
- {
-  "term": "graviton",
-  "meaning": "hypothesized particle exchanged between two particles of mass, transmitting the gravitational force between them",
-  "module": "m54593",
-  "level": "hs",
-  "section": "The Four Fundamental Forces"
- },
- {
-  "term": "gray (Gy)",
-  "meaning": "the SI unit for radiation dose which is defined to be 1 Gy=1 J/kg=100 rad",
-  "module": "m42652",
-  "level": "college",
-  "section": "Biological Effects of Ionizing Radiation"
  },
  {
   "term": "greenhouse effect",
@@ -4298,13 +3927,6 @@
   "section": "Particles, Patterns, and Conservation Laws"
  },
  {
-  "term": "half-life",
-  "meaning": "time for half of the original nuclei to decay (or half of the original nuclei remain)",
-  "module": "m58609",
-  "level": "university",
-  "section": "Radioactive Decay"
- },
- {
   "term": "Hall effect",
   "meaning": "the creation of voltage across a current-carrying conductor by a magnetic field",
   "module": "m42377",
@@ -4352,13 +3974,6 @@
   "module": "m54287",
   "level": "hs",
   "section": "Temperature and Thermal Energy"
- },
- {
-  "term": "heat capacity",
-  "meaning": "amount of heat necessary to change the temperature of a substance by 1.00 degrees C",
-  "module": "m54290",
-  "level": "hs",
-  "section": "Heat, Specific Heat, and Heat Transfer"
  },
  {
   "term": "heat engine",
@@ -4487,13 +4102,6 @@
   "section": "Holography"
  },
  {
-  "term": "Hooke's law",
-  "meaning": "proportional relationship between the force F on a material and the deformation Delta_L it causes, F=kDelta_L",
-  "module": "m54154",
-  "level": "hs",
-  "section": "Simple Harmonic Motion"
- },
- {
   "term": "horizontally polarized",
   "meaning": "the oscillations are in a horizontal plane",
   "module": "m42522",
@@ -4527,13 +4135,6 @@
   "module": "m42686",
   "level": "college",
   "section": "Cosmology and Particle Physics"
- },
- {
-  "term": "Hubble's constant",
-  "meaning": "constant that relates speed and distance in Hubble's law",
-  "module": "m58775",
-  "level": "university",
-  "section": "The Big Bang"
  },
  {
   "term": "Hubble's law",
@@ -4634,25 +4235,11 @@
   "section": "Magnetism in Matter"
  },
  {
-  "term": "ideal angle",
-  "meaning": "the angle at which a car can turn safely on a steep curve, which is in proportion to the ideal speed",
-  "module": "m42086",
-  "level": "college",
-  "section": "Centripetal Force"
- },
- {
   "term": "ideal banking",
   "meaning": "the sloping of a curve in a road, where the angle of the slope allows the vehicle to negotiate the curve at a certain speed without the aid of friction between the tires and the road; the net external force on the vehicle equals the horizontal centripetal force in the absence of friction",
   "module": "m42086",
   "level": "college",
   "section": "Centripetal Force"
- },
- {
-  "term": "ideal fluid",
-  "meaning": "fluid with negligible viscosity",
-  "module": "m58357",
-  "level": "university",
-  "section": "Fluid Dynamics"
  },
  {
   "term": "ideal gas",
@@ -4702,13 +4289,6 @@
   "module": "m58527",
   "level": "university",
   "section": "Images Formed by Plane Mirrors"
- },
- {
-  "term": "impedance",
-  "meaning": "the AC analogue to resistance in a DC circuit; it is the combined effect of resistance, inductive reactance, and capacitive reactance in the form Z=sqrt(R^2+(X_L-X_C)^2)",
-  "module": "m42431",
-  "level": "college",
-  "section": "RLC Series AC Circuits"
  },
  {
   "term": "impulse",
@@ -4865,13 +4445,6 @@
   "section": "Self-Inductance and Inductors"
  },
  {
-  "term": "inelastic",
-  "meaning": "collision that does not conserve kinetic energy",
-  "module": "m58321",
-  "level": "university",
-  "section": "Types of Collisions"
- },
- {
   "term": "inelastic collision",
   "meaning": "a collision in which internal kinetic energy is not conserved",
   "module": "m42164",
@@ -4898,13 +4471,6 @@
   "module": "m42659",
   "level": "college",
   "section": "Fusion"
- },
- {
-  "term": "inertial force",
-  "meaning": "force that has no physical origin",
-  "module": "m58305",
-  "level": "university",
-  "section": "Centripetal Force"
  },
  {
   "term": "inertial frame of reference",
@@ -4942,13 +4508,6 @@
   "section": "Calculating Electric Fields of Charge Distributions"
  },
  {
-  "term": "Inflationary Epoch",
-  "meaning": "the rapid expansion of the universe by an incredible factor of 10 -50 for the brief time from 10 -35 to about 10 -32 seconds",
-  "module": "m54588",
-  "level": "hs",
-  "section": "The Unification of Forces"
- },
- {
   "term": "inflationary scenario",
   "meaning": "the rapid expansion of the universe by an incredible factor of 10 -50 for the brief time from 10 -35 to about 10 -32 s",
   "module": "m42686",
@@ -4982,13 +4541,6 @@
   "module": "m42329",
   "level": "college",
   "section": "Applications of Electrostatics"
- },
- {
-  "term": "input work",
-  "meaning": "effort force multiplied by the distance over which it is applied",
-  "module": "m54274",
-  "level": "hs",
-  "section": "Simple Machines"
  },
  {
   "term": "instantaneous acceleration",
@@ -5066,13 +4618,6 @@
   "module": "m42290",
   "level": "college",
   "section": "*Extended Topic* Microscopy Enhanced by the Wave Characteristics of Light"
- },
- {
-  "term": "interferometer",
-  "meaning": "instrument that uses interference of waves to make measurements",
-  "module": "m58541",
-  "level": "university",
-  "section": "The Michelson Interferometer"
  },
  {
   "term": "internal energy",
@@ -5215,13 +4760,6 @@
   "section": "Reversible and Irreversible Processes"
  },
  {
-  "term": "isentropic",
-  "meaning": "reversible adiabatic process where the process is frictionless and no heat is transferred",
-  "module": "m58408",
-  "level": "university",
-  "section": "Entropy on a Microscopic Scale"
- },
- {
   "term": "isobaric process",
   "meaning": "process during which the system's pressure does not change",
   "module": "m58399",
@@ -5301,13 +4839,6 @@
  {
   "term": "Kelvin",
   "meaning": "unit on the Kelvin temperature scale; note that it is never referred to in terms of \"degrees\" Kelvin",
-  "module": "m54287",
-  "level": "hs",
-  "section": "Temperature and Thermal Energy"
- },
- {
-  "term": "Kelvin scale",
-  "meaning": "temperature scale in which 0 K is the lowest possible temperature, representing absolute zero",
   "module": "m54287",
   "level": "hs",
   "section": "Temperature and Thermal Energy"
@@ -5481,13 +5012,6 @@
   "section": "Phase Change and Latent Heat"
  },
  {
-  "term": "latent heat of fusion",
-  "meaning": "amount of heat needed to cause a phase change between solid and liquid",
-  "module": "m54292",
-  "level": "hs",
-  "section": "Phase Change and Latent Heat"
- },
- {
   "term": "latent heat of vaporization",
   "meaning": "amount of heat needed to cause a phase change between liquid and gas",
   "module": "m54292",
@@ -5523,13 +5047,6 @@
   "section": "Static Electricity and Charge: Conservation of Charge"
  },
  {
-  "term": "law of conservation of energy",
-  "meaning": "the general law that total energy is constant in any process; energy may change in form or be transferred from one system to another, but the total remains the same",
-  "module": "m42151",
-  "level": "college",
-  "section": "Conservation of Energy"
- },
- {
   "term": "law of conservation of momentum",
   "meaning": "when the net external force is zero, the total momentum of the system is conserved or constant",
   "module": "m54202",
@@ -5542,20 +5059,6 @@
   "module": "m54138",
   "level": "hs",
   "section": "Newton's First Law of Motion: Inertia"
- },
- {
-  "term": "law of reflection",
-  "meaning": "the law that indicates the angle of reflection equals the angle of incidence",
-  "module": "m54357",
-  "level": "hs",
-  "section": "Reflection"
- },
- {
-  "term": "law of refraction",
-  "meaning": "the law that describes the relationship between refractive indices of materials on both sides of a boundary and the change in the path of light crossing the boundary, as given by the equation n 1 sin theta_1 = n 2 sin theta_2",
-  "module": "m54357",
-  "level": "hs",
-  "section": "Reflection"
  },
  {
   "term": "LC circuit",
@@ -5614,25 +5117,11 @@
   "section": "Rotational Motion"
  },
  {
-  "term": "lifetime",
-  "meaning": "average time that a nucleus exists before decaying",
-  "module": "m58609",
-  "level": "university",
-  "section": "Radioactive Decay"
- },
- {
   "term": "linear accelerator",
   "meaning": "accelerator that accelerates particles in a straight line",
   "module": "m42718",
   "level": "college",
   "section": "Accelerators Create Matter from Energy"
- },
- {
-  "term": "linear charge density",
-  "meaning": "amount of charge in an element of a charge distribution that is essentially one-dimensional (the width and height are much, much smaller than its length); its units are C/m",
-  "module": "m58416",
-  "level": "university",
-  "section": "Calculating Electric Fields of Charge Distributions"
  },
  {
   "term": "linear hypothesis",
@@ -5677,13 +5166,6 @@
   "section": "Mathematics of Waves"
  },
  {
-  "term": "linearity limit (proportionality limit)",
-  "meaning": "largest stress value beyond which stress is no longer proportional to strain",
-  "module": "m58343",
-  "level": "university",
-  "section": "Elasticity and Plasticity"
- },
- {
   "term": "liquid drop model",
   "meaning": "model of the atomic nucleus (useful only to understand some of its features) in which nucleons in a nucleus act like atoms in a drop",
   "module": "m54574",
@@ -5700,13 +5182,6 @@
  {
   "term": "log-log plot",
   "meaning": "a plot that uses a logarithmic scale in both axes",
-  "module": "m54599",
-  "level": "hs",
-  "section": "The Language of Physics: Physical Quantities and Units"
- },
- {
-  "term": "logarithmic scale",
-  "meaning": "a graphing scale in which each major tick on an axis is the previous tick multiplied by some value; minor ticks are often included at intermediate values which are logarithmically spaced",
   "module": "m54599",
   "level": "hs",
   "section": "The Language of Physics: Physical Quantities and Units"
@@ -5754,22 +5229,8 @@
   "section": "Medical Applications and Biological Effects of Nuclear Radiation"
  },
  {
-  "term": "lumens",
-  "meaning": "unit of measure for luminous flux",
-  "module": "m54346",
-  "level": "hs",
-  "section": "The Behavior of Electromagnetic Radiation"
- },
- {
   "term": "luminous flux",
   "meaning": "rate at which light is radiated from a source",
-  "module": "m54346",
-  "level": "hs",
-  "section": "The Behavior of Electromagnetic Radiation"
- },
- {
-  "term": "lux",
-  "meaning": "unit of measure for illuminance",
   "module": "m54346",
   "level": "hs",
   "section": "The Behavior of Electromagnetic Radiation"
@@ -5857,13 +5318,6 @@
   "module": "m54342",
   "level": "hs",
   "section": "The Electromagnetic Spectrum"
- },
- {
-  "term": "magnetic field lines",
-  "meaning": "continuous curves that show the direction of a magnetic field; these lines point in the same direction as a compass points, toward the magnetic south pole of a bar magnet",
-  "module": "m58739",
-  "level": "university",
-  "section": "Magnetic Fields and Lines"
  },
  {
   "term": "magnetic field strength",
@@ -6279,13 +5733,6 @@
   "section": "Medical Applications and Biological Effects of Nuclear Radiation"
  },
  {
-  "term": "modern physics",
-  "meaning": "physics as developed from the twentieth century to the present, involving the theories of relativity and quantum mechanics",
-  "module": "m54057",
-  "level": "hs",
-  "section": "Physics: Definitions and Applications"
- },
- {
   "term": "molar heat capacity at constant pressure",
   "meaning": "quantifies the ratio of the amount of heat added removed to the temperature while measuring at constant pressure",
   "module": "m58400",
@@ -6342,13 +5789,6 @@
   "section": "Applications of Diffraction, Interference, and Coherence"
  },
  {
-  "term": "Moseley plot",
-  "meaning": "plot of the atomic number versus the square root of X-ray frequency",
-  "module": "m58590",
-  "level": "university",
-  "section": "Atomic Spectra and X-rays"
- },
- {
   "term": "Moseley's law",
   "meaning": "relationship between the atomic number and X-ray photon frequency for X-ray production",
   "module": "m58590",
@@ -6361,13 +5801,6 @@
   "module": "m58394",
   "level": "university",
   "section": "Distribution of Molecular Speeds"
- },
- {
-  "term": "motion",
-  "meaning": "displacement of an object as a function of time",
-  "module": "m42042",
-  "level": "college",
-  "section": "Projectile Motion"
  },
  {
   "term": "motionally induced emf",
@@ -6389,13 +5822,6 @@
   "module": "m58743",
   "level": "university",
   "section": "Force and Torque on a Current Loop"
- },
- {
-  "term": "muon family number",
-  "meaning": "the number +/-1 that is assigned to all members of the muon family, or the number 0 that is assigned to all particles not in the muon family",
-  "module": "m42674",
-  "level": "college",
-  "section": "Particles, Patterns, and Conservation Laws"
  },
  {
   "term": "mutual inductance",
@@ -6685,20 +6111,6 @@
   "section": "Fictitious Forces and Non-inertial Frames: The Coriolis Force"
  },
  {
-  "term": "non-renewable",
-  "meaning": "energy source that is not renewable, but is depleted by human consumption",
-  "module": "m58661",
-  "level": "university",
-  "section": "Sources of Energy"
- },
- {
-  "term": "nonconservative force",
-  "meaning": "a force whose work depends on the path followed between the given initial and final configurations",
-  "module": "m42150",
-  "level": "college",
-  "section": "Nonconservative Forces"
- },
- {
   "term": "noninertial frame of reference",
   "meaning": "accelerated frame of reference",
   "module": "m58305",
@@ -6811,13 +6223,6 @@
   "section": "Bohr's Model of the Hydrogen Atom"
  },
  {
-  "term": "nuclear radiation",
-  "meaning": "rays that originate in the nuclei of atoms, the first examples of which were discovered by Becquerel",
-  "module": "m42623",
-  "level": "college",
-  "section": "Nuclear Radioactivity"
- },
- {
   "term": "nuclear reaction energy",
   "meaning": "the energy created in a nuclear reaction",
   "module": "m42633",
@@ -6860,25 +6265,11 @@
   "section": "Null Measurements"
  },
  {
-  "term": "null vector",
-  "meaning": "a vector with all its components equal to zero",
-  "module": "m58279",
-  "level": "university",
-  "section": "Algebra of Vectors"
- },
- {
   "term": "numerical aperture",
   "meaning": "a number or measure that expresses the ability of a lens to resolve fine detail in an object being observed. Derived by mathematical formula NA=n sin alpha, where n is the refractive index of the medium between the lens and the specimen and alpha=theta/2",
   "module": "m42491",
   "level": "college",
   "section": "Microscopes"
- },
- {
-  "term": "object distance",
-  "meaning": "distance of the object from the central axis of the optical element that produces its image",
-  "module": "m58527",
-  "level": "university",
-  "section": "Images Formed by Plane Mirrors"
  },
  {
   "term": "objective",
@@ -7042,13 +6433,6 @@
   "section": "Molecular Transport Phenomena: Diffusion, Osmosis, and Related Processes"
  },
  {
-  "term": "osmotic pressure",
-  "meaning": "the back pressure which stops the osmotic process if one solution is pure water",
-  "module": "m42212",
-  "level": "college",
-  "section": "Molecular Transport Phenomena: Diffusion, Osmosis, and Related Processes"
- },
- {
   "term": "Otto cycle",
   "meaning": "a thermodynamic cycle, consisting of a pair of adiabatic processes and a pair of isochoric processes, that converts heat into work, e.g., the four-stroke engine cycle of intake, compression, ignition, and exhaust",
   "module": "m42234",
@@ -7075,13 +6459,6 @@
   "module": "m58365",
   "level": "university",
   "section": "Damped Oscillations"
- },
- {
-  "term": "overtone",
-  "meaning": "frequency that produces standing waves and is higher than the fundamental frequency",
-  "module": "m58373",
-  "level": "university",
-  "section": "Standing Waves and Resonance"
  },
  {
   "term": "overtones",
@@ -7182,25 +6559,11 @@
   "section": "Nuclear Decay and Conservation Laws"
  },
  {
-  "term": "parent nucleus",
-  "meaning": "original nucleus before decay",
-  "module": "m58610",
-  "level": "university",
-  "section": "Nuclear Reactions"
- },
- {
   "term": "partial pressure",
   "meaning": "the pressure a gas would create if it occupied the total volume of space available",
   "module": "m42218",
   "level": "college",
   "section": "Phase Changes"
- },
- {
-  "term": "particle accelerator",
-  "meaning": "machine designed to accelerate charged particles; this acceleration is usually achieved with strong electric fields, magnetic fields, or both",
-  "module": "m58772",
-  "level": "university",
-  "section": "Particle Accelerators and Detectors"
  },
  {
   "term": "particle detector",
@@ -7266,13 +6629,6 @@
   "section": "Electric Generators and Back Emf"
  },
  {
-  "term": "peak speed",
-  "meaning": "same as \"most probable speed\"",
-  "module": "m58394",
-  "level": "university",
-  "section": "Distribution of Molecular Speeds"
- },
- {
   "term": "percent relative humidity",
   "meaning": "the ratio of vapor density to saturation vapor density",
   "module": "m42219",
@@ -7301,13 +6657,6 @@
   "section": "Statements of the Second Law of Thermodynamics"
  },
  {
-  "term": "perfectly inelastic",
-  "meaning": "collision after which all objects are stuck together, moving with the same velocity; momentum is conserved, and the loss of kinetic energy is a maximum",
-  "module": "m58321",
-  "level": "university",
-  "section": "Types of Collisions"
- },
- {
   "term": "perfectly inelastic collision",
   "meaning": "collision in which objects stick together after impact and kinetic energy is not conserved",
   "module": "m54209",
@@ -7333,13 +6682,6 @@
   "meaning": "time taken to complete one oscillation",
   "module": "m58361",
   "level": "university",
-  "section": "Simple Harmonic Motion"
- },
- {
-  "term": "periodic motion",
-  "meaning": "motion that repeats itself at regular time intervals",
-  "module": "m54154",
-  "level": "hs",
   "section": "Simple Harmonic Motion"
  },
  {
@@ -7418,13 +6760,6 @@
   "module": "m58361",
   "level": "university",
   "section": "Simple Harmonic Motion"
- },
- {
-  "term": "phase-contrast microscope",
-  "meaning": "microscope utilizing wave interference and differences in phases to enhance contrast",
-  "module": "m42290",
-  "level": "college",
-  "section": "*Extended Topic* Microscopy Enhanced by the Wave Characteristics of Light"
  },
  {
   "term": "phon",
@@ -7525,13 +6860,6 @@
   "section": "Physics: An Introduction"
  },
  {
-  "term": "pion",
-  "meaning": "particle exchanged between nucleons, transmitting the strong nuclear force between them",
-  "module": "m54593",
-  "level": "hs",
-  "section": "The Four Fundamental Forces"
- },
- {
   "term": "pit",
   "meaning": "a tiny indentation on the spiral track moulded into the top of the polycarbonate layer of CD",
   "module": "m42083",
@@ -7600,13 +6928,6 @@
   "module": "m58343",
   "level": "university",
   "section": "Elasticity and Plasticity"
- },
- {
-  "term": "point charge",
-  "meaning": "A charged particle, designated Q, generating an electric field",
-  "module": "m42310",
-  "level": "college",
-  "section": "Electric Field: Concept of a Field Revisited"
  },
  {
   "term": "point masses",
@@ -7733,13 +7054,6 @@
   "module": "m42633",
   "level": "college",
   "section": "Nuclear Decay and Conservation Laws"
- },
- {
-  "term": "positron emission tomography (PET)",
-  "meaning": "tomography technique that uses beta^+ emitters and detects the two annihilation gamma rays, aiding in source localization",
-  "module": "m42649",
-  "level": "college",
-  "section": "Diagnostics and Medical Imaging"
  },
  {
   "term": "postulate",
@@ -7980,13 +7294,6 @@
   "section": "Nuclear Fusion"
  },
  {
-  "term": "proton-proton cycle",
-  "meaning": "combined reactions ^1H+^1H -> ^2H + e^-+v_e. ^1H+^2H -> ^3He + gamma and ^3He+^3He -> ^4He +^1H +^1H that begins with hydrogen and ends with helium",
-  "module": "m54574",
-  "level": "hs",
-  "section": "Nuclear Fission and Fusion"
- },
- {
   "term": "protons",
   "meaning": "the positively charged nucleons found in a nucleus",
   "module": "m42631",
@@ -7999,13 +7306,6 @@
   "module": "m54192",
   "level": "hs",
   "section": "Kepler's Laws of Planetary Motion"
- },
- {
-  "term": "pulley",
-  "meaning": "a simple machine consisting of a rope that passes over one or more grooved wheels",
-  "module": "m54274",
-  "level": "hs",
-  "section": "Simple Machines"
  },
  {
   "term": "pulse",
@@ -8064,13 +7364,6 @@
   "section": "Planck and Quantum Nature of Light"
  },
  {
-  "term": "quantum chromodynamics",
-  "meaning": "the theory of color interaction between quarks that leads to understanding of the nuclear strong force",
-  "module": "m54595",
-  "level": "hs",
-  "section": "Quarks"
- },
- {
   "term": "quantum chromodynamics (QCD)",
   "meaning": "theory that describes strong interactions between quarks",
   "module": "m58774",
@@ -8085,13 +7378,6 @@
   "section": "The Quantum Tunneling of Particles through Potential Barriers"
  },
  {
-  "term": "quantum electrodynamics",
-  "meaning": "the theory of electromagnetism on the particle scale",
-  "module": "m54593",
-  "level": "hs",
-  "section": "The Four Fundamental Forces"
- },
- {
   "term": "quantum electrodynamics (QED)",
   "meaning": "theory that describes the interaction of electrons with photons",
   "module": "m58774",
@@ -8104,13 +7390,6 @@
   "module": "m42689",
   "level": "college",
   "section": "General Relativity and Quantum Gravity"
- },
- {
-  "term": "quantum mechanical tunneling",
-  "meaning": "quantum mechanical effect whereby a particle has a nonzero probability to cross through a potential energy barrier despite not having sufficient energy to pass over the barrier; also called barrier penetration",
-  "module": "m42644",
-  "level": "college",
-  "section": "Tunneling"
  },
  {
   "term": "quantum mechanics",
@@ -8162,20 +7441,6 @@
   "section": "Quarks"
  },
  {
-  "term": "Quark Era",
-  "meaning": "the time period from 10 -11 to 10 -6 seconds at which all four fundamental forces are separated and quarks begin to exit",
-  "module": "m54588",
-  "level": "hs",
-  "section": "The Unification of Forces"
- },
- {
-  "term": "quasars",
-  "meaning": "the moderately distant galaxies that emit as much or more energy than a normal galaxy",
-  "module": "m42689",
-  "level": "college",
-  "section": "General Relativity and Quantum Gravity"
- },
- {
   "term": "quasi-static process",
   "meaning": "evolution of a system that goes so slowly that the system involved is always in thermodynamic equilibrium",
   "module": "m58396",
@@ -8188,13 +7453,6 @@
   "module": "m42228",
   "level": "college",
   "section": "Conduction"
- },
- {
-  "term": "rad",
-  "meaning": "amount of ionizing energy deposited per kilogram of tissue",
-  "module": "m54578",
-  "level": "hs",
-  "section": "Medical Applications of Radioactivity: Diagnostic Imaging and Radiation"
  },
  {
   "term": "radar",
@@ -8351,13 +7609,6 @@
   "section": "Dispersion: The Rainbow and Prisms"
  },
  {
-  "term": "range",
-  "meaning": "the maximum horizontal distance that a projectile travels",
-  "module": "m54162",
-  "level": "hs",
-  "section": "Projectile Motion"
- },
- {
   "term": "range of radiation",
   "meaning": "the distance that the radiation can travel through a material",
   "module": "m42623",
@@ -8407,20 +7658,6 @@
   "section": "Applications of Diffraction, Interference, and Coherence"
  },
  {
-  "term": "RC circuit",
-  "meaning": "a circuit that contains both a resistor and a capacitor",
-  "module": "m42363",
-  "level": "college",
-  "section": "DC Circuits Containing Resistors and Capacitors"
- },
- {
-  "term": "real image",
-  "meaning": "an optical image formed when light rays converge and pass through the image, producing an image that can be projected onto a screen",
-  "module": "m54357",
-  "level": "hs",
-  "section": "Reflection"
- },
- {
   "term": "recoil",
   "meaning": "backward movement of an object caused by the transfer of momentum from another object in a collision",
   "module": "m54209",
@@ -8468,13 +7705,6 @@
   "module": "m54365",
   "level": "hs",
   "section": "Refraction"
- },
- {
-  "term": "refraction",
-  "meaning": "bending of a wave as it passes from one medium to another medium with a different density",
-  "module": "m54318",
-  "level": "hs",
-  "section": "Wave Interaction: Superposition and Interference"
  },
  {
   "term": "refrigerator",
@@ -8701,25 +7931,11 @@
   "section": "Vector Addition and Subtraction: Graphical Methods"
  },
  {
-  "term": "retinex",
-  "meaning": "a theory proposed to explain color and brightness perception and constancies; is a combination of the words retina and cortex, which are the two areas responsible for the processing of visual information",
-  "module": "m42487",
-  "level": "college",
-  "section": "Color and Color Vision"
- },
- {
   "term": "retinex theory of color vision",
   "meaning": "the ability to perceive color in an ambient-colored environment",
   "module": "m42487",
   "level": "college",
   "section": "Color and Color Vision"
- },
- {
-  "term": "reverse bias configuration",
-  "meaning": "diode configuration that results in low current",
-  "module": "m58601",
-  "level": "university",
-  "section": "Semiconductor Devices"
  },
  {
   "term": "reverse dialysis",
@@ -8876,13 +8092,6 @@
   "section": "Rotational Kinetic Energy: Work and Energy Revisited"
  },
  {
-  "term": "rotational motion",
-  "meaning": "the circular motion of an object about an axis of rotation",
-  "module": "m54176",
-  "level": "hs",
-  "section": "Angle of Rotation and Angular Velocity"
- },
- {
   "term": "rotational work",
   "meaning": "work done on a rigid body due to the sum of the torques integrated over the angle through with the body rotates",
   "module": "m58333",
@@ -8904,13 +8113,6 @@
   "section": "Bohr's Model of the Hydrogen Atom"
  },
  {
-  "term": "Rydberg constant",
-  "meaning": "a physical constant related to the atomic spectra with an established value of 1.097*10^7 m^(-1)",
-  "module": "m42596",
-  "level": "college",
-  "section": "Bohr's Theory of the Hydrogen Atom"
- },
- {
   "term": "Rydberg constant for hydrogen",
   "meaning": "physical constant in the Balmer formula",
   "module": "m58764",
@@ -8930,13 +8132,6 @@
   "module": "m42219",
   "level": "college",
   "section": "Humidity, Evaporation, and Boiling"
- },
- {
-  "term": "scalar",
-  "meaning": "a quantity that has magnitude (and possibly sign) but no direction",
-  "module": "m54108",
-  "level": "hs",
-  "section": "Relative Motion, Distance, and Displacement"
  },
  {
   "term": "scalar component",
@@ -8995,25 +8190,11 @@
   "section": "The Schrodinger Equation"
  },
  {
-  "term": "Schrodinger's time-independent equation",
-  "meaning": "equation in space that allows us to determine wave functions of a quantum particle; this wave function must be multiplied by a time-modulation factor to obtain the time-dependent wave function",
-  "module": "m58579",
-  "level": "university",
-  "section": "The Schrodinger Equation"
- },
- {
   "term": "Schwarzschild radius",
   "meaning": "critical radius (R_S) such that if a mass were compressed to the extent that its radius becomes less than the Schwarzschild radius, then the mass will collapse to a singularity, and anything that passes inside that radius cannot escape",
   "module": "m58352",
   "level": "university",
   "section": "Einstein's Theory of Gravity"
- },
- {
-  "term": "science",
-  "meaning": "the study or knowledge of how the physical world operates, based on objective evidence determined through observation and experimentation",
-  "module": "m54057",
-  "level": "hs",
-  "section": "Physics: Definitions and Applications"
  },
  {
   "term": "scientific law",
@@ -9070,13 +8251,6 @@
   "module": "m54274",
   "level": "hs",
   "section": "Simple Machines"
- },
- {
-  "term": "second",
-  "meaning": "the SI unit for time, abbreviated (s)",
-  "module": "m54599",
-  "level": "hs",
-  "section": "The Language of Physics: Physical Quantities and Units"
  },
  {
   "term": "second equilibrium condition",
@@ -9156,13 +8330,6 @@
   "section": "The Language of Physics: Physical Quantities and Units"
  },
  {
-  "term": "semiconductor",
-  "meaning": "solid with a relatively small energy gap between the lowest completely filled band and the next available unfilled band",
-  "module": "m58599",
-  "level": "university",
-  "section": "Band Theory of Solids"
- },
- {
   "term": "semipermeable",
   "meaning": "a type of membrane that allows only certain small molecules to pass through",
   "module": "m42212",
@@ -9210,13 +8377,6 @@
   "module": "m58342",
   "level": "university",
   "section": "Stress, Strain, and Elastic Modulus"
- },
- {
-  "term": "shell",
-  "meaning": "a probability cloud for electrons that has a single principal quantum number",
-  "module": "m42618",
-  "level": "college",
-  "section": "The Pauli Exclusion Principle"
  },
  {
   "term": "shielding",
@@ -9289,25 +8449,11 @@
   "section": "The Language of Physics: Physical Quantities and Units"
  },
  {
-  "term": "simple circuit",
-  "meaning": "a circuit with a single voltage source and a single resistor",
-  "module": "m42344",
-  "level": "college",
-  "section": "Ohm's Law: Resistance and Simple Circuits"
- },
- {
   "term": "simple cubic",
   "meaning": "basic crystal structure in which each ion is located at the nodes of a three-dimensional grid",
   "module": "m58594",
   "level": "university",
   "section": "Bonding in Crystalline Solids"
- },
- {
-  "term": "simple harmonic motion",
-  "meaning": "the oscillatory motion in a system where the net force can be described by Hooke's law",
-  "module": "m54154",
-  "level": "hs",
-  "section": "Simple Harmonic Motion"
  },
  {
   "term": "simple harmonic motion (SHM)",
@@ -9364,13 +8510,6 @@
   "module": "m42649",
   "level": "college",
   "section": "Diagnostics and Medical Imaging"
- },
- {
-  "term": "slope",
-  "meaning": "the ratio of the change of a graph on the y axis to the change along the x- axis, the value of m in the equation of a line, y=mx+b",
-  "module": "m54599",
-  "level": "hs",
-  "section": "The Language of Physics: Physical Quantities and Units"
  },
  {
   "term": "small-angle approximation",
@@ -9485,13 +8624,6 @@
   "section": "Archimedes' Principle"
  },
  {
-  "term": "specific heat",
-  "meaning": "amount of heat necessary to change the temperature of 1.00 kg of a substance by 1.00 degrees C; also called \"specific heat capacity\"",
-  "module": "m58387",
-  "level": "university",
-  "section": "Heat Transfer, Specific Heat, and Calorimetry"
- },
- {
   "term": "speed",
   "meaning": "rate at which an object changes its location",
   "module": "m54104",
@@ -9569,13 +8701,6 @@
   "section": "Electron Spin"
  },
  {
-  "term": "spontaneous symmetry breaking",
-  "meaning": "the transition from GUT to electroweak where the forces were no longer unified",
-  "module": "m42686",
-  "level": "college",
-  "section": "Cosmology and Particle Physics"
- },
- {
   "term": "spring tide",
   "meaning": "high tide created when the Moon, the Sun, and Earth are along one line",
   "module": "m58351",
@@ -9625,13 +8750,6 @@
   "section": "The Quantum Particle in a Box"
  },
  {
-  "term": "state reduction",
-  "meaning": "hypothetical process in which an observed or detected particle \"jumps into\" a definite state, often described in terms of the collapse of the particle's wave function",
-  "module": "m58576",
-  "level": "university",
-  "section": "Wave Functions"
- },
- {
   "term": "static electricity",
   "meaning": "buildup of electric charge on the surface of an object; the arrangement of the charge remains constant (\"static\")",
   "module": "m58412",
@@ -9651,13 +8769,6 @@
   "module": "m54159",
   "level": "hs",
   "section": "Inclined Planes"
- },
- {
-  "term": "stationary state",
-  "meaning": "state for which the probability density function, |Psi(x,t)|^2, does not vary in time",
-  "module": "m58580",
-  "level": "university",
-  "section": "The Quantum Particle in a Box"
  },
  {
   "term": "statistical analysis",
@@ -9709,13 +8820,6 @@
   "section": "Applications of Atomic Excitations and De-Excitations"
  },
  {
-  "term": "Stokes' law",
-  "meaning": "F_s=6piretav, where r is the radius of the object, eta is the viscosity of the fluid, and v is the object's velocity",
-  "module": "m42080",
-  "level": "college",
-  "section": "Drag Forces"
- },
- {
   "term": "stopping potential",
   "meaning": "in a circuit, potential difference that stops photocurrent",
   "module": "m58762",
@@ -9728,13 +8832,6 @@
   "module": "m58342",
   "level": "university",
   "section": "Stress, Strain, and Elastic Modulus"
- },
- {
-  "term": "strange",
-  "meaning": "the third lightest of all quarks",
-  "module": "m42678",
-  "level": "college",
-  "section": "Quarks: Is That All There Is?"
  },
  {
   "term": "strange quark",
@@ -9842,13 +8939,6 @@
   "section": "Calculating Electric Fields of Charge Distributions"
  },
  {
-  "term": "surface mass density",
-  "meaning": "mass per unit area sigma of a two dimensional object",
-  "module": "m58330",
-  "level": "university",
-  "section": "Calculating Moments of Inertia"
- },
- {
   "term": "surface tension",
   "meaning": "the cohesive forces between molecules which cause the surface of a liquid to contract to the smallest possible surface area",
   "module": "m42197",
@@ -9889,13 +8979,6 @@
   "module": "m42199",
   "level": "college",
   "section": "Pressures in the Body"
- },
- {
-  "term": "tagged",
-  "meaning": "process of attaching a radioactive substance to a chemical compound",
-  "module": "m42649",
-  "level": "college",
-  "section": "Diagnostics and Medical Imaging"
  },
  {
   "term": "tail",
@@ -9968,13 +9051,6 @@
   "section": "Elasticity: Stress and Strain"
  },
  {
-  "term": "tensile stress",
-  "meaning": "stress caused by tensile forces, only in one direction, which occurs when forces are stretching an object, causing its elongation",
-  "module": "m58342",
-  "level": "university",
-  "section": "Stress, Strain, and Elastic Modulus"
- },
- {
   "term": "tension",
   "meaning": "a pulling force that acts along a connecting medium, especially a stretched flexible connector, such as a rope or cable; when a rope supports the weight of an object, the force exerted on the object by the rope is called tension",
   "module": "m54131",
@@ -10017,13 +9093,6 @@
   "section": "Electric Field"
  },
  {
-  "term": "theory",
-  "meaning": "explanation of patterns in nature that is supported by much scientific evidence and verified multiple times by various groups of researchers",
-  "module": "m54083",
-  "level": "hs",
-  "section": "The Scientific Methods"
- },
- {
   "term": "theory of everything",
   "meaning": "a theory of particle interactions that unifies all four fundamental forces",
   "module": "m58768",
@@ -10043,13 +9112,6 @@
   "module": "m42678",
   "level": "college",
   "section": "Quarks: Is That All There Is?"
- },
- {
-  "term": "theory of relativity",
-  "meaning": "theory constructed by Albert Einstein which describes how space, time and energy are different for different observers in relative motion",
-  "module": "m54057",
-  "level": "hs",
-  "section": "Physics: Definitions and Applications"
  },
  {
   "term": "therapeutic ratio",
@@ -10185,13 +9247,6 @@
   "section": "Tidal Forces"
  },
  {
-  "term": "timbre",
-  "meaning": "number and relative intensity of multiple sound frequencies",
-  "module": "m42297",
-  "level": "college",
-  "section": "Hearing"
- },
- {
   "term": "time",
   "meaning": "change, or the interval over which change occurs",
   "module": "m42096",
@@ -10290,13 +9345,6 @@
   "section": "Relating Angular and Translational Quantities"
  },
  {
-  "term": "trajectory",
-  "meaning": "the path of a projectile through the air",
-  "module": "m54162",
-  "level": "hs",
-  "section": "Projectile Motion"
- },
- {
   "term": "transducer",
   "meaning": "device that converts energy of a signal into measurable energy form, for example, a microphone converts sound waves into an electrical signal",
   "module": "m58377",
@@ -10330,13 +9378,6 @@
   "module": "m58582",
   "level": "university",
   "section": "The Quantum Tunneling of Particles through Potential Barriers"
- },
- {
-  "term": "transmutation",
-  "meaning": "process of changing elemental composition",
-  "module": "m54580",
-  "level": "hs",
-  "section": "Nuclear Forces and Radioactivity"
  },
  {
   "term": "transuranic element",
@@ -10400,13 +9441,6 @@
   "module": "m58315",
   "level": "university",
   "section": "Potential Energy Diagrams and Stability"
- },
- {
-  "term": "TV",
-  "meaning": "video and audio signals broadcast on electromagnetic waves",
-  "module": "m42444",
-  "level": "college",
-  "section": "The Electromagnetic Spectrum"
  },
  {
   "term": "twin paradox",
@@ -10486,20 +9520,6 @@
   "section": "The Electromagnetic Spectrum"
  },
  {
-  "term": "ultraviolet radiation (UV)",
-  "meaning": "electromagnetic radiation in the range extending upward in frequency from violet light and overlapping with the lowest X-ray frequencies, with wavelengths from 400 nm down to about 10 nm",
-  "module": "m42444",
-  "level": "college",
-  "section": "The Electromagnetic Spectrum"
- },
- {
-  "term": "uncertainty",
-  "meaning": "a quantitative measure of how much your measured values deviate from a standard or expected value",
-  "module": "m42120",
-  "level": "college",
-  "section": "Accuracy, Precision, and Significant Figures"
- },
- {
   "term": "uncertainty in energy",
   "meaning": "lack of precision or lack of knowledge of precise results in measurements of energy",
   "module": "m42579",
@@ -10554,13 +9574,6 @@
   "module": "m58277",
   "level": "university",
   "section": "Scalars and Vectors"
- },
- {
-  "term": "unit vectors of the axes",
-  "meaning": "unit vectors that define orthogonal directions in a plane or in space",
-  "module": "m58278",
-  "level": "university",
-  "section": "Coordinate Systems and Components of a Vector"
  },
  {
   "term": "units",
@@ -10661,13 +9674,6 @@
   "section": "Types of Molecular Bonds"
  },
  {
-  "term": "van der Waals equation of state",
-  "meaning": "equation, typically approximate, which relates the pressure and volume of a gas to the number of gas molecules or number of moles of gas and the temperature of the gas",
-  "module": "m58391",
-  "level": "university",
-  "section": "Molecular Model of an Ideal Gas"
- },
- {
   "term": "vapor",
   "meaning": "a gas at a temperature below the boiling temperature",
   "module": "m42218",
@@ -10687,13 +9693,6 @@
   "module": "m54292",
   "level": "hs",
   "section": "Phase Change and Latent Heat"
- },
- {
-  "term": "vector",
-  "meaning": "a quantity that has both magnitude and direction; an arrow used to represent quantities with both magnitude and direction",
-  "module": "m42104",
-  "level": "college",
-  "section": "Kinematics in Two Dimensions: An Introduction"
  },
  {
   "term": "vector addition",
@@ -10722,13 +9721,6 @@
   "module": "m58280",
   "level": "university",
   "section": "Products of Vectors"
- },
- {
-  "term": "vector quantity",
-  "meaning": "physical quantity described by a mathematical vector, that is, by specifying both its magnitude and its direction; synonymous with a vector in physics",
-  "module": "m58277",
-  "level": "university",
-  "section": "Scalars and Vectors"
  },
  {
   "term": "vector sum",
@@ -10799,13 +9791,6 @@
   "module": "m58774",
   "level": "university",
   "section": "The Standard Model"
- },
- {
-  "term": "virtual particles",
-  "meaning": "particles which cannot be directly observed but their effects can be directly observed",
-  "module": "m42669",
-  "level": "college",
-  "section": "The Yukawa Particle and the Heisenberg Uncertainty Principle Revisited"
  },
  {
   "term": "viscosity",
@@ -10948,13 +9933,6 @@
   "section": "Waves"
  },
  {
-  "term": "wave-particle duality",
-  "meaning": "particles can behave as waves and radiation can behave as particles",
-  "module": "m58766",
-  "level": "university",
-  "section": "Wave-Particle Duality"
- },
- {
   "term": "wavefront",
   "meaning": "points on a wave surface that all share an identical, constant phase",
   "module": "m54369",
@@ -10997,13 +9975,6 @@
   "section": "Newton's Second Law of Motion"
  },
  {
-  "term": "Wheatstone bridge",
-  "meaning": "a null measurement device for calculating resistance by balancing potential drops in a circuit",
-  "module": "m42362",
-  "level": "college",
-  "section": "Null Measurements"
- },
- {
   "term": "wheel and axle",
   "meaning": "a simple machine consisting of a rod fixed to the center of a wheel",
   "module": "m54274",
@@ -11032,13 +10003,6 @@
   "section": "Work: The Scientific Definition"
  },
  {
-  "term": "work function",
-  "meaning": "energy needed to detach photoelectron from the metal surface",
-  "module": "m58762",
-  "level": "university",
-  "section": "Photoelectric Effect"
- },
- {
   "term": "work-energy theorem",
   "meaning": "if one or more external forces act upon a rigid object, causing its kinetic energy to change from KE_1 to KE_2, then the work W done by the net force is equal to the change in kinetic energy",
   "module": "m42180",
@@ -11053,25 +10017,11 @@
   "section": "The Lorentz Transformation"
  },
  {
-  "term": "x ray",
-  "meaning": "EM photon between gamma-ray and UV in energy",
-  "module": "m42563",
-  "level": "college",
-  "section": "Photon Energies and the Electromagnetic Spectrum"
- },
- {
   "term": "x rays",
   "meaning": "a form of electromagnetic radiation",
   "module": "m42599",
   "level": "college",
   "section": "X Rays: Atomic Origins and Applications"
- },
- {
-  "term": "X-ray",
-  "meaning": "invisible, penetrating form of very high frequency electromagnetic radiation, overlapping both the ultraviolet range and the gamma-ray range",
-  "module": "m42444",
-  "level": "college",
-  "section": "The Electromagnetic Spectrum"
  },
  {
   "term": "x-ray diffraction",

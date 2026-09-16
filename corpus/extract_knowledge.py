@@ -106,7 +106,16 @@ def strip(x):
     for ch in mathlin.unmapped(x):
         STATS["unmapped"][ch] += 1
     x = mathlin.fold(x)
-    return re.sub(r"\s+", " ", x).strip()
+    x = re.sub(r"\s+", " ", x)
+    # Tidy the seams left where a math block sat between literal punctuation. The source writes
+    # "amplitude (<m:math>A</m:math>)" with formatting whitespace around the element, which
+    # collapses to "amplitude ( A )" and lands straight in the question surface.
+    x = re.sub(r"\(\s+", "(", x)
+    x = re.sub(r"\s+\)", ")", x)
+    x = re.sub(r"\[\s+", "[", x)
+    x = re.sub(r"\s+\]", "]", x)
+    x = re.sub(r"\s+([,.;:!?])", r"\1", x)
+    return x.strip()
 
 
 def drop_notes(body):
