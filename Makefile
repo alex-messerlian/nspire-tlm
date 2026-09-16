@@ -49,7 +49,7 @@ HOST_LINK := src/store/gfx.c src/store/chatstore.c src/store/pickui.c src/store/
 # ---- host tests ------------------------------------------------------------------------------
 # Two groups, because they differ in what they link. INCLUDES_APP suites #include app.c directly to
 # reach its file-scope state; the others link toolrun.c and the evaluator.
-TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme test_select test_persist
+TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme test_select test_persist test_palette
 TESTS_EVAL := test_toolrun test_prov
 # test_prov.c has existed, correct and well-designed -- it even has the 'rounds to 2 sf is
 # legitimate' case -- and was referenced by NO Makefile and NO gate. Its binary sat committed

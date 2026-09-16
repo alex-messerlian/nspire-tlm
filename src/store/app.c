@@ -229,16 +229,70 @@ static int TEXT_X, TEXT_Y, TEXT_W;   /* the composer's last laid-out text origin
  * WHAT IT IS: the characters a question needs that the keypad cannot reach. The store's own
  * spelling decides the list -- it writes `pi`, `theta`, `Delta`, `sqrt(` as ASCII, so those are
  * what get inserted, not glyphs the tokenizer has never seen. */
-static const char *PAL[] = {
-    "_", "^", "sqrt(", "pi",
-    "Delta", "theta", "omega", "lambda",
-    "alpha", "rho", "mu", "sigma",
-    "epsilon", "(", ")", "e",
+/* CATEGORISED, because one flat grid of sixteen could not hold what a physics question needs and
+ * the user asked for "pretty much any type of mathematical thing". TAB cycles the categories.
+ *
+ * EVERY ENTRY IS SOMETHING THE STORE OR THE KNOWLEDGE TIER ACTUALLY WRITES. Measured over
+ * corpus/store_clean.json, the only functions any of the 164 formulas use are sqrt, sin, asin and
+ * cos -- so those four are offered and nothing else. Same reasoning as the note above: a tile is a
+ * promise, and a palette with log( or integral on it would promise arithmetic this model has never
+ * been trained to emit. Units and subscripts are the ones the store measures as most frequent. */
+typedef struct { const char *name; const char *const *it; int n; } pal_cat;
+
+static const char *const PAL_GREEK[] = {
+    "alpha", "beta", "gamma", "delta", "epsilon",
+    "theta", "lambda", "mu", "nu", "pi",
+    "rho", "sigma", "tau", "phi", "omega",
+    "Delta", "Theta", "Sigma", "Phi", "Omega",
 };
-#define SYM_N ((int)(sizeof PAL / sizeof PAL[0]))
-#define SYM_COLS 4
-static int SYM_ON, SYM_SEL;
-static gfx_rect R_SYM[SYM_N];
+static const char *const PAL_MATH[] = {
+    "_", "^", "^2", "^3", "sqrt(",
+    "(", ")", "*", "/", "+",
+    "-", "=", ".", ",", "e-",
+    "sin(", "cos(", "asin(", "<", ">",
+};
+static const char *const PAL_VARS[] = {
+    "_0", "_1", "_2", "_i", "_f",
+    "_x", "_y", "_z", "_t", "_n",
+    "_net", "_max", "_min", "_tot", "_rms",
+    "_CM", "_avg", "_in", "_out", "_eff",
+};
+static const char *const PAL_UNITS[] = {
+    "m", "s", "kg", "N", "J",
+    "W", "A", "V", "C", "K",
+    "Hz", "Pa", "T", "ohm", "mol",
+    "m/s", "m/s^2", "N/m", "kg/m^3", "W/m^2",
+};
+static const char *const PAL_CONST[] = {
+    "c", "g", "h", "hbar", "k_B",
+    "N_A", "R", "G", "epsilon_0", "mu_0",
+    "q_e", "m_e", "m_p", "sigma", "atm",
+};
+
+#define CAT(a) { #a, PAL_##a, (int)(sizeof PAL_##a / sizeof PAL_##a[0]) }
+static const pal_cat PAL_CAT[] = {
+    { "GREEK", PAL_GREEK, (int)(sizeof PAL_GREEK / sizeof PAL_GREEK[0]) },
+    { "MATH",  PAL_MATH,  (int)(sizeof PAL_MATH  / sizeof PAL_MATH[0]) },
+    { "SUB",   PAL_VARS,  (int)(sizeof PAL_VARS  / sizeof PAL_VARS[0]) },
+    { "UNITS", PAL_UNITS, (int)(sizeof PAL_UNITS / sizeof PAL_UNITS[0]) },
+    { "CONST", PAL_CONST, (int)(sizeof PAL_CONST / sizeof PAL_CONST[0]) },
+};
+#undef CAT
+#define CAT_N   ((int)(sizeof PAL_CAT / sizeof PAL_CAT[0]))
+#define SYM_MAX 25                  /* tiles a category may hold; R_SYM is sized to it */
+#define SYM_COLS 5
+static int SYM_ON, SYM_SEL, SYM_CAT;
+static gfx_rect R_SYM[SYM_MAX];
+static gfx_rect R_CAT[CAT_N];
+
+/* The live category's tiles. One accessor so the drawing, the keys and the touch path cannot
+ * disagree about which list is on screen -- the class of defect that gave this app two rankers. */
+static const pal_cat *pal_cur(void) {
+    if (SYM_CAT < 0 || SYM_CAT >= CAT_N) SYM_CAT = 0;
+    return &PAL_CAT[SYM_CAT];
+}
+static int pal_n(void) { const pal_cat *c = pal_cur(); return c->n > SYM_MAX ? SYM_MAX : c->n; }
+static const char *pal_at(int i) { return pal_cur()->it[i]; }
 
 static void compose_clear(void) { COMPOSE_N = 0; COMPOSE[0] = 0; COMPOSE_SEL = 0; COMPOSE_C = 0; }
 
@@ -2048,24 +2102,41 @@ static void open_picker(void) {
 }
 
 static void draw_symbols(void) {
-    const int cw = 62, ch = 22, cols = SYM_COLS;
-    const int rows = (SYM_N + cols - 1) / cols;
-    const int W = cols * cw + 16, H = rows * ch + 40;
+    const int cw = 58, ch = 22, cols = SYM_COLS;
+    const int n = pal_n();
+    const int rows = (n + cols - 1) / cols;
+    const int W = cols * cw + 16, H = rows * ch + 56;
     const int X = (GFX_W - W) / 2, Y = (GFX_H - H) / 2;
     gfx_fill(0, 0, GFX_W, GFX_H, C_SCRIM);
     gfx_rrect(X, Y, W, H, 8, C_SHEET);
-    gfx_text(X + 10, Y + 6, "INSERT", F_XS, C_INK3, C_SHEET);
-    gfx_fill(X + 8, Y + 19, W - 16, 1, C_LINE);
-    for (int i = 0; i < SYM_N; i++) {
+    gfx_text(X + 10, Y + 5, "INSERT", F_XS, C_INK3, C_SHEET);
+
+    /* Category tabs. SYM_SEL == -1 parks the cursor here, so UP from the first row reaches them
+     * and DOWN returns: the grid and the tabs are one focus chain rather than two modes. */
+    int tx = X + 8;
+    for (int c = 0; c < CAT_N; c++) {
+        int tw = gfx_text_w(PAL_CAT[c].name, F_XS) + 8;
+        gfx_rect b = { tx, Y + 16, tw, 13 };
+        R_CAT[c] = b;
+        int on = (c == SYM_CAT);
+        if (on) gfx_rrect(b.x, b.y, b.w, b.h, 3, SYM_SEL < 0 ? C_SEL : C_BUBBLE);
+        gfx_text(b.x + 4, b.y + 2, PAL_CAT[c].name, F_XS,
+                 on ? C_INK : C_INK3, on ? (SYM_SEL < 0 ? C_SEL : C_BUBBLE) : C_SHEET);
+        tx += tw + 3;
+    }
+    gfx_fill(X + 8, Y + 32, W - 16, 1, C_LINE);
+
+    for (int i = 0; i < SYM_MAX; i++) { R_SYM[i].w = 0; }
+    for (int i = 0; i < n; i++) {
         int r = i / cols, c = i % cols;
-        gfx_rect b = { X + 8 + c * cw, Y + 24 + r * ch, cw - 4, ch - 3 };
+        gfx_rect b = { X + 8 + c * cw, Y + 37 + r * ch, cw - 4, ch - 3 };
         R_SYM[i] = b;
         int sel = (i == SYM_SEL);
         if (sel) gfx_rrect(b.x, b.y, b.w, b.h, 4, C_SEL);
-        int tw = gfx_text_w(PAL[i], F_UI);
-        gfx_text(b.x + (b.w - tw) / 2, b.y + 3, PAL[i], F_UI, C_INK, sel ? C_SEL : C_SHEET);
+        int tw = gfx_text_w(pal_at(i), F_UI);
+        gfx_text(b.x + (b.w - tw) / 2, b.y + 3, pal_at(i), F_UI, C_INK, sel ? C_SEL : C_SHEET);
     }
-    gfx_text(X + 10, Y + H - 13, "enter insert   esc close", F_XS, C_INK3, C_SHEET);
+    gfx_text(X + 10, Y + H - 13, "enter insert   tab category   esc close", F_XS, C_INK3, C_SHEET);
 }
 
 static void draw_picker(void) {
@@ -2243,10 +2314,16 @@ void app_event(const in_event *e) {
             SETTINGS_ON = 0;
             return;
         }
-        if (SYM_ON) {                          /* modal: a tile, or nothing */
-            for (int i = 0; i < SYM_N; i++)
+        if (SYM_ON) {                          /* modal: a tab, a tile, or nothing */
+            for (int c = 0; c < CAT_N; c++)
+                if (R_CAT[c].w && inside(R_CAT[c], MX, MY)) {
+                    SYM_CAT = c;
+                    if (SYM_SEL >= pal_n()) SYM_SEL = pal_n() - 1;
+                    return;
+                }
+            for (int i = 0; i < pal_n(); i++)
                 if (R_SYM[i].w && inside(R_SYM[i], MX, MY)) {
-                    compose_insert_str(PAL[i]); SYM_ON = 0; return;
+                    compose_insert_str(pal_at(i)); SYM_ON = 0; return;
                 }
             SYM_ON = 0; return;                /* a tap outside closes: nothing is pending */
         }
@@ -2358,12 +2435,23 @@ void app_event(const in_event *e) {
     if (e->kind == IN_KEY) {
         int k = e->key;
         if (SYM_ON) {
+            int n = pal_n();
             if (k == K_ESC || k == K_SYM) { SYM_ON = 0; return; }
+            if (k == K_TAB)   { SYM_CAT = (SYM_CAT + 1) % CAT_N;
+                                if (SYM_SEL >= pal_n()) SYM_SEL = pal_n() - 1; return; }
+            /* SYM_SEL == -1 is the tab row. Left/right there change category; anywhere else they
+             * move within the grid. One chain, so there is no mode to get stuck in. */
+            if (SYM_SEL < 0) {
+                if (k == K_LEFT)  { SYM_CAT = (SYM_CAT + CAT_N - 1) % CAT_N; return; }
+                if (k == K_RIGHT) { SYM_CAT = (SYM_CAT + 1) % CAT_N; return; }
+                if (k == K_DOWN || k == K_ENTER) { SYM_SEL = 0; return; }
+                return;
+            }
             if (k == K_LEFT)  { if (SYM_SEL > 0) SYM_SEL--; return; }
-            if (k == K_RIGHT) { if (SYM_SEL + 1 < SYM_N) SYM_SEL++; return; }
-            if (k == K_UP)    { if (SYM_SEL - SYM_COLS >= 0) SYM_SEL -= SYM_COLS; return; }
-            if (k == K_DOWN)  { if (SYM_SEL + SYM_COLS < SYM_N) SYM_SEL += SYM_COLS; return; }
-            if (k == K_ENTER) { compose_insert_str(PAL[SYM_SEL]); SYM_ON = 0; return; }
+            if (k == K_RIGHT) { if (SYM_SEL + 1 < n) SYM_SEL++; return; }
+            if (k == K_UP)    { SYM_SEL = (SYM_SEL - SYM_COLS >= 0) ? SYM_SEL - SYM_COLS : -1; return; }
+            if (k == K_DOWN)  { if (SYM_SEL + SYM_COLS < n) SYM_SEL += SYM_COLS; return; }
+            if (k == K_ENTER) { compose_insert_str(pal_at(SYM_SEL)); SYM_ON = 0; return; }
             return;
         }
         if (k == K_SYM) { SYM_ON = !SYM_ON; SYM_SEL = 0; return; }

@@ -378,26 +378,38 @@ int main(void) {
      * It inserts the store's OWN spelling -- theta, Delta, sqrt( -- because to_display() renders
      * those as glyphs while the model reads the ASCII it was trained on. */
     printf("\n  -- the character palette --\n");
+    /* ASSERTED THROUGH pal_at(), NOT AGAINST LITERAL TILE CONTENTS. This block used to read
+     * T2(.., COMPOSE, "_") and T2(.., COMPOSE, "vDelta = 5"), which asserted that tile 0 was "_"
+     * and tile 4 was "Delta". Both were true of a sixteen-tile flat array and neither is a
+     * property of the composer, so categorising the palette failed five assertions in a file
+     * about EXIT PATHS. What this test is for is that a palette insertion lands at the caret and
+     * that ESC inserts nothing; the tile's text is test_palette's subject, not this one's. */
     reset(); CUR = -1; compose_clear();
+    SYM_CAT = 0; SYM_SEL = 0;
     key(K_SYM);
     T("menu opens the palette", SYM_ON, 1);
+    const char *t0 = pal_at(0);
     key(K_ENTER);
     T("enter inserts the selected token", SYM_ON, 0);
-    T2("and it lands in the box", COMPOSE, "_");
-    T("caret sits after it", COMPOSE_C, 1);
+    T2("and it lands in the box", COMPOSE, t0);
+    T("caret sits after it", COMPOSE_C, (int)strlen(t0));
     /* a multi-character token, inserted AT the caret rather than appended */
     compose_clear();
     for (const char *c = "v = 5"; *c; c++) key(*c);
     for (int i = 0; i < 4; i++) key(K_LEFT);
     key(K_SYM);
-    for (int i = 0; i < 4; i++) key(K_RIGHT);   /* row 1 -> "Delta" */
+    SYM_CAT = 0;
+    for (int i = 0; i < 4; i++) key(K_RIGHT);
     T("arrows move the palette selection", SYM_SEL, 4);
+    const char *t4 = pal_at(4);
+    T("...onto a multi-character tile", (int)strlen(t4) > 1, 1);
+    char want[64]; snprintf(want, sizeof want, "v%s = 5", t4);
     key(K_ENTER);
-    T2("a multi-char token inserts at the caret", COMPOSE, "vDelta = 5");
-    T("and the caret is past all of it", COMPOSE_C, 6);
+    T2("a multi-char token inserts at the caret", COMPOSE, want);
+    T("and the caret is past all of it", COMPOSE_C, 1 + (int)strlen(t4));
     key(K_SYM); key(K_ESC);
     T("esc closes without inserting", SYM_ON, 0);
-    T2("and the box is untouched", COMPOSE, "vDelta = 5");
+    T2("and the box is untouched", COMPOSE, want);
 
     /* -- controls respond outside their drawn box --
      *

@@ -158,6 +158,8 @@ if ! _skip split_valid; then $PY tools/eval/gate_split_valid.py >/dev/null 2>&1 
 if ! _skip no_repo_symlink; then $PY tools/eval/gate_no_repo_symlink.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_repo_symlink" || { printf "  %-20s FAIL\n" "no_repo_symlink"; fail=1; }; fi
 if ! _skip name_provenance; then $PY tools/eval/gate_name_provenance.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "name_provenance" || { printf "  %-20s FAIL\n" "name_provenance"; fail=1; }; fi
 if ! _skip d3_legitimacy; then $PY tools/eval/gate_d3_legitimacy.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "d3_legitimacy" || { printf "  %-20s FAIL\n" "d3_legitimacy"; fail=1; }; fi
+if ! _skip knowledge; then $PY tools/eval/gate_knowledge.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "knowledge" || { printf "  %-20s FAIL\n" "knowledge"; fail=1; }; fi
+if ! _skip keypad; then $PY tools/eval/gate_keypad.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "keypad" || { printf "  %-20s FAIL\n" "keypad"; fail=1; }; fi
 if ! _skip decl_siblings; then $PY tools/eval/gate_declaration_siblings.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "decl_siblings" || { printf "  %-20s FAIL\n" "decl_siblings"; fail=1; }; fi
 if ! _skip ascii_boundary; then $PY tools/eval/gate_ascii_boundary.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ascii_boundary" || { printf "  %-20s FAIL\n" "ascii_boundary"; fail=1; }; fi
 if ! _skip coupling_family; then $PY tools/eval/gate_coupling_family.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "coupling_family" || { printf "  %-20s FAIL\n" "coupling_family"; fail=1; }; fi
@@ -243,7 +245,7 @@ if ! _skip test_ui_errs; then $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && 
 # not TESTS, is what decides whether the suite passed -- a roster kept in two places drifts, and
 # the half nobody reads is the half that silently stops running.
 # test_ckpt exits 2 for CANNOT CHECK, which the loop below already renders distinctly from FAIL.
-for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_shapecheck test_prov test_select test_persist; do
+for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_shapecheck test_prov test_select test_persist test_palette; do
     if [ ! -x "build/$b" ]; then
         # A MISSING binary is a failure, not a skip. "cannot check" and "checked and clean" must
         # never share an exit status.

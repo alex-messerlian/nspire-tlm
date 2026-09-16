@@ -73,11 +73,15 @@ int main(int argc, char **argv) {
             for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c}); }
         app_draw(); goto out;
     }
-    if (!strcmp(screen, "palette")) {
+    /* paletteN -> N presses of TAB, so every category gets looked at. The palette is categorised
+     * now and a layout that fits GREEK can still overflow UNITS, which has the widest labels. */
+    if (!strncmp(screen, "palette", 7)) {
         CUR = -1; MX = 300; MY = 220; FIELD_FOCUS = 1;
         const char *q = "Find kinetic energy. Given m = 2";
         for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c});
         app_event(&(in_event){.kind=IN_KEY,.key=K_SYM});
+        for (int i = 0, t = atoi(screen + 7); i < t; i++)
+            app_event(&(in_event){.kind=IN_KEY,.key=K_TAB});
         for (int i = 0; i < 5; i++) app_event(&(in_event){.kind=IN_KEY,.key=K_RIGHT});
         app_draw(); goto out;
     }
