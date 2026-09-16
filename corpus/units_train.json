@@ -110,7 +110,8 @@
    "E": "J",
    "h": "J*s"
   },
-  "scope": "m58776"
+  "scope": "m58776",
+  "req": "order-of-magnitude estimate from the uncertainty principle, not an exact lifetime"
  },
  {
   "f": "Delta_U=Q-W",
@@ -205,7 +206,8 @@
    "R": "m",
    "alpha": "1/s^2"
   },
-  "scope": "m58338"
+  "scope": "m58338",
+  "req": "rolling without slipping; in a burnout alpha is large while a_CM is near zero"
  },
  {
   "f": "epsilon=B*l*v",
@@ -268,7 +270,8 @@
    "C": "F",
    "R": "ohm"
   },
-  "scope": "m58458"
+  "scope": "m58458",
+  "req": "series RC circuit"
  },
  {
   "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
@@ -571,7 +574,8 @@
    "v_0x": "m/s"
   },
   "scope": "m42042",
-  "source": "worked-example"
+  "source": "worked-example",
+  "req": "projectile with no air resistance, so the horizontal velocity never changes"
  },
  {
   "f": "a=((m_2)/(m_1+m_2))*g",
@@ -583,7 +587,8 @@
    "m_2": "kg"
   },
   "scope": "m58303",
-  "source": "worked-example"
+  "source": "worked-example",
+  "req": "frictionless table, massless pulley and string"
  },
  {
   "f": "C_p=C_V+R",
@@ -637,7 +642,8 @@
    "r": "m",
    "theta": "1"
   },
-  "scope": "m58338"
+  "scope": "m58338",
+  "req": "rolling without slipping on the incline"
  },
  {
   "f": "C_V=((d)/(2))*R",
@@ -669,7 +675,8 @@
    "r_1": "m",
    "r_2": "m"
   },
-  "scope": "m58382"
+  "scope": "m58382",
+  "req": "isotropic source, nothing absorbing the wave between the two distances"
  },
  {
   "f": "K*E=((1)/(2))*m*(v)^(2)",
@@ -777,7 +784,8 @@
    "P": "W",
    "r": "m"
   },
-  "scope": "m58373"
+  "scope": "m58373",
+  "req": "isotropic source, nothing absorbing the wave"
  },
  {
   "f": "PE_elec=(Delta_m)(c)^(2)",
@@ -828,7 +836,8 @@
    "h": "J*s",
    "lambda": "m"
   },
-  "scope": "m54552"
+  "scope": "m54552",
+  "req": false
  },
  {
   "f": "v=v_0+a*t",
@@ -926,7 +935,8 @@
    "v": "m/s"
   },
   "scope": "m58734",
-  "source": "worked-example"
+  "source": "worked-example",
+  "req": "force along the direction of motion; otherwise only the component along v does work"
  },
  {
   "f": "Q=((omega_0)/(Delta_omega))",
@@ -958,7 +968,8 @@
    "v_0": "m/s"
   },
   "scope": "m58286",
-  "source": "worked-example"
+  "source": "worked-example",
+  "req": "free fall with no air resistance, upward positive, before impact"
  },
  {
   "f": "tau=R*F",
@@ -1022,7 +1033,8 @@
    "r": "m",
    "s": "m"
   },
-  "scope": "m58333"
+  "scope": "m58333",
+  "req": "theta in radians, which is what makes arc length equal r times the angle"
  },
  {
   "f": "f=((d_i*d_o)/(d_o+d_i))",
@@ -1032,7 +1044,8 @@
    "d_i": "m",
    "d_o": "m"
   },
-  "scope": "m54357"
+  "scope": "m54357",
+  "req": "paraxial rays, close to the axis"
  },
  {
   "f": "a_n=((a_0)/(n!))",
@@ -1052,7 +1065,8 @@
    "f": "m",
    "R": "m"
   },
-  "scope": "m58534"
+  "scope": "m58534",
+  "req": "paraxial rays, close to the axis; a far off-axis ray misses the focus"
  },
  {
   "f": "F=((m*Delta_v)/(Delta_t))",
@@ -1064,7 +1078,8 @@
    "m": "kg"
   },
   "scope": "m42159",
-  "source": "worked-example"
+  "source": "worked-example",
+  "req": "constant mass, and Delta_t is the interval over which the force acts"
  },
  {
   "f": "a=((v_c)/(t_1))",
@@ -1271,7 +1286,8 @@
    "omega_0": "1/s",
    "t": "s"
   },
-  "scope": "m58333"
+  "scope": "m58333",
+  "req": "constant angular acceleration"
  },
  {
   "f": "p_f=((h)/(lambda))",
@@ -1419,7 +1435,8 @@
    "V": "V"
   },
   "scope": "m58732",
-  "source": "worked-example"
+  "source": "worked-example",
+  "req": "ohmic material at constant temperature"
  },
  {
   "f": "N=m*g",
@@ -1582,7 +1599,8 @@
    "Delta_t": "s",
    "F_net": "N"
   },
-  "scope": "m54215"
+  "scope": "m54215",
+  "req": "constant net force over Delta_t; otherwise F_net is its average"
  },
  {
   "f": "m=F/a",
@@ -1647,7 +1665,8 @@
    "U": "J"
   },
   "scope": "m58314",
-  "source": "worked-example"
+  "source": "worked-example",
+  "req": "conservative forces only; friction makes E fall rather than hold"
  },
  {
   "f": "F_c=m*a_c",
@@ -1843,7 +1862,8 @@
    "I": "A",
    "R": "ohm"
   },
-  "scope": "m58735"
+  "scope": "m58735",
+  "req": "ohmic material at constant temperature; a diode does not obey it"
  },
  {
   "f": "E=h*f",
@@ -1895,7 +1915,8 @@
    "a": "m/s^2"
   },
   "scope": "canonical",
-  "source": "hand"
+  "source": "hand",
+  "req": "constant mass in an inertial frame; it fails on a rocket burning its own fuel"
  },
  {
   "f": "K=0.5*m*(v)^(2)",
@@ -2043,7 +2064,8 @@
    "F": "N"
   },
   "scope": "canonical",
-  "source": "hand"
+  "source": "hand",
+  "req": "velocity perpendicular to the field; otherwise only the perpendicular component counts"
  },
  {
   "f": "V=((k_e*q)/(r))",
@@ -2066,7 +2088,8 @@
    "sigma": "C/m^2"
   },
   "scope": "canonical",
-  "source": "hand"
+  "source": "hand",
+  "req": "just outside a charged conductor, below the field that makes air break down"
  },
  {
   "f": "F=G*m1*m2/(r)^(2)",
@@ -2091,7 +2114,8 @@
    "dT": "K"
   },
   "scope": "canonical",
-  "source": "hand"
+  "source": "hand",
+  "req": "no phase change over the interval; at the melting point dT stays flat"
  },
  {
   "f": "a=(vf-vi)/t",
@@ -2103,7 +2127,8 @@
    "t": "s"
   },
   "scope": "canonical",
-  "source": "hand"
+  "source": "hand",
+  "req": "constant acceleration; otherwise this is the average over t"
  },
  {
   "f": "v=f*L",

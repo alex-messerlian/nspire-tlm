@@ -133,8 +133,18 @@ def main():
     cond = re.compile(r"\b(only (if|while|when|holds|true)|assumes?|breaks? down|stops holding|"
                       r"quits|throw this out|no longer|as long as|so long as|ignores?|neglect\w*|"
                       r"frictionless|weightless|near the axis|close to the axis)\b", re.I)
-    skew = [(r["name"], v) for r, v in V
-            if cond.search(v) and not (store.get(r["formula"], {}).get("req") or "").strip()]
+    # THREE STATES, NOT TWO, which is store_pack.py's own convention and this first ignored it:
+    #   "req": <string>   the condition, which the device puts in the prompt
+    #   "req": false      REVIEWED, the relation carries no physical restriction
+    #   key absent        nobody has looked
+    # Treating `false` as "no req" reported the deBroglie relation as skewed for the sentence
+    # "That works only if a photon has momentum, and it does", which is rhetoric, not a condition,
+    # on a record somebody had already decided was unrestricted. `false` is a DECISION and is
+    # respected; only an absent or empty req counts.
+    def unreviewed(f):
+        rq = store.get(f, {}).get("req", None)
+        return rq is None or (isinstance(rq, str) and not rq.strip())
+    skew = [(r["name"], v) for r, v in V if cond.search(v) and unreviewed(r["formula"])]
     print(f"        OPEN, reported not gated: {len(skew)} variants state a condition their record's "
           f"`req` does not carry, so the prompt will read 'standard conditions'.")
     print(f"        docs/RESULT_F1_PROSE.md; either those conditions belong in req (and in "

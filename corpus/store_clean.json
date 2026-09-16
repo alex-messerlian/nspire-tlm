@@ -100,7 +100,8 @@
   "rid": "e596c35a",
   "cval": {
    "h": "6.626e-34"
-  }
+  },
+  "req": "order-of-magnitude estimate from the uncertainty principle, not an exact lifetime"
  },
  {
   "f": "Delta_U=Q-W",
@@ -206,7 +207,8 @@
   },
   "scope": "m58338",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "79b5145a"
+  "rid": "79b5145a",
+  "req": "rolling without slipping; in a burnout alpha is large while a_CM is near zero"
  },
  {
   "f": "epsilon=B*l*v",
@@ -258,7 +260,8 @@
   },
   "scope": "m58458",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "6938afd5"
+  "rid": "6938afd5",
+  "req": "series RC circuit"
  },
  {
   "f": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
@@ -491,7 +494,8 @@
   "scope": "m42042",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "2c78f2d0"
+  "rid": "2c78f2d0",
+  "req": "projectile with no air resistance, so the horizontal velocity never changes"
  },
  {
   "f": "a=((m_2)/(m_1+m_2))*g",
@@ -508,7 +512,8 @@
   "rid": "8e6fab7b",
   "cval": {
    "g": "9.81"
-  }
+  },
+  "req": "frictionless table, massless pulley and string"
  },
  {
   "f": "C_p=C_V+R",
@@ -553,7 +558,8 @@
   "rid": "7600847d",
   "cval": {
    "g": "9.81"
-  }
+  },
+  "req": "rolling without slipping on the incline"
  },
  {
   "f": "C_V=((d)/(2))*R",
@@ -581,7 +587,8 @@
   },
   "scope": "m58382",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "a1c77827"
+  "rid": "a1c77827",
+  "req": "isotropic source, nothing absorbing the wave between the two distances"
  },
  {
   "f": "F=q*v*B*sin(theta)",
@@ -659,7 +666,8 @@
   },
   "scope": "m58373",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "e885ea28"
+  "rid": "e885ea28",
+  "req": "isotropic source, nothing absorbing the wave"
  },
  {
   "f": "I=((((Delta_p_max))^(2))/(2*rho*v))",
@@ -710,7 +718,8 @@
   "rid": "623dd433",
   "cval": {
    "h": "6.626e-34"
-  }
+  },
+  "req": false
  },
  {
   "f": "v=v_0+a*t",
@@ -812,7 +821,8 @@
   "scope": "m58734",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "e9fca28e"
+  "rid": "e9fca28e",
+  "req": "force along the direction of motion; otherwise only the component along v does work"
  },
  {
   "f": "Q=((omega_0)/(Delta_omega))",
@@ -853,7 +863,8 @@
   "rid": "90852813",
   "cval": {
    "g": "9.81"
-  }
+  },
+  "req": "free fall with no air resistance, upward positive, before impact"
  },
  {
   "f": "W_o=F_o*d_o",
@@ -890,7 +901,8 @@
   },
   "scope": "m58333",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "4aca8d85"
+  "rid": "4aca8d85",
+  "req": "theta in radians, which is what makes arc length equal r times the angle"
  },
  {
   "f": "f=((d_i*d_o)/(d_o+d_i))",
@@ -902,7 +914,8 @@
   },
   "scope": "m54357",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "b2042904"
+  "rid": "b2042904",
+  "req": "paraxial rays, close to the axis"
  },
  {
   "f": "f=((R)/(2))",
@@ -913,7 +926,8 @@
   },
   "scope": "m58534",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "cb81ba93"
+  "rid": "cb81ba93",
+  "req": "paraxial rays, close to the axis; a far off-axis ray misses the focus"
  },
  {
   "f": "F=((m*Delta_v)/(Delta_t))",
@@ -927,7 +941,8 @@
   "scope": "m42159",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "448943fb"
+  "rid": "448943fb",
+  "req": "constant mass, and Delta_t is the interval over which the force acts"
  },
  {
   "f": "n=((K/E_1))^(1/2)",
@@ -1099,7 +1114,8 @@
   },
   "scope": "m58333",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "91cbfe4e"
+  "rid": "91cbfe4e",
+  "req": "constant angular acceleration"
  },
  {
   "f": "theta_r=theta_i",
@@ -1219,7 +1235,8 @@
   "scope": "m58732",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "8d2cb915"
+  "rid": "8d2cb915",
+  "req": "ohmic material at constant temperature"
  },
  {
   "f": "N=m*g",
@@ -1392,7 +1409,8 @@
   },
   "scope": "m54215",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "1672f61e"
+  "rid": "1672f61e",
+  "req": "constant net force over Delta_t; otherwise F_net is its average"
  },
  {
   "f": "R_eqv=((1)/(1/R_1+1/R_2))",
@@ -1433,7 +1451,8 @@
   "scope": "m58314",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "da1e3585"
+  "rid": "da1e3585",
+  "req": "conservative forces only; friction makes E fall rather than hold"
  },
  {
   "f": "F_c=m*a_c",
@@ -1605,7 +1624,8 @@
   },
   "scope": "m58735",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "8f12b5dc"
+  "rid": "8f12b5dc",
+  "req": "ohmic material at constant temperature; a diode does not obey it"
  },
  {
   "f": "E=h*f",
@@ -1658,7 +1678,8 @@
   "scope": "canonical",
   "source": "hand",
   "verified": "unverifiable-no-source",
-  "rid": "5d4d128a"
+  "rid": "5d4d128a",
+  "req": "constant mass in an inertial frame; it fails on a rocket burning its own fuel"
  },
  {
   "f": "K=0.5*m*(v)^(2)",
@@ -1799,7 +1820,8 @@
   "scope": "canonical",
   "source": "hand",
   "verified": "unverifiable-no-source",
-  "rid": "5f2c9c2b"
+  "rid": "5f2c9c2b",
+  "req": "velocity perpendicular to the field; otherwise only the perpendicular component counts"
  },
  {
   "f": "V=((k_e*q)/(r))",
@@ -1832,7 +1854,8 @@
   "rid": "d1109352",
   "cval": {
    "epsilon_0": "8.854e-12"
-  }
+  },
+  "req": "just outside a charged conductor, below the field that makes air break down"
  },
  {
   "f": "F=G*m1*m2/(r)^(2)",
@@ -1864,7 +1887,8 @@
   "scope": "canonical",
   "source": "hand",
   "verified": "unverifiable-no-source",
-  "rid": "b67a93e8"
+  "rid": "b67a93e8",
+  "req": "no phase change over the interval; at the melting point dT stays flat"
  },
  {
   "f": "a=(vf-vi)/t",
@@ -1878,7 +1902,8 @@
   "scope": "canonical",
   "source": "hand",
   "verified": "unverifiable-no-source",
-  "rid": "e3c3da51"
+  "rid": "e3c3da51",
+  "req": "constant acceleration; otherwise this is the average over t"
  },
  {
   "f": "d=vi*t+0.5*a*(t)^(2)",
@@ -2023,7 +2048,8 @@
   },
   "scope": "m54176",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "b891bbb8"
+  "rid": "b891bbb8",
+  "req": "average angular speed over the interval, in radians per second"
  },
  {
   "f": "y=y_0+v_0*t-((1)/(2))*g*(t)^(2)",
@@ -2040,7 +2066,8 @@
   "rid": "11a8fb85",
   "cval": {
    "g": "9.81"
-  }
+  },
+  "req": "free fall with no air resistance and constant g, upward positive"
  },
  {
   "f": "B=((mu_0*I)/(2*pi*R))",
@@ -2098,7 +2125,8 @@
   "scope": "m42042",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "776a4aba"
+  "rid": "776a4aba",
+  "req": "constant acceleration, so the average velocity is half the sum of the ends"
  },
  {
   "f": "E=n*h*f",
@@ -2127,7 +2155,8 @@
   "scope": "m54442",
   "source": "worked-example",
   "verified": "gates-passed-hand-coverage-unproven",
-  "rid": "77e7a335"
+  "rid": "77e7a335",
+  "req": "resistors in series, with nothing branching off between them"
  },
  {
   "f": "a_c=(((v)^(2))/(r))",
@@ -2155,7 +2184,8 @@
   "rid": "2a4a8866",
   "cval": {
    "g": "9.81"
-  }
+  },
+  "req": "projectile returning to its launch height, no air resistance"
  },
  {
   "f": "T=2*pi*sqrt(((m)/(k)))",
