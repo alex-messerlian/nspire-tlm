@@ -47,9 +47,23 @@ def input_hash():
     return h.hexdigest()[:16]
 
 
+# THE HASH IS TAKEN AT IMPORT, NOT AT WRITE.
+#
+# generate.py calls write() at the END of a run that takes twenty minutes. input_hash() reads
+# corpus/generate.py and seven data files FROM DISK, so editing any of them mid-run stamped the
+# corpus with the hash of code that did not produce it -- and gate_corpus_fresh would then PASS on
+# a corpus built by the old generator. A FALSE GREEN, and the one this stamp exists to prevent.
+#
+# Same lesson as A50, which moved corpus_sha to the START of select_run.py for the same reason: a
+# long-running producer must pin its inputs when it READS them, not when it finishes. I hit this
+# while the regeneration was live and had to leave the generator alone for twenty minutes rather
+# than trigger it.
+_HASH_AT_IMPORT = input_hash()
+
+
 def write(n_docs):
     (ROOT / "corpus/synth_stamp.json").write_text(json.dumps({
-        "input_hash": input_hash(),
+        "input_hash": _HASH_AT_IMPORT,
         "n_docs": n_docs,
         "inputs": INPUTS,
         "_doc": "Written by corpus/generate.py. tools/eval/gate_corpus_fresh.py recomputes this "

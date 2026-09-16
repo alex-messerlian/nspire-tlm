@@ -1,5 +1,5 @@
 {
- "input_hash": "99018884961791ae",
+ "input_hash": "9c4b0914dd259327",
  "n_docs": 239853,
  "inputs": [
   "corpus/generate.py",
@@ -9,7 +9,8 @@
   "corpus/d3_stems.json",
   "corpus/symbol_map.json",
   "corpus/empirical_values.json",
-  "corpus/asks_dev.json"
+  "corpus/asks_dev.json",
+  "corpus/records_raw.json"
  ],
  "_doc": "Written by corpus/generate.py. tools/eval/gate_corpus_fresh.py recomputes this and fails when corpus/synth_sample.jsonl was produced by different inputs."
 }
