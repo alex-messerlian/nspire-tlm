@@ -21,9 +21,25 @@ as head coverage printing 979.9%: a second population arrived and the denominato
 """
 import collections
 import json
+import os
 
 KNOWLEDGE_KINDS = {"K1", "K2", "K3"}
 BANDS = {"D1": (0.08, 0.12), "D2": (0.03, 0.07)}
+
+# THE CORPUS SIZE IS PART OF THE EXPERIMENT AND IT IS THE COMPUTE TIER'S SIZE.
+#
+# corpus/generate.py's N argument sizes the COMPUTE corpus; the knowledge tier is a fixed 52,385
+# documents determined by the glossary and the dose, not by N. Checking the total against 240,000
+# therefore fails a correct corpus by exactly the size of the tier, which is the fourth time today
+# that a second population arrived and a denominator did not move -- after head coverage printing
+# 979.9%, gate_store_coverage counting knowledge records against 164, and the D1/D2 bands.
+#
+# The guard itself is not weakened. It exists because generate.py defaults to N=10,000 while run 2
+# trained on 239,942, so an ordinary `python corpus/generate.py` between runs silently shrinks the
+# compute corpus 24x and the run still converges and is comparable to nothing. That is still caught,
+# against the population the number describes.
+COMPUTE_DOCS = 240000
+SIZE_TOL = 0.02
 
 
 def check(path="corpus/synth_sample.jsonl", verbose=True):
@@ -45,6 +61,14 @@ def check(path="corpus/synth_sample.jsonl", verbose=True):
 
     assert any("fit:low" in d["text"] for d in docs), "corpus contains no fit:low documents"
 
+    want = int(os.environ.get("CORPUS_DOCS", COMPUTE_DOCS))
+    assert abs(ctot - want) <= SIZE_TOL * want, (
+        f"the COMPUTE tier holds {ctot:,} documents, expected {want:,} "
+        f"(+/-{100*SIZE_TOL:.0f}%). Regenerate with `python corpus/generate.py {want}`, or set "
+        f"CORPUS_DOCS deliberately. A run at the wrong corpus size converges and is comparable to "
+        f"nothing. The knowledge tier is sized by the glossary and the dose, not by N, so it is "
+        f"counted separately.")
+
     if verbose:
         nk = tot - ctot
         print("  corpus composition: "
@@ -53,8 +77,8 @@ def check(path="corpus/synth_sample.jsonl", verbose=True):
             kk = collections.Counter(d.get("kind") for d in docs if d.get("kind") in KNOWLEDGE_KINDS)
             print(f"  knowledge tier: {nk:,} documents ({100*nk/tot:.1f}% of the corpus) {dict(kk)}",
                   flush=True)
-            print(f"  bands checked against the {ctot:,} compute documents, not the {tot:,} total",
-                  flush=True)
+            print(f"  bands and size checked against the {ctot:,} compute documents, "
+                  f"not the {tot:,} total", flush=True)
     return docs, kinds
 
 

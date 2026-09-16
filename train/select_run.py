@@ -43,23 +43,8 @@ ANS=[i for i in SEL if i["expect"]=="answer"]; REFI=[i for i in SEL if i["expect
 print(f"  seed {SEED}  corpus " + " ".join(f"{a} {100*b/tot:.0f}%" for a,b in kinds.most_common())
       + f"  SELECT {len(ANS)} answer / {len(REFI)} refuse", flush=True)
 
-# THE CORPUS SIZE IS PART OF THE EXPERIMENT AND NOTHING USED TO CHECK IT.
-#
-# train/prepare.py reads corpus/synth_sample.jsonl WHOLE, so that file IS the training corpus and
-# its length sets the token budget. corpus/generate.py defaults to N=10,000 while run 2 trained on
-# 239,942 -- so an ordinary `python corpus/generate.py` between runs silently shrinks the corpus
-# 24x, and the run still completes, still converges, and is not comparable to anything.
-#
-# Caught by review before it happened, not after. docs/PREREG_FIT_RETRAIN.md fixes the size for
-# the fit-judgement retrain; CORPUS_DOCS overrides it deliberately for a smaller probe run.
-_want = int(os.environ.get("CORPUS_DOCS", "240000"))
-_tol = 0.02
-assert abs(tot - _want) <= _tol * _want, (
-    f"corpus/synth_sample.jsonl holds {tot:,} documents, expected {_want:,} (+/-{100*_tol:.0f}%). "
-    f"Regenerate with `python corpus/generate.py {_want}`, or set CORPUS_DOCS deliberately. "
-    f"A run at the wrong corpus size converges and is comparable to nothing.")
-print(f"  corpus size check: {tot:,} documents, within {100*_tol:.0f}% of the expected {_want:,}",
-      flush=True)
+# The corpus size guard lives in train/corpus_check.py with the composition bands: both are
+# facts about the COMPUTE tier, and keeping them apart is how one of them got the wrong denominator.
 
 # A49. TWO ARTEFACTS THIS RUN IS ABOUT TO DESTROY, AND NEITHER LOSS ANNOUNCES ITSELF.
 #
