@@ -102,7 +102,7 @@ def refusal_strict(prompt, generation):
     return "<tool>" not in generation and grade.refusal_ok(prompt, generation)
 
 
-CANON_REFUSAL = "<a>I cannot answer that — the record gives something else, which does not apply.<end>"
+CANON_REFUSAL = "<a>I cannot answer that: the record gives something else, which does not apply.<end>"
 CANON_ANSWER = "<tool>eval<arg>(1.0)*(2.0)</tool><res>2.0</res><a>The result is 2.0.<end>"
 
 

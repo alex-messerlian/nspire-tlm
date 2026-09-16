@@ -2022,7 +2022,7 @@ EXPLAIN_ASK_Q   = ["what is {s}?", "define {s}.", "explain what {s} is.", "how d
 # state it unless the question did.
 EXPLAIN_CLOSE_REL = ["{S} is {f}, with {u}.",
                      "{S}: {f}. Here {u}.",
-                     "{S} states that {f} — {u}.",
+                     "{S} states that {f}, where {u}.",
                      "{S} is the relation {f}, where {u}.",
                      "{S} is {f}, with {u}, under {c}."]
 EXPLAIN_CLOSE_Q   = ["{S} is given by {f}, with {u}.",
@@ -2665,7 +2665,7 @@ def gen(n, seed=0):
             # why the literal is written out here rather than composed from the five-field builder:
             # this prompt has no record, so it has no units, no condition and no formula, and
             # composing it would invite the fields back in.
-            ans = "I cannot answer that — no record matches this question."
+            ans = "I cannot answer that: no record matches this question."
             built.append({"head": d["head"], "kind": "D3", "ans": ans,
                           "text": f"<q>{d['q']}</q><r>none | missing:none | "
                                   f"no matching relation | fit:low<a>{ans}<end>"})
@@ -2710,9 +2710,9 @@ def gen(n, seed=0):
             # is the other fix and it is worse twice over: it is a device change, and A9 measured
             # that widening the prompt makes this model refuse MORE.
             _mm = d["mismatch"]
-            ans = (f"I cannot answer that — the record shown computes {_mm['lhs']} from "
+            ans = (f"I cannot answer that: the record shown computes {_mm['lhs']} from "
                    f"{_mm['from']}, which does not apply." if _mm["from"] else
-                   f"I cannot answer that — the record shown computes {_mm['lhs']}, "
+                   f"I cannot answer that: the record shown computes {_mm['lhs']}, "
                    f"which does not apply.")
             built.append({"head": d["head"], "kind": "D2",
                           "text": f"<q>{d['q']}</q><r>{d['rec']}<a>{ans}<end>", "ans": ans})
@@ -2730,7 +2730,7 @@ def gen(n, seed=0):
             # itself by moving a grader. An answer that ASKS instead of refusing is the better
             # design and it needs a second device turn -- app_request builds one prompt and returns
             # -- so it is filed rather than smuggled in here.
-            ans = f"I cannot answer that — {d['withhold']} is not given."
+            ans = f"I cannot answer that: {d['withhold']} is not given."
             if d.get("need"):
                 _nd = d["need"]
                 _lst = _nd[0] if len(_nd) == 1 else ", ".join(_nd[:-1]) + " and " + _nd[-1]

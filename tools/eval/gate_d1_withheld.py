@@ -19,7 +19,11 @@ gate does, and the defect it was written for is its own negative control.
 import json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-CLAIM = re.compile(r"[—-]\s*([A-Za-z_][A-Za-z0-9_]*) is not given")
+# The separator accepts a colon OR an em dash. The corpus is migrating off the em dash at the
+# user's request and a corpus generated before that change must still be checkable; the property
+# here is "the refusal names a variable", and which punctuation precedes it is incidental. An
+# answer that names NOTHING still counts as unparsed and still fails, which is the real guard.
+CLAIM = re.compile(r"[:—-]\s*([A-Za-z_][A-Za-z0-9_]*) is not given")
 GIVEN = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)\s*=")
 
 
@@ -44,7 +48,7 @@ def control():
     """The predicate must separate a known-bad from a known-good; a clean tree proves neither."""
     bad_q = "Where r = 2.42, q = 3.71e-07, calculate electric potential."
     good_q = "Where r = 2.42, calculate electric potential."
-    ans = "I cannot answer that — q is not given."
+    ans = "I cannot answer that: q is not given."
     v = CLAIM.search(ans).group(1)
     return v in set(GIVEN.findall(bad_q)) and v not in set(GIVEN.findall(good_q))
 
