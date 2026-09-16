@@ -169,7 +169,20 @@ int main(int argc, char **argv) {
     case_formula("explain hookes law", "F=-k*x");
     case_formula("whats hooks law", "F=-k*x");         /* and misspelt, which needs A56 or A54 */
     case_formula("what is Hooke's law", "F=-k*x");     /* the apostrophe form still works */
-    case_formula("newtons second law", "F_net=m*a");
+    /* A67 CHANGED THIS EXPECTATION, and it is changed because the DEVICE TEST called the old one
+     * wrong, not because the new ranker happens to produce it. The store carries two records:
+     *
+     *     F=m*a      "Newton's second law"
+     *     F_net=m*a  "Newton's second law, scalar form"
+     *
+     * and the user typed "newton second law" on the calculator and reported back: "newton second
+     * law first suggested the scalar version or smth". The bare name is the exact name of F=m*a;
+     * the other carries a qualifier the question did not ask for. Name coverage prefers the record
+     * whose name IS the query over one that merely contains it, which is the whole point of the
+     * term, and this is the case that says so. */
+    case_formula("newtons second law", "F=m*a");
+    case_formula("newton second law", "F=m*a");        /* the device transcript's exact input */
+    case_formula("what is newtons second law", "F=m*a");
     /* THE CONTROL IS MEASURED, NOT ASSERTED HERE, and the first version of this line got that
      * wrong: I asserted "A runner averages 5.5 m/s for 1320 s. How far?" should return v=d/t. It
      * never did -- before or after the change -- so the assertion described a behaviour that has

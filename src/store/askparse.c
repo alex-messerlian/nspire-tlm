@@ -208,7 +208,10 @@ static int idf16(const char *w) {
  *
  * A record name is a bag of DISTINCT terms for retrieval purposes; repeating one is a property of
  * the phrasing, not evidence about the question. Dedupe is per record, reset by score_record. */
-struct sctx { const char *q; int score; int mode; char seen[12][24]; int nseen; };
+/* nterms/nmatch drive the COVERAGE bonus in score_record: see there for why a sum alone is the
+ * wrong shape for a ranking over names of very different lengths. */
+struct sctx { const char *q; int score; int mode; char seen[12][24]; int nseen;
+              int nterms; int nmatch; };
 /* A56. Fuzzy matching is the SHIPPING DEFAULT, and ask_fuzz_set(0) is the control. Subject and
  * control are the same binary, which is the discipline rankcli's own header states.
  *
@@ -231,8 +234,13 @@ struct sctx { const char *q; int score; int mode; char seen[12][24]; int nseen; 
 static int FUZZ_ON = 1;
 void ask_fuzz_set(int on) { FUZZ_ON = on; }
 
+/* A67 name-coverage: 1 shipping, 0 off, 2 the shuffled control. See score_record. */
+static int COV_MODE = 1;
+void ask_cov_set(int m) { COV_MODE = m; }
+
 static void score_word(const char *w, void *v) {
     struct sctx *c = (struct sctx *)v;
+    /* A dedupe hit is the SAME term again (A55), so it is neither a new term nor a new match. */
     for (int i = 0; i < c->nseen; i++) if (!strcmp(c->seen[i], w)) return;
     if (c->nseen < 12) {                       /* no stdio in device code -- bounded copy */
         char *d = c->seen[c->nseen]; int n = 0;
@@ -243,11 +251,13 @@ static void score_word(const char *w, void *v) {
         /* A FUZZY HIT IS WEAKER EVIDENCE THAN AN EXACT ONE and must not outrank it. Half weight:
          * two fuzzy matches still lose to two exact ones, and a fuzzy match only decides a record
          * that would otherwise have scored nothing. */
-        if (!(FUZZ_ON && word_near(c->q, w))) return;
+        if (!(FUZZ_ON && word_near(c->q, w))) { c->nterms++; return; }   /* a term, not a match */
         c->score += ((c->mode == ASK_IDF) ? idf16(w) : 16) / 2;
+        c->nterms++; c->nmatch++;
         return;
     }
     c->score += (c->mode == ASK_IDF) ? idf16(w) : 16;
+    c->nterms++; c->nmatch++;
 }
 
 /* THE QUESTION NAMES THE PHYSICS; THE RECORD NAMES THE EPONYM.
@@ -341,19 +351,99 @@ static int score_record(const ns_store2 *st, int r, const char *question,
     const char *nm = st->rec[r].name;
     if (!nm || !nm[0]) return 0;
     int qty = (mode == ASK_QTY || mode == ASK_QSHUF || mode == ASK_NOUN || mode == ASK_NSHUF);
-    struct sctx c = { question, 0, qty ? ASK_IDF : mode, {{0}}, 0 };
+    struct sctx c = { question, 0, qty ? ASK_IDF : mode, {{0}}, 0, 0, 0 };
     each_word(nm, score_word, &c);
+    int name_score = c.score;      /* what the NAME earned, before qty/noun cues and variables */
+    /* A67. NAME COVERAGE. The score above is a SUM over matched name words, so a long name that
+     * merely CONTAINS the question outscores a name that IS the question:
+     *
+     *   "what is acceleration?"  ->  "Acceleration of center of mass of rolling object"
+     *   "what is AC current?"    ->  "rms current"
+     *
+     * both measured on the 1,607-record store, and both wrong for the same reason. The record
+     * named exactly "acceleration" matched 1 of 1 of its words; the rolling-object record matched
+     * 1 of 7 and scored the same. A sum cannot tell those apart, because it never looks at what it
+     * did NOT match.
+     *
+     * The bonus is proportional to the FRACTION of the record's own name the question accounted
+     * for, so a fully-matched name is rewarded and a fully-matched name that is also SHORT is
+     * rewarded most. It is added, not multiplied: multiplying would let coverage overturn a record
+     * that matched more words in absolute terms, which is the opposite failure.
+     *
+     * Scaled to 16 per word, the unit every other term here uses. */
+    if (c.nterms > 0 && c.nmatch > 0) {
+        /* THE CONTROL LIVES IN THE SAME BINARY, which is the discipline this repo already applies
+         * to fuzzy matching and to the topic-scoping experiment. COV_SHUFFLE replaces this
+         * record's own name length with another record's, so every record still receives a bonus
+         * drawn from the same distribution and ONLY THE ASSOCIATION between a record and its own
+         * coverage is broken. If the measured gain survives that, the gain was "more points" and
+         * not "the right record"; the size-matched-random-subset discipline, applied to a scorer.
+         *
+         *   ask_cov_set(1)  shipping
+         *   ask_cov_set(0)  no coverage term at all
+         *   ask_cov_set(2)  the control
+         */
+        int denom = c.nterms;
+        if (COV_MODE == 2) {
+            const char *onm = st->rec[(r + 7) % st->n].name;
+            struct sctx c2 = { question, 0, c.mode, {{0}}, 0, 0, 0 };
+            if (onm && onm[0]) each_word(onm, score_word, &c2);
+            if (c2.nterms > 0) denom = c2.nterms;
+        }
+        /* PROPORTIONAL TO WHAT THE NAME EARNED, not a flat bonus, and the first version was flat.
+         *
+         * A flat `16 * 2 * nmatch / nterms` regressed "what is force, k = 500, x = 0.4" from
+         * Hooke's law to DRAG FORCE: the question supplies k and x, which are two of Hooke's three
+         * variables and the strongest evidence any question carries, while "Drag force" matched the
+         * single generic word "force" at 1 of 2 coverage and collected a bonus big enough to pass
+         * it. Covering a name made of common words is not evidence; the flat form could not tell
+         * the difference because it ignored WHICH words were covered.
+         *
+         * Scaling by name_score carries the IDF weighting through: a record that earned little
+         * from its name gets little coverage bonus, and an exact match on a rare name doubles. */
+        /* QUADRATIC IN COVERAGE, and the linear form was measured wrong. Linear gives a 2-word
+         * name that matched ONE generic word a half-weight bonus, which is what took
+         * "what is force, k = 500, x = 0.4" from Hooke's law to DRAG FORCE: the question supplies
+         * k and x, two of Hooke's three variables and the strongest evidence a question carries,
+         * and "Drag force" passed it on the single word "force".
+         *
+         * Squaring makes partial coverage cheap and complete coverage full:
+         *
+         *   1 of 1  -> 1.00   "acceleration", the case this exists for
+         *   3 of 4  -> 0.56   "Newton's second law" against "newtons second law"
+         *   1 of 2  -> 0.25   "Drag force" on the word "force"
+         *   1 of 7  -> 0.02   "Acceleration of center of mass of rolling object"
+         */
+        if (COV_MODE != 0 && name_score > 0 && denom > 0)
+            c.score += (name_score * c.nmatch * c.nmatch) / (denom * denom);
+    }
     if (qty) {
         c.mode = (mode == ASK_QSHUF) ? ASK_QSHUF : ASK_QTY;
         score_qty(st, r, question, &c);
         if (mode == ASK_NOUN || mode == ASK_NSHUF) { c.mode = mode; score_nouns(st, r, question, &c); }
     }
     if (use_vars && in) {
+        int vmatch = 0, vfree = 0;
+        for (int k = 0; k < st->rec[r].nvars; k++)
+            if (!(st->rec[r].lhs && !strcmp(st->rec[r].var[k], st->rec[r].lhs))) vfree++;
         for (int v = 0; v < in->nvals; v++)
             for (int k = 0; k < st->rec[r].nvars; k++) {
                 if (st->rec[r].lhs && !strcmp(st->rec[r].var[k], st->rec[r].lhs)) continue;
-                if (!strcmp(st->rec[r].var[k], in->var[v])) { c.score += 16; break; }
+                if (!strcmp(st->rec[r].var[k], in->var[v])) { c.score += 16; vmatch++; break; }
             }
+        /* VARIABLE COVERAGE, the same quadratic shape as name coverage and for the same reason.
+         *
+         * Without it the two signals were asymmetric: covering a record's NAME was rewarded and
+         * accounting for all of its INPUTS was not. "what is force, k = 500, x = 0.4" supplies
+         * both free variables of F=-k*x, which is the strongest evidence a question carries -- the
+         * note above says so -- and Hooke's law still lost to "Drag force", which matched the one
+         * generic word "force" and 0 of its 4 variables.
+         *
+         * A record whose inputs the question fully accounts for is very probably the record meant.
+         * A record sharing one common word is not. Squaring keeps a single incidental variable
+         * match cheap, exactly as it does for names. */
+        if (COV_MODE != 0 && vfree > 0 && vmatch > 0)
+            c.score += (16 * 2 * vmatch * vmatch) / (vfree * vfree);
     }
     return c.score;
 }

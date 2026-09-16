@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
      * default was doing the deciding and nothing said so. Default here is the SHIPPING
      * configuration, so this binary answers "what does the device do". */
     ask_fuzz_set(argc > 3 ? atoi(argv[3]) : 1);
+    ask_cov_set(argc > 4 ? atoi(argv[4]) : 1);   /* 0 off, 1 shipping, 2 shuffled control */
     if (ns_load(&st, argc > 1 ? argv[1] : "build/store.tns") != NS_OK) return 2;
     char line[2048];
     while (fgets(line, sizeof line, stdin)) {

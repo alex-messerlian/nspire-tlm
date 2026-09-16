@@ -54,3 +54,5 @@ void ask_parse(const char *question, ns_ask *a);
 void ask_build(const ns_store2 *st, const char *question, ns_ask *a);
 #endif
 void ask_fuzz_set(int on);
+/* A67 name-coverage bonus: 1 shipping, 0 off, 2 shuffled control. Subject and control, one binary. */
+void ask_cov_set(int m);
