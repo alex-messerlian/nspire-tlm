@@ -58,6 +58,28 @@ static void each_word(const char *name, void (*fn)(const char *, void *), void *
         if (*c && alpha(*c) && w < (int)sizeof word - 1) { word[w++] = (char)lc(*c); }
         else {
             if (w >= 3) { word[w] = 0; if (!is_stopword(word)) fn(word, ctx); }
+            /* A54. A POSSESSIVE IN A RECORD NAME IS ALSO REACHABLE WITHOUT THE APOSTROPHE.
+             *
+             * "Hooke's law" splits here into "hooke" and "law" -- the lone "s" is below the
+             * length-3 floor -- so a student who CANNOT FIND THE APOSTROPHE on the keypad and
+             * types "hookes law" matched neither, and the picker returned LAW OF REFRACTION.
+             * Measured on device: the Hooke's law demo was unreachable.
+             *
+             * So the NAME also offers "hookes". This is deliberately narrower than relaxing the
+             * matcher to accept any trailing 's': that version was built and measured first, and
+             * it made SEVEN of 200 eval questions falsely match a record where nothing matched
+             * before ("A runner averages 5.5 m/s for 1320 s. How far?" -> P_ave=I_rms*V_rms),
+             * because it also turned "seconds"/"lengths"/"cables" into matches. Retrieval@1 was
+             * unchanged at 18.4% either way, so the plural half bought nothing and cost seven
+             * confident wrong suggestions. This form touches possessives only.
+             *
+             * Both scorer and document-frequency count run through this same walk, so the extra
+             * word is counted consistently by construction -- the invariant this function's
+             * docstring already states. */
+            if (w >= 3 && *c == '\'' && lc(c[1]) == 's' && !alpha(c[2])) {
+                word[w] = 's'; word[w + 1] = 0;
+                if (!is_stopword(word)) fn(word, ctx);
+            }
             w = 0;
             if (!*c) break;
         }
@@ -110,9 +132,23 @@ static int idf16(const char *w) {
     return 16 * (bits + 1) / 2;
 }
 
-struct sctx { const char *q; int score; int mode; };
+/* A55. A WORD REPEATED IN ONE RECORD NAME WAS SCORED ONCE PER OCCURRENCE.
+ *
+ * "Law of refraction (Snell's law)" contains "law" TWICE, so a question saying "law" scored it 2
+ * while "Hooke's law" -- which genuinely matched two distinct words -- also scored 2, and the tie
+ * went to Snell. Measured: "what is hookes law" returned LAW OF REFRACTION from ask_pick.
+ *
+ * A record name is a bag of DISTINCT terms for retrieval purposes; repeating one is a property of
+ * the phrasing, not evidence about the question. Dedupe is per record, reset by score_record. */
+struct sctx { const char *q; int score; int mode; char seen[12][24]; int nseen; };
 static void score_word(const char *w, void *v) {
     struct sctx *c = (struct sctx *)v;
+    for (int i = 0; i < c->nseen; i++) if (!strcmp(c->seen[i], w)) return;
+    if (c->nseen < 12) {                       /* no stdio in device code -- bounded copy */
+        char *d = c->seen[c->nseen]; int n = 0;
+        while (w[n] && n < (int)sizeof c->seen[0] - 1) { d[n] = w[n]; n++; }
+        d[n] = 0; c->nseen++;
+    }
     if (!word_in(c->q, w)) return;
     c->score += (c->mode == ASK_IDF) ? idf16(w) : 16;
 }
@@ -208,7 +244,7 @@ static int score_record(const ns_store2 *st, int r, const char *question,
     const char *nm = st->rec[r].name;
     if (!nm || !nm[0]) return 0;
     int qty = (mode == ASK_QTY || mode == ASK_QSHUF || mode == ASK_NOUN || mode == ASK_NSHUF);
-    struct sctx c = { question, 0, qty ? ASK_IDF : mode };
+    struct sctx c = { question, 0, qty ? ASK_IDF : mode, {{0}}, 0 };
     each_word(nm, score_word, &c);
     if (qty) {
         c.mode = (mode == ASK_QSHUF) ? ASK_QSHUF : ASK_QTY;

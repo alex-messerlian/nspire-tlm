@@ -144,6 +144,34 @@ int main(int argc, char **argv) {
     ask_build(&ST, "m = 2, v = 3", &A);
     ck(A.question && A.question[0], "a values-only question still survives the trim", A.question);
 
+    printf("\n-- A54: a possessive record name is reachable without the apostrophe ------\n");
+    /* MEASURED ON DEVICE: the user could not find the apostrophe on the keypad, typed
+     * "what is hookes law", and the picker returned LAW OF REFRACTION -- then the model explained
+     * Snell's law confidently and one sample fabricated a number. "Hooke's law" splits into
+     * "hooke" and "law" (the lone "s" is under the length floor), so "hookes" matched neither. */
+    case_formula("what is hookes law", "F=-k*x");
+    /* NOT asserted here, and the reason is a finding: THERE ARE TWO RANKERS. The device
+     * shows pk_open's SHORTLIST, which returns Hooke's law for "hookes law", "what is
+     * hookes law", "explain hookes law" and the form with values -- verified via
+     * build/devprompt. ask_build's auto-pick still ties on the bare two-word form, because
+     * Snell picks up a second point from the quantity/noun scoring that the shortlist
+     * weighs differently. Same class as every other two-implementations defect in this
+     * repo; recorded in docs/RESULT_DEVICE_TEST_1.md rather than papered over with an
+     * expectation that matches whichever path I happened to call. */
+    case_formula("what is Hooke's law", "F=-k*x");     /* the apostrophe form still works */
+    case_formula("newtons second law", "F_net=m*a");
+    /* THE CONTROL IS MEASURED, NOT ASSERTED HERE, and the first version of this line got that
+     * wrong: I asserted "A runner averages 5.5 m/s for 1320 s. How far?" should return v=d/t. It
+     * never did -- before or after the change -- so the assertion described a behaviour that has
+     * never existed and failed for that reason rather than finding anything.
+     *
+     * What IS measured, by rebuilding rankcli from a patched copy outside the tree and diffing
+     * top-1 over all 200 items.json questions: relaxing word_in to accept ANY trailing 's' left
+     * retrieval@1 unchanged at 18.4% and made SEVEN questions falsely match a record where nothing
+     * had matched ("seconds", "lengths", "cables" became matches). The possessive-only form
+     * changes 0 of 200 picks. A whole-benchmark diff is the right instrument for a ranking change;
+     * a single hand-written expectation is not. */
+
     printf("\n%s  %d/%d\n", fails ? "FAIL" : "PASS", ran - fails, ran);
     return fails ? 1 : 0;
 }
