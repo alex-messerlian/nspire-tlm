@@ -12,7 +12,7 @@ No JSON on device. Format is line-based and parseable with a hand-written scanne
 The trailing END line carries the count again, so a TRUNCATED FILE IS DETECTABLE. A loader that
 stops early would otherwise return a short store and read as success -- the silent-empty failure
 this format exists to prevent."""
-import json, sys, pathlib, re
+import json, os, sys, pathlib, re
 
 VAR = re.compile(r"(?<![A-Za-z0-9_])([A-Za-z][A-Za-z0-9_]*)(?![A-Za-z0-9_(])")
 RESV = {"pi","e","sin","cos","tan","ln","log","sqrt","exp","asin"}
@@ -110,11 +110,84 @@ def pack(store):
     out.append(f"END\t{len(store)}")
     return "\n".join(out) + "\n"
 
+
+# ---------------------------------------------------------------------------------------------
+# THE KNOWLEDGE TIER (K-TEXT). A definition packed as an ordinary store record, so NOT ONE LINE OF
+# DEVICE C CHANGES. ns_assemble already emits the right five fields for it:
+#
+#     <q>what is aberration?</q><r>aberration | term:text | missing:none | <meaning> | fit:high
+#
+# HOW THE FIELDS FALL OUT, each from a line of src/store/assemble.c that is unchanged:
+#   formula  the term. Field 0, which is what the reader sees first.
+#   var[0] == lhs  so assemble.c:114's missing loop `continue`s on its only variable and `miss`
+#            stays "none" with no invented value and no new branch.
+#   unit[0]  "text", a POSITIVE marker that this record defines rather than computes. An empty
+#            units field would be a shape with 0 documents in 239,853 and byte-indistinguishable
+#            from a compute record whose V lines were dropped.
+#   req      the meaning. Field 3 is the only field that already carries free prose.
+#   cval[0]  empty, so assemble.c:90's constant-inlining loop writes nothing and no " Given " is
+#            emitted for a question that supplies nothing.
+#
+# WHY var[0] IS "term" AND NOT THE TERM ITSELF. assemble.c only requires var[0] == lhs; it does
+# NOT require lhs == formula. Using the term for both would put a SPACE inside a variable name on
+# 1,086 of 1,443 records (75.3%) -- "absolute pressure:text" -- and the units field is
+# space-delimited `var:unit` on all 232,385 five-field documents. tools/eval/grade.py:154 parses it
+# with `parts[1].split()`, so a spaced name silently returns "no unit required": the right answer
+# for a definition, reached by a parse failure, which is the dim_gate defect ("cannot check" must
+# not share a value with "checked and nothing needed"). A fixed `term` keeps the grammar intact and
+# costs nothing, because the term is still field 0 and still the record's name.
+#
+# A SECOND PROPERTY FALLS OUT FREE: ask_pick's supplied-variable term compares typed variables
+# against rec.var[k] and skips the lhs, so a question carrying givens can never score a knowledge
+# record on its variable. A definition takes no givens, and now cannot be retrieved by one.
+KNOWLEDGE_VAR = "term"
+KNOWLEDGE_UNIT = "text"
+
+
+def knowledge_lines(defs):
+    """Pack term/meaning pairs as K-TEXT records. Returns (lines, n)."""
+    import hashlib
+    out, seen = [], set()
+    for d in defs:
+        term, mean = d["term"].strip(), d["meaning"].strip()
+        if not term or not mean:
+            continue
+        key = term.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        rid = "k" + hashlib.sha256(("ktext/v1:" + key).encode()).hexdigest()[:7]
+        for field in (rid, term, mean):
+            assert "\t" not in field and "\n" not in field, f"delimiter in {field!r}"
+            assert all(ord(c) < 128 for c in field), f"non-ASCII in {field!r}"
+        out.append("\t".join(["R", rid, KNOWLEDGE_VAR, term, term, mean, "1"]))
+        out.append("\t".join(["V", KNOWLEDGE_VAR, KNOWLEDGE_UNIT, ""]))
+    return out, len(seen)
+
+
 if __name__ == "__main__":
     store = json.load(open("corpus/store_clean.json"))
     txt = pack(store)
+    # THE KNOWLEDGE TIER, appended. The held-out 150 are NOT here: a retrievable record the model
+    # was never trained on is what gate_store_coverage exists to fail on, measured at 41.0% against
+    # 12.2%. definitions_train.json is the A58 carve and is the only file read.
+    #
+    # OPT-IN, AND OFF BY DEFAULT, until corpus/generate.py actually teaches these terms.
+    # gate_store_coverage's rule is R_train superseteq R_store: a record the picker can return and
+    # the model has never seen is measured at 12.2% correct against 41.0% for a trained one. Packing
+    # 1,443 definitions before the corpus mentions them puts 1,443 fabrication sites on the device.
+    # Build and test the knowledge store freely with WITH_KNOWLEDGE=1; ship it when the gate passes.
+    kpath = pathlib.Path("corpus/knowledge/definitions_train.json")
+    nk = 0
+    if kpath.exists() and os.environ.get("WITH_KNOWLEDGE"):
+        klines, nk = knowledge_lines(json.load(open(kpath)))
+        body = txt.rstrip("\n").split("\n")
+        assert body[-1].startswith("END\t"), "pack() must end with its END line"
+        total = len(store) + nk
+        txt = "\n".join(body[:1] + [str(total)] + body[2:-1] + klines + [f"END\t{total}"]) + "\n"
     tmp = pathlib.Path("build/store.tns.tmp"); tmp.parent.mkdir(exist_ok=True)
     tmp.write_text(txt)
     tmp.rename("build/store.tns")          # atomic: a crash leaves no half-written store
-    print(f"packed {len(store)} records -> build/store.tns ({len(txt)} bytes)")
+    print(f"packed {len(store)} compute + {nk} knowledge = {len(store)+nk} records "
+          f"-> build/store.tns ({len(txt):,} bytes)")
     print(f"  largest record line: {max(len(l) for l in txt.split(chr(10)))} chars")

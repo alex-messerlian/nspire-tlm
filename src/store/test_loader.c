@@ -53,15 +53,49 @@ int main(int argc, char **argv) {
         }
         ck(speed != NULL, "known record v=d/t is present");
         if (speed) ck(strcmp(speed->lhs, "v") == 0, "v=d/t has lhs v");
-        /* every record must be structurally complete -- no half-parsed tail */
-        int bad = 0;
+        /* Every record structurally complete -- no half-parsed tail.
+         *
+         * TWO KINDS NOW, and the difference is DECLARED rather than the '=' test being relaxed.
+         * A compute record's formula is a relation and must contain '='. A KNOWLEDGE record
+         * (K-TEXT) has unit[0] == "text" and its formula is a bare term, so "aberration" has no
+         * '=' and is correct. Weakening the test to "formula is non-empty" would have let a
+         * truncated compute record through, which is the whole reason this check exists.
+         *
+         * The knowledge branch is checked HARDER than the old test, not softer: exactly one
+         * variable, that variable IS the lhs (which is what makes assemble.c emit missing:none
+         * without a new branch), and a non-empty req, which is where the meaning lives. */
+        int bad = 0, nk = 0, nc = 0;
         for (int i = 0; i < st.n; i++) {
             const ns_rec2 *r = &st.rec[i];
-            if (!r->rid || !r->lhs || !r->formula || !r->name || !r->req) bad++;
-            else if (strchr(r->formula, '=') == NULL) bad++;
+            if (!r->rid || !r->lhs || !r->formula || !r->name || !r->req) { bad++; continue; }
+            int knowledge = (r->nvars == 1 && r->unit[0] && strcmp(r->unit[0], "text") == 0);
+            if (knowledge) {
+                nk++;
+                if (strcmp(r->var[0], r->lhs) != 0) bad++;   /* else assemble.c reports it missing */
+                if (!r->req[0]) bad++;                        /* the meaning IS field 3 */
+                if (strchr(r->formula, '=') != NULL) bad++;   /* a term, not a relation */
+            } else {
+                nc++;
+                if (strchr(r->formula, '=') == NULL) bad++;
+            }
             for (int k = 0; k < r->nvars; k++) if (!r->var[k] || !r->unit[k]) bad++;
         }
         ck(bad == 0, "every record structurally complete");
+        printf("  (%d compute records, %d knowledge records)\n", nc, nk);
+        /* If the knowledge tier is packed at all, it must be packed correctly end to end. */
+        if (nk) {
+            const ns_rec2 *kd = NULL;
+            for (int i = 0; i < st.n; i++)
+                if (st.rec[i].nvars == 1 && !strcmp(st.rec[i].unit[0], "text")
+                    && !strcmp(st.rec[i].formula, "aberration")) { kd = &st.rec[i]; break; }
+            ck(kd != NULL, "a known knowledge record is present");
+            if (kd) {
+                ck(strcmp(kd->name, "aberration") == 0, "the term is the record NAME, so it is retrievable");
+                ck(strstr(kd->req, "converge") != NULL, "the meaning is in req, which assemble emits as field 3");
+                ck(kd->cval[0] == NULL || kd->cval[0][0] == '\0',
+                   "cval is empty, so no \" Given \" is emitted for a definition");
+            }
+        }
         ns_free(&st);
         ck(st.rec == NULL && st.slab == NULL && st.n == 0, "ns_free clears the struct");
     }

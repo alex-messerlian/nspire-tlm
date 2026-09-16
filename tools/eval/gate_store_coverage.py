@@ -26,6 +26,34 @@ import importlib.util, io, contextlib, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
+def read_packed(path):
+    """The device's own view of the store: the R lines of build/store.tns.
+
+    Returns [{f, name, kind}], where kind is "knowledge" when the record's single variable is
+    declared `text` -- which is how a K-TEXT definition marks itself -- and "compute" otherwise.
+    """
+    if not path.exists():
+        return None
+    recs, lines = [], path.read_text().split("\n")
+    i = 0
+    while i < len(lines):
+        fl = lines[i].split("\t")
+        if fl[0] == "R" and len(fl) >= 7:
+            nv = int(fl[6]) if fl[6].isdigit() else 0
+            units = []
+            for j in range(1, nv + 1):
+                if i + j < len(lines):
+                    v = lines[i + j].split("\t")
+                    if v[0] == "V" and len(v) >= 3:
+                        units.append(v[2])
+            recs.append({"f": fl[3], "name": fl[4],
+                         "kind": "knowledge" if units == ["text"] else "compute"})
+            i += nv + 1
+            continue
+        i += 1
+    return recs
+
+
 if __name__ == "__main__":
     spec = importlib.util.spec_from_file_location("gen", ROOT / "corpus/generate.py")
     m = importlib.util.module_from_spec(spec)
@@ -34,7 +62,18 @@ if __name__ == "__main__":
             spec.loader.exec_module(m)
     except SystemExit:
         pass
-    store = json.load(open(ROOT / "corpus/store_clean.json"))
+    # THE PACKED STORE, NOT THE JSON. build/store.tns is what the device loads and what the picker
+    # can return; store_clean.json is only one of its inputs. Reading the JSON made this gate
+    # STRUCTURALLY BLIND to the knowledge tier: 1,443 K-TEXT records were packed into the shipped
+    # store and it reported "SHIPPED BUT UNTRAINED 0", because those records exist in no JSON.
+    #
+    # Same class as the three propagation failures already recorded, mirrored: there a fix to the
+    # JSON never reached the packed store, here a record in the packed store was invisible to the
+    # check. Ask the ARTEFACT THE DEVICE READS, every time.
+    store = read_packed(ROOT / "build/store.tns")
+    if store is None:
+        print("CANNOT CHECK: build/store.tns absent -- run tools/store_pack.py. Not a pass.")
+        sys.exit(2)
     if not store or not getattr(m, "recs", None):
         # ABSENCE IS FAILURE: an empty store trivially satisfies containment, and an empty
         # generator trivially violates it. Neither is "checked and clean".
@@ -42,8 +81,24 @@ if __name__ == "__main__":
         sys.exit(2)
 
     trained = {r["f"] for r in m.recs}
-    untrained = [r for r in store if r["f"] not in trained]
-    print(f"  store records (retrievable)  {len(store)}")
+    # KNOWLEDGE TERMS ARE ASKED OF THE GENERATOR, exactly like relations, and NOT of
+    # corpus/knowledge/definitions_train.json.
+    #
+    # That file is the generator's INPUT: a term in it is SLATED for training, not trained. Reading
+    # it here reported "SHIPPED BUT UNTRAINED 0" for 1,443 records no corpus mentions, which is the
+    # false-closure this gate exists to prevent -- an open defect is on a list somebody re-reads,
+    # a defect wrongly marked closed is protected from the next audit.
+    #
+    # generate.py publishes `kterms` once it emits knowledge documents. Until then the set is empty
+    # and every packed knowledge record is correctly reported untrained, which is what makes
+    # "pack it before you teach it" fail rather than pass.
+    ktrained = set(getattr(m, "kterms", ()) or ())
+    def is_untrained(r):
+        return (r["f"] not in ktrained) if r["kind"] == "knowledge" else (r["f"] not in trained)
+    untrained = [r for r in store if is_untrained(r)]
+    nk = sum(1 for r in store if r["kind"] == "knowledge")
+    print(f"  store records (retrievable)  {len(store)}  "
+          f"({len(store)-nk} compute, {nk} knowledge)")
     print(f"  relations the corpus teaches {len(trained)}")
     print(f"  SHIPPED BUT UNTRAINED        {len(untrained)}")
     for r in untrained[:12]:
