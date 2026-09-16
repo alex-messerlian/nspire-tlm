@@ -34,7 +34,7 @@ EVAL_CORE := $(addprefix tools/eval/, fmt.c ast.c units.c parser.c numeric.c der
 
 APP_SRC   := src/store/app.c src/store/gfx.c src/store/loader.c src/store/assemble.c \
              src/store/tokenizer.c src/store/picker.c src/store/toolrun.c src/store/chatstore.c \
-             src/store/shapecheck.c src/store/askparse.c src/store/pickui.c
+             src/store/shapecheck.c src/store/askparse.c src/store/pickui.c src/store/pointer.c
 
 APP_HDR   := $(wildcard src/store/*.h)
 
@@ -55,7 +55,7 @@ TESTS_EVAL := test_toolrun test_prov
 # legitimate' case -- and was referenced by NO Makefile and NO gate. Its binary sat committed
 # under tools/eval/ with nothing that rebuilt it. WIRING_AUDIT records provenance.c going from
 # 'exists but is never called' to 'called but never verified'; this is the second half.
-TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck test_ansmatch
+TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck test_ansmatch test_pointer
 # STORE SUITES. These four ran as COMMITTED BINARIES that no rule rebuilt, so they could not see a
 # source change: re-adding the pre-opened `<a>` bug to assemble.c and running `make check` gave ALL
 # GATES PASS. run_gates.sh's own header claims `make check` 'BUILDS the host binaries first'; for
@@ -110,6 +110,13 @@ $(BUILD)/test_prov: tools/eval/test_prov.c tools/eval/provenance.c | $(BUILD)
 
 $(BUILD)/test_toolrun: tools/eval/test_toolrun.c src/store/toolrun.c src/store/toolrun.h $(EVAL_CORE) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/toolrun.c $(EVAL_CORE) -lm
+
+# The touchpad gesture machine. It is a separate translation unit precisely so this can exist:
+# the defect it was written for -- a physical click emitting no click event -- lived inside
+# device_app.c, which only cross-compiles, so no host check could reach it.
+$(BUILD)/test_pointer: tools/eval/test_pointer.c src/store/pointer.c src/store/pointer.h \
+                       src/store/app.h | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< -lm
 
 $(BUILD)/test_chatstore: tools/eval/test_chatstore.c src/store/chatstore.c src/store/chatstore.h | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/chatstore.c src/store/gfx.c -lm

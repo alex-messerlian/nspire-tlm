@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "app.h"
+#include "pointer.h"
 #include "loader.h"
 #include "assemble.h"
 #include "askparse.h"
@@ -126,117 +127,26 @@ static int MODEL_READY;
  * panel once, at startup, rather than assuming a scale -- pad dimensions differ across revisions. */
 static int PAD_W = 1, PAD_H = 1;
 static int CX = GFX_W / 2, CY = GFX_H / 2;
+static ns_pointer PTR;
 
 static void pointer_init(void) {
     touchpad_info_t *ti = touchpad_getinfo();
     if (ti && ti->width && ti->height) { PAD_W = ti->width; PAD_H = ti->height; }
+    ns_pointer_init(&PTR, PAD_W, PAD_H, GFX_W, GFX_H);
+    CX = PTR.cx; CY = PTR.cy;
 }
 
-/* RELATIVE, WITH ACCELERATION, which is the part the earlier relative attempt was missing.
- *
- * A tap never teleports the cursor: touching down only anchors a reference, and the cursor moves
- * by the DELTA of a swipe from there. That is the behaviour asked for, and it is what the absolute
- * version got wrong.
- *
- * The reason the first relative attempt was unusable was gain, not principle. At a fixed 1.5x a
- * 2 cm pad cannot cross a 320px screen in one stroke, so reaching anything meant repeated
- * swipe-lift-swipe. Acceleration fixes that the way every real trackpad does: a slow swipe stays
- * near 1:1 so a 24px control can be settled on precisely, while a fast one is multiplied so the
- * whole screen is one flick away. Speed is measured per sample in pad units, and the multiplier is
- * a step function rather than a curve because integer arithmetic here has to stay cheap.
- *
- * The remainder is carried in 1/256ths: the pad out-resolves the panel, so a plain divide throws
- * away every slow movement and the cursor simply refuses to budge under a careful finger.
- */
-static int DOWN, TRAVEL, HAVE_REF, REF_X, REF_Y, ACC_X, ACC_Y, PAD_TRAVEL, MOVING;
-#define TAP_SLOP  10          /* cursor px of travel still counted as a tap */
-/* A TAP MUST NOT MOVE THE POINTER, which is why clicking took two goes.
- *
- * The second sample after touch-down moved the cursor, so the finger jitter of a tap dragged the
- * pointer a few pixels off whatever it was aimed at and the click landed elsewhere. Tapping again
- * appeared to work only because the first tap had already shifted the cursor onto the target.
- *
- * Nothing moves until the finger has travelled past this much, in PAD units. Below it the touch is
- * a tap; above it, it is a swipe and stays one for the rest of the contact. */
-#define MOVE_DEADZONE 7
-
-static int WAS_PRESSED;                   /* touchpad click state, for drag detection */
-
-static int accel(int d) {
-    int a = d < 0 ? -d : d;
-    /* thresholds in PAD units per sample; tuned so a deliberate swipe crosses the screen */
-    /* HALVED, roughly. The first curve topped out at 3.5x and a flick overshot the whole screen,
-     * so the cursor arrived somewhere past wherever you were aiming. These reach 2x, which still
-     * crosses most of the panel in one stroke while leaving the top end controllable. */
-    /* Eased down again, about a fifth, to smooth the top end. The pointer was reported as good at
-     * the previous curve and just slightly quick. */
-    int mul = a < 4 ? 80             /* 0.31x: fine placement                */
-            : a < 10 ? 152           /* 0.59x                                 */
-            : a < 20 ? 256           /* 1x                                    */
-                     : 400;          /* 1.56x                                 */
-    return d * mul;
-}
-
+/* RELATIVE, WITH ACCELERATION. The gesture state machine now lives in src/store/pointer.c so it
+ * can be driven by a host test -- see pointer.h. This file keeps only the libndls call and the
+ * cursor the drawing code reads. There is ONE implementation: a second copy here is how this repo
+ * ended up with two rankers that disagreed. */
 static int pointer_poll(in_event *e) {
     touchpad_report_t r;
     if (touchpad_scan(&r) != 0) return 0;
-
-    if (!r.contact) {                         /* lift: drop the anchor, finish a tap */
-        HAVE_REF = 0;
-        /* A press-drag ends here, and it is NOT a tap however little the cursor moved: reporting a
-         * click would clear the selection the drag just made. */
-        if (WAS_PRESSED) {
-            WAS_PRESSED = 0; DOWN = 0; TRAVEL = 0;
-            e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1; e->pressed = 0;
-            return 1;
-        }
-        if (DOWN) {
-            DOWN = 0;
-            if (TRAVEL <= TAP_SLOP) { e->kind = IN_CLICK; e->x = CX; e->y = CY; return 1; }
-        }
-        return 0;
-    }
-
-    /* The press EDGE is reported even with no movement, so the app sees where a drag started.
-     * Everything below only fires when the cursor actually moves, which would swallow a press. */
-    if (r.pressed != WAS_PRESSED) {
-        WAS_PRESSED = r.pressed;
-        e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1; e->pressed = r.pressed;
-        return 1;
-    }
-
-    if (!HAVE_REF) {                           /* first sample: anchor, do NOT move */
-        HAVE_REF = 1; DOWN = 1; TRAVEL = 0; PAD_TRAVEL = 0; MOVING = 0;
-        REF_X = r.x; REF_Y = r.y; ACC_X = ACC_Y = 0;
-        return 0;
-    }
-
-    int dx = r.x - REF_X, dy = REF_Y - r.y;    /* pad y is bottom-up */
-    REF_X = r.x; REF_Y = r.y;
-
-    /* Below the dead zone this is still a tap. The reference keeps tracking, so when it does turn
-     * into a swipe the cursor carries on from where it is rather than jumping by the slack. */
-    if (!MOVING) {
-        PAD_TRAVEL += (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-        if (PAD_TRAVEL <= MOVE_DEADZONE) return 0;
-        MOVING = 1;
-    }
-
-    ACC_X += accel(dx) * GFX_W / (PAD_W ? PAD_W : 1);
-    ACC_Y += accel(dy) * GFX_H / (PAD_H ? PAD_H : 1);
-    int mx = ACC_X / 256, my = ACC_Y / 256;
-    ACC_X -= mx * 256; ACC_Y -= my * 256;      /* keep the remainder */
-    if (!mx && !my) return 0;
-
-    TRAVEL += (mx < 0 ? -mx : mx) + (my < 0 ? -my : my);
-    CX += mx; CY += my;
-    if (CX < 0) CX = 0;
-    if (CX >= GFX_W) CX = GFX_W - 1;
-    if (CY < 0) CY = 0;
-    if (CY >= GFX_H) CY = GFX_H - 1;
-
-    e->kind = IN_MOVE; e->x = CX; e->y = CY; e->hover = 1; e->pressed = r.pressed;
-    return 1;
+    ns_pad_sample s = { .contact = r.contact, .pressed = r.pressed, .x = r.x, .y = r.y };
+    int got = ns_pointer_feed(&PTR, &s, e);
+    CX = PTR.cx; CY = PTR.cy;
+    return got;
 }
 
 /* ---- keypad ---------------------------------------------------------------------------------- */
