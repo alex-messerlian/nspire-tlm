@@ -77,11 +77,23 @@ def _clean(s):
 _SINGULAR_S = ("ics", "ss", "us", "sis", "ies", "ness", "eous", "ous")
 
 
+# THE HEAD OF "X of Y" IS X. This repo already recorded the rule and I broke it again:
+# "method of adding percents" ends in -s, so the last-word test said plural and generated
+# "Method of adding percents ARE the percent uncertainty ...". The project log, verbatim: "A suffix of a
+# noun phrase is not a noun phrase, and position is not headedness. English `X of Y` has head `X`."
+# 14 of 1,443 terms are affected, and every one of them would have shipped.
+_PREP = re.compile(r"\b(of|in|for|from|to|by|with|on|at|between|per|across|through|under|about)\b")
+
+
+def _head(term):
+    t = re.sub(r"\s*\([^)]*\)", "", term).strip()
+    m = _PREP.search(t)
+    return (t[:m.start()].strip() if m and m.start() > 0 else t).lower()
+
+
 def _art(term):
-    """`is` or `are`, because "kinetic energies is" reads as broken English to a reader and the
-    corpus is what teaches the register."""
-    t = term.strip().lower()
-    t = re.sub(r"\s*\([^)]*\)\s*$", "", t).strip()      # "alpha (alpha) rays" -> "alpha rays"
+    """`is` or `are`, decided by the HEAD noun of the term, not its last word."""
+    t = _head(term)
     if not t.endswith("s"):
         return "is"
     return "is" if t.endswith(_SINGULAR_S) else "are"
@@ -114,10 +126,19 @@ _DETERMINED = re.compile(
     r"used|equal|same|half|twice|either|both|such)\b", re.I)
 
 
+# A meaning that already contains its own main verb is a SENTENCE, not a complement.
+# "the physical law that states that the magnetic field ... IS proportional to the current" after
+# "Ampere's law is" gives two predicates in one sentence. 145 of 1,443 meanings are like this, and
+# they read as broken because they are. They take the COLON frame, where a sentence is fine.
+_CLAUSE = re.compile(r"^(?:the|a|an)\b[^.;]{0,90}?\b(is|are|was|were)\b", re.I)
+
+
 def _determined(meaning):
-    """True when the meaning can follow "X is" as written."""
+    """True when the meaning can follow "X is" as written: determined AND not already a clause."""
     m = meaning.strip()
-    return bool(m) and (bool(_DETERMINED.match(m)) or m[0].isupper() or m[0].isdigit())
+    if not m or _CLAUSE.match(m):
+        return False
+    return bool(_DETERMINED.match(m)) or m[0].isupper() or m[0].isdigit()
 
 
 # WHY THERE ARE THIS MANY. The first banks had four frames each, which for a given term collapsed
@@ -199,12 +220,15 @@ def ask_agrees(question, term):
     """
     if _art(term) != "are":
         return question
+    # ONLY WHEN THE TERM IS THE SUBJECT. The first version matched the prefix "what is " and
+    # rewrote "what is the definition of adhesive forces" to "what ARE the definition of adhesive
+    # forces" -- 455 documents, caught by gate_ask_quantity, which flags exactly this shape because
+    # 63% of a hand-read sample was ill-posed the last time a frame like it was in use. The subject
+    # there is "the definition", singular; the plural term is the object of a preposition.
     for a, b in (("what is ", "what are "), ("What is ", "What are "),
                  ("what's ", "what are "), ("whats ", "what are "),
-                 ("what exactly is ", "what exactly are "),
-                 ("what is the definition of ", "what is the definition of "),
-                 ("{t} is ", "{t} are ")):
-        if question.startswith(a):
+                 ("what exactly is ", "what exactly are ")):
+        if question.startswith(a) and question[len(a):].lower().startswith(term.lower()):
             return b + question[len(a):]
     return question
 

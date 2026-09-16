@@ -115,6 +115,10 @@ def strip(x):
     x = re.sub(r"\[\s+", "[", x)
     x = re.sub(r"\s+\]", "]", x)
     x = re.sub(r"\s+([,.;:!?])", r"\1", x)
+    # "p -type semiconductor", "B -field": the source writes p<emphasis>-type</emphasis> and the
+    # tag strip leaves a space. Restricted to a SINGLE letter before the hyphen so a real dash
+    # between words ("the force, - k*x") is untouched.
+    x = re.sub(r"(?<![A-Za-z])([A-Za-z])\s+-(?=[A-Za-z])", r"\1-", x)
     return x.strip()
 
 

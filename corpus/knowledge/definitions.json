@@ -344,7 +344,7 @@
  },
  {
   "term": "angular momentum projection quantum number (m)",
-  "meaning": "quantum number associated with the z -component of the orbital angular momentum of an electron in a hydrogen atom",
+  "meaning": "quantum number associated with the z-component of the orbital angular momentum of an electron in a hydrogen atom",
   "module": "m58584",
   "level": "university",
   "section": "The Hydrogen Atom"
@@ -609,7 +609,7 @@
   "section": "Polarization"
  },
  {
-  "term": "B -field",
+  "term": "B-field",
   "meaning": "another term for magnetic field",
   "module": "m42370",
   "level": "college",
@@ -687,7 +687,7 @@
  },
  {
   "term": "base current",
-  "meaning": "current drawn from the base n -type material in a transistor",
+  "meaning": "current drawn from the base n-type material in a transistor",
   "module": "m58601",
   "level": "university",
   "section": "Semiconductor Devices"
@@ -1450,7 +1450,7 @@
  },
  {
   "term": "collector current",
-  "meaning": "current drawn from the collector p -type material",
+  "meaning": "current drawn from the collector p-type material",
   "module": "m58601",
   "level": "university",
   "section": "Semiconductor Devices"
@@ -2276,7 +2276,7 @@
  },
  {
   "term": "dependent variable",
-  "meaning": "the vertical, or y -axis, variable, which changes with (or is dependent on) the value of the independent variable",
+  "meaning": "the vertical, or y-axis, variable, which changes with (or is dependent on) the value of the independent variable",
   "module": "m54599",
   "level": "hs",
   "section": "The Language of Physics: Physical Quantities and Units"
@@ -2493,7 +2493,7 @@
  },
  {
   "term": "direction angle",
-  "meaning": "in a plane, an angle between the positive direction of the x -axis and the vector, measured counterclockwise from the axis to the vector",
+  "meaning": "in a plane, an angle between the positive direction of the x-axis and the vector, measured counterclockwise from the axis to the vector",
   "module": "m58278",
   "level": "university",
   "section": "Coordinate Systems and Components of a Vector"
@@ -2857,7 +2857,7 @@
  },
  {
   "term": "electric field strength",
-  "meaning": "the magnitude of the electric field, denoted E -field",
+  "meaning": "the magnitude of the electric field, denoted E-field",
   "module": "m42440",
   "level": "college",
   "section": "Production of Electromagnetic Waves"
@@ -5671,7 +5671,7 @@
  },
  {
   "term": "linear wave equation",
-  "meaning": "equation describing waves that result from a linear restoring force of the medium; any function that is a solution to the wave equation describes a wave moving in the positive x -direction or the negative x -direction with a constant wave speed v",
+  "meaning": "equation describing waves that result from a linear restoring force of the medium; any function that is a solution to the wave equation describes a wave moving in the positive x-direction or the negative x-direction with a constant wave speed v",
   "module": "m58369",
   "level": "university",
   "section": "Mathematics of Waves"
@@ -5867,7 +5867,7 @@
  },
  {
   "term": "magnetic field strength",
-  "meaning": "the magnitude of the magnetic field, denoted B -field",
+  "meaning": "the magnitude of the magnetic field, denoted B-field",
   "module": "m42440",
   "level": "college",
   "section": "Production of Electromagnetic Waves"
@@ -6412,7 +6412,7 @@
   "section": "Vision Correction"
  },
  {
-  "term": "n -type semiconductor",
+  "term": "n-type semiconductor",
   "meaning": "doped semiconductor that conducts electrons",
   "module": "m58600",
   "level": "university",
@@ -7091,18 +7091,18 @@
   "section": "Sound Interference and Resonance"
  },
  {
-  "term": "p -type semiconductor",
+  "term": "p-n junction",
+  "meaning": "junction formed by joining p - and n-type semiconductors",
+  "module": "m58601",
+  "level": "university",
+  "section": "Semiconductor Devices"
+ },
+ {
+  "term": "p-type semiconductor",
   "meaning": "doped semiconductor that conducts holes",
   "module": "m58600",
   "level": "university",
   "section": "Semiconductors and Doping"
- },
- {
-  "term": "p-n junction",
-  "meaning": "junction formed by joining p - and n -type semiconductors",
-  "module": "m58601",
-  "level": "university",
-  "section": "Semiconductor Devices"
  },
  {
   "term": "pair production",
@@ -9535,7 +9535,7 @@
  },
  {
   "term": "spin projection quantum number (m_s)",
-  "meaning": "quantum number associated with the z -component of the spin angular momentum of an electron",
+  "meaning": "quantum number associated with the z-component of the spin angular momentum of an electron",
   "module": "m58586",
   "level": "university",
   "section": "Electron Spin"
@@ -11086,13 +11086,6 @@
   "module": "m42329",
   "level": "college",
   "section": "Applications of Electrostatics"
- },
- {
-  "term": "y -intercept",
-  "meaning": "the point where a plot line intersects the y -axis",
-  "module": "m54599",
-  "level": "hs",
-  "section": "The Language of Physics: Physical Quantities and Units"
  },
  {
   "term": "y-intercept",

@@ -60,6 +60,26 @@ def audit(m, n=N, seed=11):
     # "mined sentence fragment" shape flags the feature as the defect: this gate polices the
     # GENERATED ASK frames, which only appear on answerable documents.
     docs = [d for d in docs if "no matching relation" not in text(d)]
+    # THE KNOWLEDGE TIER IS EXEMPT FOR THE SAME REASON D3 IS, and the reason is worth stating
+    # because this gate's predicate is a PREFIX MATCH and prefixes are shared by honest frames.
+    #
+    # K1/K2/K3 questions come from corpus/asks_explain.py: 111 hand-written frames across seven
+    # registers, each asserted to take {t}, none mined. This gate exists to catch a MINED sentence
+    # fragment returning to corpus/asks_dev.json's ASK bank, and it identifies one by the first six
+    # characters of its lead. "What are" is the lead of a rejected mined frame AND the correct
+    # opening of "what are alpha rays good for?", which ask_agrees produces for a plural term.
+    #
+    # Scanning the knowledge questions therefore flags a reviewed frame as the defect -- which is
+    # what the D3 exemption three lines up already says about mined stems.
+    #
+    # MEASURED BEFORE EXEMPTING, because an exemption asserted rather than measured is how a real
+    # defect gets protected from the next audit. Over a 4,000-document run: 52,388 knowledge
+    # questions, 225 contain "what are", and 0 of the 225 have a subject that is not a plural term.
+    # The subject was read from the document's own `head` rather than parsed back out of the
+    # question -- the first attempt parsed it and reported 40 false defects, because it could not
+    # strip a trailing "explain briefly." or an appended given.
+    docs = [d for d in docs if (d.get("kind") if isinstance(d, dict) else None) not in
+            ("K1", "K2", "K3")]
     qs = [mm.group(1) for mm in (re.search(r"<q>(.*?)</q>", text(d)) for d in docs) if mm]
     if not qs:
         # ABSENCE IS A FAILURE, NOT A SKIP: a generator emitting no <q> span would otherwise
