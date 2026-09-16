@@ -216,15 +216,6 @@
   "in_train_defs": false
  },
  {
-  "term": "Hooke's law",
-  "meaning": "proportional relationship between the force F on a material and the deformation Delta_L it causes, F=kDelta_L",
-  "module": "m54154",
-  "level": "hs",
-  "section": "Simple Harmonic Motion",
-  "sec_freq": 0.0152,
-  "in_train_defs": true
- },
- {
   "term": "heat capacity",
   "meaning": "amount of heat necessary to change the temperature of a substance by 1.00 degrees C",
   "module": "m54290",
@@ -447,6 +438,15 @@
   "level": "hs",
   "section": "Phase Change and Latent Heat",
   "sec_freq": 0.0143,
+  "in_train_defs": true
+ },
+ {
+  "term": "scintillator",
+  "meaning": "radiation detection method that records light produced when radiation interacts with materials",
+  "module": "m54580",
+  "level": "hs",
+  "section": "Nuclear Forces and Radioactivity",
+  "sec_freq": 0.0027,
   "in_train_defs": true
  },
  {

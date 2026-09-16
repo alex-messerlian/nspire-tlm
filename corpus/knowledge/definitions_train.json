@@ -4102,6 +4102,13 @@
   "section": "Holography"
  },
  {
+  "term": "Hooke's law",
+  "meaning": "proportional relationship between the force F on a material and the deformation Delta_L it causes, F=kDelta_L",
+  "module": "m54154",
+  "level": "hs",
+  "section": "Simple Harmonic Motion"
+ },
+ {
   "term": "horizontally polarized",
   "meaning": "the oscillations are in a horizontal plane",
   "module": "m42522",
@@ -8223,13 +8230,6 @@
   "module": "m54599",
   "level": "hs",
   "section": "The Language of Physics: Physical Quantities and Units"
- },
- {
-  "term": "scintillator",
-  "meaning": "radiation detection method that records light produced when radiation interacts with materials",
-  "module": "m54580",
-  "level": "hs",
-  "section": "Nuclear Forces and Radioactivity"
  },
  {
   "term": "scintillators",
