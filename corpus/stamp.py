@@ -27,6 +27,12 @@ INPUTS = [
     "corpus/symbol_map.json",
     "corpus/empirical_values.json",
     "corpus/asks_dev.json",
+    # MISSING UNTIL A64, and this file's own docstring predicted it: "Adding a new input to
+    # generate.py means adding it here; gate_corpus_fresh will not know about it otherwise."
+    # generate.py:1111 loads it into `_mined`, which supplies a record's NAME at :1452 and the
+    # source record at :1484 -- so editing it changes the question surfaces and the stamp said
+    # fresh. Found by auditing what generate.py opens against what this list enumerates.
+    "corpus/records_raw.json",
 ]
 
 

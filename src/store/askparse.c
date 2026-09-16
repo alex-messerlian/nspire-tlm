@@ -209,10 +209,26 @@ static int idf16(const char *w) {
  * A record name is a bag of DISTINCT terms for retrieval purposes; repeating one is a property of
  * the phrasing, not evidence about the question. Dedupe is per record, reset by score_record. */
 struct sctx { const char *q; int score; int mode; char seen[12][24]; int nseen; };
-/* A56. Fuzzy matching is OFF by default and switched on per call, so the subject and the control
- * are the same binary -- the discipline rankcli's own header states. ask_fuzz_set() is called by
- * the measurement harness and by the device once a threshold has been measured. */
-static int FUZZ_ON = 0;
+/* A56. Fuzzy matching is the SHIPPING DEFAULT, and ask_fuzz_set(0) is the control. Subject and
+ * control are the same binary, which is the discipline rankcli's own header states.
+ *
+ * A64. IT DEFAULTED TO OFF AND NOTHING TURNED IT ON, so A56 shipped disabled. The comment that
+ * stood here said ask_fuzz_set() "is called by the measurement harness and by the device once a
+ * threshold has been measured" -- the device call was deferred, and the commit message then
+ * reported 80.6% retrieval with every word mistyped as though it were live. The only caller in the
+ * entire tree was tools/eval/rankcli.c.
+ *
+ * Measured on the DEVICE path (ask_build -> ask_pick) with the default as it was:
+ *
+ *     "what is hookes law"  ->  theta_2=asin((n_1*sin(theta_1))/n_2)     Snell's law
+ *
+ * which is verbatim the failure the device test reported: "what is hookes law is totally wrong
+ * suggested snell". The fix was measured, committed, documented and switched off.
+ *
+ * The default therefore lives where the shipping behaviour is, not in a call site somebody has to
+ * remember. tools/eval/test_askparse.c asserts it through ask_build, the device's own entry point,
+ * on the four questions from that device transcript. */
+static int FUZZ_ON = 1;
 void ask_fuzz_set(int on) { FUZZ_ON = on; }
 
 static void score_word(const char *w, void *v) {
@@ -360,36 +376,35 @@ int ask_rank(const ns_store2 *st, const char *question, const ns_input *in, int 
     return n;
 }
 
+/* THE AUTO-PICK. ONE SCORER, and until A64 there were two.
+ *
+ * This function had its OWN inline word splitter -- `for (c = nm; ; c++) if (alpha(c))` -- while
+ * the picker's shortlist went through score_record()/each_word(). Three consecutive retrieval
+ * fixes landed in each_word and NONE of them reached here:
+ *
+ *   A54  a possessive is reachable without the apostrophe ("hookes" matches "Hooke's")
+ *   A55  a repeated word scores once ("Law of refraction (Snell's law)" counted "law" twice)
+ *   A56  bounded-Levenshtein fuzzy matching
+ *
+ * Measured on the shipped store, this exact function, before the change:
+ *
+ *     "what is hookes law"  ->  theta_2=asin((n_1*sin(theta_1))/n_2)   score 2   Snell's law
+ *
+ * which is verbatim what the device test reported. ask_rank, given the same question and the same
+ * store, returns F=-k*x. Two rankers, one question, opposite answers -- the hazard docs/
+ * WIRING_AUDIT.md already records for this app, here in the function ask_build calls.
+ *
+ * So the body is now an argmax over score_record, the same function ask_rank ranks with, in the
+ * same ASK_NOUN mode pk_open uses. A fix to the scorer now reaches both by construction rather
+ * than by somebody remembering. The signature is unchanged; the supplied-variable term that used
+ * to live here is score_record's, at the same weight relative to a word match. */
 int ask_pick(const ns_store2 *st, const char *question, const ns_input *in, int use_vars,
              int *score_out) {
     int idx = 0, best = 0;
     if (!st || !question) { if (score_out) *score_out = 0; return 0; }
+    df_build(st);
     for (int r = 0; r < st->n; r++) {
-        const char *nm = st->rec[r].name;
-        if (!nm || !nm[0]) continue;
-        int score = 0;
-        char word[48]; int w = 0;
-        for (const char *c = nm; ; c++) {
-            if (*c && alpha(*c) && w < (int)sizeof word - 1) {
-                word[w++] = (char)lc(*c);
-            } else {
-                if (w >= 3) { word[w] = 0; if (word_in(question, word)) score++; }
-                w = 0;
-                if (!*c) break;
-            }
-        }
-        /* SUPPLIED VARIABLES. A student who types "k = 500, x = 0.4" has named two of the three
-         * variables of F=-k*x; no wording of the question carries that much information about
-         * which record is meant. The LHS is skipped -- it is the OUTPUT, and a question that
-         * supplied it would not be asking. */
-        if (use_vars && in) {
-            for (int v = 0; v < in->nvals; v++) {
-                for (int k = 0; k < st->rec[r].nvars; k++) {
-                    if (st->rec[r].lhs && !strcmp(st->rec[r].var[k], st->rec[r].lhs)) continue;
-                    if (!strcmp(st->rec[r].var[k], in->var[v])) { score++; break; }
-                }
-            }
-        }
+        int score = score_record(st, r, question, in, use_vars, ASK_NOUN);
         if (score > best) { best = score; idx = r; }
     }
     if (score_out) *score_out = best;
