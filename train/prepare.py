@@ -50,7 +50,17 @@ if _tok_path.exists():
     _cand = Tokenizer.from_file(str(_tok_path))
     if _cand.get_vocab_size() == V:
         _unk = _cand.token_to_id("<unk>")
-        _probe = syn[:400] + oer[:40]
+        # SPREAD ACROSS THE CORPUS, NOT A PREFIX. This was `syn[:400]`, and the knowledge tier is
+        # APPENDED -- documents 239,853 to 292,237 -- so the probe contained 0 of them and the
+        # reuse decision was made without ever seeing the population it was being asked about.
+        # It happened to be right (measured: 0 unk on 50,533 knowledge tokens), which is worse
+        # than being wrong, because nothing would have said otherwise.
+        #
+        # Fifth instance today of a check scoped to the wrong population, after head coverage,
+        # gate_store_coverage, the D1/D2 bands and the corpus size guard. A stride samples the
+        # whole file at the same cost and cannot miss a tier appended to the end.
+        _stride = max(1, len(syn) // 400)
+        _probe = syn[::_stride][:400] + oer[:40]
         _n = sum(len(_cand.encode(d).ids) for d in _probe)
         _u = sum(_cand.encode(d).ids.count(_unk) for d in _probe)
         _spec_ok = all((_cand.token_to_id(t) is not None and _cand.token_to_id(t) < 11)
