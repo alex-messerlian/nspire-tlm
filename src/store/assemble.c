@@ -25,10 +25,64 @@ static int appendn(char *out, int cap, int n, const char *s, int len) {
     return n + len;
 }
 
+static int ieq(const char *a, const char *b) {
+    for (; *a && *b; a++, b++) {
+        char x = *a, y = *b;
+        if (x >= 'A' && x <= 'Z') x = (char)(x - 'A' + 'a');
+        if (y >= 'A' && y <= 'Z') y = (char)(y - 'A' + 'a');
+        if (x != y) return 0;
+    }
+    return *a == *b;
+}
+
+/* THE KEYPAD IS LOWERCASE AND THE STORE IS NOT, so an exact match alone loses the given.
+ *
+ * device_app.c:314 upcases only while shift is held, so a student who types `f=12 d=2.5` -- which
+ * is verbatim what the device test did -- supplied `f`, the record wants `F`, strcmp said no, and
+ * ns_assemble emitted a prompt that contradicted itself in one line:
+ *
+ *     <q>find work. Given f = 12, d = 2.5.</q><r>W=F*d | W:J F:N d:m | missing:F | ...
+ *
+ * "Given f = 12" and "missing:F" at once. The model answered anyway and the number happened to be
+ * right, which is how this survived a device test reported as "kinda decent".
+ *
+ * CASE IS NOT NOISE IN PHYSICS, so this is not a blind tolower: T is period or temperature and t is
+ * time, V is volume or voltage and v is velocity. A case-insensitive match is accepted ONLY when it
+ * is unambiguous in BOTH directions -- exactly one of the record's variables matches the typed
+ * token ignoring case, and exactly one typed token matches that record variable. On a record
+ * carrying both T and t, neither resolves and the behaviour is exactly what it was.
+ */
+static int ci_unique(const ns_rec2 *r, const ns_input *in, int vi, int k) {
+    int nrec = 0, nin = 0;
+    for (int j = 0; j < r->nvars; j++) if (ieq(r->var[j], in->var[vi])) nrec++;
+    for (int j = 0; j < in->nvals; j++) if (in->var[j] && ieq(in->var[j], r->var[k])) nin++;
+    return nrec == 1 && nin == 1;
+}
+
+/* The record's spelling for a typed variable, or NULL when it does not resolve. */
+static const char *canon_var(const ns_rec2 *r, const ns_input *in, int vi) {
+    if (!r || !in) return 0;
+    for (int k = 0; k < r->nvars; k++)
+        if (strcmp(r->var[k], in->var[vi]) == 0) return r->var[k];
+    for (int k = 0; k < r->nvars; k++)
+        if (ieq(r->var[k], in->var[vi]) && ci_unique(r, in, vi, k)) return r->var[k];
+    return 0;
+}
+
 static const char *value_for(const ns_input *in, const char *var) {
     if (!in) return 0;
     for (int i = 0; i < in->nvals; i++)
         if (in->var[i] && strcmp(in->var[i], var) == 0) return in->val[i];
+    return 0;
+}
+
+/* value_for, resolved against the record so an unambiguous case difference still counts. */
+static const char *value_for_rec(const ns_rec2 *r, const ns_input *in, int k) {
+    const char *v = value_for(in, r->var[k]);
+    if (v || !r || !in) return v;
+    for (int i = 0; i < in->nvals; i++)
+        if (in->var[i] && ieq(in->var[i], r->var[k]) && ci_unique(r, in, i, k))
+            return in->val[i];
     return 0;
 }
 
@@ -82,14 +136,20 @@ int ns_assemble(char *out, int cap, const ns_rec2 *r, const char *question, cons
     int nwrote = 0;
     if ((in && in->nvals > 0) || r->nvars) {
         for (int i = 0; in && i < in->nvals; i++) {
+            /* THE RECORD'S SPELLING, not the student's, when they differ only by case and resolve
+             * unambiguously. The record span right below says `F:N`, so a given written `f = 12`
+             * is a different symbol to the model and to prov_call_unsourced alike. An unresolved
+             * token is echoed exactly as typed, because rewriting a variable the record does not
+             * have would be inventing one. */
+            const char *cv = canon_var(r, in, i);
             n = appends(out, cap, n, nwrote++ ? ", " : " Given ");
-            n = appends(out, cap, n, in->var[i]);
+            n = appends(out, cap, n, cv ? cv : in->var[i]);
             n = appends(out, cap, n, " = ");
             n = appends(out, cap, n, in->val[i]);
         }
         for (int k = 0; k < r->nvars; k++) {
             if (!r->cval[k] || !r->cval[k][0]) continue;
-            if (value_for(in, r->var[k])) continue;   /* the student overrode it; theirs wins */
+            if (value_for_rec(r, in, k)) continue;   /* the student overrode it; theirs wins */
             n = appends(out, cap, n, nwrote++ ? ", " : " Given ");
             n = appends(out, cap, n, r->var[k]);
             n = appends(out, cap, n, " = ");
@@ -115,7 +175,7 @@ int ns_assemble(char *out, int cap, const ns_rec2 *r, const char *question, cons
     for (int k = 0; k < r->nvars; k++) {
         if (strcmp(r->var[k], r->lhs) == 0) continue;
         if (r->cval[k] && r->cval[k][0]) continue;      /* supplied constant, not asked of the student */
-        if (!value_for(in, r->var[k])) { miss = r->var[k]; break; }
+        if (!value_for_rec(r, in, k)) { miss = r->var[k]; break; }
     }
     n = appends(out, cap, n, " | missing:");
     n = appends(out, cap, n, miss);

@@ -70,6 +70,62 @@ int main(int argc, char **argv) {
                 "| no matching relation | fit:low<a>", "form C exact string");
     ck(strstr(buf, "fit:low") != NULL, "form C carries fit:low -- the mechanism measured at 100% refusal");
 
+    /* ---- A65: THE KEYPAD IS LOWERCASE AND THE STORE IS NOT ------------------------------
+     *
+     * device_app.c:314 upcases only while shift is held, so `f=12 d=2.5` -- verbatim the device
+     * test's input -- is what a student actually sends. Before this, strcmp lost the given and the
+     * prompt contradicted itself in one line: "Given f = 12" beside "missing:F". */
+    {
+        int w = -1;
+        for (int i = 0; i < st.n; i++) if (!strcmp(st.rec[i].formula, "W=F*d")) { w = i; break; }
+        ck(w >= 0, "W=F*d present");
+        if (w >= 0) {
+            ns_input lo = {0}, up = {0};
+            lo.nvals = 2; lo.var[0] = "f"; lo.val[0] = "12"; lo.var[1] = "d"; lo.val[1] = "2.5";
+            up.nvals = 2; up.var[0] = "F"; up.val[0] = "12"; up.var[1] = "d"; up.val[1] = "2.5";
+            char a[NS_PROMPT_MAX], b[NS_PROMPT_MAX];
+            ns_assemble(a, sizeof a, &st.rec[w], "find work", &lo);
+            ns_assemble(b, sizeof b, &st.rec[w], "find work", &up);
+            ck_str(a, b, "a lowercase given assembles byte-identically to the uppercase one");
+            ck(strstr(a, "missing:none") != NULL, "lowercase f is NOT reported missing");
+            ck(strstr(a, "Given F = 12") != NULL, "the prompt echoes the RECORD's spelling");
+            ck(strstr(a, "Given f = 12") == NULL, "...and not the student's, when they differ");
+        }
+    }
+    /* THE AMBIGUITY GUARD, exercised on a SYNTHETIC record because no record in the shipped store
+     * has case-colliding variables -- measured, 0 of 164. A guard nobody has watched fire is a
+     * claim, not a check, so it is fired here deliberately.
+     *
+     * Case is not noise in physics: T is period or temperature and t is time. On a record carrying
+     * both, a typed `t` must resolve EXACTLY as it did before, never guess. */
+    {
+        ns_rec2 amb = {0};
+        amb.formula = "x=T*t"; amb.name = "ambiguous"; amb.lhs = "x"; amb.req = ""; amb.rid = "amb1";
+        amb.nvars = 3;
+        amb.var[0] = "x"; amb.unit[0] = "m";  amb.cval[0] = "";
+        amb.var[1] = "T"; amb.unit[1] = "s";  amb.cval[1] = "";
+        amb.var[2] = "t"; amb.unit[2] = "s";  amb.cval[2] = "";
+        ns_input one = {0};
+        one.nvals = 1; one.var[0] = "t"; one.val[0] = "5";
+        char c[NS_PROMPT_MAX];
+        ck(ns_assemble(c, sizeof c, &amb, "find x", &one) > 0, "ambiguous record assembles");
+        ck(strstr(c, "Given t = 5") != NULL, "an exact match still wins on an ambiguous record");
+        ck(strstr(c, "missing:T") != NULL,
+           "and T stays MISSING: a case-insensitive fallback must not resolve it");
+        /* the other direction: two typed tokens differing only by case must not both claim one var */
+        ns_rec2 one_var = {0};
+        one_var.formula = "y=F"; one_var.name = "single"; one_var.lhs = "y"; one_var.req = ""; one_var.rid = "one1";
+        one_var.nvars = 2;
+        one_var.var[0] = "y"; one_var.unit[0] = "N"; one_var.cval[0] = "";
+        one_var.var[1] = "F"; one_var.unit[1] = "N"; one_var.cval[1] = "";
+        ns_input two = {0};
+        two.nvals = 2; two.var[0] = "f"; two.val[0] = "1"; two.var[1] = "F"; two.val[1] = "2";
+        char e[NS_PROMPT_MAX];
+        ck(ns_assemble(e, sizeof e, &one_var, "find y", &two) > 0, "two-token record assembles");
+        ck(strstr(e, "missing:none") != NULL,
+           "the EXACT token still binds F when a case variant is also present");
+    }
+
     /* ---- NEGATIVE CONTROLS ------------------------------------------------------------- */
     ck(ns_assemble(NULL, 10, &st.rec[0], "q", NULL) == -1, "null out rejected");
     ck(ns_assemble(buf, sizeof buf, NULL, "q", NULL) == -1, "null record rejected");

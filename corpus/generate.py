@@ -2657,6 +2657,58 @@ def gen(n, seed=0):
     out = re.findall(r"<res>(.*?)</res>",
           subprocess.run(["tools/eval/evalcli","-"], input="\n".join(calls)+"\n",
                          capture_output=True, text=True).stdout, re.S)
+    # A65. CASE JITTER, drawn INDEPENDENTLY OF CLASS, applied to every question before any text is
+    # composed. This exists because of a measurement on the shipped corpus:
+    #
+    #   class     total    question starts with a lowercase letter
+    #   ANSWER  192,851         0   (0.0%)
+    #   D1       22,743         0   (0.0%)
+    #   D2       12,085         0   (0.0%)
+    #   D3        7,468       277   (3.7%)
+    #   EXPLAIN   4,706     3,905  (83.0%)
+    #
+    # A lowercase first letter NEVER occurs in ANSWER, D1 or D2. On the record-bearing zero-given
+    # stratum -- the exact shape ns_assemble emits for "what is Hooke's law?" -- it is a perfect
+    # EXPLAIN classifier. And src/store/device_app.c:314 upcases only while SHIFT IS HELD, so the
+    # keypad's default output is lowercase: every unshifted question a real student types lands in
+    # a case the corpus uses for nothing but EXPLAIN and D3.
+    #
+    # That is the A42 shape-cue defect with a different surface. fit_m scored 98.9% on a rule that
+    # was a 100%-precision classifier over 12,014 firings, and both pre-registered guards passed
+    # because neither VARIED the input the defect lived in. Here the input is letter case, and
+    # nothing in the suite varies it: tools/eval/gate_refusal_cue.py:58 LOWERCASES before it
+    # searches, so the one n-gram cue search in the repo is blind to this class by construction.
+    #
+    # FIRST LETTER ONLY, deliberately. Lowercasing the whole question would hit the givens, which
+    # live inside the question string here -- "Given F = 12" would become "given f = 12" while the
+    # record span still says `F:N`, which is precisely the self-contradiction A65 just removed from
+    # assemble.c. The cue that was measured is the first character, and that is what is destroyed.
+    _jit = 0
+    for _d in docs:
+        _q = _d.get("q")
+        if not _q:
+            continue
+        _i = next((j for j, ch in enumerate(_q) if ch.isalpha()), -1)
+        if _i < 0:
+            continue
+        # Never touch a leading VARIABLE: "F_net is the ..." must keep its symbol. A first word that
+        # is short and not all-lowercase-able English is left alone.
+        _w = _q[_i:].split(" ", 1)[0].strip(".,?:;")
+        if "_" in _w or any(c.isdigit() for c in _w) or (len(_w) <= 3 and _w.isupper()):
+            continue
+        # BOTH DIRECTIONS. The first version only LOWERED, which killed "lowercase -> EXPLAIN"
+        # (100% -> 3.6%) and left "UPPERCASE -> not explain" at ~99.7%, because the EXPLAIN
+        # templates are authored lowercase and nothing ever raised them. A cue removed in one
+        # direction is a cue moved, not a cue removed -- RESULT_CANNOT_EXPLAIN is this repo's
+        # record of closing a coverage hole with one class and relocating the signal.
+        _want_lower = rng.random() < 0.5
+        _new = _q[_i].lower() if _want_lower else _q[_i].upper()
+        if _new != _q[_i]:
+            _d["q"] = _q[:_i] + _new + _q[_i + 1:]
+            _jit += 1
+    print(f"  case jitter: flipped the first letter of {_jit:,} of {len(docs):,} questions "
+          f"({100*_jit/max(1,len(docs)):.1f}%), both directions, drawn independently of class")
+
     built, dropped = [], 0
     for d, c, res in zip(docs, calls, out):
         if d.get("nomatch"):
