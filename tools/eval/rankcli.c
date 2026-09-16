@@ -7,6 +7,7 @@
 int main(int argc, char **argv) {
     ns_store2 st;
     int mode = argc > 2 ? atoi(argv[2]) : 0, k = argc > 3 ? atoi(argv[3]) : 5;
+    ask_fuzz_set(argc > 4 ? atoi(argv[4]) : 0);   /* A56: argv[4]=1 enables fuzzy */
     if (ns_load(&st, argc > 1 ? argv[1] : "build/store.tns") != NS_OK) return 2;
     char line[2048];
     while (fgets(line, sizeof line, stdin)) {

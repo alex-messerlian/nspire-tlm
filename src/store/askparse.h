@@ -53,3 +53,4 @@ void ask_parse(const char *question, ns_ask *a);
 /* One call: pick, parse, strip. a->question is what to hand ns_assemble. */
 void ask_build(const ns_store2 *st, const char *question, ns_ask *a);
 #endif
+void ask_fuzz_set(int on);

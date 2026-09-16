@@ -13,6 +13,74 @@ static int idch(char c) { return alpha(c) || (c >= '0' && c <= '9') || c == '_';
  * and "for" is a substring of "force". Both ends have to sit on a boundary. Eleventh instance of
  * the proxy-predicate pattern in this repo -- "contains the letters" standing in for "uses the
  * word" -- and, as every previous instance, it was the control that caught it and not the rule. */
+/* A56. FUZZY WORD MATCHING, BECAUSE STUDENTS MISTYPE AND THE KEYPAD IS AWKWARD.
+ *
+ * Measured on device: the user could not find an apostrophe, typed "hookes law", and the picker
+ * returned LAW OF REFRACTION. A54 fixed that one word. The general case is every word: "hooks",
+ * "huke", "hokes", "momentom", "accelaration", "freqency".
+ *
+ * Bounded Levenshtein with early exit. The budget scales with length because a one-edit window on a
+ * four-letter word matches far too much ("mass"/"pass"/"mask"/"maps"), while an eight-letter word
+ * can absorb two typos and stay unambiguous:
+ *
+ *     len <= 4   exact only      -- too short to relax safely
+ *     len 5-7    1 edit
+ *     len >= 8   2 edits
+ *
+ * THE COST IS FALSE MATCHES AND IT IS REAL, not hypothetical. Relaxing matching by merely allowing
+ * a trailing 's' was measured to make 7 of 200 eval questions match a record where nothing had
+ * matched before. This is a strictly larger relaxation, so the threshold above is a starting point
+ * to be MEASURED in both directions (typo-injection for recall, the 200-item benchmark for false
+ * matches), not a setting to assert. See docs/RESULT_FUZZY.md. */
+static int edist_le(const char *a, const char *b, int max) {
+    int la = 0, lb = 0;
+    while (a[la]) la++;
+    while (b[lb]) lb++;
+    int d = la - lb; if (d < 0) d = -d;
+    if (d > max) return 0;                       /* length alone rules it out */
+    int prev[40], cur[40];
+    if (lb > 38) return 0;
+    for (int j = 0; j <= lb; j++) prev[j] = j;
+    for (int i = 1; i <= la; i++) {
+        cur[0] = i;
+        int lo = i - max, hi = i + max, best = max + 1;
+        if (lo < 1) lo = 1;
+        if (hi > lb) hi = lb;
+        for (int j = 1; j <= lb; j++) cur[j] = max + 1;   /* outside the band is unreachable */
+        for (int j = lo; j <= hi; j++) {
+            int sub = prev[j - 1] + (lc(a[i - 1]) == lc(b[j - 1]) ? 0 : 1);
+            int del = prev[j] + 1, ins = cur[j - 1] + 1;
+            int v = sub < del ? sub : del; if (ins < v) v = ins;
+            cur[j] = v; if (v < best) best = v;
+        }
+        if (best > max) return 0;                /* whole row exceeded the budget: stop */
+        for (int j = 0; j <= lb; j++) prev[j] = cur[j];
+    }
+    return prev[lb] <= max;
+}
+
+static int fuzz_budget(const char *w) {
+    int n = 0; while (w[n]) n++;
+    return n <= 4 ? 0 : (n <= 7 ? 1 : 2);
+}
+
+/* Walk the question's words and accept one within the edit budget of `word`. */
+static int word_near(const char *hay, const char *word) {
+    int max = fuzz_budget(word);
+    if (max == 0) return 0;
+    char qw[40];
+    for (const char *h = hay; ; h++) {
+        if (*h && (alpha(*h) || *h == '_')) {
+            int n = 0; const char *k = h;
+            while (*k && (alpha(*k) || *k == '_' || (*k >= '0' && *k <= '9')) && n < 39) qw[n++] = (char)lc(*k++);
+            qw[n] = 0; h = k - 1;
+            if (n >= 3 && edist_le(qw, word, max)) return 1;
+            if (!*k) break;
+        } else if (!*h) break;
+    }
+    return 0;
+}
+
 static int word_in(const char *hay, const char *word) {
     for (const char *h = hay; *h; h++) {
         if (h != hay && alpha(h[-1])) continue;
@@ -141,6 +209,12 @@ static int idf16(const char *w) {
  * A record name is a bag of DISTINCT terms for retrieval purposes; repeating one is a property of
  * the phrasing, not evidence about the question. Dedupe is per record, reset by score_record. */
 struct sctx { const char *q; int score; int mode; char seen[12][24]; int nseen; };
+/* A56. Fuzzy matching is OFF by default and switched on per call, so the subject and the control
+ * are the same binary -- the discipline rankcli's own header states. ask_fuzz_set() is called by
+ * the measurement harness and by the device once a threshold has been measured. */
+static int FUZZ_ON = 0;
+void ask_fuzz_set(int on) { FUZZ_ON = on; }
+
 static void score_word(const char *w, void *v) {
     struct sctx *c = (struct sctx *)v;
     for (int i = 0; i < c->nseen; i++) if (!strcmp(c->seen[i], w)) return;
@@ -149,7 +223,14 @@ static void score_word(const char *w, void *v) {
         while (w[n] && n < (int)sizeof c->seen[0] - 1) { d[n] = w[n]; n++; }
         d[n] = 0; c->nseen++;
     }
-    if (!word_in(c->q, w)) return;
+    if (!word_in(c->q, w)) {
+        /* A FUZZY HIT IS WEAKER EVIDENCE THAN AN EXACT ONE and must not outrank it. Half weight:
+         * two fuzzy matches still lose to two exact ones, and a fuzzy match only decides a record
+         * that would otherwise have scored nothing. */
+        if (!(FUZZ_ON && word_near(c->q, w))) return;
+        c->score += ((c->mode == ASK_IDF) ? idf16(w) : 16) / 2;
+        return;
+    }
     c->score += (c->mode == ASK_IDF) ? idf16(w) : 16;
 }
 
