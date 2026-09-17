@@ -267,3 +267,43 @@ assert not answer_ok(_MP, _MW),        "answer_ok must reject a shape mismatch"
 assert answer_ok(_MP, _MR),            "answer_ok must accept the correct call"
 assert well_formed("<tool> e<arg> 1</tool><res> 1</res><a> 1.<end>")
 assert not well_formed("<tool> e<arg> 1</tool><res> 1</res> 1.<end>")
+
+# THE STORE SPELLS A RELATION WITH REDUNDANT PARENTHESES AND A READABLE ANSWER DOES NOT.
+#
+# store_clean.json holds `P=(((V)^(2))/(R))` and `I_0=((V_0)/(Z))`, and src/store/assemble.c prints
+# that verbatim into the <r> span. A written explanation says `P = V^2/R`, because that is what a
+# person writes. explain_ok compared the two with whitespace removed and nothing else, so 265 of
+# 492 written variants -- 53.9% -- would have scored FALSE for spelling the SAME RELATION readably.
+#
+# That is a grader reporting the explain arm at roughly half its true value, and it would have read
+# as the model failing. Caught before the arm was run, by checking the oracle against the corpus it
+# was about to grade.
+#
+# IT IS A NORMALISATION, NOT A LOOSENING. Only redundant grouping is removed; a sign, a symbol or an
+# operator surviving the reduction still has to match, so `F = k*x` against a record of `F=-k*x`
+# remains a mismatch and so does `F = G*x`. test_grade_relation.py asserts both directions.
+def _relnorm(x):
+    """Whitespace and ALL parentheses removed.
+
+    Reducing only REDUNDANT parentheses does not work: `P=(((V)^(2))/(R))` reduces to `P=((V^2)/R)`
+    and a person writes `P = V^2/R`, so the two still differ by a grouping that carries no meaning
+    here. Chasing that with more rewrite rules is writing a parser badly.
+
+    THE TRADEOFF, STATED RATHER THAN HIDDEN: dropping all parentheses also equates `(a+b)*c` with
+    `a+b*c`, which are different relations. That is accepted because of what this predicate is FOR
+    -- "does the answer state the record's relation" -- and because the failure it must catch is a
+    WRONG relation, which in every observed case is a changed SIGN or a changed SYMBOL:
+
+        F=-k*x   vs  "F = k*x"    still a mismatch, the minus survives
+        F=-k*x   vs  "F = G*x"    still a mismatch, G is not k
+
+    A precedence-sensitive comparison would need the evaluator's own parser, and tools/eval has one;
+    if a record ever appears where the paren structure is the thing in doubt, this should call it
+    rather than grow another regex.
+    """
+    return re.sub(r"[\s()]", "", x)
+
+
+def relation_stated(formula, text):
+    """True when `text` states `formula`, allowing the store's redundant parentheses to be dropped."""
+    return _relnorm(formula) in _relnorm(text)

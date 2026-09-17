@@ -105,8 +105,12 @@ def is_template_only(a):
 # Both are fluent, neither is the template, and both are wrong physics stated confidently. That is
 # the failure the whole tool-augmented architecture exists to prevent, so the gate has to see it.
 # Same idea as prov_call_unsourced, applied to the ANSWER span instead of the tool call.
+sys.path.insert(0, str(ROOT / "tools/eval"))
+import grade                             # ONE relation comparison, shared with score_arms
+
+
 def _norm_rel(x):
-    return re.sub(r"[\s()]", "", x)
+    return grade._relnorm(x)
 
 
 def states_wrong_relation(answer, formula):

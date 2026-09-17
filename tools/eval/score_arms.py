@@ -124,7 +124,14 @@ def explain_ok(prompt, generation):
     if grade.is_refusal(generation): return False
     if "<tool>" in generation: return False          # nothing to compute; a call is a wrong shape
     formula = prompt.split("</q><r>", 1)[1].split(" | ", 1)[0]
-    if _SQ(formula) not in _SQ(generation): return False
+    # THROUGH grade.relation_stated, NOT a whitespace-stripped substring.
+    #
+    # The store spells `P=(((V)^(2))/(R))` and a written explanation says `P = V^2/R`, which is the
+    # same relation and what a person writes. The old comparison scored 265 of 492 written variants
+    # (53.9%) FALSE for that alone -- the explain arm would have read at roughly half its true value
+    # and I would have read it as the model failing. Caught by checking the oracle against the
+    # corpus it was about to grade, before the arm was run.
+    if not grade.relation_stated(formula, generation): return False
     return grade.prov_clean(prompt + generation)
 
 

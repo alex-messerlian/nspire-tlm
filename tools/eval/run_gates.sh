@@ -161,6 +161,7 @@ if ! _skip d3_legitimacy; then $PY tools/eval/gate_d3_legitimacy.py >/dev/null 2
 if ! _skip knowledge; then $PY tools/eval/gate_knowledge.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "knowledge" || { printf "  %-20s FAIL\n" "knowledge"; fail=1; }; fi
 if ! _skip keypad; then $PY tools/eval/gate_keypad.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "keypad" || { printf "  %-20s FAIL\n" "keypad"; fail=1; }; fi
 if ! _skip explanations; then $PY tools/eval/gate_explanations.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "explanations" || { printf "  %-20s FAIL\n" "explanations"; fail=1; }; fi
+if ! _skip grade_relation; then $PY tools/eval/test_grade_relation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "grade_relation" || { printf "  %-20s FAIL\n" "grade_relation"; fail=1; }; fi
 if ! _skip no_dead_api; then $PY tools/eval/gate_no_dead_api.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "no_dead_api" || { printf "  %-20s FAIL\n" "no_dead_api"; fail=1; }; fi
 if ! _skip decl_siblings; then $PY tools/eval/gate_declaration_siblings.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "decl_siblings" || { printf "  %-20s FAIL\n" "decl_siblings"; fail=1; }; fi
 if ! _skip ascii_boundary; then $PY tools/eval/gate_ascii_boundary.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "ascii_boundary" || { printf "  %-20s FAIL\n" "ascii_boundary"; fail=1; }; fi
