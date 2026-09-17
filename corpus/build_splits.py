@@ -353,6 +353,21 @@ def _arm_from_gen(pool, seed, want, n=6000, cap=120):
     for d in docs:
         if not want(d):
             continue
+        # A51-SCRAMBLED DOCUMENTS ARE EXCLUDED, and the reason is that their record is not
+        # lookupable rather than that scrambling is bad.
+        #
+        # A51 renames a record's variables consistently in ~24% of documents, so the record span
+        # reads `beta=epsilon+tau` while `head` keeps the original formula. Every assertion below
+        # resolves the SHOWN formula against the record pool to check that a question's givens are
+        # record constants, and a scrambled formula is in no pool -- it fails with
+        # "record beta=epsilon+tau is in no pool", which is the check being unable to run rather
+        # than a defect it found.
+        #
+        # An arm of scrambled records would be a legitimate READING test and is a different arm
+        # from this one, which is about what the model does with a record it may have memorised.
+        # Mixing them would make the arm two things measured under one name.
+        if d.get("scrambled"):
+            continue
         t = d["text"]
         q = t[3:].split("</q>", 1)[0]
         rec = t.split("</q><r>", 1)[1].split("<a>", 1)[0]

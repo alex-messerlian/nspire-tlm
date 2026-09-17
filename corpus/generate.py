@@ -2157,7 +2157,16 @@ KNOWLEDGE = float(os.environ.get("KNOWLEDGE", "1"))
 # one under 215 chars, pure ASCII, using only variables the record declares, grounded in that
 # record's own OpenStax section where evidence existed (127 of 164). See docs/RESULT_F1_PROSE.md.
 _EXPL_PATH = pathlib.Path(__file__).resolve().parent / "knowledge/explanations.json"
-_EXPL = ({e["formula"]: e["variants"] for e in json.load(open(_EXPL_PATH))}
+# EXPLAIN_VARIANTS caps how many of the three written variants a record may use.
+#
+# know1 fabricated a relation on 23.2% of records. EXPLAIN gives 29 documents per record split
+# across 3 variants, so each STRING is seen about 10 times (about 26 gradient exposures at 2.58
+# passes over the corpus). K1 succeeds at 16 documents per term -- but a K1 answer is readable from
+# field 3 of its own prompt, while an EXPLAIN answer exists nowhere in the prompt and must be
+# memorised whole. One variant triples exposures per string at zero corpus cost, spending
+# within-record variety and keeping across-record variety untouched.
+EXPLAIN_VARIANTS = int(os.environ.get("EXPLAIN_VARIANTS", "3"))
+_EXPL = ({e["formula"]: e["variants"][:EXPLAIN_VARIANTS] for e in json.load(open(_EXPL_PATH))}
          if _EXPL_PATH.exists() else {})
 _EXPL_USED, _EXPL_FALL = [0], [0]
 _KPATH = pathlib.Path(__file__).resolve().parent / "knowledge/definitions_train.json"
@@ -3058,7 +3067,8 @@ def gen(n, seed=0):
         _t = _EXPL_USED[0] + _EXPL_FALL[0]
         print(f"  F1 explanations: {_EXPL_USED[0]:,} of {_t:,} used a WRITTEN answer "
               f"({100*_EXPL_USED[0]/_t:.1f}%), {_EXPL_FALL[0]:,} fell back to the formula template "
-              f"({len(_EXPL):,} records have written prose)")
+              f"({len(_EXPL):,} records have written prose, "
+              f"{EXPLAIN_VARIANTS} variant{'' if EXPLAIN_VARIANTS==1 else 's'} each)")
 
     if KNOWLEDGE > 0 and _KDEFS:
         kdocs = gen_knowledge(rng)
