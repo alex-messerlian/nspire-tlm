@@ -96,6 +96,29 @@ def is_template_only(a):
     return len(words) <= 6
 
 
+# A RELATION THE RECORD DOES NOT HAVE IS A FABRICATION, and my first D1 counted two of them as
+# PASS because the predicate only asked "is this not the template". Measured on know1:
+#
+#   record F=-k*x   answer "F = k*x is how long that force is"     sign flipped
+#   record F=-k*x   answer "because F = G*x is not a big Delta_t"  G invented
+#
+# Both are fluent, neither is the template, and both are wrong physics stated confidently. That is
+# the failure the whole tool-augmented architecture exists to prevent, so the gate has to see it.
+# Same idea as prov_call_unsourced, applied to the ANSWER span instead of the tool call.
+def _norm_rel(x):
+    return re.sub(r"[\s()]", "", x)
+
+
+def states_wrong_relation(answer, formula):
+    """True when the answer asserts a relation that is not the record's."""
+    want = _norm_rel(formula)
+    for m in re.finditer(r"([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^.,;]{1,40})", answer):
+        got = _norm_rel(m.group(0))
+        if got and got not in want and want not in got:
+            return True, m.group(0).strip()
+    return False, ""
+
+
 def rare_words(meaning, df, k=5):
     """Content words of the meaning that appear in <= k of all meanings. Copying the term is easy;
     carrying its rare words is what the HIT leg is actually asking for."""
@@ -140,10 +163,14 @@ def main():
         out = gen(m, pre)
         a = answer_of(out)
         tmpl = is_template_only(a)
-        ok = bool(a) and "<end>" in out and not DECLINE.search(a) and not tmpl
+        rec_f = pre.split("</q><r>", 1)[1].split(" | ", 1)[0] if "</q><r>" in pre else ""
+        wrong, badrel = states_wrong_relation(a, rec_f)
+        ok = (bool(a) and "<end>" in out and not DECLINE.search(a) and not tmpl and not wrong)
         d1 += ok
         why = "" if ok else ("  <- DECLINED" if DECLINE.search(a) else
-                             "  <- TEMPLATE ONLY, no explanation" if tmpl else "  <- malformed")
+                             "  <- TEMPLATE ONLY, no explanation" if tmpl else
+                             f"  <- FABRICATED RELATION {badrel!r} against {rec_f!r}" if wrong
+                             else "  <- malformed")
         print(f"  {'PASS' if ok else 'FAIL'} {q!r}{why}\n       {a[:150]}")
     print(f"  D1 = {d1}/6   (PASS is >= 5)\n")
 
