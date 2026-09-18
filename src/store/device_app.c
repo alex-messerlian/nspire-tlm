@@ -461,11 +461,22 @@ void app_request(const char *question, const char *rid) {
     app_status("Reading", idx < 0 ? "no matching relation" : ST.rec[idx].name);
     app_draw();
 
-    /* Checked at startup by rq_probe, so this cannot reach read_checkpoint's exit() path. */
+    /* THIS COMMENT USED TO READ "Checked at startup by rq_probe, so this cannot reach
+     * read_checkpoint's exit() path." IT WAS FALSE, and it is the reason the app vanished on enter
+     * in front of the operator. rq_probe checks the FILE and allocates nothing; the path that
+     * actually killed the process was malloc returning NULL for the 11.4 MB checkpoint on a
+     * calculator whose heap had been eaten by previous failed runs. A comment asserting a
+     * guarantee the code does not make is worse than no comment -- this repo already had that
+     * rule, and the comment is what stopped me reading the line under it.
+     *
+     * Both doors are now covered at startup: rq_probe for the file, and a trial allocation of the
+     * real size for the heap. See main(). */
     if (!MODEL_OK) {
-        char msg[220];
-        snprintf(msg, sizeof msg, "<a> The model file could not be loaded: %s. "
-                                  "Re-copy model4096.bin.tns to the calculator.<end>", MODEL_WHY);
+        /* 320, NOT 220. MODEL_WHY is 160 and the wrapper text is ~90, so 220 truncated -- and what
+         * it truncated was the trailing "<end>", the token app_stream_end pairs with. An error
+         * message that loses its own terminator is a hang wearing an error's clothes. */
+        char msg[320];
+        snprintf(msg, sizeof msg, "<a> The model could not be loaded: %s<end>", MODEL_WHY);
         app_stream_token(msg); app_stream_end(); return;
     }
     if (!MODEL_READY) { rq_build(dpath("model4096.bin.tns")); MODEL_READY = 1; }
@@ -713,6 +724,49 @@ int main(void) {
      * answer is far more useful in front of a judge than one that disappears, and the reason is
      * exact enough to act on. */
     if (rq_probe(dpath("model4096.bin.tns"), MODEL_WHY, sizeof MODEL_WHY) == 0) MODEL_OK = 1;
+
+    /* AND PROBE THE ALLOCATION, NOT ONLY THE FILE. A90.
+     *
+     * rq_probe validates the checkpoint's HEADER and allocates nothing, so it passes on a
+     * calculator that has no room to load it. read_checkpoint then mallocs the whole file on the
+     * first send, gets NULL, and exit()s -- which is the same vanishing-on-enter symptom the probe
+     * above was added to remove, arriving through the one door it does not cover.
+     *
+     * MEASURED ON DEVICE, and it is not hypothetical. Ndless does not reclaim the heap from a
+     * program that exit()s, so each failed attempt cost ~11 MB and they accumulated:
+     *
+     *     ram free 32,088,184 B   after a reboot          -> the app answers normally
+     *     ram free  7,072,756 B   after a few failed runs -> malloc(11,417,728) returns NULL
+     *
+     * bench_ask caught it in one run, at `error=oom bytes=11417728`, after reading the code had
+     * produced two confident wrong diagnoses. I had also cleared this hypothesis against
+     * bench_memceiling, which reports first_alloc_11417728=ok and bare_largest_malloc=22,377,216 --
+     * both true, both taken ON A FRESH HEAP, and neither a statement about a running program.
+     * The project log already carries that exact trap (21.56 MiB bare against 4.83 MiB in situ) and I
+     * trusted the probe without its precondition anyway.
+     *
+     * A TRIAL ALLOCATION IS THE ONLY HONEST PREDICTOR. Free RAM as reported is not the same
+     * question as "can one contiguous block of this size be had", which is what read_checkpoint
+     * needs. So ask for exactly what it will ask for, then give it straight back. */
+    if (MODEL_OK) {
+        FILE *mf = fopen(dpath("model4096.bin.tns"), "rb");
+        if (mf) {
+            long msz = 0;
+            if (fseek(mf, 0, SEEK_END) == 0) msz = ftell(mf);
+            fclose(mf);
+            if (msz > 0) {
+                void *trial = malloc((size_t)msz);
+                if (!trial) {
+                    MODEL_OK = 0;
+                    snprintf(MODEL_WHY, sizeof MODEL_WHY,
+                             "Not enough free RAM: the model needs %ld bytes in one block. "
+                             "Reboot, re-run Ndless, open this app first.", msz);
+                } else {
+                    free(trial);
+                }
+            }
+        }
+    }
 
     if (ns_tok_load(&TK, dpath("tok4096.tok.tns")) != NST_OK) {
         die("Tokenizer failed to load.", dpath("tok4096.tok.tns"));
