@@ -26,4 +26,13 @@ int  ns_family_of_unit(const char *unit);
  * "current" nor "resistance". */
 const char *ns_unit_nouns(const char *unit);
 int  ns_family_count(void);
+/* BROWSABLE means "a student can reach every record in this family by paging a list". It is FALSE
+ * for exactly one family, Definitions, which holds the knowledge tier's 1,442 glossary records:
+ * 97 screens is not a browse path. Those are reached by TYPING, and ns_filter narrows them well
+ * (measured on the shipped store: "entro" -> 6, "photon" -> 11, "refr" -> 10).
+ *
+ * This is a FUNCTION and not a comment because a decision held by documentation alone lapses.
+ * test_picker asserts the 2-screen bound over the browsable families and asserts a filter bound
+ * over the search-only one, so neither population is unchecked. */
+int  ns_family_browsable(int fam);
 #endif

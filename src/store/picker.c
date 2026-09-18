@@ -6,14 +6,22 @@
 #include <ctype.h>
 #include "picker.h"
 
-/* unit -> family. Order defines first-screen order. 13 families: measured worst browse path is
+/* unit -> family. Order defines first-screen order. 14 families: measured worst browse path is
  * 27 records (2 screens) against 61 (5 screens) for a coarser 7-family split, at no cost --
- * 13 rows still fit the 15 visible. HEADROOM IS 2 ROWS: a 16th family would start scrolling. */
+ * 14 rows still fit the 15 visible. HEADROOM IS 1 ROW: a 16th family would start scrolling.
+ *
+ * "Definitions" is APPENDED, never inserted, because a family's index is its identity to every
+ * caller that stored one. It holds the knowledge tier: 1,442 glossary records packed as ordinary
+ * store records with nvars=1 and unit "text" (K-TEXT), which is why the taxonomy extends by one
+ * unit row rather than by a special case. The rule the header states still holds without
+ * exception: a family is derived from the UNIT of the solved-for variable, so it cannot drift
+ * from the store. Before this row every one of those records was UNMAPPED and test_picker failed
+ * three assertions -- "every record maps to a family", the family-count sum, and the empty query. */
 static const char *FAMILY[] = {
     "Distance, area & volume", "Speed & velocity", "Acceleration", "Time & period",
     "Force & pressure", "Energy & work", "Power", "Mass & momentum",
     "Electricity & magnetism", "Waves & optics", "Rotation",
-    "Heat & thermodynamics", "Ratios & dimensionless",
+    "Heat & thermodynamics", "Ratios & dimensionless", "Definitions",
 };
 #define NFAM ((int)(sizeof FAMILY / sizeof FAMILY[0]))
 
@@ -26,6 +34,7 @@ static const struct { const char *unit; int fam; } UNIT_FAM[] = {
     {"1/s",10},{"1/s^2",10},{"kg*m^2/s",10},{"kg*m^2",10},
     {"K",11},{"J/K",11},{"J/(mol*K)",11},
     {"1",12},
+    {"text",13},                 /* the knowledge tier's K-TEXT records */
 };
 #define NUF ((int)(sizeof UNIT_FAM / sizeof UNIT_FAM[0]))
 
@@ -97,6 +106,11 @@ const char *ns_unit_nouns(const char *unit) {
 }
 
 int ns_family_count(void) { return NFAM; }
+
+/* Derived from the family's own unit row, not a hardcoded index: the search-only family is the one
+ * whose unit is "text", which is the K-TEXT marker. Hardcoding 13 would silently attach to whatever
+ * family took that index after a reorder. */
+int ns_family_browsable(int fam) { return fam != ns_family_of_unit("text"); }
 const char *ns_family_name(int f) { return (f >= 0 && f < NFAM) ? FAMILY[f] : 0; }
 
 int ns_family_of_unit(const char *unit) {

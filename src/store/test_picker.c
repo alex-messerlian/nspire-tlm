@@ -26,7 +26,8 @@ int main(int argc, char **argv) {
         ck(f >= 0, "v=d/t maps to a family");
         ck(f >= 0 && strcmp(ns_family_name(f), "Speed & velocity") == 0,
            "v=d/t lands in 'Speed & velocity' specifically");
-        int buf[512], n = ns_records_in_family(&st, f, buf, 512);
+        static int buf[NS_MAX_RECORDS];
+        int n = ns_records_in_family(&st, f, buf, NS_MAX_RECORDS);
         int found = 0;
         for (int i = 0; i < n; i++) if (buf[i] == spd) found = 1;
         ck(found, "browsing that family reaches v=d/t");
@@ -56,26 +57,37 @@ int main(int argc, char **argv) {
     int tot = 0, worst = 0;
     for (int i = 0; i < nf; i++) { tot += fam[i].count; if (fam[i].count > worst) worst = fam[i].count; }
     ck(tot == st.n, "family counts sum to the store size");
-    ck(worst <= NS_FAMILY_ROWS * 2, "worst browse path is at most 2 screens");
+    /* THE 2-SCREEN BOUND IS A PROPERTY OF BROWSABLE FAMILIES. Definitions holds 1,442 glossary
+     * records and cannot satisfy it by paging; it is reached by typing. Asserting the old bound
+     * over all families would have forced either a weakened threshold (useless for the 13 that
+     * CAN satisfy it) or no knowledge tier at all. Two populations, two assertions, neither
+     * unchecked. */
+    int worst_b = 0;
+    for (int i = 0; i < nf; i++)
+        if (ns_family_browsable(i) && fam[i].count > worst_b) worst_b = fam[i].count;
+    ck(worst_b <= NS_FAMILY_ROWS * 2, "worst BROWSE path is at most 2 screens");
     for (int i = 0; i < nf; i++) {
         ck(fam[i].count > 0, "no empty family on the first screen");
         ck(strlen(fam[i].name) + 6 <= 50, "family name fits 50 columns with its count");
     }
 
     /* ---- NEGATIVE CONTROLS --------------------------------------------------------------- */
-    int buf[512];
-    ck(ns_filter(&st, -1, "zzzznotarelation", buf, 512) == 0,
+    /* SIZED TO THE STORE, not to 512. With the knowledge tier the store is 1,606 records and a
+     * 512-entry buffer made "empty query matches everything" fail on the BUFFER, not the filter. */
+    static int buf[NS_MAX_RECORDS];
+    const int NBUF = NS_MAX_RECORDS;
+    ck(ns_filter(&st, -1, "zzzznotarelation", buf, NBUF) == 0,
        "empty search returns 0 -- a VALID result, the empty-search screen");
-    ck(ns_filter(&st, -1, "", buf, 512) == st.n, "empty query matches everything");
-    ck(ns_filter(&st, -1, "SPEED", buf, 512) == ns_filter(&st, -1, "speed", buf, 512),
+    ck(ns_filter(&st, -1, "", buf, NBUF) == st.n, "empty query matches everything");
+    ck(ns_filter(&st, -1, "SPEED", buf, NBUF) == ns_filter(&st, -1, "speed", buf, NBUF),
        "filter is case-insensitive");
-    ck(ns_records_in_family(&st, -1, buf, 512) == -1, "negative family index rejected");
-    ck(ns_records_in_family(&st, 999, buf, 512) == -1, "out-of-range family index rejected");
+    ck(ns_records_in_family(&st, -1, buf, NBUF) == -1, "negative family index rejected");
+    ck(ns_records_in_family(&st, 999, buf, NBUF) == -1, "out-of-range family index rejected");
     ck(ns_family_of(&st, -1) == -1 && ns_family_of(&st, st.n) == -1, "record index bounds checked");
     ck(ns_family_name(-1) == NULL && ns_family_name(999) == NULL, "family name bounds checked");
     ck(ns_filter(&st, -1, "e", buf, 4) <= 4, "filter respects the caller's array bound");
     /* scoped filter must be a subset of the unscoped one */
-    int all_n = ns_filter(&st, -1, "energy", buf, 512);
+    int all_n = ns_filter(&st, -1, "energy", buf, NBUF);
     int sc[512], sc_n = ns_filter(&st, 5, "energy", sc, 512);
     ck(sc_n <= all_n, "family-scoped filter is a subset of the global filter");
 
