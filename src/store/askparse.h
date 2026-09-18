@@ -47,6 +47,54 @@ enum { ASK_PLAIN = 0,      /* one point per whole-word name term, plus supplied 
 int  ask_rank(const ns_store2 *st, const char *question, const ns_input *in, int mode,
               int *out, int k);
 
+/* The same ranking, with the SCORES carried out alongside the indices. Needed because a no-match
+ * decision cannot be made from the winner alone: the raw top-1 score is unnormalised (a longer
+ * question scores higher) and measured, the best single cut point on it refuses 49.2% of
+ * out-of-scope questions while keeping only 68.0% of in-scope ones. Anything better has to compare
+ * the top candidate against its rivals, which means seeing more than one score.
+ * `k` is clamped to ASK_RANK_MAX; every caller in the tree asks for 32 or fewer. */
+#define ASK_RANK_MAX 32
+
+/* Of the QUESTION's content words, the percentage this record's name accounts for (0..100).
+ * The A67 coverage bonus measures the other direction (how much of the NAME the question matched);
+ * a no-match decision needs this one, because what makes a question out-of-scope is how much of it
+ * goes unexplained. See the comment on the definition for the measurement that forced it. */
+int  ask_qcover(const ns_store2 *st, int r, const char *question);
+
+/* IS THE TOP RECORD GOOD ENOUGH TO USE WITHOUT ASKING THE STUDENT? Fills *idx_out with the top
+ * record (-1 if nothing scored) and returns 1 when the question is well enough explained.
+ *
+ * THIS IS NOT A REFUSAL TEST, and the distinction is the whole design. ask_pick has no way to say
+ * "no match" -- it opens `int idx = 0` and returns record 0, which is Hooke's law -- and a cut
+ * point on its SCORE cannot fix that: measured over 2,000 certified out-of-scope questions, the
+ * best single threshold on the top-1 score refuses 49.2% of them while keeping 68.0% of in-scope
+ * questions. The score is unnormalised, so a long out-of-scope question and a long physics word
+ * problem look alike. Every rule built on it that refused out-of-scope well also refused word
+ * problems: normalising by question length reached 98.0% refusal while keeping 5.8% of word
+ * problems, which is a length filter wearing a discriminator's name.
+ *
+ * What separates them is how much of the QUESTION the winner explains (ask_qcover). Measured on
+ * the shipped 1,606-record store at this threshold:
+ *
+ *     record-name lookups     100.0% confident  (150)
+ *     glossary lookups         99.7% confident  (300)
+ *     physics word problems     6.8% confident  (103)   <- and THOSE are 71.4% correct
+ *     certified out-of-scope    2.2% confident  (2000)     against 28.1% for the rest
+ *
+ * So a lookup is answered directly and a word problem goes to the picker, which is right: at
+ * retrieval@1 of 31.1% on word problems the student's choice is worth far more than the ranker's.
+ * A false negative costs one picker screen -- today's behaviour for every question -- so this can
+ * only reduce the number of screens, never refuse something the device could answer.
+ *
+ * THE THRESHOLD SITS ON A PLATEAU, not on a fitted point: 67 and 75 give identical rates on all
+ * four populations, and 50 admits 41.7% of word problems. 75 is chosen inside that plateau because
+ * it is the minimum over the six device-transcript questions, which is stated plainly rather than
+ * buried -- the plateau is chosen by measurement, the point within it by the demo. */
+#define ASK_CONFIDENT_MIN 75
+int  ask_confident(const ns_store2 *st, const char *question, const ns_input *in, int *idx_out);
+int  ask_rank_scored(const ns_store2 *st, const char *question, const ns_input *in, int mode,
+                     int *out, int *scores, int k);
+
 /* Pull `name = value` out of free text: k = 500, x = 0.4, c = 3.0e8, v = -12. */
 void ask_parse(const char *question, ns_ask *a);
 

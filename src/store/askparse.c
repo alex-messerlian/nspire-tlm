@@ -114,6 +114,25 @@ static int is_stopword(const char *w) {
         "the", "and", "for", "with", "from", "its", "this", "that", "are", "was",
         "into", "onto", "over", "under", "between", "due", "you", "your", "have",
         "when", "what", "which", "any", "all", "one", "two",
+        /* ASK VERBS. These name the REQUEST, not the subject: "explain hookes law" is a question
+         * about Hooke's law, and "explain" is no more part of the subject than "the" is.
+         *
+         * WHERE THIS ACTUALLY BITES is ask_qcover, not the score. is_stopword filters the words
+         * each_word yields, and the scorer walks the RECORD NAME while qcover walks the QUESTION,
+         * so a word absent from every name can only change qcover. Checked rather than assumed:
+         * across 164 compute names and 1,442 knowledge terms, every word below occurs in EXACTLY
+         * ZERO of them, so the name side and the family-name side cannot move.
+         *
+         * "state" was in the candidate list and was REMOVED: it occurs in 10 knowledge terms
+         * ("equation of state", "excited state", "ground state"), where it is a physics noun. The
+         * list was written from a measurement of the store, not from a sense of which words feel
+         * like verbs, which is how "state" would have gone in.
+         *
+         * Without these, "explain hokes law" covered 1 of 3 words (33%) and "find work when
+         * f=12 d=2.5" covered 1 of 2 (50%), purely because "explain" and "find" can never match
+         * anything -- so two questions the device answers correctly looked like poor matches. */
+        "explain", "find", "calculate", "define", "compute", "determine", "describe",
+        "give", "tell", "show", "how", "why", "does", "did", "much", "many",
     };
     for (unsigned i = 0; i < sizeof STOP / sizeof STOP[0]; i++)
         if (!strcmp(STOP[i], w)) return 1;
@@ -448,22 +467,124 @@ static int score_record(const ns_store2 *st, int r, const char *question,
     return c.score;
 }
 
-int ask_rank(const ns_store2 *st, const char *question, const ns_input *in, int mode,
-             int *out, int k) {
-    if (!st || !question || !out || k <= 0) return 0;
+/* QUESTION-SIDE COVERAGE: of the question's own content words, what percentage does this record's
+ * name account for? 0..100.
+ *
+ * THIS IS THE OPPOSITE DIRECTION FROM THE A67 BONUS, and the difference is the whole point. A67
+ * asks what fraction of the RECORD'S NAME the question matched, which is what stops a seven-word
+ * name outranking the record named exactly "acceleration". It says nothing about how much of the
+ * QUESTION went unexplained, and that is the quantity a no-match decision needs:
+ *
+ *   "what is hookes law"                              -> {hookes, law}, both in "Hooke's law"  100%
+ *   "Find the gradient of f(x,y,z) ... at point P"    -> {find, gradient, point, ...}, and the
+ *                                                        winner "critical point" explains one    ~14%
+ *
+ * Measured over four populations, the raw top-1 score cannot tell a physics WORD PROBLEM from an
+ * out-of-scope question, because both are long and both share few words with a terse record name.
+ * Every rule built on the score alone that refused out-of-scope well also refused word problems:
+ * normalising by question length reached 98.0% refusal while keeping 5.8% of word problems, which
+ * is not a discriminator, it is a length filter. Coverage is the feature that is about MEANING
+ * rather than about size.
+ *
+ * Both walks are the shipped ones -- each_word for what a content word is, word_in for what a
+ * match is -- so this cannot disagree with the scorer about either. */
+/* The name's words as each_word YIELDS them, which is not the same as the name's characters.
+ * A54 makes "Hooke's law" offer "hookes" as well as "hooke" and "law", and that variant is exactly
+ * what rescues the typo "hokes": edist("hokes","hookes") is 1 and within budget, while
+ * edist("hokes","hooke") is 2 and is not. Matching against the raw string throws the variant away,
+ * which is why "explain hokes law" read 50% -- the scorer finds that record and my coverage said
+ * half the question was unexplained. Same defect as the first version, one level in: not an
+ * asymmetric MATCHER this time, an asymmetric WORD LIST. */
+#define QCOV_MAXW 16
+struct qnw { char w[QCOV_MAXW][48]; int n; };
+static void qnw_add(const char *w, void *v) {
+    struct qnw *q = (struct qnw *)v;
+    if (q->n >= QCOV_MAXW) return;              /* bounded: no allocation in device code */
+    int i = 0; while (w[i] && i < 47) { q->w[q->n][i] = w[i]; i++; }
+    q->w[q->n][i] = 0; q->n++;
+}
+
+struct qcov { const struct qnw *nw; int total; int match; };
+static void qcov_word(const char *w, void *v) {
+    struct qcov *q = (struct qcov *)v;
+    q->total += 2;                              /* 2 == one exact match; see the fuzzy branch */
+    /* EXACT THEN FUZZY, THE MIRROR IMAGE OF score_word. The scorer tests each NAME word against
+     * the question with word_in and then word_near; this tests each QUESTION word against the name
+     * the same way. The first version used word_in alone and read 50% on "what is hookes law" --
+     * {hookes, law} against the name "Hooke's law", where the apostrophe defeats a literal match
+     * on "hookes". The scorer has never had that problem, because A54 makes the NAME offer
+     * "hookes"; an asymmetric test threw that away and under-counted every possessive record.
+     * Checked against the oracle before it was believed: D1's own six questions are what exposed
+     * it, reading 50/100/33/100/50/100 where the first should plainly have been 100. */
+    for (int i = 0; i < q->nw->n; i++) if (!strcmp(q->nw->w[i], w)) { q->match += 2; return; }
+    if (!FUZZ_ON) return;
+    int mx = fuzz_budget(w);
+    if (mx <= 0) return;
+    /* HALF WEIGHT FOR A FUZZY HIT, which is score_word's own rule and is load-bearing here.
+     *
+     * "Solve F=m*a for a." reduces to ONE content word, "solve", and the store contains a record
+     * named "lens/mirror equation (SOLVED version)". One fuzzy hit over a denominator of one read
+     * as 100% coverage -- a perfectly explained question -- and it is the thin lens equation
+     * answering a question about Newton's second law. Seven of the eighteen word problems that
+     * cleared a full-weight threshold were that exact shape, which is why coverage measured
+     * INVERSELY correlated with retrieval@1 on that population (11.1% against 35.3%).
+     *
+     * A rate of 100% over a denominator of one is not a measurement. Weighting the fuzzy hit at
+     * half is not a fudge to exclude it: it is what the scorer already believes about fuzzy
+     * evidence, and applying it here removes an asymmetry rather than adding a rule. */
+    for (int i = 0; i < q->nw->n; i++)
+        if (edist_le(q->nw->w[i], w, mx)) { q->match += 1; return; }
+}
+
+int ask_qcover(const ns_store2 *st, int r, const char *question) {
+    if (!st || r < 0 || r >= st->n || !question) return 0;
+    const char *nm = st->rec[r].name;
+    if (!nm || !nm[0]) return 0;
+    struct qnw nw = { {{0}}, 0 };
+    each_word(nm, qnw_add, &nw);
+    struct qcov q = { &nw, 0, 0 };
+    each_word(question, qcov_word, &q);
+    if (q.total <= 0) return 0;
+    return (100 * q.match) / q.total;
+}
+
+int ask_confident(const ns_store2 *st, const char *question, const ns_input *in, int *idx_out) {
+    if (idx_out) *idx_out = -1;
+    if (!st || !question) return 0;
+    int out[2], sc[2];
+    int n = ask_rank_scored(st, question, in, ASK_NOUN, out, sc, 2);
+    if (n < 1) return 0;
+    if (idx_out) *idx_out = out[0];
+    return ask_qcover(st, out[0], question) >= ASK_CONFIDENT_MIN;
+}
+
+int ask_rank_scored(const ns_store2 *st, const char *question, const ns_input *in, int mode,
+                    int *out, int *scores, int k) {
+    if (!st || !question || !out || !scores || k <= 0) return 0;
+    if (k > ASK_RANK_MAX) k = ASK_RANK_MAX;
     df_build(st);
     int n = 0;
     for (int r = 0; r < st->n; r++) {
         int sc = score_record(st, r, question, in, 1, mode);
         if (sc <= 0) continue;
+        /* CARRYING the score instead of RE-DERIVING it. The previous form called score_record a
+         * second time inside the insertion loop, once per comparison -- correct, and O(n*k) extra
+         * scoring passes over a store that is now 1,606 records. Identical output either way;
+         * score_record is a pure function of (st, r, question, in, mode). */
         int at = n;
-        while (at > 0 && score_record(st, out[at-1], question, in, 1, mode) < sc) at--;
+        while (at > 0 && scores[at-1] < sc) at--;
         if (at >= k) continue;
         if (n < k) n++;
-        for (int j = n - 1; j > at; j--) out[j] = out[j-1];
-        out[at] = r;
+        for (int j = n - 1; j > at; j--) { out[j] = out[j-1]; scores[j] = scores[j-1]; }
+        out[at] = r; scores[at] = sc;
     }
     return n;
+}
+
+int ask_rank(const ns_store2 *st, const char *question, const ns_input *in, int mode,
+             int *out, int k) {
+    int scores[ASK_RANK_MAX];
+    return ask_rank_scored(st, question, in, mode, out, scores, k);
 }
 
 /* THE AUTO-PICK. ONE SCORER, and until A64 there were two.

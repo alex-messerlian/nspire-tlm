@@ -195,6 +195,52 @@ int main(int argc, char **argv) {
      * changes 0 of 200 picks. A whole-benchmark diff is the right instrument for a ranking change;
      * a single hand-written expectation is not. */
 
+    /* ---- ask_confident: BOTH DIRECTIONS, ON REAL QUESTIONS -------------------------------
+     *
+     * A66/A88. ask_pick cannot say "no match" -- it returns record 0, which is Hooke's law -- and
+     * a threshold on its SCORE cannot fix that (measured: the best cut refuses 49.2% of certified
+     * out-of-scope questions while keeping 68.0% of in-scope ones). ask_confident asks a different
+     * question: how much of the QUESTION does the winner explain.
+     *
+     * A CONTROL PER DIRECTION, because a predicate that always says yes and a predicate that works
+     * produce the same output on the confident cases alone.
+     *
+     * The six CONFIDENT cases are the device transcript verbatim -- the questions the student
+     * actually typed -- and not synthetic ones: a control built on a made-up record tests the
+     * mechanism and not the property.
+     *
+     * The NOT-CONFIDENT cases are the two shapes that must reach the picker. "Solve F=m*a for a."
+     * is the one that made this measurement honest: it reduces to a single content word, "solve",
+     * which fuzzy-matches the record named "lens/mirror equation (SOLVED version)", and under
+     * full-weight fuzzy matching it read as a 100%-explained question. Seven word problems had
+     * that shape and they are why coverage first measured INVERSELY correlated with retrieval@1.
+     * If the fuzzy half-weight is ever removed, this line fails. */
+    {   int idx;
+        const char *CONF[] = { "what is hookes law", "newton second law", "explain hokes law",
+                               "what is kinetic energy", "find work when f=12 d=2.5",
+                               "what is acceleration" };
+        for (unsigned i = 0; i < sizeof CONF / sizeof CONF[0]; i++) {
+            static ns_ask a; ask_parse(CONF[i], &a);
+            int c = ask_confident(&ST, CONF[i], &a.in, &idx);
+            char m[160]; snprintf(m, sizeof m, "confident=%d, coverage %d%%", c,
+                                  idx >= 0 ? ask_qcover(&ST, idx, CONF[i]) : -1);
+            ck(c == 1, CONF[i], m);
+        }
+        const char *NOPE[] = {
+            "Solve F=m*a for a.",                       /* one content word, fuzzy, degenerate   */
+            "Solve v=d/t for d.",
+            "Find the gradient of f(x,y,z) = xy + yz + xz at point P(1,2,3).",  /* out of scope  */
+            "A sled is pushed 84 m in 7 s at constant speed. Find the speed.",  /* word problem  */
+        };
+        for (unsigned i = 0; i < sizeof NOPE / sizeof NOPE[0]; i++) {
+            static ns_ask a; ask_parse(NOPE[i], &a);
+            int c = ask_confident(&ST, NOPE[i], &a.in, &idx);
+            char m[160]; snprintf(m, sizeof m, "confident=%d, coverage %d%%", c,
+                                  idx >= 0 ? ask_qcover(&ST, idx, NOPE[i]) : -1);
+            ck(c == 0, NOPE[i], m);
+        }
+    }
+
     printf("\n%s  %d/%d\n", fails ? "FAIL" : "PASS", ran - fails, ran);
     return fails ? 1 : 0;
 }

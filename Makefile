@@ -49,7 +49,7 @@ HOST_LINK := src/store/gfx.c src/store/chatstore.c src/store/pickui.c src/store/
 # ---- host tests ------------------------------------------------------------------------------
 # Two groups, because they differ in what they link. INCLUDES_APP suites #include app.c directly to
 # reach its file-scope state; the others link toolrun.c and the evaluator.
-TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme test_select test_persist test_palette
+TESTS_APP  := test_search test_span test_exit test_bubble test_notation test_theme test_select test_persist test_palette test_autopick
 TESTS_EVAL := test_toolrun test_prov
 # test_prov.c has existed, correct and well-designed -- it even has the 'rounds to 2 sf is
 # legitimate' case -- and was referenced by NO Makefile and NO gate. Its binary sat committed
@@ -183,6 +183,9 @@ $(BUILD)/test_ansmatch: tools/eval/test_ansmatch.c $(BUILD)/ansmatch_impl.h | $(
 $(BUILD)/test_askparse:  tools/eval/test_askparse.c src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
 $(BUILD)/askcli:         tools/eval/askcli.c       src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
+# nomatchcli emits the RANKING SHAPE so a no-match rule is chosen by measurement, not by taste.
+$(BUILD)/nomatchcli:     tools/eval/nomatchcli.c   src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c -lm
 # rankcli exists to MEASURE retrieval@k, with subject and control in one binary.
 $(BUILD)/rankcli:        tools/eval/rankcli.c      src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)

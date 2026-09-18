@@ -2097,6 +2097,31 @@ static void open_picker(void) {
     if (!st) { snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE); compose_clear(); picker_send(0); return; }
     snprintf(PENDQ, sizeof PENDQ, "%s", COMPOSE);
     compose_clear();
+    /* A88. SKIP THE PICKER WHEN THE QUESTION IS ALREADY ANSWERED BY ONE RECORD.
+     *
+     * "what is hookes law" does not need a shortlist: the record's name IS the question. Until now
+     * every question opened the picker, including all six from the device transcript, so the
+     * demo's shortest path was three screens.
+     *
+     * THE FALLBACK IS THE PICKER, NEVER A REFUSAL, and that is what makes this safe to ship
+     * without the device. A false negative costs exactly one screen -- today's behaviour for every
+     * question -- so this can only reduce screens, never lose an answer. A false positive shows a
+     * record the student did not choose, which is bounded by measurement: 2.2% of 2,000 certified
+     * out-of-scope questions and 6.8% of word problems clear the bar, and those word problems
+     * retrieve at 71.4% against 28.1% for the ones that fall through.
+     *
+     * Deliberately NOT ask_pick's score. ask_pick cannot say "no match" at all -- it returns
+     * record 0, Hooke's law -- and a cut point on its score refuses 49.2% of out-of-scope while
+     * keeping 68.0% of in-scope. See ask_confident for the measurement that chose this instead. */
+    {
+        static ns_ask aq;
+        ask_parse(PENDQ, &aq);
+        int idx = -1;
+        if (ask_confident(st, PENDQ, &aq.in, &idx) && idx >= 0 && st->rec[idx].rid) {
+            picker_send(st->rec[idx].rid);
+            return;
+        }
+    }
     pk_open(&PK, st, PENDQ);      /* ranks the shortlist and places the cursor */
     PICK_ON = 1;
 }
