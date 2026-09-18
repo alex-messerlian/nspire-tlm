@@ -25,3 +25,6 @@ build/test_*_mut
 # destroyed it. Keep it ignored so `git add -A` cannot pick it up.
 corpus/raw
 build/model_*.bin
+overnight.log
+probe_*.txt
+d2_*.txt
