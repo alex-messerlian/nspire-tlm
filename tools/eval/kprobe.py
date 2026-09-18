@@ -39,8 +39,23 @@ TK = Tokenizer.from_file(os.environ.get("TOK", str(ROOT / "train/tok4096.json"))
 RES, ENDT, TOOLC = (TK.token_to_id(t) for t in ("<res>", "<end>", "</tool>"))
 
 # The six from the device transcript. Fixed here, not sampled.
-TRANSCRIPT = ["what is hookes law", "newton second law", "explain hokes law",
-              "what is kinetic energy", "find work when f=12 d=2.5", "what is acceleration"]
+#
+# FIVE ARE EXPLAIN QUESTIONS AND ONE IS A COMPUTE QUESTION, and the first version of this graded
+# all six by the explain standard. "find work when f=12 d=2.5" supplies values and asks for a
+# number; the correct answer IS "W = 30 J. W=F*d gives it.", and is_template_only flags it because
+# a computed answer looks exactly like the template it is meant to catch.
+#
+# The device test said of that exact question: "it gave 30J kinda decent". The user was satisfied
+# with it. The criterion applied an EXPLAIN standard to a COMPUTE question.
+#
+# CORRECTING THIS AFTER SEEING A RESULT IS ONLY LEGITIMATE BECAUSE IT CHANGES NOTHING. It mis-graded
+# the same item in BOTH runs in the same direction -- know1 1/6 -> 2/6, know2 3/6 -> 4/6 -- and both
+# remain below the >= 5 threshold. A correction that flipped a verdict would be fitting the
+# criterion to the result, which is what a pre-registration exists to stop. Both numbers are
+# reported so the change is visible rather than quiet.
+TRANSCRIPT = [("what is hookes law", "explain"), ("newton second law", "explain"),
+              ("explain hokes law", "explain"), ("what is kinetic energy", "explain"),
+              ("find work when f=12 d=2.5", "compute"), ("what is acceleration", "explain")]
 
 
 def _run_tool(call):
@@ -113,10 +128,19 @@ def _norm_rel(x):
     return grade._relnorm(x)
 
 
+# A NUMERIC RIGHT-HAND SIDE IS A RESULT, NOT A RELATION CLAIM. "W = 30 J" reports what the tool
+# returned; it does not assert that W equals 30 in general. The first version flagged it, so a
+# CORRECT computed answer -- the one the device test called "kinda decent" -- was marked as
+# fabricating a relation against its own record.
+_RESULT_RHS = re.compile(r"^\s*[-+]?\d")
+
+
 def states_wrong_relation(answer, formula):
     """True when the answer asserts a relation that is not the record's."""
     want = _norm_rel(formula)
     for m in re.finditer(r"([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^.,;]{1,40})", answer):
+        if _RESULT_RHS.match(m.group(2)):
+            continue
         got = _norm_rel(m.group(0))
         if got and got not in want and want not in got:
             return True, m.group(0).strip()
@@ -157,8 +181,8 @@ def main():
 
     # ---- D1 the device transcript ----------------------------------------------------------
     print("D1  THE DEVICE TRANSCRIPT (primary). Greedy, one attempt, the device's own prompt.")
-    d1 = 0
-    for q in TRANSCRIPT:
+    d1 = d1_old = 0
+    for q, kind in TRANSCRIPT:
         p = subprocess.run([str(ROOT / "build/devprompt"), str(ROOT / "build/store.tns"), q, "0"],
                            capture_output=True, text=True)
         pre = next((l for l in p.stdout.split("\n") if l.startswith("<q>")), None)
@@ -169,14 +193,18 @@ def main():
         tmpl = is_template_only(a)
         rec_f = pre.split("</q><r>", 1)[1].split(" | ", 1)[0] if "</q><r>" in pre else ""
         wrong, badrel = states_wrong_relation(a, rec_f)
-        ok = (bool(a) and "<end>" in out and not DECLINE.search(a) and not tmpl and not wrong)
+        base = bool(a) and "<end>" in out and not DECLINE.search(a) and not wrong
+        # A COMPUTE question is graded on producing a NUMBER, not on producing prose.
+        ok = base and (bool(re.search(r"\d", a)) if kind == "compute" else not tmpl)
+        d1_old += base and not tmpl
         d1 += ok
         why = "" if ok else ("  <- DECLINED" if DECLINE.search(a) else
                              "  <- TEMPLATE ONLY, no explanation" if tmpl else
                              f"  <- FABRICATED RELATION {badrel!r} against {rec_f!r}" if wrong
                              else "  <- malformed")
         print(f"  {'PASS' if ok else 'FAIL'} {q!r}{why}\n       {a[:150]}")
-    print(f"  D1 = {d1}/6   (PASS is >= 5)\n")
+    print(f"  D1 = {d1}/6   (PASS is >= 5)   "
+          f"[grading all six as explain, as first written: {d1_old}/6]\n")
 
     # ---- D4 / D5 trained terms --------------------------------------------------------------
     items = sorted(train, key=lambda d: hashlib.sha256(

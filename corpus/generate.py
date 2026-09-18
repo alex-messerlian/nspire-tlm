@@ -1938,10 +1938,38 @@ def _named_quantities(text):
 # survivors cannot notice the fragments coming back.
 ASK_REJECTED = [t for t in ASK_ALL if t not in ASK_REVIEWED]
 
-def ask_for(r, surface, rng):
+# A82. "What is {q}?" AND "What was {q}?" ARE NOT AVAILABLE TO A BARE D1.
+#
+# A46's whole premise is that EXPLAIN and bare-D1 sit on the SAME record-bearing zero-given shape
+# and are "separable only by reading what the question ASKS". Measured on the shipped corpus, they
+# are not:
+#
+#     EXPLAIN   4,706 documents,   510 start "what is"  (10.8%)
+#     bare D1   6,396 documents,   797 start "what is"  (12.5%)
+#     -> among "what is ..." questions, P(EXPLAIN) = 39.0%
+#
+# "what is the tangential acceleration?" is a bare D1 and "what is kinetic energy?" should be an
+# EXPLAIN, and nothing in the surface distinguishes them. So know2 DECLINES "what is kinetic
+# energy" and "what is acceleration", which is the majority class for that surface and therefore
+# the model being right about a corpus that is wrong.
+#
+# A question CARRYING GIVENS is unambiguous -- "What is the force? Given m = 2, a = 3." is plainly a
+# computation -- so the restriction is only on the bare case, where there is nothing else to read.
+# Same discipline as the knowledge tier's K3_ASK, which is compute-intent only for this reason.
+ASK_COMPUTE_ONLY = [t for t in ASK_REVIEWED
+                    if not t.lower().startswith(("what is", "what was"))]
+assert len(ASK_COMPUTE_ONLY) >= 4, (
+    f"only {len(ASK_COMPUTE_ONLY)} unambiguous compute frames remain; a bare D1 needs enough "
+    f"phrasing variety that the CLASS is not learnable from the frame alone")
+
+
+def ask_for(r, surface, rng, bare=False):
     """Choose a question frame. Only reviewed frames are eligible, so a frame cannot contradict
-    the quantity being asked for -- none of them names a quantity at all."""
-    return rng.choice(ASK).format(q=surface)
+    the quantity being asked for -- none of them names a quantity at all.
+
+    `bare` excludes the two frames that read as an explain request; see above."""
+    bank = ASK_COMPUTE_ONLY if bare else ASK
+    return rng.choice(bank).format(q=surface)
 
 GIVE = ["Given {g}, ", "With {g}, ", "If {g}, ", "For {g}, ", "Where {g}, ",
         "Suppose {g}. ", "Take {g}. ", "A system has {g}. ", "Assume {g}. ",
@@ -2536,7 +2564,7 @@ def gen(n, seed=0):
             # used, not with the record's canonical name -- see the note on `close` below. It was
             # drawn here and thrown away, so the answer had nothing to reach for but r["name"].
             _subj = quantity_surface(r, rng)
-            ask = ask_for(r, _subj, rng)
+            ask = ask_for(r, _subj, rng, bare=bare)
         q = compose_question(ask, g, rng)
         umap = units_field(r)
         # ABSENCE MADE EXPLICIT. The negative existential -- "no value exists for this symbol" --
