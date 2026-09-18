@@ -185,9 +185,14 @@ if __name__ == "__main__":
         assert body[-1].startswith("END\t"), "pack() must end with its END line"
         total = len(store) + nk
         txt = "\n".join(body[:1] + [str(total)] + body[2:-1] + klines + [f"END\t{total}"]) + "\n"
-    tmp = pathlib.Path("build/store.tns.tmp"); tmp.parent.mkdir(exist_ok=True)
+    # STORE_OUT lets a check build a store WITHOUT touching the one the device and every other
+    # gate read. gate_knowledge_bytes needs a knowledge store to diff against; repacking the
+    # shipped path and repacking back would leave a window where any concurrent reader sees a
+    # store nobody intended to ship.
+    dest = pathlib.Path(os.environ.get("STORE_OUT", "build/store.tns"))
+    tmp = pathlib.Path(str(dest) + ".tmp"); tmp.parent.mkdir(parents=True, exist_ok=True)
     tmp.write_text(txt)
-    tmp.rename("build/store.tns")          # atomic: a crash leaves no half-written store
+    tmp.rename(dest)                       # atomic: a crash leaves no half-written store
     print(f"packed {len(store)} compute + {nk} knowledge = {len(store)+nk} records "
-          f"-> build/store.tns ({len(txt):,} bytes)")
+          f"-> {dest} ({len(txt):,} bytes)")
     print(f"  largest record line: {max(len(l) for l in txt.split(chr(10)))} chars")

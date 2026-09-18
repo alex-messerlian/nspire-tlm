@@ -76,6 +76,27 @@ def rhs(f):
     return {v for v in VAR.findall(f.split("=", 1)[1]) if v not in RESV}
 
 
+def no_relation(rec):
+    """True when the record span declares no relation, so "a variable the record does not use" is
+    UNDEFINED and this gate has nothing to say about the document.
+
+    Two populations qualify and the gate must skip both:
+      D3            the no-match refusal, record span "none". Already handled by name below.
+      K1 / K2 / K3  the knowledge tier. Its record is a K-TEXT glossary entry packed as an ordinary
+                    store record -- "aberration | term:text | missing:none | <meaning> | fit:high".
+                    nvars=1, var[0] == lhs == "term", unit[0] == "text", and NO "=" anywhere.
+
+    The knowledge tier arrived after this gate was written, and rhs() did f.split("=", 1)[1] on
+    52,391 documents that have no "=", which is an IndexError, not a finding. Same class as the
+    D1/D2 bands, gate_store_coverage and head coverage printing 979.9%: a second population arrived
+    and the code that partitions the first one did not move.
+
+    The predicate is STRUCTURAL -- does the relation field contain "=" -- and not a test on the
+    `kind` label, because the label is a name for the property and the property is what matters.
+    """
+    return "=" not in fields(rec)[0]
+
+
 def control():
     """A CLEAN TREE AND A DISABLED CHECK PRINT THE SAME PASS. So the predicate is exercised on a
     synthetic known-bad every run: the pre-A43 distribution (D2 always spare, ANSWERABLE never)
@@ -101,11 +122,15 @@ def main():
     if not p.exists():
         print("CANNOT CHECK: corpus absent -- not a pass"); return 2
     hit, tot = collections.Counter(), collections.Counter()
+    skipped = collections.Counter()
     for line in p.open():
         o = json.loads(line)
         rec = o["text"].split("<r>", 1)[1].split("<", 1)[0]
         if rec.startswith("none"):
             continue                       # D3 has no record, so "spare" is undefined
+        if no_relation(rec):
+            skipped[o.get("kind", "?")] += 1
+            continue                       # the knowledge tier declares no relation
         if FULLY_BOUND_ONLY and "missing:none" not in rec:
             continue                       # the fit judgement is only required when bound
         k = o.get("kind", "ANSWERABLE")
@@ -117,7 +142,7 @@ def main():
     for line in p.open():
         o = json.loads(line)
         rec = o["text"].split("<r>", 1)[1].split("<", 1)[0]
-        if rec.startswith("none"):
+        if rec.startswith("none") or no_relation(rec):
             continue
         if FULLY_BOUND_ONLY and "missing:none" not in rec:
             continue
@@ -125,6 +150,10 @@ def main():
         given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", q))
         counts[o.get("kind", "ANSWERABLE")][min(len(given - rhs(fields(rec)[0])), 3)] += 1
 
+    if skipped:
+        print(f"  SCOPE: {sum(skipped.values()):,} documents skipped as having NO RELATION "
+              f"{dict(skipped)} -- the knowledge tier's record is a glossary entry, so a spare "
+              f"variable is undefined. Counted, not silent.")
     print("  [scope: FULLY-BOUND documents -- where the fit judgement is required]")
     print("  spare-variable rate by class (a question supplying a variable the record does not use):")
     for k in sorted(tot):
@@ -172,6 +201,8 @@ def main():
             o = json.loads(line)
             rc = o["text"].split("<r>", 1)[1].split("<", 1)[0]
             q = o["text"].split("<q>")[1].split("</q>")[0]
+            if no_relation(rc) and not rc.startswith("none"):
+                continue                   # knowledge tier: no relation, no fit judgement
             k = "D3" if rc.startswith("none") else o.get("kind", "ANSWERABLE")
             # D3 IS EXCLUDED FROM THE ABSENCE CHECK, AND THAT IS A SCOPE DECISION, NOT AN
             # OMISSION. src/store/assemble.c:109 emits the literal "none | ... | fit:low" whenever
