@@ -299,7 +299,7 @@ BENCHFLAGS  := -O2 -Wall -Wextra -std=gnu99 -marm -mcpu=arm926ej-s -Iinclude -Is
                -Ivendor/Ndless/ndless-sdk/thirdparty/nspire-io/include
 
 .PHONY: bench
-bench: $(addprefix bench/,$(addsuffix .tns,$(BENCH_PLAIN))) bench/bench_forward.tns
+bench: $(addprefix bench/,$(addsuffix .tns,$(BENCH_PLAIN))) bench/bench_forward.tns bench/bench_ask.tns
 
 bench/%.elf: bench/%.c bench/common.h include/nspire_screen.c
 	@PATH="$(DEVPATH)"; export PATH; \
@@ -312,6 +312,18 @@ bench/bench_forward.elf: bench/bench_forward.c bench/common.h src/runq_nspire.c 
 	@PATH="$(DEVPATH)"; export PATH; \
 	 nspire-gcc $(BENCHFLAGS) -DTLM_PROFILE -o $@ \
 	   bench/bench_forward.c src/runq_nspire.c src/nspire.c include/nspire_screen.c -lnspireio -lm
+
+# bench_ask walks the app's ENTER path stage by stage with a flushed marker before each call, so a
+# process that vanishes leaves its last reached stage in the log. It links the store, the parser,
+# the tokenizer AND the engine, which is why it cannot use the bench/%.elf rule.
+bench/bench_ask.elf: bench/bench_ask.c bench/common.h src/runq_nspire.c src/nspire.c \
+                     src/store/loader.c src/store/assemble.c src/store/askparse.c \
+                     src/store/picker.c src/store/tokenizer.c include/nspire_screen.c
+	@PATH="$(DEVPATH)"; export PATH; \
+	 nspire-gcc $(BENCHFLAGS) -o $@ \
+	   bench/bench_ask.c src/runq_nspire.c src/nspire.c src/store/loader.c \
+	   src/store/assemble.c src/store/askparse.c src/store/picker.c src/store/tokenizer.c \
+	   include/nspire_screen.c -lnspireio -lm
 
 bench/%.tns: bench/%.elf
 	@PATH="$(DEVPATH)"; export PATH; \
