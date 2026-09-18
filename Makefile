@@ -239,8 +239,36 @@ $(BUILD)/test_ckpt: tools/eval/test_ckpt.c src/runq_nspire.c | $(BUILD)
 # THE FORWARD-PASS GOLDEN. Compiles the same runq_nspire.c the calculator runs, so a claim that a
 # hot-loop change is bit-exact is checkable on the host without a device round-trip. Phase 1 of the
 # brief asks for this artefact; it did not exist until the soft-float attention work needed it.
+# THE GROUP SIZE IS READ FROM THE SOURCE, NOT TYPED HERE. runq_nspire.c guards its FIXED_GS with
+# #ifndef, so a -D on the command line WINS -- and tools/export_device.sh rewrites that #define on
+# every run. A hardcoded 88 here would therefore keep building the host golden at 88 after an export
+# moved the device to another group size, and the two would disagree while both looked correct.
+# The golden's whole job is to catch exactly that kind of silent divergence.
+GS_SRC := $(shell grep -oE '^\#define FIXED_GS [0-9]+' src/runq_nspire.c | grep -oE '[0-9]+$$')
+
 $(BUILD)/golden_forward: tools/eval/golden_forward.c src/runq_nspire.c | $(BUILD)
-	$(CC) $(HOSTFLAGS) -DFIXED_GS=88 -o $@ $< -lm
+	$(CC) $(HOSTFLAGS) -DFIXED_GS=$(GS_SRC) -o $@ $< -lm
+
+# THE DEVICE HALF OF THE GOLDEN, WHICH HAD NO BUILD RULE AT ALL.
+#
+# build/golden_dev.tns was cross-compiled once by a hand-typed line and nothing in the repo
+# reproduced it, so it sat at its August build while runq_nspire.c moved underneath it. `make -q`
+# even reported it UP TO DATE, because an existing file with no rule is indistinguishable from a
+# current one -- the trap this repo already documented for gate_binaries.
+#
+# That is worse here than anywhere else: this binary IS the correctness oracle. A stale golden does
+# not fail, it AGREES WITH ITSELF, and it certifies a device build that was never compared to the
+# host at all. Same class as push-all.sh's own staleness gate, which exists because bench_forward
+# was built the same way.
+$(BUILD)/golden_dev.tns: tools/eval/golden_forward.c tools/eval/golden_dev_shim.c src/runq_nspire.c src/nspire.c | $(BUILD)
+	@PATH="$(DEVPATH)"; export PATH; \
+	 nspire-gcc $(NSPFLAGS) -DFIXED_GS=$(GS_SRC) -o $(BUILD)/golden_dev.elf \
+	     tools/eval/golden_forward.c tools/eval/golden_dev_shim.c src/nspire.c include/nspire_screen.c \
+	     -lm -lnspireio && \
+	 genzehn --input $(BUILD)/golden_dev.elf --output $(BUILD)/golden_dev.zehn --name golden_dev && \
+	 make-prg $(BUILD)/golden_dev.zehn $@ && \
+	 rm -f $(BUILD)/golden_dev.zehn && \
+	 echo "  $@  $$(wc -c < $@ | tr -d ' ') bytes  (GS=$(GS_SRC), read from src/runq_nspire.c)"
 
 
 # ---- device ----------------------------------------------------------------------------------
