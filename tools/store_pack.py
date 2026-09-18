@@ -172,14 +172,25 @@ if __name__ == "__main__":
     # was never trained on is what gate_store_coverage exists to fail on, measured at 41.0% against
     # 12.2%. definitions_train.json is the A58 carve and is the only file read.
     #
-    # OPT-IN, AND OFF BY DEFAULT, until corpus/generate.py actually teaches these terms.
-    # gate_store_coverage's rule is R_train superseteq R_store: a record the picker can return and
-    # the model has never seen is measured at 12.2% correct against 41.0% for a trained one. Packing
-    # 1,443 definitions before the corpus mentions them puts 1,443 fabrication sites on the device.
-    # Build and test the knowledge store freely with WITH_KNOWLEDGE=1; ship it when the gate passes.
+    # ON BY DEFAULT SINCE A86. The condition written here when it was opt-in was "until
+    # corpus/generate.py actually teaches these terms ... ship it when the gate passes", and that
+    # condition is MET: the corpus carries 52,391 knowledge documents over these 1,442 terms, D4
+    # measures 70-82% recall on them across three seeds, and gate_store_coverage passes.
+    #
+    # The flip is the point. This file is a BUILD PRODUCT and build/store.tns is gitignored, so
+    # while the tier was behind an env var the decision to ship it lived in whoever remembered to
+    # type WITH_KNOWLEDGE=1. A decision held that way lapses -- the next ordinary `python
+    # tools/store_pack.py` silently drops 1,442 records and the device goes back to retrieving a
+    # formula for "what is entropy", with nothing saying so.
+    #
+    # The original hazard is unchanged and is still policed: gate_store_coverage's rule is
+    # R_train superseteq R_store, because a record the picker can return and the model has never
+    # seen measured 12.2% correct against 41.0% for a trained one. That gate, not this default, is
+    # what stops an untrained record shipping. NO_KNOWLEDGE=1 builds the 164-record store for a
+    # comparison; it is not a supported device configuration.
     kpath = pathlib.Path("corpus/knowledge/definitions_train.json")
     nk = 0
-    if kpath.exists() and os.environ.get("WITH_KNOWLEDGE"):
+    if kpath.exists() and not os.environ.get("NO_KNOWLEDGE"):
         klines, nk = knowledge_lines(json.load(open(kpath)))
         body = txt.rstrip("\n").split("\n")
         assert body[-1].startswith("END\t"), "pack() must end with its END line"
