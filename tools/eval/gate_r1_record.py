@@ -25,17 +25,32 @@ CORPUS = ROOT / "corpus/synth_sample.jsonl"
 
 
 def scan(lines):
-    """Return (n_r1, mismatches). One pass, no regex: both fields are at fixed tag boundaries."""
+    """Return (n, mismatches) over every document that calls a SYMBOLIC tool on its own record.
+
+    THREE TOOLS, TWO SHAPES, and the difference is not cosmetic:
+      solve(FORMULA, var)  -- the argument is the WHOLE relation, so it must equal the record
+      diff(RHS, var)       -- the argument is the RIGHT-HAND SIDE, because you differentiate an
+      integ(RHS, var)         expression and not an equation
+
+    Checking diff against the whole formula would fail every C1 document, and checking solve against
+    the RHS would fail every R1 one. A gate that applied one rule to both would be wrong in one
+    direction and would look like a corpus defect."""
     n = 0
     bad = []
     for t in lines:
-        if "<tool>solve<arg>" not in t or "<r>" not in t:
+        if "<r>" not in t:
             continue
-        n += 1
-        rec_f = t.split("<r>", 1)[1].split(" | ", 1)[0]
-        call_f = t.split("<tool>solve<arg>", 1)[1].split("<arg>", 1)[0]
-        if rec_f != call_f:
-            bad.append((rec_f, call_f, t[:110]))
+        for tool, whole in (("solve", True), ("diff", False), ("integ", False)):
+            tag = f"<tool>{tool}<arg>"
+            if tag not in t:
+                continue
+            n += 1
+            rec = t.split("<r>", 1)[1].split(" | ", 1)[0]
+            want = rec if whole else (rec.split("=", 1)[1] if "=" in rec else rec)
+            got = t.split(tag, 1)[1].split("<arg>", 1)[0]
+            if want != got:
+                bad.append((f"{tool}: {want}", got, t[:110]))
+            break
     return n, bad
 
 
@@ -50,18 +65,28 @@ def main():
            "fit:high<tool>solve<arg>V=I*R<arg>I</tool><res>I=V/R</res><a>x<end>")
     GOOD = ("<q>solve V=I*R for I</q><r>V=I*R | V:V I:A R:ohm | missing:none | c | "
             "fit:high<tool>solve<arg>V=I*R<arg>I</tool><res>I=V/R</res><a>x<end>")
+    # The calculus shape needs its own controls: a diff call carries the RHS, so a gate that
+    # checked it against the whole formula would fire on every correct C1 document.
+    CBAD = ("<q>d/dt</q><r>v=v_0+a*t | v:m/s | missing:none | c | fit:high"
+            "<tool>diff<arg>x_0+v_0*t<arg>t</tool><res>v_0</res><a>x<end>")
+    CGOOD = ("<q>d/dt</q><r>v=v_0+a*t | v:m/s | missing:none | c | fit:high"
+             "<tool>diff<arg>v_0+a*t<arg>t</tool><res>a</res><a>x<end>")
+    if not scan([CBAD])[1] or scan([CGOOD])[1]:
+        print("  CONTROL BROKEN: the diff shape is not separated from a mismatched one")
+        return 2
     if not scan([BAD])[1] or scan([GOOD])[1]:
         print("  CONTROL BROKEN: the predicate does not separate the known-bad from the known-good")
         return 2
-    print("  controls: the A51-scrambled shape fires, the matching shape does not")
+    print("  controls: A51-scrambled fires and matching does not, for BOTH the solve "
+          "(whole formula) and the diff (right-hand side) shapes")
 
     lines = [json.loads(l)["text"] for l in CORPUS.open()]
     n, bad = scan(lines)
-    print(f"  {len(lines):,} documents, {n:,} carry a solve call")
+    print(f"  {len(lines):,} documents, {n:,} carry a symbolic tool call")
     if n == 0:
         # Not a pass and not a failure: REARRANGE=0 is a legitimate configuration, and saying so is
         # different from saying the check ran clean.
-        print("  NOTHING TO CHECK: no solve documents in this corpus (REARRANGE=0?). Not a pass.")
+        print("  NOTHING TO CHECK: no symbolic-tool documents in this corpus (REARRANGE=0?). Not a pass.")
         return 2
     for rec_f, call_f, t in bad[:4]:
         print(f"  MISMATCH  record {rec_f!r}  call {call_f!r}\n     {t}")
@@ -69,7 +94,7 @@ def main():
         print(f"\n  FAIL: {len(bad)} of {n} solve documents show a record that is not the relation "
               f"the call rearranges ({100*len(bad)/n:.1f}%).")
         return 1
-    print(f"  PASS: all {n:,} solve documents show the relation their call rearranges")
+    print(f"  PASS: all {n:,} documents call a symbolic tool on the relation their call rearranges")
     return 0
 
 

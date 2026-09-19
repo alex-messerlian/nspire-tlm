@@ -2337,6 +2337,14 @@ import rearrange as _RA
 
 REARRANGE = float(os.environ.get("REARRANGE", "1"))
 
+# C1/C2 CALCULUS. Differentiating and integrating the store's own relations, through `diff` and
+# `integ`. The record is a PHYSICS relation, not "x^2": the scope is the math that is part of
+# physics, so the question is how one physical quantity changes with another. Measured before
+# building: 398 of 405 (record, variable) pairs differentiate cleanly. See corpus/calculus.py.
+import calculus as _CA
+
+CALCULUS = float(os.environ.get("CALCULUS", "1"))
+
 # WRITTEN EXPLANATIONS for the 164 compute records, keyed by formula. Three variants each, every
 # one under 215 chars, pure ASCII, using only variables the record declares, grounded in that
 # record's own OpenStax section where evidence existed (127 of 164). See docs/RESULT_F1_PROSE.md.
@@ -3372,6 +3380,35 @@ def gen(n, seed=0):
         # run so the number cannot drift unnoticed.
         print(f"    {len(rskip)} (record, variable) pairs skipped: `solve` returned !nosol, which "
               f"is a refusal to guess and not a failure")
+
+    # ---- C1 / C2 CALCULUS, appended -----------------------------------------------------------
+    # Shares span_of with R1: the record span comes from build/asmcli, which links the assembler
+    # the calculator runs, so it is device-identical by construction. Building a second one here
+    # is the defect that has been found five times in this repo.
+    if CALCULUS > 0 and REARRANGE > 0:
+        cdocs, cskip = _CA.build(recs, _run_tool_text, rng)
+        if CALCULUS < 1:
+            rng.shuffle(cdocs)
+            cdocs = cdocs[:int(len(cdocs) * CALCULUS)]
+        cj = case_jitter(cdocs, rng)          # BEFORE the text is built, as the knowledge tier does
+        ckept = 0
+        for d in cdocs:
+            rec = span_of.get(d["head"])
+            if not rec:
+                continue
+            built.append({"head": d["head"], "kind": d["kind"], "ans": d["ans"],
+                          "text": f"<q>{d['q']}</q><r>{rec}{d['call']}"
+                                  f"<res>{d['res']}</res><a>{d['ans']}<end>"})
+            ckept += 1
+        import collections as _c2
+        km2 = _c2.Counter(d["kind"] for d in cdocs)
+        sk2 = _c2.Counter(x[2] for x in cskip)
+        print(f"  C1/C2 calculus: {ckept:,} documents over "
+              f"{len({d['head'] for d in cdocs}):,} records  {dict(km2)}")
+        print(f"    case jitter flipped {cj:,} ({100*cj/max(1,len(cdocs)):.1f}%)")
+        print(f"    {sum(sk2.values())} (record, variable) pairs skipped {dict(sk2)}: the tool "
+              f"declined or rendered badly, and a document whose <res> is an error code teaches "
+              f"the model to ask for what it cannot have")
     return built, dropped
 
 # ---- diversity metrics -------------------------------------------------------

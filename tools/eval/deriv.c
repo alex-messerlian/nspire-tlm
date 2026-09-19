@@ -316,6 +316,22 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
             *changed = 1;
             return ar_bin(a, N_MUL, r->kid[0], ar_bin(a, N_MUL, l, r->kid[1]));
         }
+        /* ...AND OUT OF A LEFT-NESTED ONE: (c*x)*y -> c*(x*y). The mirror of the rule above, and
+         * without it a coefficient trapped on the left never meets one on the right.
+         *
+         * MEASURED, on the single most important derivative in kinematics: v = dx/dt.
+         *   d/dt(0.5*t^2)     -> t            two factors, folds
+         *   d/dt(0.5*a*t^2)   -> 2*0.5*a*t    THREE factors, does not
+         * The tree is MUL(MUL(0.5,a), MUL(2,t)); the right-pull hoists the 2, leaving
+         * MUL(2, MUL(MUL(0.5,a), t)), and the reassociation rule needs kid[0] to be a NUMBER
+         * rather than another product, so 2 and 0.5 never meet. With this rule the left product
+         * flattens first and they do.
+         *
+         * No loop: the rewrite requires l to be a MUL, and it produces an l that is a NUMBER. */
+        if (l && l->t == N_MUL && is_anynum(l->kid[0])) {
+            *changed = 1;
+            return ar_bin(a, N_MUL, l->kid[0], ar_bin(a, N_MUL, l->kid[1], r));
+        }
         /* c*(f/k) -> (c/k)*f for numeric c and k, so a numeric coefficient meets a numeric
          * denominator and folds. Antidifferentiating 3*x^2 builds 3*(x^3/3) by construction -- the
          * constant-factor rule and the power rule each doing their own correct job -- and without
@@ -362,6 +378,21 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
             return ar_bin(a, N_MUL, ar_num(a, l->kid[0]->num / r->num), l->kid[1]);
         }
         if (node_eq(l, r) && !is_num(l, 0)) { *changed = 1; return ar_num(a, 1); }
+        /* x/x^n -> 1/x^(n-1). The quotient rule builds exactly this and never cancels it:
+         * d/dT_c of 1 - T_c/T_h gives (1*T_h - T_c*0)/T_h^2, which folds to T_h/T_h^2 and stops,
+         * where a textbook writes 1/T_h. Found by reading generated C1 documents.
+         *
+         * Guarded on a POSITIVE integer exponent so nothing is cancelled that might be zero or
+         * fractional at the point of interest -- x/x^0.5 is not 1/x^-0.5 for negative x, and the
+         * derivative table is not the place to take that risk. */
+        if (r && r->t == N_POW && node_eq(l, r->kid[0]) && is_anynum(r->kid[1])
+            && r->kid[1]->num > 1.0 && r->kid[1]->num == (double)(int)r->kid[1]->num) {
+            *changed = 1;
+            double e2 = r->kid[1]->num - 1.0;
+            return ar_bin(a, N_DIV, ar_num(a, 1),
+                          e2 == 1.0 ? ar_clone(a, l)
+                                    : ar_bin(a, N_POW, ar_clone(a, l), ar_num(a, e2)));
+        }
         if (l && l->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l->kid[0], r)); }
         if (r && r->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l, r->kid[0])); }
         /* A negative numeric denominator moves its sign up, so -(P-2*w)/-2 can fold to (P-2*w)/2.
