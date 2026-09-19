@@ -751,7 +751,19 @@ void ask_parse(const char *question, ns_ask *a) {
         if (vn + nlen + vlen + 2 >= (int)sizeof a->slab) break;
         char *nd = a->slab + vn; memcpy(nd, ns, (size_t)nlen); nd[nlen] = 0; vn += nlen + 1;
         char *vd = a->slab + vn; memcpy(vd, vs, (size_t)vlen); vd[vlen] = 0; vn += vlen + 1;
-        a->in.var[a->in.nvals] = nd; a->in.val[a->in.nvals] = vd; a->in.nvals++;
+        /* A113. LAST ASSIGNMENT WINS, because a FOLLOW-UP restates a variable to change it.
+         *
+         * "Earlier: find the work when F=12 and d=2.5" + "now d = 5" parses both, and the
+         * assembler emitted `F = 12, d = 2.5, d = 5` -- the same variable twice with conflicting
+         * values, leaving the model to guess which. That is ambiguous supervision on the one shape
+         * a follow-up always has. Overwriting in place also keeps the ORDER of first mention, so a
+         * restated value does not jump to the end of the given list and change the surface for
+         * everything else. */
+        int slot = a->in.nvals;
+        for (int k = 0; k < a->in.nvals; k++)
+            if (strcmp(a->in.var[k], nd) == 0) { slot = k; break; }
+        a->in.var[slot] = nd; a->in.val[slot] = vd;
+        if (slot == a->in.nvals) a->in.nvals++;
         c = end;
     }
 }
