@@ -250,6 +250,67 @@ def main():
           f"-- n={n} gives about +-7 pp at p=0.10 and cannot resolve a 10-point effect.")
     print(f"      The aggregate mixes 'never seen' with 'seen in prose all chapter'; "
           f"the strata above are the number.")
+
+    # ---- D7 REARRANGEMENT: does a new tool actually get REACHED FOR? -------------------------
+    #
+    # The corpus called `eval` 192,754 times and `solve` zero times until A93. The question this
+    # arm answers is not "can the model rearrange" -- it cannot, and is not supposed to; the TOOL
+    # rearranges. It is whether the model RECOGNISES a rearrangement request and emits a solve call
+    # against the record it was shown.
+    #
+    # THREE THINGS ARE SCORED SEPARATELY AND NEVER SUMMED, because they fail for different reasons
+    # and a single "correct" rate would hide which:
+    #   called   it emitted <tool>solve   (did it reach for the right tool at all)
+    #   targeted the call's relation is the record's, and the variable is the one asked for
+    #   answered the prose states the rearranged relation the tool returned
+    # A model can call solve on the wrong relation, or call it correctly and then ignore the result.
+    #
+    # THE ITEMS ARE DRAWN FROM THE STORE, NOT WRITTEN, so this cannot drift from what ships. Twelve
+    # (record, variable) pairs, chosen by the same sha256 rule the other arms use so the set is
+    # frozen without being hand-picked.
+    store = json.load(open(ROOT / "corpus/store_clean.json"))
+    pairs = [(r, v) for r in store for v in (r.get("units") or {})
+             if v != r["f"].split("=", 1)[0].strip()]
+    pairs.sort(key=lambda rv: hashlib.sha256(
+        ("kprobe/r1/v1:" + rv[0]["f"] + ":" + rv[1]).encode()).hexdigest())
+    called = targeted = answered = usable = 0
+    for r, v in pairs:
+        if usable >= 12:
+            break
+        want = subprocess.run([str(ROOT / "tools/eval/evalcli"),
+                        f"<tool>solve<arg>{r['f']}<arg>{v}</tool>"],
+                       capture_output=True, text=True).stdout
+        # NOT `m`: that is the MODEL in this function, and shadowing it with a regex match made
+        # the generation loop call a re.Match. Renamed rather than reordered, because the next
+        # person to add an arm here will reach for `m` too.
+        mm = re.search(r"<res>(.*?)</res>", want, re.S)
+        if not mm or mm.group(1).startswith("!"):
+            continue                      # !nosol: the tool refuses, so there is nothing to ask for
+        want = mm.group(1)
+        usable += 1
+        q = f"solve {r['f']} for {v}"
+        pr = subprocess.run([str(ROOT / "build/devprompt"), str(ROOT / "build/store.tns"), q, "0"],
+                     capture_output=True, text=True)
+        pre = next((l for l in pr.stdout.split("\n") if l.startswith("<q>")), None)
+        if not pre:
+            continue                      # retrieval found nothing; counted as a miss on all three
+        out = gen(m, pre)
+        a = answer_of(out)
+        if "<tool>solve<arg>" in out:
+            called += 1
+            arg = out.split("<tool>solve<arg>", 1)[1]
+            got_f = arg.split("<arg>", 1)[0]
+            got_v = arg.split("<arg>", 1)[1].split("</tool>", 1)[0] if "<arg>" in arg else ""
+            if got_f == r["f"] and got_v == v:
+                targeted += 1
+        if a and want.replace(" ", "") in a.replace(" ", ""):
+            answered += 1
+    print(f"\nD7  REARRANGEMENT, {usable} store pairs, greedy, the device's own prompt")
+    print(f"      called solve   {called}/{usable}" + (f" = {100*called/usable:.1f}%" if usable else ""))
+    print(f"      right target   {targeted}/{usable}" + (f" = {100*targeted/usable:.1f}%" if usable else ""))
+    print(f"      stated result  {answered}/{usable}" + (f" = {100*answered/usable:.1f}%" if usable else ""))
+    print(f"      These are NOT summed. A model can call the right tool on the wrong relation, or "
+          f"call it correctly and ignore what it returns.")
     return 0
 
 
