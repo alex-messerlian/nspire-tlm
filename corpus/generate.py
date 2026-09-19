@@ -3252,11 +3252,56 @@ def gen(n, seed=0):
     # would be invisible until a device run disagreed with the corpus. gate_record_bytes diffs the
     # harvested span against build/asmcli like any other, so this inherits that check for free.
     if REARRANGE > 0:
+        # THE SPAN COMES FROM THE DEVICE ITSELF, through build/asmcli.
+        #
+        # Harvesting it from already-built documents was the first design and it was wrong twice.
+        # It picked up A51-SCRAMBLED spans (the question asked about one relation and the record
+        # showed another, on ~24% of the class), and then it picked up spans whose `missing:` field
+        # was computed for a DIFFERENT GIVEN SET -- an R1 question supplies none, so a span
+        # harvested from a document that had givens carries the wrong missing. gate_record_bytes
+        # caught the second one:
+        #
+        #   Q       get r out of tau=r*F        (no givens)
+        #   corpus  ... | missing:none | ...    harvested from a document that had them
+        #   device  ... | missing:r    | ...    what the device emits for no givens
+        #
+        # Restricting the harvest to EXPLAIN documents fixed it and DROPPED 6,360 documents whose
+        # record happened to have none in that run. Asking asmcli removes both problems at once and
+        # is not a second producer: asmcli links src/store/assemble.c, which is the code the
+        # calculator runs. The span is device-identical BY CONSTRUCTION rather than by harvest luck.
+        # rid lives in _store (store_clean.json), not in `recs` -- `recs` is the units-side view
+        # and carries no rid at all. A record absent from the shipped store cannot be assembled by
+        # the device and is skipped rather than guessed at.
+        _rid = {f: _store[f]["rid"] for f in (r["f"] for r in recs)
+                if f in _store and _store[f].get("rid")}
+        _lines = [f"{_rid[f]}\tQ\t" for f in _rid]
+        _out = subprocess.run(["build/asmcli", "build/store.tns"],
+                              input="\n".join(_lines) + "\n",
+                              capture_output=True, text=True).stdout.strip().split("\n")
         span_of = {}
+        for f, o in zip(_rid, _out):
+            if "<r>" in o:
+                span_of[f] = o.split("<r>", 1)[1]
+        _harvested = {}
         for b in built:
             h, t = b.get("head"), b.get("text", "")
-            if not h or h in span_of or "<r>" not in t:
+            if not h or h in _harvested or "<r>" not in t:
                 continue
+            # THE SPAN MUST BELONG TO A QUESTION WITH THE SAME GIVENS, AND AN R1 QUESTION HAS NONE.
+            #
+            # `missing:` is computed by the device from what the student supplied, so a span
+            # harvested from a document that HAD givens carries a missing field that is wrong for a
+            # rearrangement question. Caught by gate_record_bytes:
+            #
+            #   Q       get r out of tau=r*F        (no givens)
+            #   corpus  ... | missing:none | ...    harvested from a document that had them
+            #   device  ... | missing:r    | ...    what the device emits for no givens
+            #
+            # EXPLAIN documents carry no givens by construction, so their span is the no-givens
+            # span, which is the one an R1 question will actually be shown. Restricting the harvest
+            # is the fix; rebuilding the span here would make this file a second producer of a
+            # field the device owns, which is the defect that has now been found five times.
+
             after = t.split("<r>", 1)[1]
             cut = min([i for i in (after.find("<tool>"), after.find("<a>")) if i >= 0] or [-1])
             # THE SPAN MUST BE THE SPAN FOR *THIS* RELATION. `head` stays the store formula, but
@@ -3271,7 +3316,7 @@ def gen(n, seed=0):
             # tool result -- and the supervision is wrong. Found by hand-reading eight documents,
             # which is the step that precedes generating at volume, and found nowhere else.
             if cut > 0 and after[:cut].startswith(h + " |"):
-                span_of[h] = after[:cut]
+                _harvested[h] = after[:cut]
         rdocs, rskip = _RA.build(recs, _run_tool_text, rng)
         if REARRANGE < 1:
             rng.shuffle(rdocs)
