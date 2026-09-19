@@ -47,6 +47,21 @@ def recmap():
     return {r["f"]: (r.get("name") or "") for r in d}
 
 
+def varmap():
+    """formula -> the variables the record DECLARES, and name -> the variable its record solves for.
+
+    These answer the one question the identity test cannot: is the named quantity a VARIABLE OF THIS
+    RECORD rather than a claim about the record itself? An explanation of v = v_0 + a*t that opens
+    "Acceleration is how much velocity you pick up each second" is not asserting that this record is
+    the acceleration record. It is defining `a`, which this record declares, because `a` is the
+    mechanism of the relation -- and it is a better explanation for doing so."""
+    d = json.loads((ROOT / "corpus/store_clean.json").read_text())
+    decl = {r["f"]: set((r.get("units") or {}).keys()) for r in d}
+    solves = {_ident(r.get("name") or ""): r["f"].split("=", 1)[0].strip()
+              for r in d if r.get("name") and "=" in r["f"]}
+    return decl, solves
+
+
 _DET = ("the ", "a ", "an ")
 
 def _ident(name):
@@ -78,7 +93,7 @@ def _true_of(n, own):
     return bool(own) and (n == own or n in own or own in n)
 
 
-def violations(docs, pool, min_name, rmap=None, tally=None):
+def violations(docs, pool, min_name, rmap=None, tally=None, decl=None, solves=None):
     """ONE regex pass per document, not one substring search per (document, name).
 
     The naive form is 240,000 x 199 = 48M scans and took minutes. The project log: a gate's runtime is a
@@ -122,6 +137,17 @@ def violations(docs, pool, min_name, rmap=None, tally=None):
             if rmap is not None and _true_of(n, rmap.get(rec, "")):
                 if tally is not None: tally["exempt: true of the record shown"] += 1
                 continue
+            # (b2) THE NAME IS A QUANTITY THIS RECORD DECLARES. "Acceleration is how much
+            #      velocity you pick up each second ... v = v_0 + a*t" explains `a`, and `a` is one
+            #      of this record's own variables. The test is structural, not a wordlist: the
+            #      record that quantity NAMES solves for a symbol, and the record shown declares
+            #      that symbol. Case is significant, so P (power) does not match p (pressure) --
+            #      which is what keeps the known-bad control firing.
+            if decl is not None and solves is not None:
+                sym = solves.get(_ident(n))
+                if sym and sym in decl.get(rec, set()):
+                    if tally is not None: tally["exempt: a quantity this record declares"] += 1
+                    continue
             # (c) VOCABULARY, not an identity claim. Store names are built from ordinary physics
             #     nouns -- distance, power, velocity, pressure, kinetic energy -- and prose that
             #     explains physics must use them. Before this clause the gate flagged
@@ -146,6 +172,7 @@ def main():
         return 2
 
     rmap = recmap()
+    decl, solves = varmap()
 
     # A CHECK WITH NOTHING TO FIND AND A DISABLED CHECK PRODUCE THE SAME OUTPUT, so the predicate is
     # exercised on known-bad and known-good samples on EVERY run, clean tree or not.
@@ -172,9 +199,21 @@ def main():
         # (a) an A51-scrambled record keeps its quantity, so its name is still true of it
         (False, doc("sigma=((W)/(kappa))", "Power is not how much work you do, it is how fast. sigma = W/kappa."),
                 "known-good: A51-scrambled record"),
+        # (b2) a quantity the record DECLARES. v=v_0+a*t declares `a`, and the record named
+        #      "acceleration" solves for `a`, so defining acceleration here explains a variable of
+        #      this relation rather than claiming the relation is something else. This is the shape
+        #      that fired on 16 real documents and was correct prose every time.
+        (False, doc("v=v_0+a*t", "Acceleration is how much velocity you pick up each second: v = v_0 + a*t."),
+                "known-good: a quantity this record declares"),
+        # ...AND THE EXEMPTION MUST NOT SWALLOW THE DEFECT. p=F/A declares p, F and A. The record
+        #      named "power from force and velocity" solves for P, and P is not p -- case is physics
+        #      here. If (b2) ever folded case this line would start passing and the gate would go
+        #      blind on exactly the class it exists for.
+        (True,  doc(R, "Power from force and velocity is p = F/A."),
+                "known-bad: case keeps P (power) distinct from p (pressure)"),
     ]
     for want, d, label in CONTROLS:
-        got = bool(violations([d], pool, MIN_NAME, rmap))
+        got = bool(violations([d], pool, MIN_NAME, rmap, None, decl, solves))
         if got != want:
             print(f"  CONTROL BROKEN [{label}]: fired={got}, expected={want}")
             return 2
@@ -188,12 +227,12 @@ def main():
     # 3x and the table only exists to show the choice of MIN_NAME is not load-bearing.
     smp = docs[:20000]
     for m in (4, 5, 6):
-        v = violations(smp, pool, m, rmap)
+        v = violations(smp, pool, m, rmap, None, decl, solves)
         mark = " <- MIN_NAME" if m == MIN_NAME else ""
         print(f"    names >= {m} chars   {100*len(v)/len(smp):5.2f}% of a {len(smp):,}-doc sample{mark}")
 
     tally = collections.Counter()
-    bad = violations(docs, pool, MIN_NAME, rmap, tally)
+    bad = violations(docs, pool, MIN_NAME, rmap, tally, decl, solves)
     print("  MEASURED, what the literal predicate flags and why each part is exempt:")
     for k, v in tally.most_common():
         print(f"    {v:6,}  {k}")

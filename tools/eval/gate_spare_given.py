@@ -131,6 +131,20 @@ def main():
         if no_relation(rec):
             skipped[o.get("kind", "?")] += 1
             continue                       # the knowledge tier declares no relation
+        # R1 IS EXCLUDED, AND NOT BECAUSE IT WOULD FAIL. This gate asks one question: does a SPARE
+        # GIVEN predict a REFUSAL. R1 does neither of the things that question is about.
+        #
+        # It does not refuse -- it answers, through `solve` -- so counting it in the refuse
+        # population inverts the gate's own definition. And it supplies no givens: its question
+        # carries a RELATION ("solve F=m*a for a"), which the givens regex `(\w+)\s*=` reads as an
+        # assignment of F, making every R1 document score 100% spare against a denominator that
+        # means nothing. Two separate reasons, either one sufficient.
+        #
+        # Counted and printed, never silently dropped: a class this gate cannot speak about must be
+        # visible, because "excluded" and "clean" must not share an exit.
+        if o.get("kind") == "R1":
+            skipped["R1 (answers, and its question is a relation not a given)"] += 1
+            continue
         if FULLY_BOUND_ONLY and "missing:none" not in rec:
             continue                       # the fit judgement is only required when bound
         k = o.get("kind", "ANSWERABLE")
@@ -142,7 +156,7 @@ def main():
     for line in p.open():
         o = json.loads(line)
         rec = o["text"].split("<r>", 1)[1].split("<", 1)[0]
-        if rec.startswith("none") or no_relation(rec):
+        if rec.startswith("none") or no_relation(rec) or o.get("kind") == "R1":
             continue
         if FULLY_BOUND_ONLY and "missing:none" not in rec:
             continue
@@ -151,9 +165,11 @@ def main():
         counts[o.get("kind", "ANSWERABLE")][min(len(given - rhs(fields(rec)[0])), 3)] += 1
 
     if skipped:
-        print(f"  SCOPE: {sum(skipped.values()):,} documents skipped as having NO RELATION "
-              f"{dict(skipped)} -- the knowledge tier's record is a glossary entry, so a spare "
-              f"variable is undefined. Counted, not silent.")
+        print(f"  SCOPE: {sum(skipped.values()):,} documents excluded, by class, with reasons: "
+              f"{dict(skipped)}")
+        print(f"         K1/K2/K3: the record is a glossary entry, so a spare variable is "
+              f"undefined. R1: it answers rather than refuses, and its question carries a relation "
+              f"rather than givens. Counted and named, never silently dropped.")
     print("  [scope: FULLY-BOUND documents -- where the fit judgement is required]")
     print("  spare-variable rate by class (a question supplying a variable the record does not use):")
     for k in sorted(tot):
@@ -201,8 +217,8 @@ def main():
             o = json.loads(line)
             rc = o["text"].split("<r>", 1)[1].split("<", 1)[0]
             q = o["text"].split("<q>")[1].split("</q>")[0]
-            if no_relation(rc) and not rc.startswith("none"):
-                continue                   # knowledge tier: no relation, no fit judgement
+            if (no_relation(rc) and not rc.startswith("none")) or o.get("kind") == "R1":
+                continue                   # knowledge tier and R1: see the exclusions above
             k = "D3" if rc.startswith("none") else o.get("kind", "ANSWERABLE")
             # D3 IS EXCLUDED FROM THE ABSENCE CHECK, AND THAT IS A SCOPE DECISION, NOT AN
             # OMISSION. src/store/assemble.c:109 emits the literal "none | ... | fit:low" whenever
