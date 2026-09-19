@@ -59,7 +59,11 @@ typedef struct {
     int  hit[NS_MAX_RECORDS];
     int  nhit;
     int  sel, scroll;
+    /* THE BROWSABLE FAMILIES ONLY, compacted. `fams[i]` is the i'th row of the family list and
+     * `fammap[i]` is its REAL family index, which is its identity to ns_filter and ns_family_of.
+     * The two are no longer the same number, because the glossary family is not browsed. */
     ns_family fams[NS_MAX_FAMILIES];
+    int  fammap[NS_MAX_FAMILIES];
     int  nfam;
 } pk_state;
 

@@ -37,8 +37,28 @@ void pk_open(pk_state *p, const ns_store2 *st, const char *question) {
     memset(p, 0, sizeof *p);
     p->level = PK_FAMILY;
     p->fam   = -1;
-    p->nfam  = ns_families(st, p->fams, NS_MAX_FAMILIES);
-    if (p->nfam < 0) p->nfam = 0;
+    /* A111. THE GLOSSARY IS NOT A BROWSE ROW. ns_family_browsable() was written to say so and had
+     * NO CALLER -- declared in picker.h, defined in picker.c, used only by test_picker.c, so a test
+     * exercised it and the shipped UI ignored it. Sixth instance of the unwired-check class after
+     * provenance.c, dim_gate on absent input, base() by documentation, the two graders and
+     * IN_SCROLL. A test using a function makes it read as wired, which is the part that hid it.
+     *
+     * The knowledge tier put 1,442 glossary terms in one family. Listed as a browse row it is 111
+     * screens of 13, and it also pushed the family list to 14 rows against 13 visible. Those terms
+     * stay reachable by TYPING, which scopes to every record -- the path a student uses anyway, and
+     * measured at a median of 4 keystrokes. What they are not is a row you can walk into and be
+     * stranded in. */
+    {
+        ns_family all[NS_MAX_FAMILIES];
+        int nall = ns_families(st, all, NS_MAX_FAMILIES);
+        if (nall < 0) nall = 0;
+        p->nfam = 0;
+        for (int f = 0; f < nall; f++)
+            if (ns_family_browsable(f)) {
+                p->fams[p->nfam]     = all[f];
+                p->fammap[p->nfam++] = f;
+            }
+    }
 
     /* THE SHORTLIST, not a winner. ASK_QTY because it is the measured best of the three -- and
      * the reason it is only a shortlist is measured too: on the 148 items whose record is still
@@ -66,8 +86,9 @@ void pk_open(pk_state *p, const ns_store2 *st, const char *question) {
      * five rows. One key removes it, and the destination is the ranker's own top family, which is
      * exactly where the pre-Suggested build put the cursor. */
     if (p->nsug) {
-        int f = ns_family_of(st, p->sug[0]);
-        p->browse_row = p->nsug + ((f >= 0 && f < p->nfam) ? f : 0);
+        int f = ns_family_of(st, p->sug[0]), row = 0;
+        for (int i = 0; i < p->nfam; i++) if (p->fammap[i] == f) { row = i; break; }
+        p->browse_row = p->nsug + row;   /* a glossary suggestion has no row: land on the first */
     }
 
     /* The cursor starts on the top suggestion when there is one -- that is the row most likely to
@@ -113,8 +134,8 @@ pk_action pk_key(pk_state *p, const ns_store2 *st, int key, int *out_rec) {
                 if (out_rec) *out_rec = p->sug[p->sel];
                 return PK_ACT_PICKED;
             }
-            int f = pk_row_family(p, p->sel);
-            if (f >= 0 && p->fams[f].count > 0) enter_records(p, st, f);
+            int d = pk_row_family(p, p->sel);
+            if (d >= 0 && p->fams[d].count > 0) enter_records(p, st, p->fammap[d]);
             return PK_ACT_NONE;      /* an empty family is not openable; it cannot be entered */
         }
         /* '/' is the documented key. A letter does the same thing, because a student who types

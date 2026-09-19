@@ -69,6 +69,11 @@ int main(int argc, char **argv) {
          * capacitance records, so it renders a full list. The empty screen needs a real miss. */
         if (!strcmp(screen, "pickempty")) { const char *q = "zzqq";
             for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c}); }
+        /* THE BOTTOM OF THE FAMILY LIST. `n = PK.nfam` ignored the suggestion rows, so at maximum
+         * scroll the draw computed five fewer rows than the scroller allows and the last families
+         * were reachable but not drawn. This renders that exact state. */
+        if (!strcmp(screen, "pickbottom"))
+            for (int i = 0; i < 30; i++) app_event(&(in_event){.kind=IN_KEY,.key=K_DOWN});
         if (!strcmp(screen, "pickfind"))  { const char *q = "force";
             for (const char *c = q; *c; c++) app_event(&(in_event){.kind=IN_KEY,.key=*c}); }
         app_draw(); goto out;

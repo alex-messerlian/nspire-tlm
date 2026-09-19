@@ -2176,7 +2176,14 @@ static void draw_picker(void) {
     int rows, n, top;
     if (PK.level == PK_FAMILY) {
         snprintf(head, sizeof head, "WHAT ARE YOU SOLVING FOR?");
-        n = PK.nfam;
+        /* MODEL ROWS, NOT FAMILIES. The family level draws the suggestion rows ABOVE the families
+         * and pk_row_family()/pk_row_is_sug() index over both, which is also what clamp() scrolls
+         * over. Using the family count alone made this disagree with the scroller in two visible
+         * ways: the footer said "2 more below" with SEVEN families off-screen, and at the bottom of
+         * the list `rows` came out five short, so the last five families could be scrolled to and
+         * not drawn. Same hidden-data class as the session list and the search sheet -- silence
+         * about what was dropped is the bug, not the limit. */
+        n = PK.nsug + PK.nfam;
     } else if (PK.nhit == 0) {
         snprintf(head, sizeof head, "No relation matches \"%s\"", PK.q);
         n = 0;
