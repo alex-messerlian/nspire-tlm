@@ -1,6 +1,6 @@
 {
- "input_hash": "11fc4d34d5a4283f",
- "n_docs": 292247,
+ "input_hash": "83ed942d826ee524",
+ "n_docs": 314637,
  "inputs": [
   "corpus/generate.py",
   "corpus/store_clean.json",
