@@ -81,6 +81,17 @@ static int word_near(const char *hay, const char *word) {
     return 0;
 }
 
+/* Strip spaces and parentheses so a store relation and a student's typing of it compare equal:
+ * "P=(((V)^(2))/(R))" and "P = V^2/R" both reduce to "P=V^2/R". Returns the length written. */
+static int norm_expr(const char *s, char *out, int cap) {
+    int n = 0;
+    if (!s || !out || cap <= 0) return 0;
+    for (; *s && n < cap - 1; s++)
+        if (*s != ' ' && *s != '\t' && *s != '(' && *s != ')') out[n++] = *s;
+    out[n] = 0;
+    return n;
+}
+
 static int word_in(const char *hay, const char *word) {
     for (const char *h = hay; *h; h++) {
         if (h != hay && alpha(h[-1])) continue;
@@ -373,6 +384,37 @@ static int score_record(const ns_store2 *st, int r, const char *question,
     struct sctx c = { question, 0, qty ? ASK_IDF : mode, {{0}}, 0, 0, 0 };
     each_word(nm, score_word, &c);
     int name_score = c.score;      /* what the NAME earned, before qty/noun cues and variables */
+
+    /* A94. THE STUDENT TYPED THE FORMULA. Until now the scorer read record NAMES and never the
+     * relation itself, so the single most specific thing a student can offer was thrown away.
+     *
+     * MEASURED on the shipped store before this term:
+     *   "solve F=m*a for a"      -> f=((d_i*d_o)/(d_o+d_i))   the thin lens equation, because
+     *                               "solve" fuzzy-matches the name "(SOLVED version)"
+     *   "isolate k in F=-k*x"    -> "isolated system", because "isolate" matches "isolated"
+     *   "rearrange W=F*d for d"  -> nothing at all
+     * The question VERB was outscoring the relation printed next to it.
+     *
+     * Normalisation drops spaces and parentheses only. The store writes P=(((V)^(2))/(R)) and a
+     * student types P=V^2/R; both reduce to P=V^2/R. Case is NOT folded, because case is physics
+     * here -- T against t, V against v.
+     *
+     * The bonus scales with the MATCHED LENGTH rather than being flat, so when two records'
+     * normalised relations both appear in a question the longer and more specific one wins on its
+     * own evidence instead of on a tie-break. */
+    {
+        char nf[160], nq[640];
+        /* A RELATION, NOT A TERM. The knowledge tier packs a glossary entry as an ordinary record
+         * whose `formula` field IS THE TERM -- "force", "pressure", "kinetic energy". Without the
+         * '=' test this bonus fired on those: "what is force, k = 500, x = 0.4" matched the
+         * glossary record "force" for +240 and beat F=-k*x. test_askparse went 40/40 to 33/40 in
+         * one build and named every case. Requiring '=' is the same structural predicate
+         * gate_spare_given uses to tell the two populations apart. */
+        if (norm_expr(st->rec[r].formula, nf, (int)sizeof nf) >= 4 && strchr(nf, '=') &&
+            norm_expr(question, nq, (int)sizeof nq) > 0 && strstr(nq, nf))
+            c.score += 48 * (int)strlen(nf);
+    }
+
     /* A67. NAME COVERAGE. The score above is a SUM over matched name words, so a long name that
      * merely CONTAINS the question outscores a name that IS the question:
      *
