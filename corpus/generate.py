@@ -165,10 +165,38 @@ def _device_missing_mod(rec, given_names):
     for x in VAR.findall(rec["f"].split("=", 1)[1]):
         if x in ("pi", "e") or x in _seen: continue
         _seen.add(x); _vs.append(x)
+    # A102. CASE-INSENSITIVE RESOLUTION, BECAUSE THE DEVICE DOES IT AND THIS MUST MIRROR IT.
+    #
+    # A65 taught src/store/assemble.c that a typed `f` binds to a record's `F` when the match is
+    # unambiguous, because the device test had produced a prompt contradicting itself in one line:
+    # "Given f = 12 ... missing:F". This function kept comparing case-SENSITIVELY, so the two
+    # producers disagreed whenever a spare given collided with a record variable by case alone:
+    #
+    #   Q       Starting from R = 0.135, K = 6.72e-20, ... determine n.
+    #   corpus  tau=r*F | ... | missing:r        R and r are different strings
+    #   device  tau=r*F | ... | missing:F        R bound to r, so F is the first unbound
+    #
+    # One span in 400, found by gate_record_bytes. Fourth time a field of the record span has
+    # disagreed between these two producers, and the byte diff is what caught it again.
+    #
+    # THE RULE IS COPIED FROM ci_unique(), NOT APPROXIMATED. Case is not noise in physics -- T is
+    # period or temperature and t is time -- so a case-insensitive match counts ONLY when it is
+    # unambiguous in BOTH directions: exactly one record variable matches the typed token ignoring
+    # case, and exactly one typed token matches that record variable. A blind lower() would bind
+    # V to v and silently answer the wrong question.
+    _rec_vars = [v for v in _vs if v != lhs_] + ([lhs_] if lhs_ else [])
+    def _bound(v):
+        if v in given_names:
+            return True                                  # exact match wins, as value_for() does
+        lv = v.lower()
+        nrec = sum(1 for x in _rec_vars if x.lower() == lv)
+        nin = sum(1 for g in given_names if g.lower() == lv)
+        return nrec == 1 and nin == 1
+
     for v in _vs:
         if v == lhs_: continue
         if _const_for(rec, v) is not None: continue     # supplied constant, not asked for
-        if v not in given_names: return v
+        if not _bound(v): return v
     return "none"
 
 def sample_value(rng, unit=None):
