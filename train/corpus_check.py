@@ -24,6 +24,21 @@ import json
 import os
 
 KNOWLEDGE_KINDS = {"K1", "K2", "K3"}
+
+# THE SYMBOLIC-TOOL TIERS, AND THE THIRD TIME THIS EXACT MISTAKE WOULD HAVE BEEN MADE.
+#
+# R1 (solve), C1 (diff) and C2 (integ) are sized by the STORE AND THE DOSE -- 338 rearrangement
+# pairs at 30 each, 398 derivative pairs at 24 -- and not by generate.py's N, exactly like the
+# knowledge tier. Counting them against a 240,000 target fails a correct corpus by precisely their
+# size: 262,250 against 240,000, and the difference is 22,480, which is them.
+#
+# The docstring above already records this class twice (head coverage printing 979.9%,
+# gate_store_coverage counting knowledge records against 164) and the file still carried one
+# denominator. A second population arriving is not a rare event in this project; it is what every
+# week of it has produced. So the partition is NAMED now rather than implied, and the next tier
+# needs one line here instead of a debugging session before a training run.
+TOOL_TIER_KINDS = {"R1", "C1", "C2"}
+SIZED_ELSEWHERE = KNOWLEDGE_KINDS | TOOL_TIER_KINDS
 BANDS = {"D1": (0.08, 0.12), "D2": (0.03, 0.07)}
 
 # THE CORPUS SIZE IS PART OF THE EXPERIMENT AND IT IS THE COMPUTE TIER'S SIZE.
@@ -49,7 +64,7 @@ def check(path="corpus/synth_sample.jsonl", verbose=True):
     tot = sum(kinds.values())
     assert tot, f"{path} is empty -- an empty corpus trivially satisfies every band"
 
-    compute = [d for d in docs if d.get("kind") not in KNOWLEDGE_KINDS]
+    compute = [d for d in docs if d.get("kind") not in SIZED_ELSEWHERE]
     ctot = len(compute)
     assert ctot, "the corpus contains no compute documents at all"
     for kind, (lo, hi) in BANDS.items():
@@ -75,8 +90,12 @@ def check(path="corpus/synth_sample.jsonl", verbose=True):
               + "  ".join(f"{a} {100*b/tot:.0f}%" for a, b in kinds.most_common()), flush=True)
         if nk:
             kk = collections.Counter(d.get("kind") for d in docs if d.get("kind") in KNOWLEDGE_KINDS)
-            print(f"  knowledge tier: {nk:,} documents ({100*nk/tot:.1f}% of the corpus) {dict(kk)}",
-                  flush=True)
+            tk = collections.Counter(d.get("kind") for d in docs if d.get("kind") in TOOL_TIER_KINDS)
+            nkk, ntk = sum(kk.values()), sum(tk.values())
+            print(f"  knowledge tier:     {nkk:,} documents ({100*nkk/tot:.1f}% of the corpus) "
+                  f"{dict(kk)}", flush=True)
+            print(f"  symbolic-tool tier: {ntk:,} documents ({100*ntk/tot:.1f}%) {dict(tk)} "
+                  f"-- sized by the store and the dose, not by N", flush=True)
             print(f"  bands and size checked against the {ctot:,} compute documents, "
                   f"not the {tot:,} total", flush=True)
     return docs, kinds

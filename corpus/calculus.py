@@ -60,9 +60,15 @@ D_PROSE = [
 # The three results that ARE another record. Written out, because "m*v" is a correct answer and
 # "momentum" is the one a student remembers.
 NOTABLE = {
+    # NAMES THE PHYSICS, DOES NOT STATE A SECOND RELATION. The first version said "which is the
+    # velocity relation v = v_0 + a*t", and gate_name_provenance fired on it -- correctly. That
+    # gate exists because a model asserting a record name it cannot read from the prompt supplies a
+    # DIFFERENT record's name 89.7% of the time on anything it has not memorised, and teaching the
+    # habit on three records it has memorised is still teaching the habit. The physics survives
+    # without the second formula.
     ("d=d_0+v_0*t+((1)/(2))*a*(t)^(2)", "t"):
-        "d{lhs}/d{v} = {r}, which is the velocity relation v = v_0 + a*t. Velocity IS the "
-        "derivative of position, and this is where that relation comes from.",
+        "d{lhs}/d{v} = {r}. Differentiate a position with respect to time and you get velocity, "
+        "and that is not a coincidence: it is what velocity means.",
     ("K=0.5*m*(v)^(2)", "v"):
         "d{lhs}/d{v} = {r}, and m*v is momentum. Momentum is the derivative of kinetic energy "
         "with respect to speed, which is why the two always move together.",

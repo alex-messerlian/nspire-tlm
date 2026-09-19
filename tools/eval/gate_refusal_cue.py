@@ -58,8 +58,24 @@ def main():
         w = re.findall(r"[A-Za-z]+", q.lower())
         return {" ".join(w[i:i + k]) for i in range(len(w) - k + 1)}
 
+    # THE SYMBOLIC-TOOL TIER IS NOT PART OF THIS POPULATION, and leaving it in was a pure
+    # denominator error. R1/C1/C2 always ANSWER, through solve/diff/integ, and a fit judgement is
+    # not available to them: there is nothing to refuse. Counting them dilutes "documents that
+    # REQUIRE reading the record" without changing the number of such documents --
+    #
+    #     3,114 / 314,637 = 0.99%   fails a 1.0% floor
+    #     3,114 / 292,157 = 1.07%   excluding a tier the claim is not about
+    #
+    # The COUNT did not move. This is the fourth time in one week that a second population arrived
+    # and a denominator did not, after the D1/D2 bands, gate_store_coverage and corpus_check's size
+    # guard. Excluded and NAMED, because "excluded" and "clean" must not share an exit.
+    TOOL_TIER = {"R1", "C1", "C2"}
+    skipped_tier = 0
     for line in p.open():
         o = json.loads(line)
+        if o.get("kind") in TOOL_TIER:
+            skipped_tier += 1
+            continue
         rec = o["text"].split("<r>", 1)[1].split("<", 1)[0]
         q = o["text"].split("<q>")[1].split("</q>")[0]
         f = fields(rec)
@@ -84,6 +100,8 @@ def main():
     pf = 100.0 * pure / n
     print(f"  documents {n:,}   D2 {d2:,}")
     print(f"  'refuse <=> missing != none' classifies {acc:.2f}% of the corpus")
+    print(f"  excluded: {skipped_tier:,} R1/C1/C2 documents -- they always answer through a tool, "
+          f"so a fit judgement is not available to them and they are not this claim's population")
     print(f"  documents that REQUIRE reading the record: {pure} ({pf:.2f}%)")
     print(f"  question n-grams covering >= {100*NGRAM_RECALL:.0f}% of the class and ZERO outside: "
           f"{len(leaks)}")
