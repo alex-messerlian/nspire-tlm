@@ -957,7 +957,7 @@
   ],
   "expect": "answer",
   "ref": [
-   "k=F/(-1*x)",
+   "k=-F/x",
    "250"
   ],
   "hand30": false
