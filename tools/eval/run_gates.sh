@@ -159,6 +159,7 @@ if ! _skip no_repo_symlink; then $PY tools/eval/gate_no_repo_symlink.py >/dev/nu
 if ! _skip name_provenance; then $PY tools/eval/gate_name_provenance.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "name_provenance" || { printf "  %-20s FAIL\n" "name_provenance"; fail=1; }; fi
 if ! _skip d3_legitimacy; then $PY tools/eval/gate_d3_legitimacy.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "d3_legitimacy" || { printf "  %-20s FAIL\n" "d3_legitimacy"; fail=1; }; fi
 if ! _skip knowledge; then $PY tools/eval/gate_knowledge.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "knowledge" || { printf "  %-20s FAIL\n" "knowledge"; fail=1; }; fi
+if ! _skip r1_record; then $PY tools/eval/gate_r1_record.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "r1_record" || { printf "  %-20s FAIL\n" "r1_record"; fail=1; }; fi
 if ! _skip keypad; then $PY tools/eval/gate_keypad.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "keypad" || { printf "  %-20s FAIL\n" "keypad"; fail=1; }; fi
 if ! _skip explanations; then $PY tools/eval/gate_explanations.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "explanations" || { printf "  %-20s FAIL\n" "explanations"; fail=1; }; fi
 if ! _skip grade_relation; then $PY tools/eval/test_grade_relation.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "grade_relation" || { printf "  %-20s FAIL\n" "grade_relation"; fail=1; }; fi

@@ -21,10 +21,20 @@ nothing" must not share an exit.
 """
 import re
 
-# Dose per (record, variable) pair. 375 pairs, ~338 solvable, so 10 gives ~3,400 documents against
-# a 192,754-document compute tier -- deliberately a small tier. It is a NEW TOOL, not a new topic,
-# and the knowledge tier's own dose experiment (8/16/32) found the curve flat past the low end.
-DOSE = 10
+# Dose per (record, variable) pair. 338 solvable pairs.
+#
+# 30, NOT 10, AND THE UNIT THAT MATTERS IS TOOL CALLS RATHER THAN DOCUMENTS. At 10 this class is
+# 3,380 documents, which is 1.7% of the corpus's tool calls against `eval`'s 192,754. The model is
+# not being taught a new topic here, it is being taught that a SECOND TOOL EXISTS and when to reach
+# for it, and a pattern seen on 1.7% of the occasions a tool is called is thin for that. At 30 it is
+# 10,140 documents and about 5%, which is the same order as the knowledge tier's share of its own
+# surface.
+#
+# This is a judgement, not a measurement, and it is the kind the probe settles: D7 (below) reports
+# how often a rearrangement question actually produces a solve call, and if that is high the dose
+# can come back down at no cost to anything else.
+import os
+DOSE = int(os.environ.get("R1_DOSE", "30"))
 
 # HOW A LAZY STUDENT ASKS FOR A REARRANGEMENT. Written, not mined: A6 measured that mining question
 # surfaces yielded 8 usable frames and 36 sentence fragments, and substituting into all 44 blind put

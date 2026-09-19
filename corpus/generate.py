@@ -55,6 +55,24 @@ def _dim_same(u1, u2):
                        capture_output=True, text=True)
     return "!" not in p.stdout
 
+_TOOL_CACHE = {}
+
+
+def _run_tool_text(call):
+    """Run ONE tool call through the shipped evaluator and return the text inside <res>.
+
+    THE SAME BINARY THE DEVICE LINKS. tools/eval/ is EVAL_CORE in the Makefile and is compiled into
+    chattlm.tns, so a result produced here is the result produced on the calculator. That identity
+    is what gate_res_verbatim asserts, and it is the reason nothing in this file ever computes a
+    tool result in Python. Memoised because R1 asks the same 375 questions regardless of dose."""
+    if call in _TOOL_CACHE:
+        return _TOOL_CACHE[call]
+    p = subprocess.run(["tools/eval/evalcli", call], capture_output=True, text=True)
+    m = re.search(r"<res>(.*?)</res>", p.stdout, re.S)
+    _TOOL_CACHE[call] = m.group(1) if m else ""
+    return _TOOL_CACHE[call]
+
+
 _CONST_CACHE = {}
 def _const_for(rec, v):
     """The value of `v` in `rec` if it is a supplied constant there, else None."""
@@ -2181,6 +2199,16 @@ import knowledge_docs as _KD
 
 KNOWLEDGE = float(os.environ.get("KNOWLEDGE", "1"))
 
+# R1 REARRANGEMENT. Isolating a named variable in a record's own relation, through `solve`.
+#
+# The store admits 375 (record, variable) rearrangements and the corpus called `solve` in ZERO
+# documents against `eval` in 192,754. The tool has worked the whole time. This is the math that
+# connects to the physics already on the calculator: every formula becomes an object you can ask a
+# different question of. See corpus/rearrange.py and docs/RESULT_REARRANGE.md.
+import rearrange as _RA
+
+REARRANGE = float(os.environ.get("REARRANGE", "1"))
+
 # WRITTEN EXPLANATIONS for the 164 compute records, keyed by formula. Three variants each, every
 # one under 215 chars, pure ASCII, using only variables the record declares, grounded in that
 # record's own OpenStax section where evidence existed (127 of 164). See docs/RESULT_F1_PROSE.md.
@@ -3114,6 +3142,63 @@ def gen(n, seed=0):
         _kex = km.get("K1", 0); _kre = km.get("K2", 0) + km.get("K3", 0)
         print(f"    explain is {100*_kex/max(1,_kex+_kre):.1f}% of the text-record cell "
               f"-- a cell far from the formula cell's rate makes RECORD TYPE decide the answer")
+
+    # ---- R1 REARRANGEMENT, appended ---------------------------------------------------------
+    #
+    # THE RECORD SPAN IS HARVESTED FROM DOCUMENTS THIS MODULE ALREADY BUILT, NEVER REBUILT HERE.
+    # Five separate defects in this repo were one field of a record span disagreeing between two
+    # producers -- units, condition, fit, missing, and the result span -- and each was found one
+    # field later than the last. A second span builder in this function would be the sixth, and it
+    # would be invisible until a device run disagreed with the corpus. gate_record_bytes diffs the
+    # harvested span against build/asmcli like any other, so this inherits that check for free.
+    if REARRANGE > 0:
+        span_of = {}
+        for b in built:
+            h, t = b.get("head"), b.get("text", "")
+            if not h or h in span_of or "<r>" not in t:
+                continue
+            after = t.split("<r>", 1)[1]
+            cut = min([i for i in (after.find("<tool>"), after.find("<a>")) if i >= 0] or [-1])
+            # THE SPAN MUST BE THE SPAN FOR *THIS* RELATION. `head` stays the store formula, but
+            # A51 rewrites ~24% of document TEXTS with scrambled symbols, so harvesting the first
+            # document per head picked up a scrambled record on roughly a quarter of them:
+            #
+            #   Q    solve V=I*R for I
+            #   REC  V=mu*sigma | V:V mu:A sigma:ohm | ...
+            #
+            # The question asks about one relation and the record shows another. Every structural
+            # check passes -- it is a well-formed document with a real record span and a correct
+            # tool result -- and the supervision is wrong. Found by hand-reading eight documents,
+            # which is the step that precedes generating at volume, and found nowhere else.
+            if cut > 0 and after[:cut].startswith(h + " |"):
+                span_of[h] = after[:cut]
+        rdocs, rskip = _RA.build(recs, _run_tool_text, rng)
+        if REARRANGE < 1:
+            rng.shuffle(rdocs)
+            rdocs = rdocs[:int(len(rdocs) * REARRANGE)]
+        # JITTER BEFORE BUILDING THE TEXT, not after. The knowledge tier does it in this order and
+        # I wrote it the other way round first: case_jitter mutates d["q"], so calling it after the
+        # append loop flips the questions in `rdocs` and leaves every built document carrying the
+        # UNJITTERED string. The corpus would have reported a jitter rate it did not have.
+        rj = case_jitter(rdocs, rng)
+        kept = 0
+        for d in rdocs:
+            rec = span_of.get(d["head"])
+            if not rec:                     # no compute document for that record in this run
+                continue
+            built.append({"head": d["head"], "kind": "R1", "ans": d["ans"],
+                          "text": f"<q>{d['q']}</q><r>{rec}{d['call']}"
+                                  f"<res>{d['res']}</res><a>{d['ans']}<end>"})
+            kept += 1
+        print(f"  R1 rearrangement: {kept:,} documents over "
+              f"{len({d['head'] for d in rdocs}):,} records "
+              f"({len(rdocs) - kept:,} dropped for having no record span in this run)")
+        print(f"    case jitter flipped {rj:,} ({100*rj/max(1,len(rdocs)):.1f}%)")
+        # "CANNOT GENERATE" AND "GENERATED NOTHING" MUST NOT SHARE AN EXIT. The 37 skips are the
+        # tool correctly refusing a square-root inversion, not a bug, and they are reported every
+        # run so the number cannot drift unnoticed.
+        print(f"    {len(rskip)} (record, variable) pairs skipped: `solve` returned !nosol, which "
+              f"is a refusal to guess and not a failure")
     return built, dropped
 
 # ---- diversity metrics -------------------------------------------------------

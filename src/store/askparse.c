@@ -61,7 +61,26 @@ static int edist_le(const char *a, const char *b, int max) {
 
 static int fuzz_budget(const char *w) {
     int n = 0; while (w[n]) n++;
-    return n <= 4 ? 0 : (n <= 7 ? 1 : 2);
+    /* A95. MEASURED, not chosen. The user's requirement is that a hundred ways of misspelling
+     * "Hooke's law" should still reach it, so a 102-spelling set was built across the real failure
+     * modes (missing apostrophe, phonetic, doubled and dropped letters, keypad neighbours, case,
+     * spacing, question framing) and four budget curves were run against THREE populations, because
+     * a looser matcher trades spelling recall against false matches and one number cannot show that:
+     *
+     *      curve                        spelling   glossary@1   out-of-scope confident
+     *      n<=4?0 : n<=7?1 : 2  (was)    93/102     273/300           2.2%
+     *      n<=3?0 : n<=6?2 : 3           98/102     269/300           2.2%
+     *      n<=4?0 : n<=6?2 : 3  (this)   98/102     270/300           2.4%
+     *      n<=4?0 : n<=7?1 : 3           93/102     272/300           2.3%
+     *
+     * The failures it fixes are 2-edit typos in 6-letter words -- "hukes"/"hoocks"/"hoks" against
+     * the name's "hookes" -- which a budget of 1 cannot bridge. The 4-character floor STAYS: below
+     * it a word is as close to a different word as to itself, and most of the store's variable
+     * names are one or two characters.
+     *
+     * The cost is real and is stated rather than netted out: three glossary terms of 300 stop being
+     * retrieved, and false matching on 2,000 certified out-of-scope questions rises 0.2 points. */
+    return n <= 4 ? 0 : (n <= 6 ? 2 : 3);
 }
 
 /* Walk the question's words and accept one within the edit budget of `word`. */
