@@ -244,6 +244,7 @@ if ! _skip test_lossmask; then $PY train/test_lossmask.py >/dev/null 2>&1 && pri
 if ! _skip test_loader; then ./build/test_loader build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_loader" || { printf "  %-20s FAIL\n" "test_loader"; fail=1; }; fi
 if ! _skip test_picker; then ./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }; fi
 if ! _skip test_pickui; then ./build/test_pickui build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_pickui" || { printf "  %-20s FAIL\n" "test_pickui"; fail=1; }; fi
+if ! _skip test_context; then ./build/test_context >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_context" || { printf "  %-20s FAIL\n" "test_context"; fail=1; }; fi
 if ! _skip test_assemble; then ./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }; fi
 if ! _skip test_tokenizer; then ./build/test_tokenizer build/tok4096.tok build/tok_reference.json >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_tokenizer" || { printf "  %-20s FAIL\n" "test_tokenizer"; fail=1; }; fi
 
