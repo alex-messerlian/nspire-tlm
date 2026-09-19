@@ -1,6 +1,6 @@
 # Tool call format specification
 
-**Status: FROZEN v1.2.0.** Data generation, the evaluator, the training pipeline, and the device
+**Status: FROZEN v1.3.0.** Data generation, the evaluator, the training pipeline, and the device
 runtime all depend on this document. Changing it invalidates every generated corpus and every trained
 checkpoint.
 
@@ -154,6 +154,7 @@ memorise the whole interface at 45M.
 | `solve` | 2 | equation, variable | root list |
 | `diff` | 2 | expression, variable | expression |
 | `integ` | 4 | expression, variable, lower, upper | number |
+| `integ` | 2 | expression, variable | expression (A98, v1.3.0) |
 | `conv` | 2 | quantity, target unit | number with unit |
 | `stat` | 2 | op, list | number |
 
@@ -163,7 +164,27 @@ common silent wrongness in a stats tool.
 
 ### 3.1 Scope boundaries, deliberate
 
-- **No symbolic integration.** `integ` is numeric and definite. Per the architecture decision.
+- **~~No symbolic integration.~~ SUPERSEDED at v1.3.0 (A98).** `integ` now takes TWO shapes, which
+  is the shape a CAS has always had: `integ(f, x)` is the indefinite integral and returns an
+  EXPRESSION, `integ(f, x, a, b)` is the definite one and returns a NUMBER. The 4-argument form is
+  unchanged in behaviour and output.
+
+  The indefinite form is table-driven and deliberately narrow: the power rule including the excluded
+  n = -1, sin, cos, exp, linearity, and constant factors. **No substitution, no integration by
+  parts, no partial fractions.** Everything outside that returns `!nosol`, which is a refusal and
+  carries the same meaning it does for `solve`.
+
+  The narrowness is the point. A symbolic integrator that declines is harmless; one that returns a
+  plausible wrong antiderivative is not, because the model states it as fact in prose and nothing
+  downstream can catch it. `integ(sin(2*x), x)` declines rather than returning `-cos(2*x)`, which is
+  wrong by a factor of two and looks completely right.
+
+  `tools/eval/gate_antideriv.py` checks the only property that matters -- that `d/dx` of every
+  returned antiderivative equals its input -- numerically at four points including a negative one,
+  over enumerated families rather than a hand-written list.
+
+  CHANGING THIS WAS FREE AND THAT WINDOW IS NOW CLOSED. `integ` had ZERO training documents when the
+  second arity was added, so no existing document depended on the old contract.
 - **`solve` handles degree ≤ 2 only.** Higher degree returns `!nosol`. Not "attempts and fails" —
   refuses cleanly, which is a behaviour the model can learn to route around.
 - **No limits, series, matrices, or ODEs.** Out of scope for v1.

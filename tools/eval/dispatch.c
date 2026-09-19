@@ -12,9 +12,17 @@
 
 static arena_t g_arena;
 
-typedef struct { const char *name; int arity; } fn_t;
+/* `alt` is a SECOND permitted arity, -1 when a tool takes exactly one shape.
+ *
+ * Only `integ` uses it, and it is the shape a CAS has always had: integ(f, x) is the indefinite
+ * integral and integ(f, x, a, b) is the definite one. Before A98 only the 4-argument numeric form
+ * existed, so "what is the integral of x^2" had no answer the tool could give -- half of calculus,
+ * and the half a student meets first. */
+typedef struct { const char *name; int arity; int alt; } fn_t;
 static const fn_t FNS[] = {
-    {"eval",1},{"evalat",3},{"solve",2},{"diff",2},{"integ",4},{"conv",2},{"stat",2}
+    {"eval",1,-1},{"evalat",3,-1},{"solve",2,-1},{"diff",2,-1},
+    {"integ",4,2},
+    {"conv",2,-1},{"stat",2,-1}
 };
 #define NFNS ((int)(sizeof FNS / sizeof FNS[0]))
 
@@ -138,10 +146,11 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
     out[0] = 0;
     ar_reset(&g_arena);
 
-    int arity = -1;
-    for (int i = 0; i < NFNS; i++) if (!strcmp(FNS[i].name, name)) { arity = FNS[i].arity; break; }
+    int arity = -1, alt = -1;
+    for (int i = 0; i < NFNS; i++)
+        if (!strcmp(FNS[i].name, name)) { arity = FNS[i].arity; alt = FNS[i].alt; break; }
     if (arity < 0)     return fail(E_NAME,  out, out_sz);
-    if (nargs != arity) return fail(E_ARITY, out, out_sz);
+    if (nargs != arity && nargs != alt) return fail(E_ARITY, out, out_sz);
     for (int i = 0; i < nargs; i++) {
         if (!args[i] || strlen(args[i]) >= MAX_ARG_BYTES) return fail(E_PARSE, out, out_sz);
     }
@@ -200,6 +209,19 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
 
     if (!strcmp(name, "integ")) {
         if (!valid_ident(args[1])) return fail(E_EXPR, out, out_sz);
+        /* TWO ARGUMENTS: the INDEFINITE integral, symbolic. Same pipeline `diff` uses -- build,
+         * simplify, canonicalise, render -- so the two halves of symbolic calculus come out in one
+         * notation rather than two. antideriv() returns E_NOSOL for anything outside its table,
+         * which is a refusal and not a guess. */
+        if (nargs == 2) {
+            node_t *an;
+            if ((e = parse_expr(&g_arena, args[0], 0, &n)))       return fail(e, out, out_sz);
+            if ((e = antideriv(&g_arena, n, args[1], &an)))       return fail(e, out, out_sz);
+            if ((e = simplify(&g_arena, an, &an)))                return fail(e, out, out_sz);
+            if ((e = canon(&g_arena, an, args[1], &an)))          return fail(e, out, out_sz);
+            if ((e = render(an, args[1], out, out_sz)))           return fail(e, out, out_sz);
+            return TB_OK;
+        }
         double lo, hi;
         if ((e = scalar_arg(args[2], &lo))) return fail(e, out, out_sz);
         if ((e = scalar_arg(args[3], &hi))) return fail(e, out, out_sz);

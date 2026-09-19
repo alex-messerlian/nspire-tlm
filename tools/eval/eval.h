@@ -110,6 +110,12 @@ err_t num_eval(const node_t *n, const binds_t *b, int use_units, quant_t *out);
 /* ---- Symbolic differentiation --------------------------------------------------------------- */
 err_t deriv(arena_t *a, const node_t *n, const char *var, node_t **out);
 err_t simplify(arena_t *a, node_t *n, node_t **out);
+
+/* Symbolic antiderivative with respect to `var`. Returns E_NOSOL for anything outside the
+ * physics-relevant table (power rule, 1/x, sin, cos, exp, linearity, constant factors) -- it
+ * DECLINES rather than guessing, because a plausible-but-wrong antiderivative is the one failure
+ * mode that matters here: the model states it as fact in prose. See the comment on the definition. */
+err_t antideriv(arena_t *a, node_t *n, const char *var, node_t **out);
 err_t canon(arena_t *a, node_t *n, const char *var, node_t **out);     /* sum-term ordering */
 err_t render(const node_t *n, const char *var, char *out, size_t sz);   /* canonical infix */
 

@@ -41,6 +41,119 @@ static node_t *call1(arena_t *a, const char *nm, node_t *x) {
 
 static node_t *d(arena_t *a, const node_t *n, const char *var, err_t *err, int depth);
 
+/* ---- symbolic ANTIDIFFERENTIATION (A98) ------------------------------------------------------
+ *
+ * WHY THIS EXISTS. `integ` was numeric and definite only, by an explicit architecture decision, so
+ * "what is the integral of x^2" had no answer the tool could give. That is half of calculus missing
+ * from a physics calculator, and the half a student meets first.
+ *
+ * WHAT IT DELIBERATELY DOES NOT DO. No substitution, no integration by parts, no partial fractions,
+ * no trigonometric identities. Those need a search, and a search that fails silently is worse here
+ * than one that never starts: the ONE thing this tool must never do is return a plausible
+ * antiderivative that is wrong, because the model will state it as fact in prose. Everything outside
+ * the table below returns E_NOSOL, which the model already knows means "the tool declined" -- the
+ * same contract `solve` has on a square-root inversion.
+ *
+ * THE TABLE IS THE PHYSICS-RELEVANT ONE, and each entry is checkable by differentiating it back:
+ *   c            -> c*x                     constants, including symbols that are not the variable
+ *   x            -> x^2/2                   power rule at n=1
+ *   x^n          -> x^(n+1)/(n+1), n != -1
+ *   x^-1, 1/x    -> ln(x)                   the excluded case of the power rule
+ *   sin(x)       -> -cos(x)
+ *   cos(x)       -> sin(x)
+ *   exp(x)       -> exp(x)
+ *   f +- g       -> F +- G                  linearity
+ *   c*f, f*c     -> c*F
+ *   f/c          -> F/c
+ *
+ * A FUNCTION'S ARGUMENT MUST BE THE VARIABLE ITSELF. sin(2*x) is NOT integrated, because doing it
+ * correctly is the chain rule in reverse and doing it incorrectly gives -cos(2*x), which is wrong by
+ * a factor of 2 and looks right. That is exactly the failure this refuses to risk.
+ */
+static int depends_on(const node_t *n, const char *var) {
+    if (!n) return 0;
+    if (n->t == N_SYM) return !strcmp(n->name, var);
+    for (int i = 0; i < 2; i++) if (n->kid[i] && depends_on(n->kid[i], var)) return 1;
+    return 0;
+}
+
+static node_t *ai(arena_t *a, const node_t *n, const char *var, err_t *err, int depth) {
+    if (*err) return NULL;
+    if (!n || depth > MAX_DEPTH) { *err = E_RANGE; return NULL; }
+
+    /* Anything with no dependence on the variable is a constant: ∫c dx = c*x. This one line covers
+     * numbers, other symbols, and whole subexpressions like (m*g). */
+    if (!depends_on(n, var))
+        return ar_bin(a, N_MUL, ar_clone(a, n), ar_sym(a, var));
+
+    switch (n->t) {
+    case N_SYM:                                   /* the variable itself: x^2/2 */
+        return ar_bin(a, N_DIV, ar_bin(a, N_POW, ar_sym(a, var), ar_num(a, 2)), ar_num(a, 2));
+
+    case N_NEG:
+        return neg_of(a, ai(a, n->kid[0], var, err, depth + 1));
+
+    case N_ADD: case N_SUB: {
+        node_t *l = ai(a, n->kid[0], var, err, depth + 1);
+        node_t *r = ai(a, n->kid[1], var, err, depth + 1);
+        if (*err) return NULL;
+        return ar_bin(a, n->t, l, r);
+    }
+
+    case N_MUL: {                                 /* only c*f or f*c -- no parts */
+        int lc = !depends_on(n->kid[0], var), rc = !depends_on(n->kid[1], var);
+        if (lc) return ar_bin(a, N_MUL, ar_clone(a, n->kid[0]), ai(a, n->kid[1], var, err, depth + 1));
+        if (rc) return ar_bin(a, N_MUL, ar_clone(a, n->kid[1]), ai(a, n->kid[0], var, err, depth + 1));
+        *err = E_NOSOL; return NULL;              /* a product of two functions of x: by parts */
+    }
+
+    case N_DIV: {
+        if (!depends_on(n->kid[1], var))          /* f/c */
+            return ar_bin(a, N_DIV, ai(a, n->kid[0], var, err, depth + 1), ar_clone(a, n->kid[1]));
+        /* c/x -> c*ln(x). Only when the denominator IS the variable, not a function of it. */
+        if (!depends_on(n->kid[0], var) && n->kid[1]->t == N_SYM && !strcmp(n->kid[1]->name, var))
+            return ar_bin(a, N_MUL, ar_clone(a, n->kid[0]), call1(a, "ln", ar_sym(a, var)));
+        *err = E_NOSOL; return NULL;
+    }
+
+    case N_POW: {
+        const node_t *base = n->kid[0], *ex = n->kid[1];
+        if (base->t == N_SYM && !strcmp(base->name, var) && is_anynum(ex)) {
+            if (ex->num == -1.0)                  /* the case the power rule excludes */
+                return call1(a, "ln", ar_sym(a, var));
+            return ar_bin(a, N_DIV,
+                          ar_bin(a, N_POW, ar_sym(a, var), ar_num(a, ex->num + 1)),
+                          ar_num(a, ex->num + 1));
+        }
+        *err = E_NOSOL; return NULL;
+    }
+
+    case N_CALL: {
+        /* THE ARGUMENT MUST BE THE BARE VARIABLE. sin(2*x) declines rather than returning
+         * -cos(2*x), which is wrong by a factor of 2 and indistinguishable from right. */
+        const node_t *u = n->kid[0];
+        if (!u || u->t != N_SYM || strcmp(u->name, var)) { *err = E_NOSOL; return NULL; }
+        if (!strcmp(n->name, "sin")) return neg_of(a, call1(a, "cos", ar_sym(a, var)));
+        if (!strcmp(n->name, "cos")) return call1(a, "sin", ar_sym(a, var));
+        if (!strcmp(n->name, "exp")) return call1(a, "exp", ar_sym(a, var));
+        *err = E_NOSOL; return NULL;
+    }
+
+    default:
+        *err = E_NOSOL; return NULL;
+    }
+}
+
+err_t antideriv(arena_t *a, node_t *n, const char *var, node_t **out) {
+    err_t e = E_NONE;
+    node_t *r = ai(a, n, var, &e, 0);
+    if (e) return e;
+    if (!r) return E_RANGE;
+    *out = r;
+    return E_NONE;
+}
+
+
 static node_t *d_call(arena_t *a, const node_t *n, const char *var, err_t *err, int depth) {
     node_t *u  = ar_clone(a, n->kid[0]);
     node_t *du = d(a, n->kid[0], var, err, depth + 1);
@@ -203,6 +316,16 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
             *changed = 1;
             return ar_bin(a, N_MUL, r->kid[0], ar_bin(a, N_MUL, l, r->kid[1]));
         }
+        /* c*(f/k) -> (c/k)*f for numeric c and k, so a numeric coefficient meets a numeric
+         * denominator and folds. Antidifferentiating 3*x^2 builds 3*(x^3/3) by construction -- the
+         * constant-factor rule and the power rule each doing their own correct job -- and without
+         * this it renders as "3*x^3/3" where a textbook writes "x^3". Cosmetic in the sense that
+         * both are the same number, and not cosmetic at all in the sense that these become training
+         * data and the model learns to write whichever it is shown. */
+        if (is_anynum(l) && r && r->t == N_DIV && is_anynum(r->kid[1]) && r->kid[1]->num != 0) {
+            *changed = 1;
+            return ar_bin(a, N_MUL, ar_num(a, l->num / r->kid[1]->num), r->kid[0]);
+        }
         /* Hoist negation out of a product: 2*(-x) -> -(2*x). Keeps MUL free of NEG children, which
          * is what lets the renderer drop parens around a leading unary minus safely. */
         if (l && l->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_MUL, l->kid[0], r)); }
@@ -229,6 +352,15 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
         }
         if (is_num(l, 0)) { *changed = 1; return ar_num(a, 0); }
         if (is_anynum(l) && is_anynum(r) && r->num != 0) { *changed = 1; return ar_num(a, l->num / r->num); }
+        /* (c*f)/k -> (c/k)*f for numeric c and k. The MUL rules push numeric factors to the left,
+         * so differentiating k*x^2/2 builds 4*(k*x)/4 -- the power rule and the quotient rule each
+         * doing their own correct job -- and it renders as "4*k*x/4" where a textbook writes "k*x".
+         * The mirror of the c*(f/k) rule above; a coefficient can arrive on either side of the
+         * division and both spellings end up in training data if only one is folded. */
+        if (is_anynum(r) && r->num != 0 && l && l->t == N_MUL && is_anynum(l->kid[0])) {
+            *changed = 1;
+            return ar_bin(a, N_MUL, ar_num(a, l->kid[0]->num / r->num), l->kid[1]);
+        }
         if (node_eq(l, r) && !is_num(l, 0)) { *changed = 1; return ar_num(a, 1); }
         if (l && l->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l->kid[0], r)); }
         if (r && r->t == N_NEG) { *changed = 1; return neg_of(a, ar_bin(a, N_DIV, l, r->kid[0])); }
