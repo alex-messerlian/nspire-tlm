@@ -311,6 +311,61 @@ def main():
     print(f"      stated result  {answered}/{usable}" + (f" = {100*answered/usable:.1f}%" if usable else ""))
     print(f"      These are NOT summed. A model can call the right tool on the wrong relation, or "
           f"call it correctly and ignore what it returns.")
+
+    # ---- D8 CALCULUS: diff and integ, the other two tools with no training before A103 ---------
+    #
+    # Same three-way scoring as D7 and for the same reason. The shape differs in one way that
+    # matters: diff and integ take the record's RIGHT-HAND SIDE, not the whole relation, because you
+    # differentiate an expression and not an equation. A model that passes the whole formula has
+    # made a real error and `targeted` is what catches it.
+    cal_called = cal_targeted = cal_answered = cal_n = 0
+    cpairs = []
+    for r in store:
+        if "=" not in r["f"]:
+            continue
+        lhs, rhs = r["f"].split("=", 1)
+        for v in (r.get("units") or {}):
+            if v != lhs.strip() and v in rhs:
+                cpairs.append((r, lhs.strip(), rhs, v))
+    cpairs.sort(key=lambda z: hashlib.sha256(
+        ("kprobe/c1/v1:" + z[0]["f"] + ":" + z[3]).encode()).hexdigest())
+    for r, lhs, rhs, v in cpairs:
+        if cal_n >= 12:
+            break
+        w = subprocess.run([str(ROOT / "tools/eval/evalcli"),
+                            f"<tool>diff<arg>{rhs}<arg>{v}</tool>"],
+                           capture_output=True, text=True).stdout
+        mw = re.search(r"<res>(.*?)</res>", w, re.S)
+        if not mw or mw.group(1).startswith("!"):
+            continue
+        want = mw.group(1)
+        cal_n += 1
+        q = f"what is the derivative of {r['f']} with respect to {v}"
+        pr = subprocess.run([str(ROOT / "build/devprompt"), str(ROOT / "build/store.tns"), q, "0"],
+                            capture_output=True, text=True)
+        pre = next((l for l in pr.stdout.split("\n") if l.startswith("<q>")), None)
+        if not pre:
+            continue
+        out = gen(m, pre)
+        a = answer_of(out)
+        if "<tool>diff<arg>" in out:
+            cal_called += 1
+            arg = out.split("<tool>diff<arg>", 1)[1]
+            got_e = arg.split("<arg>", 1)[0]
+            got_v = arg.split("<arg>", 1)[1].split("</tool>", 1)[0] if "<arg>" in arg else ""
+            if got_e == rhs and got_v == v:
+                cal_targeted += 1
+        if a and want.replace(" ", "") in a.replace(" ", ""):
+            cal_answered += 1
+    print(f"\nD8  CALCULUS (diff), {cal_n} store pairs, greedy, the device's own prompt")
+    print(f"      called diff    {cal_called}/{cal_n}"
+          + (f" = {100*cal_called/cal_n:.1f}%" if cal_n else ""))
+    print(f"      right target   {cal_targeted}/{cal_n}"
+          + (f" = {100*cal_targeted/cal_n:.1f}%" if cal_n else ""))
+    print(f"      stated result  {cal_answered}/{cal_n}"
+          + (f" = {100*cal_answered/cal_n:.1f}%" if cal_n else ""))
+    print(f"      `right target` requires the RIGHT-HAND SIDE, not the whole relation: passing "
+          f"the formula to diff is a real error and this is what sees it.")
     return 0
 
 
