@@ -23,6 +23,8 @@ WHAT IT DOES NOT VERIFY: the QUESTION and the ANSWER. The device does not author
 nothing to compare them against; they are other gates' problem.
 """
 import importlib.util, io, contextlib, json, pathlib, re, subprocess, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / 'corpus'))
+from recfmt import formula as _rf_formula  # " | " is the separator; a formula may contain a bare pipe
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 ASM, STORE = ROOT / "build/asmcli", ROOT / "build/store.tns"
@@ -55,7 +57,7 @@ if __name__ == "__main__":
         span = record_span(t)
         if span is None or span.strip().startswith("none |"):
             continue                      # the no-record shape has no record to ask about
-        f = span.split("|", 1)[0].strip()
+        f = _rf_formula(span)
         if f not in rid: continue
         q = re.search(r"<q>(.*?)</q>", t)
         if not q: continue

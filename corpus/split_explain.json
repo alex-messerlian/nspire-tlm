@@ -1,110 +1,70 @@
 [
  {
   "id": "a46-001",
-  "q": "using h = 6.626e-34, explain how lambda is calculated.",
-  "record": "lambda=((h)/(m*v)) | lambda:m h:J*s m:kg v:m/s | missing:m | standard conditions | fit:high",
-  "shown": "lambda=((h)/(m*v))",
-  "asked": "lambda",
-  "ans": "Anything with momentum also behaves like a wave, and lambda = h/(m*v) is how long that wave is. Momentum sits on the bottom, so heavy or fast means short. You have one. It is hopelessly small."
+  "q": "How is I related to the other quantities?",
+  "record": "I=I_0*exp(-mu*x) | I:W/m^2 I_0:W/m^2 mu:1/m x:m | missing:I_0 | a uniform absorber and a narrow beam; mu is the linear attenuation coefficient | fit:high",
+  "shown": "I=I_0*exp(-mu*x)",
+  "asked": "I",
+  "ans": "Each millimetre of absorber removes the same FRACTION of what reaches it, not the same amount, so I = I_0*exp(-mu*x). Doubling the shielding squares the reduction."
  },
  {
   "id": "a46-002",
-  "q": "How do you find intensity?",
-  "record": "I=((((Delta_p_max))^(2))/(2*rho*v)) | I:W/m^2 Delta_p_max:Pa rho:kg/m^3 v:m/s | missing:Delta_p_max | standard conditions | fit:high",
-  "shown": "I=((((Delta_p_max))^(2))/(2*rho*v))",
-  "asked": "I",
-  "ans": "A microphone feels pressure, not power, and this turns one into the other: I = (Delta_p_max)^2/(2*rho*v). The rho and v are the air itself, so the same squeeze carries differently under water."
- },
- {
-  "id": "a46-003",
-  "q": "A system has g = 9.81. explain how normal force is calculated.",
-  "record": "N=m*g*cos(theta) | N:N m:kg g:m/s^2 theta:1 | missing:m | standard conditions | fit:high",
-  "shown": "N=m*g*cos(theta)",
-  "asked": "N",
-  "ans": "Turn your axes to line up with the ramp and the weight splits in two. The part pressing into the surface is N = m*g*cos(theta). The rest runs down along the slope, and unless friction holds it, you slide."
- },
- {
-  "id": "a46-004",
-  "q": "how is the intensity related to the other quantities?",
-  "record": "I_2=I_1*((((r_1)/(r_2))))^(2) | I_2:W/m^2 I_1:W/m^2 r_1:m r_2:m | missing:I_1 | isotropic source, nothing absorbing the wave between the two distances | fit:high",
-  "shown": "I_2=I_1*((((r_1)/(r_2))))^(2)",
-  "asked": "I_2",
-  "ans": "I_2 = I_1*(r_1/r_2)^2 assumes the source throws energy out in every direction. A laser barely spreads, so it holds up far better than this. A room full of echoes breaks it too."
- },
- {
-  "id": "a46-005",
-  "q": "what does s depend on?",
-  "record": "s=r*theta | s:m r:m theta:1 | missing:r | standard conditions | fit:high",
-  "shown": "s=r*theta",
-  "asked": "s",
-  "ans": "An angle on its own tells you nothing about how far anything traveled. Multiply it by the radius and now it does: s = r*theta. That is also why theta carries no unit, and s comes out in meters."
- },
- {
-  "id": "a46-006",
-  "q": "Assume c = 299800000, h = 6.626e-34. what is photon wavelength?",
-  "record": "lambda=((h*c)/(E)) | lambda:m h:J*s c:m/s E:J | missing:E | standard conditions | fit:high",
-  "shown": "lambda=((h*c)/(E))",
-  "asked": "lambda",
-  "ans": "Give a photon more energy and its wave gets shorter, not taller. lambda = (h*c)/E. X-rays sit way up at the energy end, so their wavelength is tiny, which is how Compton caught them knocking electrons loose."
- },
- {
-  "id": "a46-007",
-  "q": "what does the fundamental frequency depend on?",
-  "record": "f_1=((v)/(4*L)) | f_1:Hz v:m/s L:m | missing:v | standard conditions | fit:high",
-  "shown": "f_1=((v)/(4*L))",
-  "asked": "f_1",
-  "ans": "Blow across a tube closed at one end and the longest wave that fits is four tube lengths: air is pinned still at the closed end, free at the open one. That lowest note is f_1 = v/(4*L)."
- },
- {
-  "id": "a46-008",
-  "q": "explain what equivalent resistance of two resistors in parallel is.",
-  "record": "R_eqv=((1)/(1/R_1+1/R_2)) | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | standard conditions | fit:high",
-  "shown": "R_eqv=((1)/(1/R_1+1/R_2))",
-  "asked": "R_eqv",
-  "ans": "Add a resistor in parallel and the resistance goes down, not up, because you have opened another lane. R_eqv = 1/(1/R_1 + 1/R_2), and it always lands below the smaller of R_1 and R_2."
- },
- {
-  "id": "a46-009",
-  "q": "What does net force from rate of momentum change depend on?",
-  "record": "F_net=((Delta_p)/(Delta_t)) | F_net:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "F_net=((Delta_p)/(Delta_t))",
-  "asked": "F_net",
-  "ans": "Newton wrote his second law this way first. F_net = (Delta_p)/(Delta_t). Hold mass steady and it becomes force equals mass times acceleration, but this version survives when mass is leaving, as in a rocket."
- },
- {
-  "id": "a46-010",
-  "q": "where R = 8.314, what does the molar heat capacity at constant pressure depend on?",
-  "record": "C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
-  "shown": "C_p=C_V+R",
-  "asked": "C_p",
-  "ans": "Water in a pan hardly swells when you heat it, so its two heat capacities are nearly the same. A gas has to shove the air back to make room, and for a mole that costs R per degree: C_p = C_V + R."
- },
- {
-  "id": "a46-011",
-  "q": "what does theta depend on?",
+  "q": "how do you find theta?",
   "record": "theta=((s)/(r)) | theta:1 s:m r:m | missing:s | theta in radians, which is what makes arc length equal r times the angle | fit:high",
   "shown": "theta=((s)/(r))",
   "asked": "theta",
-  "ans": "theta = s/r is why a point at the rim of a spinning wheel and a point near the hub share one angle but not one distance. Same theta, bigger r, longer arc s. The angle is what they have in common."
+  "ans": "Walk along a curve of radius r and cover arc length s. The angle you swept is theta = s/r. That is what a radian is, and since it is a length over a length, theta has no units at all."
  },
  {
-  "id": "a46-012",
-  "q": "explain how total mass is calculated.",
-  "record": "m=m_R+m_g | m:kg m_R:kg m_g:kg | missing:m_R | standard conditions | fit:high",
-  "shown": "m=m_R+m_g",
-  "asked": "m",
-  "ans": "On the pad, most of a rocket is fuel and not rocket. m = m_R + m_g names both halves, and it is a snapshot: at liftoff m_g dominates, at burnout it is gone and m is just m_R."
+  "id": "a46-003",
+  "q": "What does entropy change of a system in a reversible isothermal process say?",
+  "record": "Delta_S=((Q)/(T)) | Delta_S:J/K Q:J T:K | missing:Q | standard conditions | fit:high",
+  "shown": "Delta_S=((Q)/(T))",
+  "asked": "Delta_S",
+  "ans": "Pour heat into something and its disorder rises by Delta_S = Q/T. The same joule buys more of it in a cold body than a hot one, which is why heat drifts from hot to cold. T is in kelvin."
  },
  {
-  "id": "a46-013",
-  "q": "how is a_CM related to the other quantities?",
-  "record": "a_CM=R*alpha | a_CM:m/s^2 R:m alpha:1/s^2 | missing:R | rolling without slipping; in a burnout alpha is large while a_CM is near zero | fit:high",
-  "shown": "a_CM=R*alpha",
-  "asked": "a_CM",
-  "ans": "A wheel that is not slipping cannot cheat. Its contact patch is momentarily at rest on the road, so spinning up harder drags the whole center along: a_CM = R*alpha, and a bigger R covers more road per turn."
+  "id": "a46-004",
+  "q": "define v_d.",
+  "record": "v_d=E/B | v_d:m/s E:V/m B:T | missing:E | standard conditions | fit:high",
+  "shown": "v_d=E/B",
+  "asked": "v_d",
+  "ans": "v_d = E/B is a speed filter. The charge cancels out of it, so every particle obeys the same number whatever it is. Mass spectrometers use this to pick one speed before sorting by mass."
  },
  {
-  "id": "a46-014",
+  "id": "a46-005",
+  "q": "if k_B = 1.381e-23, how do you find fermi temperature?",
+  "record": "T_F=((E_F)/(k_B)) | T_F:K E_F:J k_B:J/K | missing:E_F | standard conditions | fit:high",
+  "shown": "T_F=((E_F)/(k_B))",
+  "asked": "T_F",
+  "ans": "Electrons in a metal cannot all sit still, so the top ones carry the Fermi energy E_F even at absolute zero. Ask what temperature would give a normal particle that much, and you get T_F = E_F/k_B."
+ },
+ {
+  "id": "a46-006",
+  "q": "The values are R = 8.314. explain how molar heat capacity at constant volume for an ideal gas with d degrees of freedom is calculated.",
+  "record": "C_V=((d)/(2))*R | C_V:J/(mol*K) d:1 R:J/(mol*K) | missing:d | standard conditions | fit:high",
+  "shown": "C_V=((d)/(2))*R",
+  "asked": "C_V",
+  "ans": "Why does one gas warm up faster than another, mole for mole, on the same burner? Its molecules have fewer places to put the energy. That count is d, and C_V = (d/2)*R turns it into heat capacity."
+ },
+ {
+  "id": "a46-007",
+  "q": "what does v_CM depend on?",
+  "record": "v_CM=R*omega | v_CM:m/s R:m omega:1/s | missing:R | standard conditions | fit:high",
+  "shown": "v_CM=R*omega",
+  "asked": "v_CM",
+  "ans": "v_CM = R*omega is less a formula than the definition of not slipping. Spin your tires on ice and the car crawls along slower than R*omega. Lock the brakes and it slides along faster."
+ },
+ {
+  "id": "a46-008",
+  "q": "What does photon frequency depend on? Take h = 6.626e-34.",
+  "record": "f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:Delta_E_LK | standard conditions | fit:high",
+  "shown": "f=(Delta_E_LK)/h",
+  "asked": "f",
+  "ans": "An electron drops from the L level to the K level and the leftover energy leaves as one photon. f = Delta_E_LK / h fixes its frequency: a wider gap buys a higher f, never a faster photon. h is Planck's constant."
+ },
+ {
+  "id": "a46-009",
   "q": "How do you find s?",
   "record": "s=r*theta | s:m r:m theta:1 | missing:r | standard conditions | fit:high",
   "shown": "s=r*theta",
@@ -112,343 +72,415 @@
   "ans": "Two dots on a spinning CD sweep the same angle, but the outer one covers far more ground. The distance it actually travels is s = r*theta. Double the radius and you double the arc."
  },
  {
+  "id": "a46-010",
+  "q": "how do you find intensity for a spherical wave?",
+  "record": "I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+  "shown": "I=((P)/(4*pi*(r)^(2)))",
+  "asked": "I",
+  "ans": "Energy leaving a source spreads over a growing sphere, so I = P/(4*pi*r^2) with r your distance out. It assumes nothing soaks up the wave on the way and the source radiates evenly in all directions."
+ },
+ {
+  "id": "a46-011",
+  "q": "what is rotational power?",
+  "record": "P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
+  "shown": "P=tau*omega",
+  "asked": "P",
+  "ans": "It is the straight-line power rule turned sideways: swap the push for a twist and the speed for a spin rate, and you get P = tau*omega. Hold the power fixed and you trade one for the other."
+ },
+ {
+  "id": "a46-012",
+  "q": "explain how omega is calculated.",
+  "record": "omega=((theta)/(t)) | omega:1/s theta:1 t:s | missing:theta | standard conditions | fit:high",
+  "shown": "omega=((theta)/(t))",
+  "asked": "omega",
+  "ans": "Forget distance and count turning instead. omega = theta/t is the rate the angle grows, in radians per second. A radian is a ratio of two lengths, so theta carries no units of its own."
+ },
+ {
+  "id": "a46-013",
+  "q": "take R = 8.314. what is molar heat capacity at constant pressure?",
+  "record": "C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
+  "shown": "C_p=C_V+R",
+  "asked": "C_p",
+  "ans": "Water in a pan hardly swells when you heat it, so its two heat capacities are nearly the same. A gas has to shove the air back to make room, and for a mole that costs R per degree: C_p = C_V + R."
+ },
+ {
+  "id": "a46-014",
+  "q": "What does period depend on?",
+  "record": "T=((1)/(f)) | T:s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "T=((1)/(f))",
+  "asked": "T",
+  "ans": "Count how many swings land in a second and you have f. Ask instead how long a single swing takes and you have T = 1/f. Quick repeats mean a short wait, and there is nothing more to it than that."
+ },
+ {
   "id": "a46-015",
-  "q": "how is acceleration of an object rolling without slipping related to the other quantities? If g = 9.81.",
-  "record": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2)))) | a_CM:m/s^2 m:kg g:m/s^2 theta:1 I_CM:kg*m^2 r:m | missing:m | rolling without slipping on the incline | fit:high",
-  "shown": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))",
-  "asked": "a_CM",
-  "ans": "Look at the bottom of a_CM = ((m*g*sin(theta))/(m+(I_CM/r^2))). That I_CM/(r)^(2) acts like extra mass the slope has to shift, so mass parked out at the rim costs you the most."
+  "q": "what does the work done by a constant force depend on?",
+  "record": "W=F*d | W:J F:N d:m | missing:F | standard conditions | fit:high",
+  "shown": "W=F*d",
+  "asked": "W",
+  "ans": "W = F*d is the energy a force hands over. Push something along and you give it energy. Push against the motion, the way gravity does on a ball going up, and the work comes out negative."
  },
  {
   "id": "a46-016",
-  "q": "Explain what rho is.",
-  "record": "rho=((m)/(V)) | rho:kg/m^3 m:kg V:m^3 | missing:m | standard conditions | fit:high",
-  "shown": "rho=((m)/(V))",
-  "asked": "rho",
-  "ans": "Pack more mass into the same box and it gets denser. That is all rho = m/V is. Archimedes was handed the job of checking whether a king's crown was really gold, and this is the number that answers it."
+  "q": "A system has g = 9.81. what is the normal force?",
+  "record": "N=m*g | N:N m:kg g:m/s^2 | missing:m | standard conditions | fit:high",
+  "shown": "N=m*g",
+  "asked": "N",
+  "ans": "The table pushes back. Sit still on a flat surface and your weight pulls down while the surface holds you up just as hard, so N = m*g. Tilt that surface and it stops being true."
  },
  {
   "id": "a46-017",
-  "q": "Explain relationship between frequency and period.",
-  "record": "f=((1)/(T)) | f:Hz T:s | missing:T | standard conditions | fit:high",
-  "shown": "f=((1)/(T))",
-  "asked": "f",
-  "ans": "Get paid twice a month and your pay frequency is two per month, or the period between checks is half a month. Waves work the same way, f = 1/T. Hz just means cycles per second."
+  "q": "what does I depend on?",
+  "record": "I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+  "shown": "I=((P)/(4*pi*(r)^(2)))",
+  "asked": "I",
+  "ans": "Energy leaving a source spreads over a growing sphere, so I = P/(4*pi*r^2) with r your distance out. It assumes nothing soaks up the wave on the way and the source radiates evenly in all directions."
  },
  {
   "id": "a46-018",
-  "q": "What does the rms voltage depend on?",
-  "record": "V_rms=((V_0)/(sqrt(2))) | V_rms:V V_0:V | missing:V_0 | standard conditions | fit:high",
-  "shown": "V_rms=((V_0)/(sqrt(2)))",
-  "asked": "V_rms",
-  "ans": "An outlet's voltage swings up and down all day, so the peak V_0 is not the number anyone quotes. V_rms = V_0/sqrt(2) is the steady DC voltage that would heat the same toaster just as fast."
+  "q": "define A_act.",
+  "record": "A_act=lambda*N | A_act:1/s lambda:1/s N:1 | missing:lambda | activity is decays per second, so it falls as the sample does | fit:high",
+  "shown": "A_act=lambda*N",
+  "asked": "A_act",
+  "ans": "A_act = lambda*N is what a Geiger counter responds to, not the mass of the sample. Two samples with the same number of nuclei but different lambda read very differently."
  },
  {
   "id": "a46-019",
-  "q": "Define the net work of a heat engine per cycle.",
-  "record": "W=Q_h-Q_c | W:J Q_h:J Q_c:J | missing:Q_h | standard conditions | fit:high",
-  "shown": "W=Q_h-Q_c",
-  "asked": "W",
-  "ans": "Burning fuel delivers Q_h, the exhaust and the coolant carry off Q_c, and only the gap between them turns the wheels: W = Q_h - Q_c. That is why a car needs a radiator."
+  "q": "define t_half.",
+  "record": "t_half=ln(2)/lambda | t_half:s lambda:1/s | missing:lambda | exponential decay only; the half-life does not depend on how much you started with | fit:high",
+  "shown": "t_half=ln(2)/lambda",
+  "asked": "t_half",
+  "ans": "t_half = ln(2)/lambda does not mention how much you started with, and that is the whole point. A gram and a tonne of the same isotope halve in exactly the same time."
  },
  {
   "id": "a46-020",
-  "q": "Explain what energy is.",
-  "record": "K=(n)^(2)*E_1 | K:J n:1 E_1:J | missing:n | standard conditions | fit:high",
-  "shown": "K=(n)^(2)*E_1",
-  "asked": "K",
-  "ans": "Trap a particle between two walls and only certain standing waves fit, so its energy comes in rungs: K = n^2*E_1. E_1 is the bottom rung and n counts which one you are on. Nothing in between is allowed."
+  "q": "what does motionally induced emf depend on?",
+  "record": "epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:B | standard conditions | fit:high",
+  "shown": "epsilon=B*l*v",
+  "asked": "epsilon",
+  "ans": "The v is the catch. A wire sitting still in a magnetic field makes nothing, and one drifting along the field makes nothing either. It has to cut across. Then epsilon = B*l*v and your bike light glows."
  },
  {
   "id": "a46-021",
-  "q": "explain what potential-energy function of a harmonic oscillator means.",
-  "record": "U=((1)/(2))*m*(omega)^(2)*(x)^(2) | U:J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
-  "shown": "U=((1)/(2))*m*(omega)^(2)*(x)^(2)",
-  "asked": "U",
-  "ans": "Stretch an oscillator and the energy has to sit somewhere. It sits here, U = (1/2)*m*omega^2*x^2. At the turning point the mass stops dead and every bit of its motion is parked in this term."
+  "q": "explain how wavelength in a medium of refractive index n is calculated.",
+  "record": "lambda_n=((lambda)/(n)) | lambda_n:m lambda:m n:1 | missing:lambda | standard conditions | fit:high",
+  "shown": "lambda_n=((lambda)/(n))",
+  "asked": "lambda_n",
+  "ans": "Light entering glass slows down but still arrives just as often, so the waves have to bunch up. lambda_n = lambda/n is that squeezed wavelength inside, where lambda is the vacuum value."
  },
  {
   "id": "a46-022",
-  "q": "explain how energy quantum of radiation is calculated. If h = 6.626e-34.",
-  "record": "Delta_E=h*f | Delta_E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
-  "shown": "Delta_E=h*f",
-  "asked": "Delta_E",
-  "ans": "Planck found that a hot object sheds energy in whole chunks, never a trickle. Delta_E = h*f gives the size of one chunk, h being Planck's constant. Einstein used it to explain the photoelectric effect."
+  "q": "How do you find heat transferred?",
+  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:m | no phase change over the interval; at the melting point dT stays flat | fit:high",
+  "shown": "Q=m*c*dT",
+  "asked": "Q",
+  "ans": "c is how stubborn the substance is. Water demands a lot of energy per degree, most metals almost none. Q = m*c*dT scales that by how much you have and how far you moved the temperature."
  },
  {
   "id": "a46-023",
-  "q": "Explain what wave speed from wavelength and period is.",
-  "record": "v=((lambda)/(T)) | v:m/s lambda:m T:s | missing:lambda | standard conditions | fit:high",
-  "shown": "v=((lambda)/(T))",
-  "asked": "v",
-  "ans": "A wave moves forward exactly one wavelength every period. That is all v = lambda/T says. Watch a gull on the swell: it bobs once while the crest under it slides to where the next crest was."
+  "q": "State law of refraction (snell's law).",
+  "record": "theta_2=asin(((n_1*sin(theta_1))/(n_2))) | theta_2:1 n_1:1 theta_1:1 n_2:1 | missing:n_1 | standard conditions | fit:high",
+  "shown": "theta_2=asin(((n_1*sin(theta_1))/(n_2)))",
+  "asked": "theta_2",
+  "ans": "Stand a pencil in a glass of water and it looks snapped in two. Light kinks when it changes speed, and theta_2 = asin((n_1*sin(theta_1))/n_2) says by how much. Raise n_2 and the ray tips toward the perpendicular."
  },
  {
   "id": "a46-024",
-  "q": "define the arc length.",
-  "record": "s=r*theta | s:m r:m theta:1 | missing:r | standard conditions | fit:high",
-  "shown": "s=r*theta",
-  "asked": "s",
-  "ans": "Two dots on a spinning CD sweep the same angle, but the outer one covers far more ground. The distance it actually travels is s = r*theta. Double the radius and you double the arc."
- },
- {
-  "id": "a46-025",
-  "q": "A system has h = 6.626e-34. how is lambda related to the other quantities?",
-  "record": "lambda=((h)/(p)) | lambda:m h:J*s p:kg*m/s | missing:p | standard conditions | fit:high",
-  "shown": "lambda=((h)/(p))",
-  "asked": "lambda",
-  "ans": "Fire electrons at a crystal and they land in a diffraction pattern, which is what waves do. The wavelength that fits is lambda = h/p, h being Planck's constant and p the momentum. Matter is wavy too."
- },
- {
-  "id": "a46-026",
-  "q": "for h = 6.626e-34, explain what energy difference from a frequency difference is.",
-  "record": "Delta_E=h*Delta_f | Delta_E:J h:J*s Delta_f:Hz | missing:Delta_f | standard conditions | fit:high",
-  "shown": "Delta_E=h*Delta_f",
-  "asked": "Delta_E",
-  "ans": "Two shells in an atom sit some energy apart, and the photon bridging them carries exactly that gap. Delta_E = h*Delta_f. Deep shells are far apart, so what they emit comes out as X-rays."
- },
- {
-  "id": "a46-027",
   "q": "A system has g = 9.81. how do you find normal force on an object on a horizontal surface?",
   "record": "N=m*g | N:N m:kg g:m/s^2 | missing:m | standard conditions | fit:high",
   "shown": "N=m*g",
   "asked": "N",
-  "ans": "Your bathroom scale reads the floor pushing up on you, not gravity pulling down. On level ground those match, so N = m*g. Ride an elevator, or stand on a ramp, and the reading shifts."
+  "ans": "N = m*g is not Newton's third law, it comes from the second. You are not accelerating, so the upward push has to cancel the downward pull exactly. Gravity and the floor are not a pair."
  },
  {
-  "id": "a46-028",
-  "q": "how do you find the total mass?",
-  "record": "m=m_R+m_g | m:kg m_R:kg m_g:kg | missing:m_R | standard conditions | fit:high",
-  "shown": "m=m_R+m_g",
-  "asked": "m",
-  "ans": "On the pad, most of a rocket is fuel and not rocket. m = m_R + m_g names both halves, and it is a snapshot: at liftoff m_g dominates, at burnout it is gone and m is just m_R."
+  "id": "a46-025",
+  "q": "where h = 6.626e-34, how is energy quantum related to the other quantities?",
+  "record": "Delta_E=h*f | Delta_E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "Delta_E=h*f",
+  "asked": "Delta_E",
+  "ans": "Picture a car allowed only certain speeds, nothing in between. Energy behaves that way here. Delta_E = h*f is the smallest bite of radiation at frequency f, and you cannot have half a bite."
  },
  {
-  "id": "a46-029",
-  "q": "You are told n = 8.5e+28, q = 1.602e-19. what does drift velocity depend on?",
-  "record": "v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
-  "shown": "v_d=((I)/(n*q*A))",
-  "asked": "v_d",
-  "ans": "A*n electron in a wire ricochets around fast and nearly at random. Underneath the chaos is a slow average drift, v_d = I/(n*q*A). Copper packs in so many free charges that the drift is slower than a snail."
- },
- {
-  "id": "a46-030",
-  "q": "define angle.",
-  "record": "Delta_theta=((Delta_s)/(r)) | Delta_theta:1 Delta_s:m r:m | missing:Delta_s | standard conditions | fit:high",
-  "shown": "Delta_theta=((Delta_s)/(r))",
-  "asked": "Delta_theta",
-  "ans": "A long clock hand and a stubby one sweep the same angle from noon to three, but the long tip travels much further. Delta_theta = (Delta_s/r) divides that hand length straight back out."
- },
- {
-  "id": "a46-031",
+  "id": "a46-026",
   "q": "what does the angular velocity depend on?",
   "record": "omega_f=omega_0+alpha*t | omega_f:1/s omega_0:1/s alpha:1/s^2 t:s | missing:omega_0 | constant angular acceleration | fit:high",
   "shown": "omega_f=omega_0+alpha*t",
   "asked": "omega_f",
-  "ans": "Switch off a CD player and the disk slows smoothly to a stop. That is alpha with a minus sign, eating into omega_0 until nothing is left: omega_f = omega_0 + alpha*t. Only true if alpha holds steady."
+  "ans": "A fish runs and the reel spins up. alpha is how fast the spin rate itself changes, so alpha*t is the spin gained in time t, and omega_f = omega_0 + alpha*t adds it to what you started with."
  },
  {
-  "id": "a46-032",
-  "q": "Define the equivalent resistance.",
-  "record": "R_eqv=((1)/(1/R_1+1/R_2)) | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | standard conditions | fit:high",
-  "shown": "R_eqv=((1)/(1/R_1+1/R_2))",
-  "asked": "R_eqv",
-  "ans": "Give the current two paths and more of it gets through, so the pair resists less than either one alone. R_eqv = 1/(1/R_1 + 1/R_2). Collapse them to that number and Ohm's law handles the rest."
+  "id": "a46-027",
+  "q": "Explain what F_D is.",
+  "record": "F_D=((1)/(2))*C*rho*A*(v)^(2) | F_D:N C:1 rho:kg/m^3 A:m^2 v:m/s | missing:C | standard conditions | fit:high",
+  "shown": "F_D=((1)/(2))*C*rho*A*(v)^(2)",
+  "asked": "F_D",
+  "ans": "Move through air or water and it pushes back, harder the faster you go. Drag is F_D = (1/2)*C*rho*A*v^2, so doubling your speed quadruples the push. That is why a cyclist tucks."
  },
  {
-  "id": "a46-033",
+  "id": "a46-028",
   "q": "How do you find I_rms?",
   "record": "I_rms=((I_0)/(sqrt(2))) | I_rms:A I_0:A | missing:I_0 | standard conditions | fit:high",
   "shown": "I_rms=((I_0)/(sqrt(2)))",
   "asked": "I_rms",
-  "ans": "A breaker trips on I_rms, not on the peak, and the peak is always the larger one: I_rms = I_0/sqrt(2). The current on an AC nameplate is rms too, so the real current does swing past that number."
+  "ans": "AC current swings both ways, so its plain average is zero and tells you nothing. Square it, average that, take the root: I_rms = I_0/sqrt(2). It is the steady DC current that would heat the same."
+ },
+ {
+  "id": "a46-029",
+  "q": "What is centripetal acceleration?",
+  "record": "a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
+  "shown": "a=(v)^(2)/r",
+  "asked": "a",
+  "ans": "Take a bend twice as fast and the car has to haul you inward four times as hard. That is the square in a = v^2/r. Speed dominates, and a tight curve, meaning a small r, makes it worse again."
+ },
+ {
+  "id": "a46-030",
+  "q": "How is N related to the other quantities?",
+  "record": "N=N_0*exp(-lambda*t) | N:1 N_0:1 lambda:1/s t:s | missing:N_0 | a large sample, so the average is smooth; lambda is the decay constant, not a wavelength | fit:high",
+  "shown": "N=N_0*exp(-lambda*t)",
+  "asked": "N",
+  "ans": "Start with N_0 nuclei and wait. The survivors are N = N_0*exp(-lambda*t). The curve is steep early simply because there are more left to decay, not because they decay faster."
+ },
+ {
+  "id": "a46-031",
+  "q": "Explain how torque is calculated.",
+  "record": "tau=r*F | tau:N*m r:m F:N | missing:r | standard conditions | fit:high",
+  "shown": "tau=r*F",
+  "asked": "tau",
+  "ans": "Torque is force plus leverage: tau = r*F. Push straight in at the pivot and nothing turns however hard you shove. The push has to cut across the arm, and a longer arm wins."
+ },
+ {
+  "id": "a46-032",
+  "q": "what is angular position?",
+  "record": "theta=((s)/(r)) | theta:1 s:m r:m | missing:s | theta in radians, which is what makes arc length equal r times the angle | fit:high",
+  "shown": "theta=((s)/(r))",
+  "asked": "theta",
+  "ans": "Walk along a curve of radius r and cover arc length s. The angle you swept is theta = s/r. That is what a radian is, and since it is a length over a length, theta has no units at all."
+ },
+ {
+  "id": "a46-033",
+  "q": "What does C depend on?",
+  "record": "C=((Q)/(V)) | C:F Q:C V:V | missing:Q | standard conditions | fit:high",
+  "shown": "C=((Q)/(V))",
+  "asked": "C",
+  "ans": "Push charge onto a capacitor and the voltage climbs to match, so the ratio C = Q/V never budges. It tells you how much charge one volt buys, and that holds right up to the voltage where the gap arcs over."
  },
  {
   "id": "a46-034",
-  "q": "You are told h = 6.626e-34. how do you find photon frequency?",
-  "record": "f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:Delta_E_LK | standard conditions | fit:high",
-  "shown": "f=(Delta_E_LK)/h",
-  "asked": "f",
-  "ans": "Light comes in whole photons, so a jump cannot pay out half of one. Divide the energy gap by Planck's constant, f = Delta_E_LK / h, and that jump can emit one frequency and no other."
+  "q": "In one sentence, what is hooke's law?",
+  "record": "F=-k*x | F:N k:N/m x:m | missing:k | restoring force, signed: negative means opposite to the displacement | fit:high",
+  "shown": "F=-k*x",
+  "asked": "F",
+  "ans": "Here x is not the length of the spring, it is how far you dragged it off its rest position. F = -k*x is the force it spends undoing that. k is in N/m, so it reads as newtons per meter pulled."
  },
  {
   "id": "a46-035",
-  "q": "what does displacement depend on?",
-  "record": "Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_f | standard conditions | fit:high",
-  "shown": "Delta_x=x_f-x_i",
-  "asked": "Delta_x",
-  "ans": "A professor can pace all lecture and end one step left of the board. Delta_x = x_f - x_i counts that step and nothing else. Distance walked is a different number, and never the smaller of the two."
- },
- {
-  "id": "a46-036",
-  "q": "Explain how resultant velocity is calculated.",
-  "record": "v_toty=v_wy+v_p | v_toty:m/s v_wy:m/s v_p:m/s | missing:v_wy | standard conditions | fit:high",
-  "shown": "v_toty=v_wy+v_p",
-  "asked": "v_toty",
-  "ans": "Swim downstream and the current is free speed. Along one axis your speed over the ground is v_toty = v_wy + v_p, the push you ride plus your own. Turn upstream and v_p goes negative, so the sum shrinks."
- },
- {
-  "id": "a46-037",
-  "q": "The values are c = 299800000. explain what wavelength from frequency is.",
-  "record": "lambda=((c)/(f)) | lambda:m c:m/s f:Hz | missing:f | standard conditions | fit:high",
-  "shown": "lambda=((c)/(f))",
-  "asked": "lambda",
-  "ans": "A band in a stadium stays in cadence however far off you stand, because in one medium every pitch shares a speed. Call it c and lambda = c/f follows: the higher the note, the shorter its wave."
- },
- {
-  "id": "a46-038",
   "q": "Define velocity of a wave.",
   "record": "v=f*lambda | v:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
   "shown": "v=f*lambda",
   "asked": "v",
-  "ans": "Watch a gull ride the swell: it bobs in place while the wave rolls on past it. v = f*lambda is the speed of the shape, not of the water. The water itself goes nowhere."
+  "ans": "The stuff it travels through fixes v, so f and lambda have to trade off: v = f*lambda. That is why a band's low notes and high notes reach the back of the room together."
+ },
+ {
+  "id": "a46-036",
+  "q": "how is x related to the other quantities?",
+  "record": "x=l-l_0 | x:m l:m l_0:m | missing:l | standard conditions | fit:high",
+  "shown": "x=l-l_0",
+  "asked": "x",
+  "ans": "A spring does not care how long it is, only how much longer than it likes to be. x = l - l_0 is that difference: length now, minus its natural resting length. Squash it instead and x goes negative."
+ },
+ {
+  "id": "a46-037",
+  "q": "in one sentence, what is lens/mirror equation (solved version)?",
+  "record": "f=((d_i*d_o)/(d_o+d_i)) | f:m d_i:m d_o:m | missing:d_i | paraxial rays, close to the axis | fit:high",
+  "shown": "f=((d_i*d_o)/(d_o+d_i))",
+  "asked": "f",
+  "ans": "One relation covers lenses and curved mirrors both. f = (d_i*d_o)/(d_o+d_i) turns two measured distances into a focal length, and it only holds for rays that stay close to the axis."
+ },
+ {
+  "id": "a46-038",
+  "q": "Explain what total entropy change is.",
+  "record": "Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:Delta_S_h | standard conditions | fit:high",
+  "shown": "Delta_S_tot=Delta_S_h+Delta_S_c",
+  "asked": "Delta_S_tot",
+  "ans": "Push heat from hot to cold and the cold side gains more entropy than the hot side loses, because it is colder. So Delta_S_tot = Delta_S_h + Delta_S_c leans positive, and that lean is the second law itself."
  },
  {
   "id": "a46-039",
-  "q": "If c = 299800000, what is f?",
-  "record": "f=((c)/(lambda)) | f:Hz c:m/s lambda:m | missing:lambda | standard conditions | fit:high",
-  "shown": "f=((c)/(lambda))",
-  "asked": "f",
-  "ans": "Radio waves, microwaves, visible light: one family, all running at c, told apart only by lambda. f = c/lambda swaps one label for the other. Long waves count slowly, short ones count fast."
+  "q": "explain what the displacement is.",
+  "record": "Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_f | standard conditions | fit:high",
+  "shown": "Delta_x=x_f-x_i",
+  "asked": "Delta_x",
+  "ans": "Walk to the fridge and back and your displacement is zero, whatever your legs think. Delta_x = x_f - x_i only looks at the two endpoints, and the path you took between them appears nowhere in it."
  },
  {
   "id": "a46-040",
-  "q": "explain hooke's law in a sentence.",
-  "record": "F=-k*x | F:N k:N/m x:m | missing:k | restoring force, signed: negative means opposite to the displacement | fit:high",
-  "shown": "F=-k*x",
-  "asked": "F",
-  "ans": "Every solid deforms a little under force, even a brick wall. For small pushes the deformation tracks the force exactly, and that is F = -k*x. Push far enough and it bends for good, and the law quits."
- },
- {
-  "id": "a46-041",
-  "q": "How is apparent depth related to the other quantities?",
+  "q": "how is apparent depth related to the other quantities?",
   "record": "s_i=(((n_2)/(n_1)))*s_o | s_i:m n_2:1 n_1:1 s_o:m | missing:n_2 | flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT. | fit:high",
   "shown": "s_i=(((n_2)/(n_1)))*s_o",
   "asked": "s_i",
-  "ans": "Depth is the only thing that changes here. A flat surface magnifies nothing sideways, so the fish keeps its true width and just sits too shallow: s_i = (n_2/n_1)*s_o, measured straight down, not across."
+  "ans": "A coin on the pool floor looks nearer the surface than it is. s_i = (n_2/n_1)*s_o, with n_1 the stuff the coin sits in and n_2 the stuff your eye is in. Water under air, and it rises."
+ },
+ {
+  "id": "a46-041",
+  "q": "The values are c = 299800000. what does E depend on?",
+  "record": "E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:Delta_m | standard conditions | fit:high",
+  "shown": "E=(Delta_m)(c)^(2)",
+  "asked": "E",
+  "ans": "c is the speed of light, so squaring it turns a Delta_m far too small to weigh into a huge E = Delta_m*c^2. Coal fires shed mass the same way, just far too little for anyone to measure."
  },
  {
   "id": "a46-042",
-  "q": "How is the equivalent resistance of two resistors in series related to the other quantities?",
-  "record": "R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | resistors in series, with nothing branching off between them | fit:high",
-  "shown": "R_eqv=R_1+R_2",
-  "asked": "R_eqv",
-  "ans": "In series there is one path only, so the same current goes through both and their voltage drops add. Hence R_eqv = R_1+R_2. Add more bulbs to a series string and every one of them dims."
+  "q": "Take h = 6.626e-34. explain what binding energy is.",
+  "record": "E_b=h*f_O | E_b:J h:J*s f_O:Hz | missing:f_O | standard conditions | fit:high",
+  "shown": "E_b=h*f_O",
+  "asked": "E_b",
+  "ans": "Shine dim blue light on sodium and electrons jump off. Shine bright red light and nothing comes out at all. There is a threshold frequency f_O, and E_b = h*f_O is how tightly that electron was held."
  },
  {
   "id": "a46-043",
-  "q": "Where G = 6.674e-11, define newton's law of universal gravitation.",
-  "record": "F=G*m1*m2/(r)^(2) | F:N G:N*m^2/kg^2 m1:kg m2:kg r:m | missing:m1 | standard conditions | fit:high",
-  "shown": "F=G*m1*m2/(r)^(2)",
-  "asked": "F",
-  "ans": "Newton's leap was that the falling apple and the orbiting Moon obey one rule, with the same G everywhere in the universe. F = G*m1*m2/r^2. Cavendish only measured G a century later."
+  "q": "where g = 9.81, explain what time of flight is.",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | T_tof:s v_0:m/s theta_0:1 g:m/s^2 | missing:v_0 | projectile returning to its launch height, no air resistance | fit:high",
+  "shown": "T_tof=((2(v_0*sin(theta_0)))/(g))",
+  "asked": "T_tof",
+  "ans": "Launch and land at the same height and this is exact: T_tof = ((2(v_0*sin(theta_0)))/g). Let it come down on a roof or in the stands and it breaks, since the fall no longer mirrors the rise."
  },
  {
   "id": "a46-044",
-  "q": "Define W_out.",
-  "record": "W_out=W_in-W_f | W_out:J W_in:J W_f:J | missing:W_in | standard conditions | fit:high",
-  "shown": "W_out=W_in-W_f",
-  "asked": "W_out",
-  "ans": "Shove a crate up a ramp and some of your effort never reaches the top. W_out = W_in - W_f. The lost work is not destroyed, it warms the ramp. Every real machine leaks some this way."
+  "q": "define the angle of rotation.",
+  "record": "Delta_theta=((Delta_s)/(r)) | Delta_theta:1 Delta_s:m r:m | missing:Delta_s | standard conditions | fit:high",
+  "shown": "Delta_theta=((Delta_s)/(r))",
+  "asked": "Delta_theta",
+  "ans": "Measure the angle this way and you get radians, never degrees. Delta_theta = (Delta_s/r), so going once around makes Delta_s the whole circumference. Use degrees in a later formula and it breaks."
  },
  {
   "id": "a46-045",
-  "q": "how do you find the heat transferred?",
-  "record": "Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:m | no phase change over the interval; at the melting point dT stays flat | fit:high",
-  "shown": "Q=m*c*dT",
-  "asked": "Q",
-  "ans": "Why beach sand scorches your feet while the sea stays cold: same sun, but Q = m*c*dT and water's c is huge, so the same heat buys the water a far smaller dT than it buys the sand."
+  "q": "What does vertical position depend on?",
+  "record": "y=y_0+((1)/(2))(v_0y+v_y)t | y:m y_0:m v_0y:m/s v_y:m/s t:s | missing:y_0 | constant acceleration, so the average velocity is half the sum of the ends | fit:high",
+  "shown": "y=y_0+((1)/(2))(v_0y+v_y)t",
+  "asked": "y",
+  "ans": "Halving the sum of the two end speeds is an honest average only while the speed changes at a steady rate. Add air drag and y = y_0+(1/2)(v_0y+v_y)t quietly stops being true."
  },
  {
   "id": "a46-046",
-  "q": "for h = 6.626e-34, how do you find E_f?",
-  "record": "E_f=h*f | E_f:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
-  "shown": "E_f=h*f",
-  "asked": "E_f",
-  "ans": "Light arrives in packets, and a packet's energy is set by its color alone: E_f = h*f. Brightness only counts how many turn up. Dim blue light can knock electrons loose where bright red light cannot."
+  "q": "starting from mu_0 = 1.257e-06, define the magnetic field due to a long straight wire.",
+  "record": "B=((mu_0*I)/(2*pi*R)) | B:T mu_0:T*m/A I:A R:m | missing:I | standard conditions | fit:high",
+  "shown": "B=((mu_0*I)/(2*pi*R))",
+  "asked": "B",
+  "ans": "Good only close to a wire that is long compared with R, and mu_0 is just a constant of empty space. B = ((mu_0*I)/(2*pi*R)). Bend the wire and you must add up every little piece instead."
  },
  {
   "id": "a46-047",
-  "q": "In one sentence, what is common expression of ohm's law?",
-  "record": "V=I*R | V:V I:A R:ohm | missing:I | ohmic material at constant temperature; a diode does not obey it | fit:high",
-  "shown": "V=I*R",
-  "asked": "V",
-  "ans": "Voltage is the push, current is the flow, resistance is how much the wire fights back. V = I*R ties the three together: same push against more resistance, and less current gets through."
+  "q": "How is the angular frequency related to the other quantities?",
+  "record": "omega=sqrt(((k)/(m))) | omega:1/s k:N/m m:kg | missing:k | standard conditions | fit:high",
+  "shown": "omega=sqrt(((k)/(m)))",
+  "asked": "omega",
+  "ans": "Pull the mass further out and it still takes the same time to come back. Amplitude drops out of the answer completely. What is left is omega = sqrt(k/m), the spring's stiffness fighting the load's inertia."
  },
  {
   "id": "a46-048",
-  "q": "assume h = 6.626e-34. explain what lambda is.",
-  "record": "lambda=((h)/(m*v)) | lambda:m h:J*s m:kg v:m/s | missing:m | standard conditions | fit:high",
-  "shown": "lambda=((h)/(m*v))",
-  "asked": "lambda",
-  "ans": "de Broglie guessed that matter ripples the way light does. lambda = h/(m*v) says nothing big is ever wavy, because h is minute and momentum is not. Shrink m*v and the wave side shows up."
+  "q": "Define the intensity.",
+  "record": "I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:P | standard conditions | fit:high",
+  "shown": "I=((P)/(A))",
+  "asked": "I",
+  "ans": "Your ear spans an absurd range of I, whisper to jet engine, which is why sound gets quoted in decibels instead of raw numbers. Underneath the scale it is just I = P/A, power landing per square meter."
  },
  {
   "id": "a46-049",
-  "q": "Explain what the input work is.",
-  "record": "W_i=F_i*d_i | W_i:J F_i:N d_i:m | missing:F_i | standard conditions | fit:high",
-  "shown": "W_i=F_i*d_i",
-  "asked": "W_i",
-  "ans": "Shove a crate up a ramp and the work you put in is your push times how far you pushed: W_i = F_i*d_i. Push half as hard and you walk twice as far. A machine trades force for distance, never for free."
+  "q": "how is extension related to the other quantities?",
+  "record": "x=l-l_0 | x:m l:m l_0:m | missing:l | standard conditions | fit:high",
+  "shown": "x=l-l_0",
+  "asked": "x",
+  "ans": "Measure the bar now, subtract what it measured before you pulled, and the stretch itself is what is left: x = l - l_0. Spring laws want x, not l, because a rest length is not a deformation."
  },
  {
   "id": "a46-050",
-  "q": "explain what the rotational power is.",
-  "record": "P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
-  "shown": "P=tau*omega",
-  "asked": "P",
-  "ans": "Twist harder or spin faster and either way you deliver more power: P = tau*omega. Keep omega in radians per second. The radian is a bare ratio, so it never shows up in the units."
+  "q": "explain how intensity is calculated.",
+  "record": "I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+  "shown": "I=((P)/(4*pi*(r)^(2)))",
+  "asked": "I",
+  "ans": "Walk away from a speaker and it gets quieter, but no sound went missing. The same power P is smeared over a bigger sphere, and a sphere has area 4*pi*r^2. So I = P/(4*pi*r^2)."
  },
  {
   "id": "a46-051",
-  "q": "what does quality factor depend on?",
-  "record": "Q=((omega_0)/(Delta_omega)) | Q:1 omega_0:1/s Delta_omega:1/s | missing:omega_0 | standard conditions | fit:high",
-  "shown": "Q=((omega_0)/(Delta_omega))",
-  "asked": "Q",
-  "ans": "Two frequencies divided, so the units cancel and Q is a bare number. Q = omega_0/Delta_omega is the resonance over its width. High Q keeps ringing after you stop driving it; low Q dies out fast."
+  "q": "explain how the capacitance is calculated. Starting from epsilon_0 = 8.854e-12.",
+  "record": "C=epsilon_0*((A)/(d)) | C:F epsilon_0:C^2/(N*m^2) A:m^2 d:m | missing:A | standard conditions | fit:high",
+  "shown": "C=epsilon_0*((A)/(d))",
+  "asked": "C",
+  "ans": "A farad is a monstrous unit. epsilon_0 is tiny and C = epsilon_0*(A/d), so plates the size of a desk barely register, which is why real capacitors are long thin foils rolled up tight."
  },
  {
   "id": "a46-052",
-  "q": "Define the magnetic force on a moving charge.",
-  "record": "F=q*v*B | F:N q:C v:m/s B:T | missing:q | velocity perpendicular to the field; otherwise only the perpendicular component counts | fit:high",
-  "shown": "F=q*v*B",
-  "asked": "F",
-  "ans": "Park a charge in a magnetic field and nothing happens to it. Give it a speed across the field and it feels F = q*v*B. That is why a magnet ignores a still charge but grabs a wire carrying current."
+  "q": "What does common expression of ohm's law say?",
+  "record": "V=I*R | V:V I:A R:ohm | missing:I | ohmic material at constant temperature; a diode does not obey it | fit:high",
+  "shown": "V=I*R",
+  "asked": "V",
+  "ans": "Double the voltage across a resistor and you double the current. That is all Ohm's law says, V = I*R. It is not a law of nature though. Plenty of parts, a diode for one, ignore it completely."
  },
  {
   "id": "a46-053",
-  "q": "What does quantum energy depend on? A system has h = 6.626e-34.",
-  "record": "E=n*h*f | E:J n:1 h:J*s f:Hz | missing:n | standard conditions | fit:high",
-  "shown": "E=n*h*f",
-  "asked": "E",
-  "ans": "Energy here comes in whole steps, never slices. E = n*h*f says a wave of frequency f can carry one lump h*f, or two, or n of them, and nothing at all in between."
+  "q": "suppose g = 9.81. what does time of flight depend on?",
+  "record": "T_tof=((2(v_0*sin(theta_0)))/(g)) | T_tof:s v_0:m/s theta_0:1 g:m/s^2 | missing:v_0 | projectile returning to its launch height, no air resistance | fit:high",
+  "shown": "T_tof=((2(v_0*sin(theta_0)))/(g))",
+  "asked": "T_tof",
+  "ans": "g sits on the bottom, so the same throw on the Moon hangs far longer. T_tof = ((2(v_0*sin(theta_0)))/g). Aim flatter and sin(theta_0) shrinks with it: a line drive is down long before a pop fly."
  },
  {
   "id": "a46-054",
-  "q": "define alpha.",
-  "record": "alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:Delta_omega | standard conditions | fit:high",
-  "shown": "alpha=((Delta_omega)/(Delta_t))",
-  "asked": "alpha",
-  "ans": "A skater pulls her arms in and speeds up. How fast a spin rate changes is alpha = (Delta_omega)/(Delta_t). Same idea as everyday acceleration, just for turning. Braking makes alpha oppose the spin."
+  "q": "What does E depend on? The values are c = 299800000.",
+  "record": "E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:Delta_m | standard conditions | fit:high",
+  "shown": "E=(Delta_m)(c)^(2)",
+  "asked": "E",
+  "ans": "Nothing is bound tighter than iron, which is where fusion inside a star finally gives up. E = Delta_m*c^2 is the bill for pulling a nucleus apart, and Delta_m is the mass it was short."
  },
  {
   "id": "a46-055",
-  "q": "You are told E_0 = 2.17987e-18. what is the electron energy?",
-  "record": "E_n=-E_0*((1)/((n)^(2))) | E_n:J E_0:J n:1 | missing:n | standard conditions | fit:high",
-  "shown": "E_n=-E_0*((1)/((n)^(2)))",
-  "asked": "E_n",
-  "ans": "An electron in an atom cannot sit just anywhere. Its energy is E_n = -E_0*(1/n^2), one rung per whole number n. The minus sign means bound: you have to pay energy to pull the electron loose."
+  "q": "What is definition of electric potential?",
+  "record": "V=((U_E)/(q)) | V:V U_E:J q:C | missing:U_E | standard conditions | fit:high",
+  "shown": "V=((U_E)/(q))",
+  "asked": "V",
+  "ans": "Think of potential as what the field charges per coulomb. V = (U_E)/(q), so U_E depends on what you carry and V does not. Bring a charge q to that spot and the energy it holds is q times V."
  },
  {
   "id": "a46-056",
+  "q": "explain how P is calculated.",
+  "record": "P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
+  "shown": "P=tau*omega",
+  "asked": "P",
+  "ans": "It is the straight-line power rule turned sideways: swap the push for a twist and the speed for a spin rate, and you get P = tau*omega. Hold the power fixed and you trade one for the other."
+ },
+ {
+  "id": "a46-057",
   "q": "define photon wavelength from energy. For c = 299800000, h = 6.626e-34.",
   "record": "lambda=((h*c)/(E)) | lambda:m h:J*s c:m/s E:J | missing:E | standard conditions | fit:high",
   "shown": "lambda=((h*c)/(E))",
   "asked": "lambda",
-  "ans": "Give a photon more energy and its wave gets shorter, not taller. lambda = (h*c)/E. X-rays sit way up at the energy end, so their wavelength is tiny, which is how Compton caught them knocking electrons loose."
+  "ans": "Ask a photon how much energy it carries and you have asked its wavelength too: lambda = (h*c)/E locks the two together. Violet carries more energy per photon than red, so violet's wave is the shorter one."
  },
  {
-  "id": "a46-057",
+  "id": "a46-058",
+  "q": "What does relationship between frequency and period say?",
+  "record": "f=((1)/(T)) | f:Hz T:s | missing:T | standard conditions | fit:high",
+  "shown": "f=((1)/(T))",
+  "asked": "f",
+  "ans": "Count how many waves go past each second and you have f. Time one single wave and you have T. Same fact, flipped over: f = 1/T. Double how often it repeats and the period is cut in half."
+ },
+ {
+  "id": "a46-059",
+  "q": "Explain how centripetal force is calculated.",
+  "record": "F_c=m*a_c | F_c:N m:kg a_c:m/s^2 | missing:m | standard conditions | fit:high",
+  "shown": "F_c=m*a_c",
+  "asked": "F_c",
+  "ans": "The part of the net force pointing sideways to your motion turns you instead of speeding you up. That part is F_c = m*a_c. Take it away, as on ice, and you stop turning and carry straight on."
+ },
+ {
+  "id": "a46-060",
+  "q": "What is newton's law of universal gravitation? If G = 6.674e-11.",
+  "record": "F=G*m1*m2/(r)^(2) | F:N G:N*m^2/kg^2 m1:kg m2:kg r:m | missing:m1 | standard conditions | fit:high",
+  "shown": "F=G*m1*m2/(r)^(2)",
+  "asked": "F",
+  "ans": "Your weight is this force with Earth as one of the masses. F = G*m1*m2/r^2, so haul yourself to the Moon and the pull shrinks even though the matter in you has not changed one bit."
+ },
+ {
+  "id": "a46-061",
   "q": "You are told h = 6.626e-34. what is the approximate time?",
   "record": "Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:E | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
   "shown": "Delta_t=((h)/(E))",
@@ -456,171 +488,211 @@
   "ans": "Quantum rules let a particle flicker into being with energy E so long as it disappears fast enough. Delta_t = h/E is that deadline, with h Planck's constant. Borrow more energy, get less time to repay it."
  },
  {
-  "id": "a46-058",
-  "q": "Explain law of reflection.",
-  "record": "theta_r=theta_i | theta_r:1 theta_i:1 | missing:theta_i | standard conditions | fit:high",
-  "shown": "theta_r=theta_i",
-  "asked": "theta_r",
-  "ans": "Whatever angle light hits a mirror at, it leaves at the same one: theta_r = theta_i. That holds for every color, which is why big telescopes use mirrors. A lens bends blue more than red and smears the image."
- },
- {
-  "id": "a46-059",
-  "q": "How is a_t related to the other quantities?",
-  "record": "a_t=r*alpha | a_t:m/s^2 r:m alpha:1/s^2 | missing:r | standard conditions | fit:high",
-  "shown": "a_t=r*alpha",
-  "asked": "a_t",
-  "ans": "Turn the axle faster and a point out at radius r must cover more arc in the same time, so it has to accelerate harder to keep up. That is all a_t = r*alpha says. Double r and you double the push."
- },
- {
-  "id": "a46-060",
-  "q": "Define x.",
-  "record": "x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:x_0 | standard conditions | fit:high",
-  "shown": "x=x_0+v_x*t",
-  "asked": "x",
-  "ans": "x_0 is where you started, v_x*t is how far you have coasted since, so add them for where you are now. The moment friction or a push changes v_x, x = x_0 + v_x*t stops being true."
- },
- {
-  "id": "a46-061",
-  "q": "What is n?",
-  "record": "n=((K/E_1))^(1/2) | n:1 K:J E_1:J | missing:K | standard conditions | fit:high",
-  "shown": "n=((K/E_1))^(1/2)",
-  "asked": "n",
-  "ans": "n = (K/E_1)^(1/2) counts levels, not energy. The rungs climb as n^2, so they spread further apart the higher you go, and it takes a big jump in K to move n up by even one."
- },
- {
   "id": "a46-062",
-  "q": "Explain what the energy quantum of radiation is. Using h = 6.626e-34.",
-  "record": "Delta_E=h*f | Delta_E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
-  "shown": "Delta_E=h*f",
-  "asked": "Delta_E",
-  "ans": "Planck found that a hot object sheds energy in whole chunks, never a trickle. Delta_E = h*f gives the size of one chunk, h being Planck's constant. Einstein used it to explain the photoelectric effect."
+  "q": "A system has mu_0 = 1.257e-06. what does the magnetic field due to a long straight wire depend on?",
+  "record": "B=((mu_0*I)/(2*pi*R)) | B:T mu_0:T*m/A I:A R:m | missing:I | standard conditions | fit:high",
+  "shown": "B=((mu_0*I)/(2*pi*R))",
+  "asked": "B",
+  "ans": "Stand twice as far from the wire and the field is half as strong. B = ((mu_0*I)/(2*pi*R)), and that 2*pi*R underneath is the circle you are standing on: one current spread round a longer path."
  },
  {
   "id": "a46-063",
-  "q": "if n = 8.5e+28, q = 1.602e-19, how do you find v_d?",
-  "record": "v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
-  "shown": "v_d=((I)/(n*q*A))",
-  "asked": "v_d",
-  "ans": "Current is charge per second. Take the charge sitting in each cubic meter, n*q, times the wire's area A, then divide the current by it: v_d = I/(n*q*A). A*n average over a crowd, not one electron's dash."
+  "q": "define the horizontal position under constant velocity.",
+  "record": "x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:x_0 | standard conditions | fit:high",
+  "shown": "x=x_0+v_x*t",
+  "asked": "x",
+  "ans": "Roll a ball across a smooth floor and it covers the same distance each second. That is x = x_0 + v_x*t. There is no acceleration term because constant velocity means v_x is not changing."
  },
  {
   "id": "a46-064",
-  "q": "explain what alpha is.",
-  "record": "alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:Delta_omega | standard conditions | fit:high",
-  "shown": "alpha=((Delta_omega)/(Delta_t))",
-  "asked": "alpha",
-  "ans": "Angular acceleration asks how fast a spin is changing, not how fast it spins. alpha = (Delta_omega)/(Delta_t). A disk coasting down has a small alpha; a wheel caught by a brake has a big one, the other way."
+  "q": "What is the arc length?",
+  "record": "s=r*theta | s:m r:m theta:1 | missing:r | standard conditions | fit:high",
+  "shown": "s=r*theta",
+  "asked": "s",
+  "ans": "Arc length is ordinary distance, only measured along a curve. s = r*theta is how you get it: the radius is what turns an angle into meters. Go all the way around and s is the circumference."
  },
  {
   "id": "a46-065",
-  "q": "Take R = 8.314. define the molar heat capacity at constant volume for an ideal gas with d degrees of freedom.",
-  "record": "C_V=((d)/(2))*R | C_V:J/(mol*K) d:1 R:J/(mol*K) | missing:d | standard conditions | fit:high",
-  "shown": "C_V=((d)/(2))*R",
-  "asked": "C_V",
-  "ans": "C_V = (d/2)*R holds the volume fixed on purpose. Let the gas expand instead and some of your heat leaves as work on the surroundings, and the number you need goes up."
+  "q": "A system has I_0 = 1e-12. what does beta depend on?",
+  "record": "beta=10*log(((I)/(I_0))) | beta:1 I:W/m^2 I_0:W/m^2 | missing:I | I_0 is the threshold of hearing, 1e-12 W/m^2, which is what makes 0 dB mean 'just audible' | fit:high",
+  "shown": "beta=10*log(((I)/(I_0)))",
+  "asked": "beta",
+  "ans": "Hearing is logarithmic, so the decibel scale is too: beta = 10*log(I/I_0). Ten times the intensity is only 10 dB more, which is why a rock concert is not a thousand times louder than speech."
  },
  {
   "id": "a46-066",
-  "q": "Define centripetal acceleration.",
-  "record": "a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
-  "shown": "a=(v)^(2)/r",
-  "asked": "a",
-  "ans": "Take a bend twice as fast and the car has to haul you inward four times as hard. That is the square in a = v^2/r. Speed dominates, and a tight curve, meaning a small r, makes it worse again."
+  "q": "explain how intensity for a spherical wave is calculated.",
+  "record": "I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+  "shown": "I=((P)/(4*pi*(r)^(2)))",
+  "asked": "I",
+  "ans": "Stand twice as far from a source and it hits you a quarter as hard. That is I = P/(4*pi*r^2). The power never changed; the sphere carrying it has four times the area, so it is thinner everywhere."
  },
  {
   "id": "a46-067",
-  "q": "explain what the force is.",
-  "record": "F=((m*Delta_v)/(Delta_t)) | F:N m:kg Delta_v:m/s Delta_t:s | missing:m | constant mass, and Delta_t is the interval over which the force acts | fit:high",
-  "shown": "F=((m*Delta_v)/(Delta_t))",
-  "asked": "F",
-  "ans": "Force is about how fast momentum changes: F = (m*Delta_v)/(Delta_t). Same mass, same change in speed, but spread over a longer Delta_t and F drops. That is the entire job of an airbag."
+  "q": "What does the electrical power depend on?",
+  "record": "P=(((V)^(2))/(R)) | P:W V:V R:ohm | missing:V | standard conditions | fit:high",
+  "shown": "P=(((V)^(2))/(R))",
+  "asked": "P",
+  "ans": "Notice the square. Double the voltage across the same resistor and the power does not double, it goes up fourfold: P = V^2/R. A small mistake in voltage can cook a component that would have been fine."
  },
  {
   "id": "a46-068",
-  "q": "define tau.",
-  "record": "tau=R*C | tau:s R:ohm C:F | missing:R | series RC circuit | fit:high",
-  "shown": "tau=R*C",
-  "asked": "tau",
-  "ans": "Your camera flash takes ages to charge and empties in an instant. Same capacitor, different R. tau = R*C is the clock of the circuit: raise either the resistance or the capacitance and everything slows."
+  "q": "Take h = 6.626e-34. define energy difference from a frequency difference.",
+  "record": "Delta_E=h*Delta_f | Delta_E:J h:J*s Delta_f:Hz | missing:Delta_f | standard conditions | fit:high",
+  "shown": "Delta_E=h*Delta_f",
+  "asked": "Delta_E",
+  "ans": "Two shells in an atom sit some energy apart, and the photon bridging them carries exactly that gap. Delta_E = h*Delta_f. Deep shells are far apart, so what they emit comes out as X-rays."
  },
  {
   "id": "a46-069",
-  "q": "explain what P is.",
-  "record": "P=(I)^(2)*R | P:W I:A R:ohm | missing:I | standard conditions | fit:high",
-  "shown": "P=(I)^(2)*R",
-  "asked": "P",
-  "ans": "P = I^2*R falls out of two rules you already have. Power is current times voltage, and Ohm's law turns that voltage into I times R. Multiply, and you are left with watts: joules every second."
+  "q": "Explain what the force is.",
+  "record": "F=((m*Delta_v)/(Delta_t)) | F:N m:kg Delta_v:m/s Delta_t:s | missing:m | constant mass, and Delta_t is the interval over which the force acts | fit:high",
+  "shown": "F=((m*Delta_v)/(Delta_t))",
+  "asked": "F",
+  "ans": "F = (m*Delta_v)/(Delta_t) assumes m holds still while the velocity changes. With m fixed out front it is just Newton's second law. For something shedding mass, like a rocket, do not use it."
  },
  {
   "id": "a46-070",
-  "q": "explain how C_p is calculated. Assume R = 8.314.",
-  "record": "C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
-  "shown": "C_p=C_V+R",
-  "asked": "C_p",
-  "ans": "The gap between the two heat capacities is exactly R, the gas constant. C_p = C_V + R, because at constant pressure a mole of gas does R worth of work per degree just making room for itself."
+  "q": "what does v depend on?",
+  "record": "v=sqrt(((v_x))^(2)+((v_y))^(2)) | v:m/s v_x:m/s v_y:m/s | missing:v_x | two perpendicular components; the magnitude is never negative | fit:high",
+  "shown": "v=sqrt(((v_x))^(2)+((v_y))^(2))",
+  "asked": "v",
+  "ans": "v = sqrt(v_x^2 + v_y^2) is Pythagoras wearing a physics hat. The squares are why a component pointing backward counts the same as one pointing forward: a magnitude has no direction left in it."
  },
  {
   "id": "a46-071",
-  "q": "Starting from g = 9.81, explain what acceleration is.",
-  "record": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2)))) | a_CM:m/s^2 m:kg g:m/s^2 theta:1 I_CM:kg*m^2 r:m | missing:m | rolling without slipping on the incline | fit:high",
-  "shown": "a_CM=((m*g*sin(theta))/(m+(I_CM/(r)^(2))))",
-  "asked": "a_CM",
-  "ans": "Race a can down a ramp against a block sliding with no friction, and the can loses. Some of the pull goes into spinning it up instead. a_CM = ((m*g*sin(theta))/(m+(I_CM/r^2))), and I_CM is the tax."
+  "q": "define kinetic energy.",
+  "record": "K=0.5*m*(v)^(2) | K:J m:kg v:m/s | missing:m | standard conditions | fit:high",
+  "shown": "K=0.5*m*(v)^(2)",
+  "asked": "K",
+  "ans": "A helicopter flying along has kinetic energy, and so do the blades whirling overhead, but K = 0.5*m*v^2 only covers the first. Every point on a blade moves at its own speed, so blades need their own version."
  },
  {
   "id": "a46-072",
+  "q": "explain how sound intensity level is calculated. A system has I_0 = 1e-12.",
+  "record": "beta=10*log(((I)/(I_0))) | beta:1 I:W/m^2 I_0:W/m^2 | missing:I | I_0 is the threshold of hearing, 1e-12 W/m^2, which is what makes 0 dB mean 'just audible' | fit:high",
+  "shown": "beta=10*log(((I)/(I_0)))",
+  "asked": "beta",
+  "ans": "beta = 10*log(I/I_0) measures against I_0, the quietest audible sound. That is why 0 dB is the threshold of hearing rather than silence, and why a quiet room can read below zero."
+ },
+ {
+  "id": "a46-073",
+  "q": "explain how the displacement is calculated.",
+  "record": "Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_f | standard conditions | fit:high",
+  "shown": "Delta_x=x_f-x_i",
+  "asked": "Delta_x",
+  "ans": "Walk to the fridge and back and your displacement is zero, whatever your legs think. Delta_x = x_f - x_i only looks at the two endpoints, and the path you took between them appears nowhere in it."
+ },
+ {
+  "id": "a46-074",
+  "q": "For p_atm = 101300, explain how absolute pressure is calculated.",
+  "record": "p_abs=p_g+p_atm | p_abs:Pa p_g:Pa p_atm:Pa | missing:p_g | standard conditions | fit:high",
+  "shown": "p_abs=p_g+p_atm",
+  "asked": "p_abs",
+  "ans": "A flat tire still has air in it. The gauge reads zero because it only counts what is above the air around it, and p_abs = p_g + p_atm adds that air back to give the real pressure."
+ },
+ {
+  "id": "a46-075",
+  "q": "Explain how wave speed from wavelength and period is calculated.",
+  "record": "v=((lambda)/(T)) | v:m/s lambda:m T:s | missing:lambda | standard conditions | fit:high",
+  "shown": "v=((lambda)/(T))",
+  "asked": "v",
+  "ans": "A wave moves forward exactly one wavelength every period. That is all v = lambda/T says. Watch a gull on the swell: it bobs once while the crest under it slides to where the next crest was."
+ },
+ {
+  "id": "a46-076",
   "q": "How do you find the rotational power?",
   "record": "P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
   "shown": "P=tau*omega",
   "asked": "P",
-  "ans": "P = tau*omega is how you get shaft torque out of an engine rating. You know the watts, you know the revs, the twist falls out. Gearing only trades them: at the wheels, big tau comes with small omega."
- },
- {
-  "id": "a46-073",
-  "q": "What does kirchhoff junction rule say?",
-  "record": "I_1=I_2+I_3 | I_1:A I_2:A I_3:A | missing:I_2 | standard conditions | fit:high",
-  "shown": "I_1=I_2+I_3",
-  "asked": "I_1",
-  "ans": "Each junction hands you one equation, which is what makes the rule worth having: I_1 = I_2 + I_3. Collect enough of them and you can solve for currents you cannot reach with a meter."
- },
- {
-  "id": "a46-074",
-  "q": "how is the centripetal acceleration related to the other quantities?",
-  "record": "a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
-  "shown": "a=(v)^(2)/r",
-  "asked": "a",
-  "ans": "Round a curve at steady speed and you are still accelerating, because your direction keeps changing. a = v^2/r points straight at the center. Centripetal is Latin for center seeking."
- },
- {
-  "id": "a46-075",
-  "q": "given h = 6.626e-34, what is binding energy of an electron?",
-  "record": "E_b=h*f_O | E_b:J h:J*s f_O:Hz | missing:f_O | standard conditions | fit:high",
-  "shown": "E_b=h*f_O",
-  "asked": "E_b",
-  "ans": "Shine dim blue light on sodium and electrons jump off. Shine bright red light and nothing comes out at all. There is a threshold frequency f_O, and E_b = h*f_O is how tightly that electron was held."
- },
- {
-  "id": "a46-076",
-  "q": "What does motionally induced emf depend on?",
-  "record": "epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:B | standard conditions | fit:high",
-  "shown": "epsilon=B*l*v",
-  "asked": "epsilon",
-  "ans": "The v is the catch. A wire sitting still in a magnetic field makes nothing, and one drifting along the field makes nothing either. It has to cut across. Then epsilon = B*l*v and your bike light glows."
+  "ans": "It is the straight-line power rule turned sideways: swap the push for a twist and the speed for a spin rate, and you get P = tau*omega. Hold the power fixed and you trade one for the other."
  },
  {
   "id": "a46-077",
-  "q": "What does centripetal acceleration depend on?",
+  "q": "how do you find tangential speed?",
+  "record": "v_t=r*omega | v_t:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
+  "shown": "v_t=r*omega",
+  "asked": "v_t",
+  "ans": "Stand on the equator and Earth's spin carries you along quickly; stand near a pole and it hardly moves you, though the whole planet turns together. v_t = r*omega, and r is your distance from the axis."
+ },
+ {
+  "id": "a46-078",
+  "q": "how is uniform acceleration related to the other quantities?",
+  "record": "a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | missing:vf | constant acceleration; otherwise this is the average over t | fit:high",
+  "shown": "a=(vf-vi)/t",
+  "asked": "a",
+  "ans": "Drop something and it gains the same chunk of speed every second. That sameness is what uniform means, and a = (vf-vi)/t only tells the truth while it holds. A car in traffic breaks it constantly."
+ },
+ {
+  "id": "a46-079",
+  "q": "with h = 6.626e-34, explain what E is.",
+  "record": "E=h*f | E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+  "shown": "E=h*f",
+  "asked": "E",
+  "ans": "A molecule only swallows a photon whose energy matches a step it can climb, and E = h*f fixes that energy by frequency. Violet flowers soak up the red and throw the violet back. So they look violet."
+ },
+ {
+  "id": "a46-080",
+  "q": "what does kirchhoff junction rule say?",
+  "record": "I_1=I_2+I_3 | I_1:A I_2:A I_3:A | missing:I_2 | standard conditions | fit:high",
+  "shown": "I_1=I_2+I_3",
+  "asked": "I_1",
+  "ans": "A junction is where three or more wires meet, and the current has to split there. I_1 = I_2 + I_3 says the branches carry off everything the one wire brought in. The joint stores nothing."
+ },
+ {
+  "id": "a46-081",
+  "q": "explain how equivalent resistance of two resistors in series is calculated.",
+  "record": "R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | resistors in series, with nothing branching off between them | fit:high",
+  "shown": "R_eqv=R_1+R_2",
+  "asked": "R_eqv",
+  "ans": "In series there is one path only, so the same current goes through both and their voltage drops add. Hence R_eqv = R_1+R_2. Add more bulbs to a series string and every one of them dims."
+ },
+ {
+  "id": "a46-082",
+  "q": "How is the centripetal acceleration related to the other quantities?",
   "record": "a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
   "shown": "a=(v)^(2)/r",
   "asked": "a",
   "ans": "Nothing pulls you outward in a turn. a = v^2/r is the acceleration aimed inward that keeps you on the circle, and what you feel is the seat shoving you toward the center to supply it."
  },
  {
-  "id": "a46-078",
-  "q": "Define total entropy change of system and surroundings.",
-  "record": "Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:Delta_S_h | standard conditions | fit:high",
-  "shown": "Delta_S_tot=Delta_S_h+Delta_S_c",
-  "asked": "Delta_S_tot",
-  "ans": "Delta_S_tot = Delta_S_h + Delta_S_c watches both ends of a heat flow at once. Only a reversible step holds it at zero; a real temperature gap always pushes it up. Heat will not run back uphill."
+  "id": "a46-083",
+  "q": "what is magnitude of magnetic force?",
+  "record": "F=q*v*B*sin(theta) | F:N q:C v:m/s B:T theta:1 | missing:q | standard conditions | fit:high",
+  "shown": "F=q*v*B*sin(theta)",
+  "asked": "F",
+  "ans": "This force always shoves sideways, square to wherever the charge is headed, so it bends the path instead of speeding the charge up. F = q*v*B*sin(theta). Curl your right fingers from v to B; your thumb is F."
+ },
+ {
+  "id": "a46-084",
+  "q": "Suppose c = 299800000. explain relativistic doppler effect for frequency.",
+  "record": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c))))) | f_obs:Hz f_s:Hz v:m/s c:m/s | missing:f_s | standard conditions | fit:high",
+  "shown": "f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c)))))",
+  "asked": "f_obs",
+  "ans": "Astronomers run this backward. A known line arrives shifted, and f_obs = f_s*sqrt((1-v/c)/(1+v/c)) hands back v. The far galaxies all come out red, all running away from us."
+ },
+ {
+  "id": "a46-085",
+  "q": "A system has g = 9.81, p_0 = 101300. explain how the pressure is calculated.",
+  "record": "p=p_0+rho*g*h | p:Pa p_0:Pa rho:kg/m^3 g:m/s^2 h:m | missing:rho | standard conditions | fit:high",
+  "shown": "p=p_0+rho*g*h",
+  "asked": "p",
+  "ans": "Your ears hurt at the deep end because a column of water is sitting on you. p = p_0 + rho*g*h adds that weight to the air already pressing down. Only the depth h matters, not the pool shape."
+ },
+ {
+  "id": "a46-086",
+  "q": "Define the frequency of a mass-spring system in shm.",
+  "record": "f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:k | standard conditions | fit:high",
+  "shown": "f=((1)/(2*pi))*sqrt(((k)/(m)))",
+  "asked": "f",
+  "ans": "Pluck a guitar string gently or hard and the note does not change. Amplitude is nowhere in f = (1/(2*pi))*sqrt(k/m). Only the stiffness k and the mass m are, and nothing else gets a say."
+ },
+ {
+  "id": "a46-087",
+  "q": "With h = 6.626e-34, what does approximate time depend on?",
+  "record": "Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:E | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
+  "shown": "Delta_t=((h)/(E))",
+  "asked": "Delta_t",
+  "ans": "Here h is Planck's constant, and it is minuscule, so Delta_t = h/E comes out minuscule as well. Even a modest energy E buys the particle nothing more than the barest flicker before it has to vanish."
  }
 ]

@@ -1,79 +1,79 @@
 [
  {
   "id": "a46-001",
-  "q": "What does pressure depend on?",
-  "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
-  "shown": "P=((F)/(A))",
-  "asked": "P",
-  "ans": "P = ((F)/(A)). That gives pressure, with P in Pa, F in N and A in m^2."
+  "q": "how is the length related to the other quantities?",
+  "record": "L=((v)/(4*f_1)) | L:m v:m/s f_1:Hz | missing:v | standard conditions | fit:high",
+  "shown": "L=((v)/(4*f_1))",
+  "asked": "L",
+  "ans": "To find the length: L = ((v)/(4*f_1)), with L in m, v in m/s and f_1 in Hz."
  },
  {
   "id": "a46-002",
+  "q": "how is the acceleration from a speed reached in a given time related to the other quantities?",
+  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
+  "shown": "a=((v_c)/(t_1))",
+  "asked": "a",
+  "ans": "To find the acceleration from a speed reached in a given time: a = ((v_c)/(t_1)), with a in m/s^2, v_c in m/s and t_1 in s."
+ },
+ {
+  "id": "a46-003",
+  "q": "What does P depend on?",
+  "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+  "shown": "P=((F)/(A))",
+  "asked": "P",
+  "ans": "P = ((F)/(A)). That gives P, with P in Pa, F in N and A in m^2."
+ },
+ {
+  "id": "a46-004",
+  "q": "how is acceleration related to the other quantities?",
+  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
+  "shown": "a=((v_c)/(t_1))",
+  "asked": "a",
+  "ans": "To find acceleration: a = ((v_c)/(t_1)), with a in m/s^2, v_c in m/s and t_1 in s."
+ },
+ {
+  "id": "a46-005",
+  "q": "Define the average force from a change in momentum.",
+  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "F=((Delta_p)/(Delta_t))",
+  "asked": "F",
+  "ans": "The average force from a change in momentum is given by F = ((Delta_p)/(Delta_t)), with F in N, Delta_p in kg*m/s and Delta_t in s."
+ },
+ {
+  "id": "a46-006",
+  "q": "define wavelength in a medium.",
+  "record": "lambda=lambda_0/n | lambda:m lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "shown": "lambda=lambda_0/n",
+  "asked": "lambda",
+  "ans": "lambda = lambda_0/n gives wavelength in a medium, where lambda in m, lambda_0 in m and n is dimensionless."
+ },
+ {
+  "id": "a46-007",
   "q": "explain what the potential-energy function is.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | U(x):J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "shown": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
   "asked": "U(x)",
-  "ans": "The potential-energy function is given by U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2), with U(x) in J, m in kg, omega in 1/s and x in m."
- },
- {
-  "id": "a46-003",
-  "q": "what does F depend on?",
-  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "F=((Delta_p)/(Delta_t))",
-  "asked": "F",
-  "ans": "To find F: F = ((Delta_p)/(Delta_t)), with F in N, Delta_p in kg*m/s and Delta_t in s."
- },
- {
-  "id": "a46-004",
-  "q": "define motional emf.",
-  "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
-  "shown": "V=B*l*v_d",
-  "asked": "V",
-  "ans": "V = B*l*v_d. That gives motional emf, with V in V, B in T, l in m and v_d in m/s."
- },
- {
-  "id": "a46-005",
-  "q": "explain how V is calculated.",
-  "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
-  "shown": "V=B*l*v_d",
-  "asked": "V",
-  "ans": "V = B*l*v_d gives V, where V in V, B in T, l in m and v_d in m/s."
- },
- {
-  "id": "a46-006",
-  "q": "how do you find speed?",
-  "record": "v_CM=r*omega | v_CM:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
-  "shown": "v_CM=r*omega",
-  "asked": "v_CM",
-  "ans": "v_CM = r*omega. That gives speed, with v_CM in m/s, r in m and omega in 1/s."
- },
- {
-  "id": "a46-007",
-  "q": "define F.",
-  "record": "F=k*x | F:N k:N/m x:m | missing:k | standard conditions | fit:high",
-  "shown": "F=k*x",
-  "asked": "F",
-  "ans": "F = k*x. That gives F, with F in N, k in N/m and x in m."
+  "ans": "U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2). That gives the potential-energy function, with U(x) in J, m in kg, omega in 1/s and x in m."
  },
  {
   "id": "a46-008",
-  "q": "suppose h = 6.626e-34. how do you find the magnitude of photon\u2019s momentum?",
-  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
-  "shown": "p_f=((h)/(lambda))",
-  "asked": "p_f",
-  "ans": "p_f = ((h)/(lambda)). That gives the magnitude of photon\u2019s momentum, with p_f in kg*m/s, h in J*s and lambda in m."
+  "q": "What does F depend on?",
+  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "F=((Delta_p)/(Delta_t))",
+  "asked": "F",
+  "ans": "F = ((Delta_p)/(Delta_t)). That gives F, with F in N, Delta_p in kg*m/s and Delta_t in s."
  },
  {
   "id": "a46-009",
-  "q": "explain how a_C is calculated.",
-  "record": "a_C=(((v)^(2))/(r)) | a_C:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
-  "shown": "a_C=(((v)^(2))/(r))",
-  "asked": "a_C",
-  "ans": "a_C = (((v)^(2))/(r)). That gives a_C, with a_C in m/s^2, v in m/s and r in m."
+  "q": "Explain how wave speed is calculated.",
+  "record": "v_w=f*lambda | v_w:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
+  "shown": "v_w=f*lambda",
+  "asked": "v_w",
+  "ans": "Wave speed is given by v_w = f*lambda, with v_w in m/s, f in Hz and lambda in m, under standard conditions."
  },
  {
   "id": "a46-010",
-  "q": "what does V depend on?",
+  "q": "explain how V is calculated.",
   "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "shown": "V=B*l*v_d",
   "asked": "V",
@@ -81,342 +81,366 @@
  },
  {
   "id": "a46-011",
-  "q": "Define distance travelled.",
-  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
-  "shown": "x_2=v*t_2",
-  "asked": "x_2",
-  "ans": "x_2 = v*t_2 gives distance travelled, where x_2 in m, v in m/s and t_2 in s."
- },
- {
-  "id": "a46-012",
-  "q": "Explain how the pressure is calculated.",
-  "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
-  "shown": "P=((F)/(A))",
-  "asked": "P",
-  "ans": "To find the pressure: P = ((F)/(A)), with P in Pa, F in N and A in m^2."
- },
- {
-  "id": "a46-013",
-  "q": "define the acceleration.",
-  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
-  "shown": "a=((v_c)/(t_1))",
-  "asked": "a",
-  "ans": "The acceleration is given by a = ((v_c)/(t_1)), with a in m/s^2, v_c in m/s and t_1 in s."
- },
- {
-  "id": "a46-014",
-  "q": "How do you find v_CM?",
-  "record": "v_CM=r*omega | v_CM:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
-  "shown": "v_CM=r*omega",
-  "asked": "v_CM",
-  "ans": "To find v_CM: v_CM = r*omega, with v_CM in m/s, r in m and omega in 1/s."
- },
- {
-  "id": "a46-015",
-  "q": "How is the sound intensity related to the other quantities?",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
-  "asked": "I",
-  "ans": "I = ((((Delta_p))^(2))/(2*rho*v_w)) gives the sound intensity, where I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
- },
- {
-  "id": "a46-016",
-  "q": "How is P related to the other quantities?",
-  "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
-  "shown": "P=((F)/(A))",
-  "asked": "P",
-  "ans": "P = ((F)/(A)). That gives P, with P in Pa, F in N and A in m^2."
- },
- {
-  "id": "a46-017",
-  "q": "explain how f_B is calculated.",
-  "record": "f_B=|f_1-f_2| | f_B:Hz f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
-  "shown": "f_B=|f_1-f_2|",
-  "asked": "f_B",
-  "ans": "f_B = |f_1-f_2| gives f_B, where f_B in Hz, f_1 in Hz and f_2 in Hz."
- },
- {
-  "id": "a46-018",
-  "q": "what is average force?",
-  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "F=((Delta_p)/(Delta_t))",
-  "asked": "F",
-  "ans": "F = ((Delta_p)/(Delta_t)) gives average force, where F in N, Delta_p in kg*m/s and Delta_t in s."
- },
- {
-  "id": "a46-019",
-  "q": "Define the potential-energy function of a harmonic oscillator.",
-  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | U(x):J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
-  "shown": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
-  "asked": "U(x)",
-  "ans": "The potential-energy function of a harmonic oscillator is given by U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2), with U(x) in J, m in kg, omega in 1/s and x in m."
- },
- {
-  "id": "a46-020",
-  "q": "take h = 6.626e-34. explain how the magnitude of photon\u2019s momentum is calculated.",
-  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
-  "shown": "p_f=((h)/(lambda))",
-  "asked": "p_f",
-  "ans": "p_f = ((h)/(lambda)) gives the magnitude of photon\u2019s momentum, where p_f in kg*m/s, h in J*s and lambda in m."
- },
- {
-  "id": "a46-021",
-  "q": "explain how F is calculated.",
-  "record": "F=k*x | F:N k:N/m x:m | missing:k | standard conditions | fit:high",
-  "shown": "F=k*x",
-  "asked": "F",
-  "ans": "F = k*x. That gives F, with F in N, k in N/m and x in m."
- },
- {
-  "id": "a46-022",
-  "q": "what does the tangential speed depend on?",
-  "record": "v=r*omega | v:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
-  "shown": "v=r*omega",
-  "asked": "v",
-  "ans": "v = r*omega. That gives the tangential speed, with v in m/s, r in m and omega in 1/s."
- },
- {
-  "id": "a46-023",
-  "q": "what is v?",
-  "record": "v=r*omega | v:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
-  "shown": "v=r*omega",
-  "asked": "v",
-  "ans": "v = r*omega. That gives v, with v in m/s, r in m and omega in 1/s."
- },
- {
-  "id": "a46-024",
-  "q": "how is magnitude of photon\u2019s momentum related to the other quantities? Using h = 6.626e-34.",
-  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
-  "shown": "p_f=((h)/(lambda))",
-  "asked": "p_f",
-  "ans": "p_f = ((h)/(lambda)) gives magnitude of photon\u2019s momentum, where p_f in kg*m/s, h in J*s and lambda in m."
- },
- {
-  "id": "a46-025",
-  "q": "Define the wave speed.",
-  "record": "v=lambda*f | v:m/s lambda:m f:Hz | missing:lambda | standard conditions | fit:high",
-  "shown": "v=lambda*f",
-  "asked": "v",
-  "ans": "v = lambda*f. That gives the wave speed, with v in m/s, lambda in m and f in Hz."
- },
- {
-  "id": "a46-026",
-  "q": "explain what motional emf is.",
-  "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
-  "shown": "V=B*l*v_d",
-  "asked": "V",
-  "ans": "Motional emf is given by V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s, under standard conditions."
- },
- {
-  "id": "a46-027",
-  "q": "What is tangential speed?",
-  "record": "v=r*omega | v:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
-  "shown": "v=r*omega",
-  "asked": "v",
-  "ans": "To find tangential speed: v = r*omega, with v in m/s, r in m and omega in 1/s."
- },
- {
-  "id": "a46-028",
-  "q": "explain how distance travelled is calculated.",
-  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
-  "shown": "x_2=v*t_2",
-  "asked": "x_2",
-  "ans": "x_2 = v*t_2 gives distance travelled, where x_2 in m, v in m/s and t_2 in s."
- },
- {
-  "id": "a46-029",
-  "q": "how do you find average force?",
-  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "F=((Delta_p)/(Delta_t))",
-  "asked": "F",
-  "ans": "F = ((Delta_p)/(Delta_t)). That gives average force, with F in N, Delta_p in kg*m/s and Delta_t in s."
- },
- {
-  "id": "a46-030",
-  "q": "how is the resulting efficiency related to the other quantities?",
-  "record": "e=1-((T_c)/(T_h)) | e:1 T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
-  "shown": "e=1-((T_c)/(T_h))",
-  "asked": "e",
-  "ans": "The resulting efficiency is given by e = 1-((T_c)/(T_h)), with e is dimensionless, T_c in K and T_h in K, under standard conditions."
- },
- {
-  "id": "a46-031",
-  "q": "what is F?",
-  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "F=((Delta_p)/(Delta_t))",
-  "asked": "F",
-  "ans": "F = ((Delta_p)/(Delta_t)) gives F, where F in N, Delta_p in kg*m/s and Delta_t in s."
- },
- {
-  "id": "a46-032",
-  "q": "Define distance travelled.",
-  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
-  "shown": "x_2=v*t_2",
-  "asked": "x_2",
-  "ans": "Distance travelled is given by x_2 = v*t_2, with x_2 in m, v in m/s and t_2 in s, under standard conditions."
- },
- {
-  "id": "a46-033",
-  "q": "Explain how the motional emf is calculated.",
-  "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
-  "shown": "V=B*l*v_d",
-  "asked": "V",
-  "ans": "The motional emf is given by V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s."
- },
- {
-  "id": "a46-034",
-  "q": "What is hooke's law?",
-  "record": "F=k*x | F:N k:N/m x:m | missing:k | standard conditions | fit:high",
-  "shown": "F=k*x",
-  "asked": "F",
-  "ans": "Hooke's law is given by F = k*x, with F in N, k in N/m and x in m, under standard conditions."
- },
- {
-  "id": "a46-035",
-  "q": "How do you find f_B?",
-  "record": "f_B=|f_1-f_2| | f_B:Hz f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
-  "shown": "f_B=|f_1-f_2|",
-  "asked": "f_B",
-  "ans": "f_B = |f_1-f_2|. That gives f_B, with f_B in Hz, f_1 in Hz and f_2 in Hz."
- },
- {
-  "id": "a46-036",
-  "q": "Explain how acceleration from a speed reached in a given time is calculated.",
-  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
-  "shown": "a=((v_c)/(t_1))",
-  "asked": "a",
-  "ans": "To find acceleration from a speed reached in a given time: a = ((v_c)/(t_1)), with a in m/s^2, v_c in m/s and t_1 in s."
- },
- {
-  "id": "a46-037",
-  "q": "explain what x_2 is.",
-  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
-  "shown": "x_2=v*t_2",
-  "asked": "x_2",
-  "ans": "x_2 = v*t_2. That gives x_2, with x_2 in m, v in m/s and t_2 in s."
- },
- {
-  "id": "a46-038",
-  "q": "how is p_f related to the other quantities? Given h = 6.626e-34.",
-  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
-  "shown": "p_f=((h)/(lambda))",
-  "asked": "p_f",
-  "ans": "To find p_f: p_f = ((h)/(lambda)), with p_f in kg*m/s, h in J*s and lambda in m."
- },
- {
-  "id": "a46-039",
-  "q": "How is e related to the other quantities?",
-  "record": "e=1-((T_c)/(T_h)) | e:1 T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
-  "shown": "e=1-((T_c)/(T_h))",
-  "asked": "e",
-  "ans": "e = 1-((T_c)/(T_h)). That gives e, with e is dimensionless, T_c in K and T_h in K."
- },
- {
-  "id": "a46-040",
-  "q": "what is F?",
+  "q": "Define F.",
   "record": "F=k*x | F:N k:N/m x:m | missing:k | standard conditions | fit:high",
   "shown": "F=k*x",
   "asked": "F",
   "ans": "F = k*x gives F, where F in N, k in N/m and x in m."
  },
  {
-  "id": "a46-041",
-  "q": "How do you find first law?",
+  "id": "a46-012",
+  "q": "suppose h = 6.626e-34. how do you find the magnitude of photon\u2019s momentum?",
+  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
+  "shown": "p_f=((h)/(lambda))",
+  "asked": "p_f",
+  "ans": "The magnitude of photon\u2019s momentum is given by p_f = ((h)/(lambda)), with p_f in kg*m/s, h in J*s and lambda in m, under standard conditions."
+ },
+ {
+  "id": "a46-013",
+  "q": "what is the acceleration from a speed reached in a given time?",
+  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
+  "shown": "a=((v_c)/(t_1))",
+  "asked": "a",
+  "ans": "To find the acceleration from a speed reached in a given time: a = ((v_c)/(t_1)), with a in m/s^2, v_c in m/s and t_1 in s."
+ },
+ {
+  "id": "a46-014",
+  "q": "Explain what acceleration from a speed reached in a given time is.",
+  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
+  "shown": "a=((v_c)/(t_1))",
+  "asked": "a",
+  "ans": "a = ((v_c)/(t_1)) gives acceleration from a speed reached in a given time, where a in m/s^2, v_c in m/s and t_1 in s."
+ },
+ {
+  "id": "a46-015",
+  "q": "Explain how a_C is calculated.",
+  "record": "a_C=(((v)^(2))/(r)) | a_C:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
+  "shown": "a_C=(((v)^(2))/(r))",
+  "asked": "a_C",
+  "ans": "a_C = (((v)^(2))/(r)). That gives a_C, with a_C in m/s^2, v in m/s and r in m."
+ },
+ {
+  "id": "a46-016",
+  "q": "Explain what the first law is.",
   "record": "Delta_E_int=Q-W | Delta_E_int:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "shown": "Delta_E_int=Q-W",
   "asked": "Delta_E_int",
-  "ans": "First law is given by Delta_E_int = Q-W, with Delta_E_int in J, Q in J and W in J."
+  "ans": "Delta_E_int = Q-W gives the first law, where Delta_E_int in J, Q in J and W in J."
  },
  {
-  "id": "a46-042",
+  "id": "a46-017",
+  "q": "define distance travelled.",
+  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
+  "shown": "x_2=v*t_2",
+  "asked": "x_2",
+  "ans": "To find distance travelled: x_2 = v*t_2, with x_2 in m, v in m/s and t_2 in s."
+ },
+ {
+  "id": "a46-018",
+  "q": "Explain how the pressure is calculated.",
+  "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+  "shown": "P=((F)/(A))",
+  "asked": "P",
+  "ans": "The pressure is given by P = ((F)/(A)), with P in Pa, F in N and A in m^2, under standard conditions."
+ },
+ {
+  "id": "a46-019",
+  "q": "define the acceleration.",
+  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
+  "shown": "a=((v_c)/(t_1))",
+  "asked": "a",
+  "ans": "a = ((v_c)/(t_1)) gives the acceleration, where a in m/s^2, v_c in m/s and t_1 in s."
+ },
+ {
+  "id": "a46-020",
+  "q": "how do you find v_CM?",
+  "record": "v_CM=r*omega | v_CM:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
+  "shown": "v_CM=r*omega",
+  "asked": "v_CM",
+  "ans": "v_CM = r*omega gives v_CM, where v_CM in m/s, r in m and omega in 1/s."
+ },
+ {
+  "id": "a46-021",
+  "q": "How is the sound intensity related to the other quantities?",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
+  "asked": "I",
+  "ans": "The sound intensity is given by I = ((((Delta_p))^(2))/(2*rho*v_w)), with I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s, under standard conditions."
+ },
+ {
+  "id": "a46-022",
+  "q": "how is P related to the other quantities?",
+  "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+  "shown": "P=((F)/(A))",
+  "asked": "P",
+  "ans": "To find P: P = ((F)/(A)), with P in Pa, F in N and A in m^2."
+ },
+ {
+  "id": "a46-023",
+  "q": "Explain how f_B is calculated.",
+  "record": "f_B=|f_1-f_2| | f_B:Hz f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
+  "shown": "f_B=|f_1-f_2|",
+  "asked": "f_B",
+  "ans": "f_B = |f_1-f_2|. That gives f_B, with f_B in Hz, f_1 in Hz and f_2 in Hz."
+ },
+ {
+  "id": "a46-024",
+  "q": "What is average force?",
+  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "F=((Delta_p)/(Delta_t))",
+  "asked": "F",
+  "ans": "Average force is given by F = ((Delta_p)/(Delta_t)), with F in N, Delta_p in kg*m/s and Delta_t in s."
+ },
+ {
+  "id": "a46-025",
+  "q": "what does V depend on?",
+  "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
+  "shown": "V=B*l*v_d",
+  "asked": "V",
+  "ans": "To find V: V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s."
+ },
+ {
+  "id": "a46-026",
+  "q": "Define the potential-energy function of a harmonic oscillator.",
+  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | U(x):J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
+  "shown": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "asked": "U(x)",
+  "ans": "U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2) gives the potential-energy function of a harmonic oscillator, where U(x) in J, m in kg, omega in 1/s and x in m."
+ },
+ {
+  "id": "a46-027",
+  "q": "Take h = 6.626e-34. explain how the magnitude of photon\u2019s momentum is calculated.",
+  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
+  "shown": "p_f=((h)/(lambda))",
+  "asked": "p_f",
+  "ans": "To find the magnitude of photon\u2019s momentum: p_f = ((h)/(lambda)), with p_f in kg*m/s, h in J*s and lambda in m."
+ },
+ {
+  "id": "a46-028",
+  "q": "What is p_f? With h = 6.626e-34.",
+  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
+  "shown": "p_f=((h)/(lambda))",
+  "asked": "p_f",
+  "ans": "p_f = ((h)/(lambda)) gives p_f, where p_f in kg*m/s, h in J*s and lambda in m."
+ },
+ {
+  "id": "a46-029",
+  "q": "explain how F is calculated.",
+  "record": "F=k*x | F:N k:N/m x:m | missing:k | standard conditions | fit:high",
+  "shown": "F=k*x",
+  "asked": "F",
+  "ans": "To find F: F = k*x, with F in N, k in N/m and x in m."
+ },
+ {
+  "id": "a46-030",
   "q": "What is v?",
   "record": "v=r*omega | v:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
   "shown": "v=r*omega",
   "asked": "v",
-  "ans": "v = r*omega gives v, where v in m/s, r in m and omega in 1/s."
+  "ans": "v = r*omega. That gives v, with v in m/s, r in m and omega in 1/s."
  },
  {
-  "id": "a46-043",
-  "q": "what does first law depend on?",
-  "record": "Delta_E_int=Q-W | Delta_E_int:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
-  "shown": "Delta_E_int=Q-W",
-  "asked": "Delta_E_int",
-  "ans": "Delta_E_int = Q-W gives first law, where Delta_E_int in J, Q in J and W in J."
+  "id": "a46-031",
+  "q": "what does the beat frequency depend on?",
+  "record": "f_B=|f_1-f_2| | f_B:Hz f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
+  "shown": "f_B=|f_1-f_2|",
+  "asked": "f_B",
+  "ans": "f_B = |f_1-f_2|. That gives the beat frequency, with f_B in Hz, f_1 in Hz and f_2 in Hz."
  },
  {
-  "id": "a46-044",
-  "q": "explain what sound intensity is.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
-  "asked": "I",
-  "ans": "I = ((((Delta_p))^(2))/(2*rho*v_w)). That gives sound intensity, with I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
- },
- {
-  "id": "a46-045",
-  "q": "explain what lambda is.",
-  "record": "lambda=lambda_0/n | lambda:m lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
-  "shown": "lambda=lambda_0/n",
-  "asked": "lambda",
-  "ans": "To find lambda: lambda = lambda_0/n, with lambda in m, lambda_0 in m and n is dimensionless."
- },
- {
-  "id": "a46-046",
-  "q": "Define v.",
-  "record": "v=((s)/(t)) | v:m/s s:m t:s | missing:s | standard conditions | fit:high",
-  "shown": "v=((s)/(t))",
-  "asked": "v",
-  "ans": "v = ((s)/(t)). That gives v, with v in m/s, s in m and t in s."
- },
- {
-  "id": "a46-047",
-  "q": "Explain what the motional emf is.",
+  "id": "a46-032",
+  "q": "explain what motional emf is.",
   "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "shown": "V=B*l*v_d",
   "asked": "V",
-  "ans": "To find the motional emf: V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s."
+  "ans": "Motional emf is given by V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s."
  },
  {
-  "id": "a46-048",
-  "q": "explain what F is.",
+  "id": "a46-033",
+  "q": "The values are g = 9.81. what is the weight?",
+  "record": "F=m*g | F:N m:kg g:m/s^2 | missing:m | standard conditions | fit:high",
+  "shown": "F=m*g",
+  "asked": "F",
+  "ans": "To find the weight: F = m*g, with F in N, m in kg and g in m/s^2."
+ },
+ {
+  "id": "a46-034",
+  "q": "how is F related to the other quantities?",
   "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
   "shown": "F=((Delta_p)/(Delta_t))",
   "asked": "F",
   "ans": "F = ((Delta_p)/(Delta_t)) gives F, where F in N, Delta_p in kg*m/s and Delta_t in s."
  },
  {
-  "id": "a46-049",
-  "q": "consider a case where h = 6.626e-34. how is p_f related to the other quantities?",
+  "id": "a46-035",
+  "q": "what does I depend on?",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
+  "asked": "I",
+  "ans": "I = ((((Delta_p))^(2))/(2*rho*v_w)) gives I, where I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
+ },
+ {
+  "id": "a46-036",
+  "q": "Define the sound intensity.",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
+  "asked": "I",
+  "ans": "To find the sound intensity: I = ((((Delta_p))^(2))/(2*rho*v_w)), with I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
+ },
+ {
+  "id": "a46-037",
+  "q": "explain how distance travelled is calculated.",
+  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
+  "shown": "x_2=v*t_2",
+  "asked": "x_2",
+  "ans": "x_2 = v*t_2. That gives distance travelled, with x_2 in m, v in m/s and t_2 in s."
+ },
+ {
+  "id": "a46-038",
+  "q": "How do you find average force?",
+  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "F=((Delta_p)/(Delta_t))",
+  "asked": "F",
+  "ans": "F = ((Delta_p)/(Delta_t)). That gives average force, with F in N, Delta_p in kg*m/s and Delta_t in s."
+ },
+ {
+  "id": "a46-039",
+  "q": "What is F?",
+  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "F=((Delta_p)/(Delta_t))",
+  "asked": "F",
+  "ans": "To find F: F = ((Delta_p)/(Delta_t)), with F in N, Delta_p in kg*m/s and Delta_t in s."
+ },
+ {
+  "id": "a46-040",
+  "q": "define distance travelled.",
+  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
+  "shown": "x_2=v*t_2",
+  "asked": "x_2",
+  "ans": "Distance travelled is given by x_2 = v*t_2, with x_2 in m, v in m/s and t_2 in s."
+ },
+ {
+  "id": "a46-041",
+  "q": "explain how the motional emf is calculated.",
+  "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
+  "shown": "V=B*l*v_d",
+  "asked": "V",
+  "ans": "The motional emf is given by V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s, under standard conditions."
+ },
+ {
+  "id": "a46-042",
+  "q": "What is hooke's law?",
+  "record": "F=k*x | F:N k:N/m x:m | missing:k | standard conditions | fit:high",
+  "shown": "F=k*x",
+  "asked": "F",
+  "ans": "F = k*x. That gives hooke's law, with F in N, k in N/m and x in m."
+ },
+ {
+  "id": "a46-043",
+  "q": "Explain how acceleration from a speed reached in a given time is calculated.",
+  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
+  "shown": "a=((v_c)/(t_1))",
+  "asked": "a",
+  "ans": "Acceleration from a speed reached in a given time is given by a = ((v_c)/(t_1)), with a in m/s^2, v_c in m/s and t_1 in s."
+ },
+ {
+  "id": "a46-044",
+  "q": "explain what x_2 is.",
+  "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
+  "shown": "x_2=v*t_2",
+  "asked": "x_2",
+  "ans": "x_2 = v*t_2 gives x_2, where x_2 in m, v in m/s and t_2 in s."
+ },
+ {
+  "id": "a46-045",
+  "q": "How is p_f related to the other quantities? Given h = 6.626e-34.",
   "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "shown": "p_f=((h)/(lambda))",
   "asked": "p_f",
-  "ans": "p_f = ((h)/(lambda)). That gives p_f, with p_f in kg*m/s, h in J*s and lambda in m."
+  "ans": "To find p_f: p_f = ((h)/(lambda)), with p_f in kg*m/s, h in J*s and lambda in m."
+ },
+ {
+  "id": "a46-046",
+  "q": "how do you find the acceleration?",
+  "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
+  "shown": "a=((v_c)/(t_1))",
+  "asked": "a",
+  "ans": "a = ((v_c)/(t_1)) gives the acceleration, where a in m/s^2, v_c in m/s and t_1 in s."
+ },
+ {
+  "id": "a46-047",
+  "q": "how do you find first law?",
+  "record": "Delta_E_int=Q-W | Delta_E_int:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
+  "shown": "Delta_E_int=Q-W",
+  "asked": "Delta_E_int",
+  "ans": "Delta_E_int = Q-W gives first law, where Delta_E_int in J, Q in J and W in J."
+ },
+ {
+  "id": "a46-048",
+  "q": "what does first law depend on?",
+  "record": "Delta_E_int=Q-W | Delta_E_int:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
+  "shown": "Delta_E_int=Q-W",
+  "asked": "Delta_E_int",
+  "ans": "To find first law: Delta_E_int = Q-W, with Delta_E_int in J, Q in J and W in J."
+ },
+ {
+  "id": "a46-049",
+  "q": "Explain what sound intensity is.",
+  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
+  "asked": "I",
+  "ans": "I = ((((Delta_p))^(2))/(2*rho*v_w)). That gives sound intensity, with I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
  },
  {
   "id": "a46-050",
-  "q": "how is f_B related to the other quantities?",
-  "record": "f_B=|f_1-f_2| | f_B:Hz f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
-  "shown": "f_B=|f_1-f_2|",
-  "asked": "f_B",
-  "ans": "To find f_B: f_B = |f_1-f_2|, with f_B in Hz, f_1 in Hz and f_2 in Hz."
+  "q": "how do you find wavelength?",
+  "record": "lambda=lambda_0/n | lambda:m lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "shown": "lambda=lambda_0/n",
+  "asked": "lambda",
+  "ans": "lambda = lambda_0/n gives wavelength, where lambda in m, lambda_0 in m and n is dimensionless."
  },
  {
   "id": "a46-051",
+  "q": "Define v.",
+  "record": "v=((s)/(t)) | v:m/s s:m t:s | missing:s | standard conditions | fit:high",
+  "shown": "v=((s)/(t))",
+  "asked": "v",
+  "ans": "v = ((s)/(t)) gives v, where v in m/s, s in m and t in s."
+ },
+ {
+  "id": "a46-052",
+  "q": "Explain what F is.",
+  "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
+  "shown": "F=((Delta_p)/(Delta_t))",
+  "asked": "F",
+  "ans": "F = ((Delta_p)/(Delta_t)). That gives F, with F in N, Delta_p in kg*m/s and Delta_t in s."
+ },
+ {
+  "id": "a46-053",
+  "q": "How is f_B related to the other quantities?",
+  "record": "f_B=|f_1-f_2| | f_B:Hz f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
+  "shown": "f_B=|f_1-f_2|",
+  "asked": "f_B",
+  "ans": "f_B = |f_1-f_2| gives f_B, where f_B in Hz, f_1 in Hz and f_2 in Hz."
+ },
+ {
+  "id": "a46-054",
   "q": "Explain how average force from a change in momentum is calculated.",
   "record": "F=((Delta_p)/(Delta_t)) | F:N Delta_p:kg*m/s Delta_t:s | missing:Delta_p | standard conditions | fit:high",
   "shown": "F=((Delta_p)/(Delta_t))",
   "asked": "F",
-  "ans": "F = ((Delta_p)/(Delta_t)). That gives average force from a change in momentum, with F in N, Delta_p in kg*m/s and Delta_t in s."
+  "ans": "F = ((Delta_p)/(Delta_t)) gives average force from a change in momentum, where F in N, Delta_p in kg*m/s and Delta_t in s."
  },
  {
-  "id": "a46-052",
-  "q": "what does speed depend on?",
+  "id": "a46-055",
+  "q": "What does speed depend on?",
   "record": "v_CM=r*omega | v_CM:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
   "shown": "v_CM=r*omega",
   "asked": "v_CM",
-  "ans": "Speed is given by v_CM = r*omega, with v_CM in m/s, r in m and omega in 1/s, under standard conditions."
+  "ans": "v_CM = r*omega gives speed, where v_CM in m/s, r in m and omega in 1/s."
  },
  {
-  "id": "a46-053",
+  "id": "a46-056",
   "q": "How do you find the potential-energy function?",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | U(x):J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "shown": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
@@ -424,111 +448,71 @@
   "ans": "U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2) gives the potential-energy function, where U(x) in J, m in kg, omega in 1/s and x in m."
  },
  {
-  "id": "a46-054",
-  "q": "What does sound intensity depend on?",
+  "id": "a46-057",
+  "q": "what does sound intensity depend on?",
   "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
   "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
   "asked": "I",
-  "ans": "I = ((((Delta_p))^(2))/(2*rho*v_w)) gives sound intensity, where I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
- },
- {
-  "id": "a46-055",
-  "q": "what is the resulting efficiency?",
-  "record": "e=1-((T_c)/(T_h)) | e:1 T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
-  "shown": "e=1-((T_c)/(T_h))",
-  "asked": "e",
-  "ans": "To find the resulting efficiency: e = 1-((T_c)/(T_h)), with e is dimensionless, T_c in K and T_h in K."
- },
- {
-  "id": "a46-056",
-  "q": "explain what V is.",
-  "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
-  "shown": "V=B*l*v_d",
-  "asked": "V",
-  "ans": "V = B*l*v_d. That gives V, with V in V, B in T, l in m and v_d in m/s."
- },
- {
-  "id": "a46-057",
-  "q": "How is v related to the other quantities?",
-  "record": "v=((s)/(t)) | v:m/s s:m t:s | missing:s | standard conditions | fit:high",
-  "shown": "v=((s)/(t))",
-  "asked": "v",
-  "ans": "v = ((s)/(t)) gives v, where v in m/s, s in m and t in s."
+  "ans": "To find sound intensity: I = ((((Delta_p))^(2))/(2*rho*v_w)), with I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
  },
  {
   "id": "a46-058",
-  "q": "Explain what wave speed is.",
-  "record": "v_w=f*lambda | v_w:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
-  "shown": "v_w=f*lambda",
-  "asked": "v_w",
-  "ans": "v_w = f*lambda. That gives wave speed, with v_w in m/s, f in Hz and lambda in m."
+  "q": "Explain what the potential-energy function is.",
+  "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | U(x):J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
+  "shown": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
+  "asked": "U(x)",
+  "ans": "U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2) gives the potential-energy function, where U(x) in J, m in kg, omega in 1/s and x in m."
  },
  {
   "id": "a46-059",
-  "q": "How do you find resulting efficiency of a carnot cycle?",
-  "record": "e=1-((T_c)/(T_h)) | e:1 T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
-  "shown": "e=1-((T_c)/(T_h))",
-  "asked": "e",
-  "ans": "Resulting efficiency of a carnot cycle is given by e = 1-((T_c)/(T_h)), with e is dimensionless, T_c in K and T_h in K, under standard conditions."
- },
- {
-  "id": "a46-060",
-  "q": "What is e?",
-  "record": "e=1-((T_c)/(T_h)) | e:1 T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
-  "shown": "e=1-((T_c)/(T_h))",
-  "asked": "e",
-  "ans": "e = 1-((T_c)/(T_h)) gives e, where e is dimensionless, T_c in K and T_h in K."
- },
- {
-  "id": "a46-061",
-  "q": "how is wavelength related to the other quantities?",
-  "record": "lambda=lambda_0/n | lambda:m lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
-  "shown": "lambda=lambda_0/n",
-  "asked": "lambda",
-  "ans": "Wavelength is given by lambda = lambda_0/n, with lambda in m, lambda_0 in m and n is dimensionless."
- },
- {
-  "id": "a46-062",
-  "q": "explain how V is calculated.",
+  "q": "Explain what V is.",
   "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "shown": "V=B*l*v_d",
   "asked": "V",
   "ans": "V = B*l*v_d gives V, where V in V, B in T, l in m and v_d in m/s."
  },
  {
-  "id": "a46-063",
-  "q": "Using h = 6.626e-34, what is the magnitude of photon\u2019s momentum?",
-  "record": "p_f=((h)/(lambda)) | p_f:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
-  "shown": "p_f=((h)/(lambda))",
-  "asked": "p_f",
-  "ans": "p_f = ((h)/(lambda)) gives the magnitude of photon\u2019s momentum, where p_f in kg*m/s, h in J*s and lambda in m."
+  "id": "a46-060",
+  "q": "How is v related to the other quantities?",
+  "record": "v=((s)/(t)) | v:m/s s:m t:s | missing:s | standard conditions | fit:high",
+  "shown": "v=((s)/(t))",
+  "asked": "v",
+  "ans": "v = ((s)/(t)). That gives v, with v in m/s, s in m and t in s."
  },
  {
-  "id": "a46-064",
-  "q": "How is v_w related to the other quantities?",
+  "id": "a46-061",
+  "q": "Explain what wave speed is.",
   "record": "v_w=f*lambda | v_w:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
   "shown": "v_w=f*lambda",
   "asked": "v_w",
-  "ans": "To find v_w: v_w = f*lambda, with v_w in m/s, f in Hz and lambda in m."
+  "ans": "Wave speed is given by v_w = f*lambda, with v_w in m/s, f in Hz and lambda in m."
+ },
+ {
+  "id": "a46-062",
+  "q": "what is e?",
+  "record": "e=1-((T_c)/(T_h)) | e:1 T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
+  "shown": "e=1-((T_c)/(T_h))",
+  "asked": "e",
+  "ans": "To find e: e = 1-((T_c)/(T_h)), with e is dimensionless, T_c in K and T_h in K."
+ },
+ {
+  "id": "a46-063",
+  "q": "what is the wave speed?",
+  "record": "v=lambda*f | v:m/s lambda:m f:Hz | missing:lambda | standard conditions | fit:high",
+  "shown": "v=lambda*f",
+  "asked": "v",
+  "ans": "The wave speed is given by v = lambda*f, with v in m/s, lambda in m and f in Hz."
+ },
+ {
+  "id": "a46-064",
+  "q": "how is wavelength related to the other quantities?",
+  "record": "lambda=lambda_0/n | lambda:m lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "shown": "lambda=lambda_0/n",
+  "asked": "lambda",
+  "ans": "lambda = lambda_0/n. That gives wavelength, with lambda in m, lambda_0 in m and n is dimensionless."
  },
  {
   "id": "a46-065",
-  "q": "How is L related to the other quantities?",
-  "record": "L=((v)/(4*f_1)) | L:m v:m/s f_1:Hz | missing:v | standard conditions | fit:high",
-  "shown": "L=((v)/(4*f_1))",
-  "asked": "L",
-  "ans": "L = ((v)/(4*f_1)) gives L, where L in m, v in m/s and f_1 in Hz."
- },
- {
-  "id": "a46-066",
-  "q": "what does I depend on?",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
-  "asked": "I",
-  "ans": "I = ((((Delta_p))^(2))/(2*rho*v_w)). That gives I, with I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
- },
- {
-  "id": "a46-067",
   "q": "how is acceleration from a speed reached in a given time related to the other quantities?",
   "record": "a=((v_c)/(t_1)) | a:m/s^2 v_c:m/s t_1:s | missing:v_c | standard conditions | fit:high",
   "shown": "a=((v_c)/(t_1))",
@@ -536,183 +520,135 @@
   "ans": "a = ((v_c)/(t_1)) gives acceleration from a speed reached in a given time, where a in m/s^2, v_c in m/s and t_1 in s."
  },
  {
-  "id": "a46-068",
-  "q": "Explain how a_C is calculated.",
-  "record": "a_C=(((v)^(2))/(r)) | a_C:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
-  "shown": "a_C=(((v)^(2))/(r))",
-  "asked": "a_C",
-  "ans": "a_C = (((v)^(2))/(r)) gives a_C, where a_C in m/s^2, v in m/s and r in m."
- },
- {
-  "id": "a46-069",
-  "q": "Explain how pressure is calculated.",
+  "id": "a46-066",
+  "q": "explain how pressure is calculated.",
   "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
   "shown": "P=((F)/(A))",
   "asked": "P",
-  "ans": "To find pressure: P = ((F)/(A)), with P in Pa, F in N and A in m^2."
+  "ans": "P = ((F)/(A)). That gives pressure, with P in Pa, F in N and A in m^2."
  },
  {
-  "id": "a46-070",
-  "q": "How do you find potential-energy function of a harmonic oscillator?",
+  "id": "a46-067",
+  "q": "how do you find potential-energy function of a harmonic oscillator?",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | U(x):J m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "shown": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2)",
   "asked": "U(x)",
-  "ans": "To find potential-energy function of a harmonic oscillator: U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2), with U(x) in J, m in kg, omega in 1/s and x in m."
+  "ans": "Potential-energy function of a harmonic oscillator is given by U(x) = ((1)/(2))*m*(omega)^(2)*(x)^(2), with U(x) in J, m in kg, omega in 1/s and x in m, under standard conditions."
  },
  {
-  "id": "a46-071",
+  "id": "a46-068",
+  "q": "Define v.",
+  "record": "v=lambda*f | v:m/s lambda:m f:Hz | missing:lambda | standard conditions | fit:high",
+  "shown": "v=lambda*f",
+  "asked": "v",
+  "ans": "v = lambda*f. That gives v, with v in m/s, lambda in m and f in Hz."
+ },
+ {
+  "id": "a46-069",
   "q": "In a setup with g = 9.81, what is F?",
-  "record": "F=m*g | F:N m:kg g:m/s^2 | missing:m | standard conditions | fit:high",
-  "shown": "F=m*g",
-  "asked": "F",
-  "ans": "F = m*g gives F, where F in N, m in kg and g in m/s^2."
- },
- {
-  "id": "a46-072",
-  "q": "For g = 9.81, explain what F is.",
   "record": "F=m*g | F:N m:kg g:m/s^2 | missing:m | standard conditions | fit:high",
   "shown": "F=m*g",
   "asked": "F",
   "ans": "F = m*g. That gives F, with F in N, m in kg and g in m/s^2."
  },
  {
-  "id": "a46-073",
-  "q": "explain how a_C is calculated.",
-  "record": "a_C=(((v)^(2))/(r)) | a_C:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
-  "shown": "a_C=(((v)^(2))/(r))",
-  "asked": "a_C",
-  "ans": "To find a_C: a_C = (((v)^(2))/(r)), with a_C in m/s^2, v in m/s and r in m."
- },
- {
-  "id": "a46-074",
+  "id": "a46-070",
   "q": "explain what hooke's law is.",
   "record": "F=k*x | F:N k:N/m x:m | missing:k | standard conditions | fit:high",
   "shown": "F=k*x",
   "asked": "F",
-  "ans": "Hooke's law is given by F = k*x, with F in N, k in N/m and x in m."
+  "ans": "Hooke's law is given by F = k*x, with F in N, k in N/m and x in m, under standard conditions."
  },
  {
-  "id": "a46-075",
+  "id": "a46-071",
   "q": "what is L?",
   "record": "L=((v)/(4*f_1)) | L:m v:m/s f_1:Hz | missing:v | standard conditions | fit:high",
   "shown": "L=((v)/(4*f_1))",
   "asked": "L",
-  "ans": "To find L: L = ((v)/(4*f_1)), with L in m, v in m/s and f_1 in Hz."
+  "ans": "L = ((v)/(4*f_1)). That gives L, with L in m, v in m/s and f_1 in Hz."
  },
  {
-  "id": "a46-076",
-  "q": "How do you find the wave speed from frequency and wavelength?",
-  "record": "v_w=f*lambda | v_w:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
-  "shown": "v_w=f*lambda",
-  "asked": "v_w",
-  "ans": "v_w = f*lambda. That gives the wave speed from frequency and wavelength, with v_w in m/s, f in Hz and lambda in m."
- },
- {
-  "id": "a46-077",
-  "q": "Explain what the speed is.",
-  "record": "v_CM=r*omega | v_CM:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
-  "shown": "v_CM=r*omega",
-  "asked": "v_CM",
-  "ans": "The speed is given by v_CM = r*omega, with v_CM in m/s, r in m and omega in 1/s."
- },
- {
-  "id": "a46-078",
-  "q": "what does pressure depend on?",
-  "record": "P=((F)/(A)) | P:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
-  "shown": "P=((F)/(A))",
-  "asked": "P",
-  "ans": "To find pressure: P = ((F)/(A)), with P in Pa, F in N and A in m^2."
- },
- {
-  "id": "a46-079",
+  "id": "a46-072",
   "q": "how do you find the wave speed?",
   "record": "v=lambda*f | v:m/s lambda:m f:Hz | missing:lambda | standard conditions | fit:high",
   "shown": "v=lambda*f",
   "asked": "v",
-  "ans": "v = lambda*f. That gives the wave speed, with v in m/s, lambda in m and f in Hz."
+  "ans": "The wave speed is given by v = lambda*f, with v in m/s, lambda in m and f in Hz."
  },
  {
-  "id": "a46-080",
+  "id": "a46-073",
   "q": "how is the linear speed related to the other quantities?",
   "record": "v=((s)/(t)) | v:m/s s:m t:s | missing:s | standard conditions | fit:high",
   "shown": "v=((s)/(t))",
   "asked": "v",
-  "ans": "v = ((s)/(t)). That gives the linear speed, with v in m/s, s in m and t in s."
+  "ans": "The linear speed is given by v = ((s)/(t)), with v in m/s, s in m and t in s, under standard conditions."
  },
  {
-  "id": "a46-081",
-  "q": "explain what the sound intensity is.",
-  "record": "I=((((Delta_p))^(2))/(2*rho*v_w)) | I:W/m^2 Delta_p:Pa rho:kg/m^3 v_w:m/s | missing:Delta_p | standard conditions | fit:high",
-  "shown": "I=((((Delta_p))^(2))/(2*rho*v_w))",
-  "asked": "I",
-  "ans": "To find the sound intensity: I = ((((Delta_p))^(2))/(2*rho*v_w)), with I in W/m^2, Delta_p in Pa, rho in kg/m^3 and v_w in m/s."
- },
- {
-  "id": "a46-082",
+  "id": "a46-074",
   "q": "what does length of a closed tube from its fundamental frequency depend on?",
   "record": "L=((v)/(4*f_1)) | L:m v:m/s f_1:Hz | missing:v | standard conditions | fit:high",
   "shown": "L=((v)/(4*f_1))",
   "asked": "L",
-  "ans": "Length of a closed tube from its fundamental frequency is given by L = ((v)/(4*f_1)), with L in m, v in m/s and f_1 in Hz."
+  "ans": "L = ((v)/(4*f_1)). That gives length of a closed tube from its fundamental frequency, with L in m, v in m/s and f_1 in Hz."
  },
  {
-  "id": "a46-083",
+  "id": "a46-075",
+  "q": "What is lambda?",
+  "record": "lambda=lambda_0/n | lambda:m lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
+  "shown": "lambda=lambda_0/n",
+  "asked": "lambda",
+  "ans": "To find lambda: lambda = lambda_0/n, with lambda in m, lambda_0 in m and n is dimensionless."
+ },
+ {
+  "id": "a46-076",
   "q": "explain what the first law is.",
   "record": "Delta_E_int=Q-W | Delta_E_int:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "shown": "Delta_E_int=Q-W",
   "asked": "Delta_E_int",
-  "ans": "To find the first law: Delta_E_int = Q-W, with Delta_E_int in J, Q in J and W in J."
+  "ans": "The first law is given by Delta_E_int = Q-W, with Delta_E_int in J, Q in J and W in J."
  },
  {
-  "id": "a46-084",
-  "q": "Explain how wave speed is calculated.",
-  "record": "v_w=f*lambda | v_w:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
-  "shown": "v_w=f*lambda",
-  "asked": "v_w",
-  "ans": "To find wave speed: v_w = f*lambda, with v_w in m/s, f in Hz and lambda in m."
- },
- {
-  "id": "a46-085",
-  "q": "what is resulting efficiency of a carnot cycle?",
+  "id": "a46-077",
+  "q": "What is resulting efficiency of a carnot cycle?",
   "record": "e=1-((T_c)/(T_h)) | e:1 T_c:K T_h:K | missing:T_c | standard conditions | fit:high",
   "shown": "e=1-((T_c)/(T_h))",
   "asked": "e",
-  "ans": "Resulting efficiency of a carnot cycle is given by e = 1-((T_c)/(T_h)), with e is dimensionless, T_c in K and T_h in K."
+  "ans": "e = 1-((T_c)/(T_h)). That gives resulting efficiency of a carnot cycle, with e is dimensionless, T_c in K and T_h in K."
  },
  {
-  "id": "a46-086",
-  "q": "what does the motional emf depend on?",
+  "id": "a46-078",
+  "q": "What does the motional emf depend on?",
   "record": "V=B*l*v_d | V:V B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "shown": "V=B*l*v_d",
   "asked": "V",
-  "ans": "To find the motional emf: V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s."
+  "ans": "The motional emf is given by V = B*l*v_d, with V in V, B in T, l in m and v_d in m/s, under standard conditions."
  },
  {
-  "id": "a46-087",
+  "id": "a46-079",
+  "q": "How do you find first law?",
+  "record": "Delta_E_int=Q-W | Delta_E_int:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
+  "shown": "Delta_E_int=Q-W",
+  "asked": "Delta_E_int",
+  "ans": "To find first law: Delta_E_int = Q-W, with Delta_E_int in J, Q in J and W in J."
+ },
+ {
+  "id": "a46-080",
   "q": "define x_2.",
   "record": "x_2=v*t_2 | x_2:m v:m/s t_2:s | missing:v | standard conditions | fit:high",
   "shown": "x_2=v*t_2",
   "asked": "x_2",
-  "ans": "x_2 = v*t_2 gives x_2, where x_2 in m, v in m/s and t_2 in s."
+  "ans": "x_2 = v*t_2. That gives x_2, with x_2 in m, v in m/s and t_2 in s."
  },
  {
-  "id": "a46-088",
-  "q": "Explain what v_CM is.",
-  "record": "v_CM=r*omega | v_CM:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
-  "shown": "v_CM=r*omega",
-  "asked": "v_CM",
-  "ans": "v_CM = r*omega gives v_CM, where v_CM in m/s, r in m and omega in 1/s."
- },
- {
-  "id": "a46-089",
-  "q": "explain how the wave speed is calculated.",
+  "id": "a46-081",
+  "q": "Explain how the wave speed is calculated.",
   "record": "v=lambda*f | v:m/s lambda:m f:Hz | missing:lambda | standard conditions | fit:high",
   "shown": "v=lambda*f",
   "asked": "v",
-  "ans": "v = lambda*f. That gives the wave speed, with v in m/s, lambda in m and f in Hz."
+  "ans": "The wave speed is given by v = lambda*f, with v in m/s, lambda in m and f in Hz, under standard conditions."
  },
  {
-  "id": "a46-090",
+  "id": "a46-082",
   "q": "Define wave speed.",
   "record": "v=lambda*f | v:m/s lambda:m f:Hz | missing:lambda | standard conditions | fit:high",
   "shown": "v=lambda*f",

@@ -17,11 +17,22 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 # on a name is a proxy for "this value is a record span", and the value's provenance is not in its
 # spelling. So every bare-pipe split is flagged and each is either routed through recfmt or listed
 # below with the reason it is not a record.
-BARE = re.compile(r'\.split\(\s*["\']\|["\']\s*\)')
+# AND THE SPELLING OF THE CALL IS NOT THE PROPERTY EITHER. The first regex required the close paren
+# immediately after the quote, so `.split("|", 1)` -- a maxsplit, which truncates a formula exactly
+# as badly -- went straight through, and I wrote one into gate_explain_variants.py while holding
+# this file open. A maxsplit and an rsplit are now both flagged; an rsplit that counts from the END
+# is sound (it is what shapecheck.c does) but it is allowlisted with that reason rather than
+# pattern-matched, because "counts from the end" is not something a regex can see.
+BARE = re.compile(r'\.r?split\(\s*["\']\|["\']\s*(?:,\s*\d+\s*)?\)')
 SKIP = {"gate_bare_pipe.py", "recfmt.py"}
 ALLOW = {
     # file -> why this split is not a record span
     "tools/eval/gate_d3_legitimacy.py": "parses a markdown table row in docs/, not a record",
+    "tools/eval/grade.py": "rsplit counts the 4 separators from the END, so a formula's internal "
+                           "pipes stay in field 0 -- sound, and the comment there says so",
+    "tools/eval/gate_format_parity.py": "rsplit counts the 4 separators from the END of the span, "
+                                        "so a formula's internal pipes stay in field 0 -- the same "
+                                        "approach src/store/shapecheck.c takes, and sound",
 }
 
 

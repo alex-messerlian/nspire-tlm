@@ -25,6 +25,8 @@ WHAT IT CHECKS. For every document: no record name from the store or the holdout
 MIN_NAME are skipped and COUNTED -- a short name is an ordinary English word and would flag prose.
 """
 import collections, json, pathlib, re, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / 'corpus'))
+from recfmt import formula as _rf_formula  # " | " is the separator; a formula may contain a bare pipe
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MIN_NAME = 5          # firing rate measured at 4, 5 and 6 below; the choice is printed, not assumed
@@ -120,7 +122,7 @@ def violations(docs, pool, min_name, rmap=None, tally=None, decl=None, solves=No
         if "<a>" not in t:
             continue
         prompt, ans = t.split("<a>", 1)
-        rec = prompt.split("<r>", 1)[1].split("|", 1)[0].strip() if "<r>" in prompt else ""
+        rec = _rf_formula(prompt.split("<r>", 1)[1]) if "<r>" in prompt else ""
         prompt = prompt.lower()
         for m in rx.finditer(ans.lower()):
             n = m.group(0)

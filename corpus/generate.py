@@ -2357,7 +2357,28 @@ _EXPL_PATH = pathlib.Path(__file__).resolve().parent / "knowledge/explanations.j
 # field 3 of its own prompt, while an EXPLAIN answer exists nowhere in the prompt and must be
 # memorised whole. One variant triples exposures per string at zero corpus cost, spending
 # within-record variety and keeping across-record variety untouched.
-EXPLAIN_VARIANTS = int(os.environ.get("EXPLAIN_VARIANTS", "3"))
+# DEFAULT 1 SINCE A108, AND THE 3 THAT WAS HERE COST A TRAINING RUN.
+#
+# A82 MEASURED this, on a single-variable change with everything else identical:
+#
+#                            3 variants   1 variant
+#     prose, right relation      74.4%       94.5%
+#     FABRICATED a relation      23.2%        3.7%
+#
+# One explanation seen ~29 times beats three seen ~10 times each. The mechanism is exposures per
+# STRING, not documents per record, and an answer that exists nowhere in the prompt has to be
+# memorised whole.
+#
+# A82 then left the measured-better value behind an environment variable WHOSE DEFAULT WAS THE
+# BROKEN ONE, and neither tools/overnight.sh nor tools/mathrun.sh set it. So A107 regenerated with
+# three variants and reproduced the defect to within a point -- 22.0% fabrication, D2 prose 72.9%
+# below its 75% floor, and D1 = 4/6 against a pre-registered floor of 5. A whole training run.
+#
+# This is the class this repo already has a rule for: a decision held by documentation alone will
+# lapse, and an env var whose default disagrees with the measurement is worse than documentation --
+# it looks like a knob and behaves like a trap. Same shape as WITH_KNOWLEDGE before A86b.
+# EXPLAIN_VARIANTS=3 still reproduces the old arm deliberately; nothing has to remember anything.
+EXPLAIN_VARIANTS = int(os.environ.get("EXPLAIN_VARIANTS", "1"))
 _EXPL = ({e["formula"]: e["variants"][:EXPLAIN_VARIANTS] for e in json.load(open(_EXPL_PATH))}
          if _EXPL_PATH.exists() else {})
 _EXPL_USED, _EXPL_FALL = [0], [0]

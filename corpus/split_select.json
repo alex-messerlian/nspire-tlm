@@ -1,7 +1,7 @@
 [
  {
   "id": "SEL-001",
-  "q": "Calculate a_C. Consider a case where v = 81, omega_0 = 620, k = 181, Delta_theta = 1.25, r = 507.",
+  "q": "Calculate a_C. Consider a case where v = 81, omega_0 = 620, k = 181, I = 5, r = 507.",
   "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
   "asked_name": "Centripetal acceleration",
   "expect": "answer",
@@ -41,7 +41,7 @@
  },
  {
   "id": "SEL-005",
-  "q": "What was v_CM? Consider a case where r = 0.147, R = 0.223, omega = 186.3.",
+  "q": "Calculate speed of the centre of mass of a rolling object. Consider a case where r = 0.147, v = 0.501, omega = 186.3.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "asked_name": "speed of the centre of mass of a rolling object",
   "expect": "answer",
@@ -51,7 +51,7 @@
  },
  {
   "id": "SEL-006",
-  "q": "Compute the wavelength in a medium. Given theta = 1.49, n = 1.514, lambda_0 = 0.000544, n_2 = 3.48, t = 0.693, v_w = 265.",
+  "q": "Compute the wavelength in a medium. Given f = 3.54e+16, n = 1.514, lambda_0 = 0.000544, n_2 = 3.48, theta = 0.283, I = 0.157.",
   "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:none | standard conditions | fit:high",
   "asked_name": "wavelength in a medium",
   "expect": "answer",
@@ -81,7 +81,7 @@
  },
  {
   "id": "SEL-009",
-  "q": "Compute the first law of thermodynamics. Suppose R_1 = 370, rho = 1950, Q = 1.6, W = 9.8.",
+  "q": "Compute the first law of thermodynamics. Suppose y_0 = 659, rho = 1950, Q = 1.6, W = 9.8.",
   "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "asked_name": "First law of thermodynamics",
   "expect": "answer",
@@ -151,7 +151,7 @@
  },
  {
   "id": "SEL-016",
-  "q": "Take n_1 = 2.04, Delta_S_h = -36.7, n_2 = 2.59, n = 2.47, I = 3.83, lambda_0 = 2.14e-05. Estimate the wavelength.",
+  "q": "Take v = 8.1, Delta_S_h = -36.7, n_2 = 2.59, n = 2.47, I = 3.83, lambda_0 = 2.14e-05. Estimate the wavelength.",
   "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:none | standard conditions | fit:high",
   "asked_name": "wavelength in a medium",
   "expect": "answer",
@@ -181,7 +181,7 @@
  },
  {
   "id": "SEL-019",
-  "q": "Suppose Q = 5.77, I = 18.4, W_in = 73.6, W = 8.67, K = 1.69e-17. Find the first law of thermodynamics.",
+  "q": "Suppose Q = 5.77, lambda = 8.75, W_in = 73.6, W = 8.67, K = 1.69e-17. Find the first law of thermodynamics.",
   "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "asked_name": "First law of thermodynamics",
   "expect": "answer",
@@ -211,7 +211,7 @@
  },
  {
   "id": "SEL-022",
-  "q": "Compute f_B. For y_0 = 103.65, f = 2100000000000000, f_2 = 300, f_1 = 457, lambda = 0.042.",
+  "q": "Where Delta_E_int = 185.2, f_s = 5890000000000, f_2 = 300, N_0 = 20, f_1 = 457, estimate f_B.",
   "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:none | standard conditions | fit:high",
   "asked_name": "beat frequency",
   "expect": "answer",
@@ -221,7 +221,7 @@
  },
  {
   "id": "SEL-023",
-  "q": "Consider a case where v = 18.9, E_F = 1.4e-18, r = 14.8, t_2 = 3.1. Find distance travelled at constant speed.",
+  "q": "Compute distance travelled at constant speed. If t_2 = 14.8, v = 223.",
   "record": "x_2=v*t_2 | t_2:s v:m/s | missing:none | standard conditions | fit:high",
   "asked_name": "distance travelled at constant speed",
   "expect": "answer",
@@ -231,7 +231,7 @@
  },
  {
   "id": "SEL-024",
-  "q": "Determine potential-energy function. Consider a case where omega = 9.82, theta = 0.46, m = 30.87, x = 0.105.",
+  "q": "Determine potential-energy function. Consider a case where omega = 0.38, a = 29.8, Delta_s = 25.2, m = 0.737, x = 0.221, c = 347.39.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:none | standard conditions | fit:high",
   "asked_name": "Potential-energy function of a harmonic oscillator",
   "expect": "answer",
@@ -241,7 +241,7 @@
  },
  {
   "id": "SEL-025",
-  "q": "Estimate v_CM. Starting from f = 6, omega = 13, r = 1.57.",
+  "q": "Estimate v_CM. Starting from q_0 = 6, omega = 13, r = 1.57.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:none | standard conditions | fit:high",
   "asked_name": "speed of the centre of mass of a rolling object",
   "expect": "answer",
@@ -251,7 +251,7 @@
  },
  {
   "id": "SEL-026",
-  "q": "Take v_wy = 43.46, n = 2.58, lambda_0 = 0.000628, f = 2910000000000. What is wavelength?",
+  "q": "Find lambda. You are told n = 3.05, f = 4.71e+17, v_wy = 43.46, lambda_0 = 0.000628.",
   "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:none | standard conditions | fit:high",
   "asked_name": "wavelength in a medium",
   "expect": "answer",
@@ -261,7 +261,7 @@
  },
  {
   "id": "SEL-027",
-  "q": "Estimate V. In a setup with I = 18.3, v_0 = 3.13, v_d = 94.13, B = 5.001, l = 0.82.",
+  "q": "Consider a case where l = 0.346, B = 0.302, theta = 4.63, v_d = 72.15. What is V?",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:none | standard conditions | fit:high",
   "asked_name": "motional emf",
   "expect": "answer",
@@ -271,7 +271,7 @@
  },
  {
   "id": "SEL-028",
-  "q": "Compute p_f. Given V = 245.76, Delta_m = 2.26e-28, lambda = 1.41e-08.",
+  "q": "Compute p_f. Given P = 1252.5, B = 1.2, lambda = 4.31e-11, R = 0.774, Delta_m = 2.26e-28.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:none | standard conditions | fit:high",
   "asked_name": "Magnitude of photon\u2019s momentum",
   "expect": "answer",
@@ -281,7 +281,7 @@
  },
  {
   "id": "SEL-029",
-  "q": "Estimate the first law. For Q = 8.252, W = 169.7, T = 374, F = 263.1.",
+  "q": "Estimate the first law. For Q = 8.252, W = 169.7, R_1 = 30.6, F = 263.1.",
   "record": "Delta_E_int=Q-W | Q:J W:J | missing:none | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "asked_name": "First law of thermodynamics",
   "expect": "answer",
@@ -301,7 +301,7 @@
  },
  {
   "id": "SEL-031",
-  "q": "Consider a case where v = 58.44, r = 285.8, K = 1.09e-18, Delta_f = 20400000000. Estimate a_C.",
+  "q": "Consider a case where v = 58.44, r = 285.8, K = 1.09e-18, F = 200. Estimate a_C.",
   "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:none | standard conditions | fit:high",
   "asked_name": "Centripetal acceleration",
   "expect": "answer",
@@ -311,7 +311,7 @@
  },
  {
   "id": "SEL-032",
-  "q": "Determine beat frequency. With f_2 = 6, n_1 = 3.31, f_1 = 835.",
+  "q": "Determine beat frequency. With f_2 = 6, v = 500, f_1 = 835.",
   "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:none | standard conditions | fit:high",
   "asked_name": "beat frequency",
   "expect": "answer",
@@ -409,7 +409,7 @@
  },
  {
   "id": "SEL-042",
-  "q": "Using m = 1705, V_0 = 958.89, f_2 = 25, f_1 = 68, determine distance travelled at constant speed.",
+  "q": "Using theta = 0.97, V_0 = 958.89, f_2 = 25, f_1 = 68, determine distance travelled at constant speed.",
   "record": "x_2=v*t_2 | t_2:s v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "distance travelled at constant speed",
   "expect": "refuse",
@@ -417,7 +417,7 @@
  },
  {
   "id": "SEL-043",
-  "q": "Determine U(x). For t_2 = 31.1, f = 6830000000000000, v = 6.26.",
+  "q": "Determine U(x). For t_2 = 31.1, N_0 = 2, v = 6.26.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "asked_name": "Potential-energy function of a harmonic oscillator",
   "expect": "refuse",
@@ -433,7 +433,7 @@
  },
  {
   "id": "SEL-045",
-  "q": "What was the wavelength? Consider a case where v_0 = 0.84, a = 4.9, r = 0.328, omega = 0.27.",
+  "q": "Calculate lambda. Assume r = 0.328, R = 0.014, omega = 0.27, Delta_f = 2910000.",
   "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
   "asked_name": "wavelength in a medium",
   "expect": "refuse",
@@ -441,7 +441,7 @@
  },
  {
   "id": "SEL-046",
-  "q": "Calculate V. Using Delta_v = 33.8, I = 9.9, Delta_S_h = -1.88, lambda_0 = 4.84e-07.",
+  "q": "Calculate the motional emf. Take lambda_0 = 7.52e-06, v_0 = 177.98, rho = 860, Delta_S_h = -1.88, v = 1.3.",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "asked_name": "motional emf",
   "expect": "refuse",
@@ -449,7 +449,7 @@
  },
  {
   "id": "SEL-047",
-  "q": "A system has l = 0.666, B = 0.19, v_d = 0.998. Compute p_f.",
+  "q": "Suppose v_d = 11.8, l = 0.334, B = 39.12, k = 34.1. Estimate p_f.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "asked_name": "Magnitude of photon\u2019s momentum",
   "expect": "refuse",
@@ -457,7 +457,7 @@
  },
  {
   "id": "SEL-048",
-  "q": "For d = 6, lambda = 3.95e-07, m = 0.39, P = 15.75, what is first law of thermodynamics?",
+  "q": "Determine first law. Starting from T = 7.93, k = 835, lambda = 1.36e-11, v = 190000000, R = 13.3.",
   "record": "Delta_E_int=Q-W | Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "asked_name": "First law of thermodynamics",
   "expect": "refuse",
@@ -465,7 +465,7 @@
  },
  {
   "id": "SEL-049",
-  "q": "Estimate acceleration from a speed reached in a given time. With Q = 158.1, Delta_p = 2633.96, W = 57.15.",
+  "q": "Find the acceleration. If W = 2.53, Q = 7.4.",
   "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:v_c | standard conditions | fit:high",
   "asked_name": "acceleration from a speed reached in a given time",
   "expect": "refuse",
@@ -473,7 +473,7 @@
  },
  {
   "id": "SEL-050",
-  "q": "With k = 8.847, vf = 2.27, f_2 = 1176, v_c = 133, t_1 = 0.383, what was a_C?",
+  "q": "Compute a_C. Starting from t_1 = 0.458, f = 4080000, v_c = 1.28.",
   "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "Centripetal acceleration",
   "expect": "refuse",
@@ -481,7 +481,7 @@
  },
  {
   "id": "SEL-051",
-  "q": "Measurements give r = 155, v = 2.165. Determine the beat frequency.",
+  "q": "Estimate the beat frequency. Assume v = 74.5, Q_h = 2501, m = 44.1, r = 570.",
   "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
   "asked_name": "beat frequency",
   "expect": "refuse",
@@ -489,7 +489,7 @@
  },
  {
   "id": "SEL-052",
-  "q": "Calculate x_2. Given Delta_m = 3.39e-29, f_1 = 46.8, f_2 = 4.",
+  "q": "Starting from f_1 = 103, f_2 = 13, what is the distance travelled at constant speed?",
   "record": "x_2=v*t_2 | t_2:s v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "distance travelled at constant speed",
   "expect": "refuse",
@@ -497,7 +497,7 @@
  },
  {
   "id": "SEL-053",
-  "q": "Suppose v_w = 750, t_2 = 30.1, v = 5.08. What was potential-energy function of a harmonic oscillator?",
+  "q": "Estimate the potential-energy function. You are told I = 16.67, t_2 = 0.39, K = 9.61e-20, v = 11.9, r = 0.839.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "asked_name": "Potential-energy function of a harmonic oscillator",
   "expect": "refuse",
@@ -505,7 +505,7 @@
  },
  {
   "id": "SEL-054",
-  "q": "In a setup with d_0 = 350.5, m = 6.07e-26, omega = 182.9, P = 485, x = 0.59, what is the speed?",
+  "q": "Given k = 2.928, N_0 = 15, omega = 0.107, x = 0.3, what was speed?",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "asked_name": "speed of the centre of mass of a rolling object",
   "expect": "refuse",
@@ -513,7 +513,7 @@
  },
  {
   "id": "SEL-055",
-  "q": "What was wavelength? Take E_1 = 2.27e-19, r = 0.833, F = 523, omega = 472.",
+  "q": "A system has omega = 394, r = 0.41. What is the wavelength?",
   "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
   "asked_name": "wavelength in a medium",
   "expect": "refuse",
@@ -521,7 +521,7 @@
  },
  {
   "id": "SEL-056",
-  "q": "What is V? Suppose k = 35.73, lambda_0 = 0.000358, E = 8.4e-18.",
+  "q": "Assume v = 6.32, vf = 2.11, x = 4.58, lambda_0 = 1.07e-05. What was motional emf?",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "asked_name": "motional emf",
   "expect": "refuse",
@@ -529,7 +529,7 @@
  },
  {
   "id": "SEL-057",
-  "q": "What was the magnitude of photon\u2019s momentum? Measurements give l = 0.558, K_B = 2.053, v_d = 52.26, B = 99.",
+  "q": "A system has v_d = 15.6, Delta_f = 6280000, B = 3.68, l = 0.23. Find magnitude of photon\u2019s momentum.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "asked_name": "Magnitude of photon\u2019s momentum",
   "expect": "refuse",
@@ -537,7 +537,7 @@
  },
  {
   "id": "SEL-058",
-  "q": "In a setup with E = 4.01e-15, R = 920, lambda = 2.03e-10, v_0 = 5.77, V = 566, calculate first law of thermodynamics.",
+  "q": "Consider a case where Delta_f = 322000000, lambda = 1.93e-07, V = 920, E = 4.01e-15. Find first law of thermodynamics.",
   "record": "Delta_E_int=Q-W | Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "asked_name": "First law of thermodynamics",
   "expect": "refuse",
@@ -545,7 +545,7 @@
  },
  {
   "id": "SEL-059",
-  "q": "What is acceleration? In a setup with Q = 1.37, W = 138.4.",
+  "q": "Measurements give tau = 342, W = 1.37, Q = 20.9, r = 9.259, v = 2. What is acceleration?",
   "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:v_c | standard conditions | fit:high",
   "asked_name": "acceleration from a speed reached in a given time",
   "expect": "refuse",
@@ -553,7 +553,7 @@
  },
  {
   "id": "SEL-060",
-  "q": "Assume f = 811000000000000, t_1 = 46, R = 0.016, theta = 3.87, v_c = 14.96. Calculate the centripetal acceleration.",
+  "q": "The values are t_1 = 0.023, a_t = 778, v_c = 2.65, n = 7. What is the centripetal acceleration?",
   "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "Centripetal acceleration",
   "expect": "refuse",
@@ -561,7 +561,7 @@
  },
  {
   "id": "SEL-061",
-  "q": "For v = 268, r = 4.35, what was beat frequency?",
+  "q": "Calculate f_B. Using omega = 439.3, v = 0.859, r = 0.051, theta_image = 0.051, n = 2.",
   "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
   "asked_name": "beat frequency",
   "expect": "refuse",
@@ -569,7 +569,7 @@
  },
  {
   "id": "SEL-062",
-  "q": "Estimate the distance travelled. A system has q = 2.07e-07, f_2 = 5, f_1 = 26.7, Delta_E_LK = 1.26e-16, vi = 65.6.",
+  "q": "Calculate distance travelled. If v_0 = 95.5, f_2 = 7, f_1 = 660, Delta_s = 9.2.",
   "record": "x_2=v*t_2 | t_2:s v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "distance travelled at constant speed",
   "expect": "refuse",
@@ -577,7 +577,7 @@
  },
  {
   "id": "SEL-063",
-  "q": "For t_2 = 264.5, v = 34.1, what is U(x)?",
+  "q": "A system has t_2 = 88, v = 90.9, n_2 = 2.21, I = 132, P = 5750. Find potential-energy function of a harmonic oscillator.",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "asked_name": "Potential-energy function of a harmonic oscillator",
   "expect": "refuse",
@@ -585,7 +585,7 @@
  },
  {
   "id": "SEL-064",
-  "q": "A system has lambda = 2.1e-08, x = 0.202, omega = 90.9, omega_0 = 936. Determine the speed.",
+  "q": "Calculate speed. Measurements give omega = 11.3, E = 5.46e-16, theta = 0.752, rho = 2065, x = 0.82.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "asked_name": "speed of the centre of mass of a rolling object",
   "expect": "refuse",
@@ -593,7 +593,7 @@
  },
  {
   "id": "SEL-065",
-  "q": "The values are rho = 2065, r = 0.297, omega = 22.1. Determine wavelength in a medium.",
+  "q": "Where omega_0 = 7000, T = 3.34, m = 291.9, omega = 778, r = 0.19, compute lambda.",
   "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
   "asked_name": "wavelength in a medium",
   "expect": "refuse",
@@ -601,7 +601,7 @@
  },
  {
   "id": "SEL-066",
-  "q": "Estimate motional emf. Suppose theta_image = 0.285, Delta_E = 4.41e-11, lambda_0 = 6.65e-07.",
+  "q": "Consider a case where v_w = 392, lambda_0 = 3.83e-05, lambda = 0.054, m = 1.77e-26, N = 50. What was V?",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "asked_name": "motional emf",
   "expect": "refuse",
@@ -609,7 +609,7 @@
  },
  {
   "id": "SEL-067",
-  "q": "Assume m_2 = 9600, n = 12, l = 0.392, v_d = 92.3, B = 35.6. Determine magnitude of photon\u2019s momentum.",
+  "q": "Calculate magnitude of photon\u2019s momentum. With B = 8.6, s = 234, l = 1.368, v_d = 21.8.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "asked_name": "Magnitude of photon\u2019s momentum",
   "expect": "refuse",
@@ -617,7 +617,7 @@
  },
  {
   "id": "SEL-068",
-  "q": "Determine first law. Take lambda = 3.46e-10, y_0 = 24.8, v_w = 365, r = 5.48.",
+  "q": "Suppose Delta_S_h = -18.2, Delta_f = 21800000000, V_0 = 1.13, lambda = 1.38e-10. Determine the first law of thermodynamics.",
   "record": "Delta_E_int=Q-W | Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "asked_name": "First law of thermodynamics",
   "expect": "refuse",
@@ -625,7 +625,7 @@
  },
  {
   "id": "SEL-069",
-  "q": "If W = 1205.4, l = 0.208, Q = 3.81, determine the acceleration from a speed reached in a given time.",
+  "q": "If W = 271.5, Q = 43.8, find the acceleration.",
   "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:v_c | standard conditions | fit:high",
   "asked_name": "acceleration from a speed reached in a given time",
   "expect": "refuse",
@@ -633,7 +633,7 @@
  },
  {
   "id": "SEL-070",
-  "q": "Assume v_c = 5.385, t_1 = 6.32. What was centripetal acceleration?",
+  "q": "Assume R_1 = 7.43, v_c = 0.25, t_1 = 2.16. What was the centripetal acceleration?",
   "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "Centripetal acceleration",
   "expect": "refuse",
@@ -641,7 +641,7 @@
  },
  {
   "id": "SEL-071",
-  "q": "Take r = 3.28, v = 0.74, I = 0.896. Estimate f_B.",
+  "q": "Using r = 188, v = 6.56, m = 1.53, estimate beat frequency.",
   "record": "f_B=|f_1-f_2| | f_1:Hz f_2:Hz | missing:f_1 | standard conditions | fit:high",
   "asked_name": "beat frequency",
   "expect": "refuse",
@@ -649,7 +649,7 @@
  },
  {
   "id": "SEL-072",
-  "q": "Calculate x_2. Using f_2 = 25, f_1 = 41.4.",
+  "q": "Determine the distance travelled at constant speed. Where V = 6.16, f_2 = 12, f_1 = 802.",
   "record": "x_2=v*t_2 | t_2:s v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "distance travelled at constant speed",
   "expect": "refuse",
@@ -657,7 +657,7 @@
  },
  {
   "id": "SEL-073",
-  "q": "What is the potential-energy function of a harmonic oscillator? Consider a case where t_2 = 790, k = 159.68, v = 2.108, f = 5.4e+18.",
+  "q": "With theta = 0.155, v = 0.64, t_2 = 0.8, F_o = 1027, f = 89.91, what was the potential-energy function?",
   "record": "U(x)=((1)/(2))*m*(omega)^(2)*(x)^(2) | m:kg omega:1/s x:m | missing:m | standard conditions | fit:high",
   "asked_name": "Potential-energy function of a harmonic oscillator",
   "expect": "refuse",
@@ -665,7 +665,7 @@
  },
  {
   "id": "SEL-074",
-  "q": "Estimate speed. Assume omega = 10.88, Q = 1.62e-06, m = 2.001, x = 0.785, F_o = 1027.",
+  "q": "Take x = 0.431, omega = 3.46, t = 96, theta = 3.59. Estimate the speed.",
   "record": "v_CM=r*omega | omega:1/s r:m | missing:r | standard conditions | fit:high",
   "asked_name": "speed of the centre of mass of a rolling object",
   "expect": "refuse",
@@ -673,7 +673,7 @@
  },
  {
   "id": "SEL-075",
-  "q": "Assume r = 0.065, x_f = 57.4, omega = 53.7, v_0x = 19.03. Determine the wavelength.",
+  "q": "Measurements give k = 158.11, r = 1.3, omega = 29.48. Determine wavelength in a medium.",
   "record": "lambda=lambda_0/n | lambda_0:m n:1 | missing:lambda_0 | standard conditions | fit:high",
   "asked_name": "wavelength in a medium",
   "expect": "refuse",
@@ -681,7 +681,7 @@
  },
  {
   "id": "SEL-076",
-  "q": "Measurements give lambda = 0.001, Delta_E_int = 130, x = 5.88, lambda_0 = 5.82e-08, r = 3.28. Estimate motional emf.",
+  "q": "Measurements give Q = 9.56e-06, lambda_0 = 3.44e-05, Delta_E = 2.79e-13, I = 1.974, q_0 = 1000. Compute V.",
   "record": "V=B*l*v_d | B:T l:m v_d:m/s | missing:B | standard conditions | fit:high",
   "asked_name": "motional emf",
   "expect": "refuse",
@@ -689,7 +689,7 @@
  },
  {
   "id": "SEL-077",
-  "q": "Take B = 44.01, l = 0.314, v_d = 0.43. Calculate magnitude of photon\u2019s momentum.",
+  "q": "What is p_f? Using l = 0.302, v_d = 0.35, B = 28.1.",
   "record": "p_f=((h)/(lambda)) | h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
   "asked_name": "Magnitude of photon\u2019s momentum",
   "expect": "refuse",
@@ -697,7 +697,7 @@
  },
  {
   "id": "SEL-078",
-  "q": "What is the first law? Take m = 860, vi = 878, I_1 = 0.35, theta = 1.698, lambda = 2.26e-09.",
+  "q": "With v_wy = 0.452, lambda = 1.04e-10, v_0 = 35.3, what is first law of thermodynamics?",
   "record": "Delta_E_int=Q-W | Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
   "asked_name": "First law of thermodynamics",
   "expect": "refuse",
@@ -705,7 +705,7 @@
  },
  {
   "id": "SEL-079",
-  "q": "With W = 96.2, Q = 61.1, v_0 = 35.3, what is acceleration from a speed reached in a given time?",
+  "q": "Take F_o = 18.58, W = 97.2, m = 2.48, A_x = 488, Q = 940. What was acceleration?",
   "record": "a=((v_c)/(t_1)) | t_1:s v_c:m/s | missing:v_c | standard conditions | fit:high",
   "asked_name": "acceleration from a speed reached in a given time",
   "expect": "refuse",
@@ -713,7 +713,7 @@
  },
  {
   "id": "SEL-080",
-  "q": "Take F_o = 18.58, v_c = 40.8, m = 2.48, I = 11.1, t_1 = 16.92. What was a_C?",
+  "q": "Consider a case where v_c = 81, t_1 = 0.081, x_0 = 177.5. What is the centripetal acceleration?",
   "record": "a_C=(((v)^(2))/(r)) | r:m v:m/s | missing:v | standard conditions | fit:high",
   "asked_name": "Centripetal acceleration",
   "expect": "refuse",
