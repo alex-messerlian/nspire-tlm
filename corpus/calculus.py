@@ -70,11 +70,11 @@ NOTABLE = {
         "d{lhs}/d{v} = {r}. Differentiate a position with respect to time and you get velocity, "
         "and that is not a coincidence: it is what velocity means.",
     ("K=0.5*m*(v)^(2)", "v"):
-        "d{lhs}/d{v} = {r}, and m*v is momentum. Momentum is the derivative of kinetic energy "
-        "with respect to speed, which is why the two always move together.",
+        "d{lhs}/d{v} = {r}, which is the momentum of the same body. Differentiating an energy "
+        "with respect to speed gives a momentum, and that is why the two move together.",
     ("U=m*g*h", "h"):
-        "d{lhs}/d{v} = {r}, which is the weight. A force is the gradient of a potential energy, "
-        "so differentiating m*g*h gives back m*g.",
+        "d{lhs}/d{v} = {r}, which is the weight. Differentiating a potential energy with respect "
+        "to height gives back the force that stored it.",
 }
 
 I_FRAMES = [
