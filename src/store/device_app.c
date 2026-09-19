@@ -432,6 +432,34 @@ void app_request(const char *question, const char *rid) {
      * prompt regardless. */
     static char prompt[NS_PROMPT_MAX];
     static ns_ask ask;
+
+    /* A115. THE EARLIER TURNS, PREPENDED. app_context() was written, carefully, and had no caller:
+     * every turn on this calculator was turn one. docs/RESULT_FOLLOWUP_UNWIRED.md records why
+     * wiring it alone would have been wrong -- a second turn's prompt shape occurred in 0 of
+     * 239,853 training documents, and RESULT_CANNOT_EXPLAIN is what this repo gets when the runtime
+     * emits a shape the corpus does not have. The F1 tier is the other half and ships with this.
+     *
+     * IT GOES IN BEFORE ask_build, NOT AFTER. The context has to be visible to RETRIEVAL, not just
+     * to the model: a follow-up names no relation -- "recompute" or "what units is that in?" --
+     * and on its own retrieves nothing useful ("now v = 5" returns `wedge`, measured). Concatenated
+     * with the earlier question it retrieves the right record. ask_build then strips the
+     * assignments out of BOTH turns and ns_assemble appends the given list canonically, with
+     * A113's last-wins so a restated value overrides instead of appearing twice.
+     *
+     * app_begin_turn() above has already pushed this turn, and app_context excludes the pending
+     * one, so what comes back is strictly the EARLIER turns.
+     *
+     * 200 chars, against the model's 512-token context at a measured 2.564 chars/token. The record
+     * span, the question and the answer take most of the window; this is about two verbatim turns
+     * at app_context's own 90-character truncation, and it degrades by dropping the oldest rather
+     * than by truncating mid-question. */
+    static char ctxq[NS_PROMPT_MAX];
+    char ctx[256];
+    if (app_context(ctx, sizeof ctx, 200) > 0) {
+        snprintf(ctxq, sizeof ctxq, "%s%s", ctx, question);
+        question = ctxq;
+    }
+
     ask_build(&ST, question, &ask);
     const ns_input in = ask.in;
     question = ask.question;

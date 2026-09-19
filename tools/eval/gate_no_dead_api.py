@@ -42,8 +42,11 @@ EXEMPT = {}
 # run and are the list this gate exists to drive to empty. See the header for why they do
 # not fail the suite today. A NEW dead declaration fails immediately.
 OPEN = {
-    "app_context": "docs/RESULT_FOLLOWUP_UNWIRED.md -- follow-up questions are not wired to the "
-                   "device, and the corpus has 0 two-turn documents, so both halves ship together",
+    # app_context was here and is CLOSED by A115: device_app.c:458 calls it before ask_build, and
+    # the F1 tier supplies the two-turn documents that make the shape trained rather than novel.
+    # The entry is removed rather than kept "for the record" -- this file's own header says a stale
+    # exemption is how a real defect gets protected from the next audit, and the gate failed until
+    # it was removed, which is the behaviour that makes that rule hold.
     "app_hit_control": "docs/RESULT_FOLLOWUP_UNWIRED.md -- found by the same sweep; app_event "
                        "already routes clicks, so this is probably deletable rather than wirable",
 }

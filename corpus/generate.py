@@ -2369,8 +2369,13 @@ REARRANGE = float(os.environ.get("REARRANGE", "1"))
 # physics, so the question is how one physical quantity changes with another. Measured before
 # building: 398 of 405 (record, variable) pairs differentiate cleanly. See corpus/calculus.py.
 import calculus as _CA
+import followup as _FU
 
 CALCULUS = float(os.environ.get("CALCULUS", "1"))
+# A115. FOLLOW-UPS. docs/RESULT_FOLLOWUP_UNWIRED.md: app_context() builds a conversation history and
+# nothing calls it, and a second turn's prompt shape occurs in 0 of 239,853 documents. The two
+# halves ship together -- this is the corpus half.
+FOLLOWUP = float(os.environ.get("FOLLOWUP", "1"))
 
 # WRITTEN EXPLANATIONS for the 164 compute records, keyed by formula. Three variants each, every
 # one under 215 chars, pure ASCII, using only variables the record declares, grounded in that
@@ -3500,6 +3505,44 @@ def gen(n, seed=0):
         _at = max(1, dfire.pop("attempts"))
         print("    precondition firing: " +
               "  ".join(f"{k} {v:,} ({100*v/_at:.2f}%)" for k, v in dfire.items()))
+
+    # ---- F1 FOLLOW-UPS, appended ---------------------------------------------------------------
+    # THE WHOLE PROMPT COMES FROM build/devprompt, which is the device's own assembler driving the
+    # same ask_parse, ask_rank and ns_assemble the calculator runs. A second turn reaches the model
+    # as app_context's "Earlier: <q1> " concatenated with the new question, and the device then
+    # rewrites that: it strips every assignment out of the prose and appends the given list
+    # canonically, with A113's last-wins applied so a restated value overrides rather than
+    # appearing twice. Reproducing any of that here would be a second implementation of the
+    # assembler -- the defect this repo has found five times -- so F1 asks the device instead.
+    if FOLLOWUP > 0:
+        def _devprompt(text):
+            r = subprocess.run(["build/devprompt", "build/store.tns", text, "0"],
+                               capture_output=True, text=True)
+            return next((l for l in r.stdout.split("\n") if l.startswith("<q>")), None)
+
+        fdocs, fskip, ffire = _FU.build(recs, _devprompt, _run_tool_text, rng,
+                                        lambda rec, var: (lambda w: sample_in_range(
+                                            rng, w[0], w[1], w[2]) if w else None)(
+                                            quantity_range(rec, var)),
+                                        preconditions_hold, lhs_unit)
+        if FOLLOWUP < 1:
+            rng.shuffle(fdocs)
+            fdocs = fdocs[:int(len(fdocs) * FOLLOWUP)]
+        fj = case_jitter(fdocs, rng)
+        for d in fdocs:
+            # The prompt is complete: question, given list and record span, exactly as the device
+            # built it. Only the tool call, the result and the answer are ours.
+            tail = (f"{d['call']}<res>{d['res']}</res>" if d["call"] else "")
+            built.append({"head": d["head"], "kind": d["kind"], "ans": d["ans"],
+                          "text": f"{d['pre']}{tail}<a>{d['ans']}<end>"})
+        _fat = max(1, ffire.pop("attempts"))
+        import collections as _c3
+        print(f"  F1 follow-ups: {len(fdocs):,} documents over "
+              f"{len({d['head'] for d in fdocs}):,} records  "
+              f"{dict(_c3.Counter('compute' if d['call'] else 'concept' for d in fdocs))}")
+        print(f"    case jitter flipped {fj:,} ({100*fj/max(1,len(fdocs)):.1f}%)")
+        print("    firing: " +
+              "  ".join(f"{k} {v:,} ({100*v/_fat:.2f}%)" for k, v in ffire.items()))
     return built, dropped
 
 # ---- diversity metrics -------------------------------------------------------
