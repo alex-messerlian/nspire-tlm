@@ -2340,5 +2340,88 @@
   "req": "vectors add component by component; each component is signed",
   "verified": "gates-passed-hand-coverage-unproven",
   "rid": "ab4a4773"
+ },
+ {
+  "f": "N=N_0*exp(-lambda*t)",
+  "name": "number of undecayed nuclei after a time",
+  "units": {
+   "N": "1",
+   "N_0": "1",
+   "lambda": "1/s",
+   "t": "s"
+  },
+  "scope": "A100-explog",
+  "req": "a large sample, so the average is smooth; lambda is the decay constant, not a wavelength",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "967f8e81"
+ },
+ {
+  "f": "t_half=ln(2)/lambda",
+  "name": "half-life from the decay constant",
+  "units": {
+   "t_half": "s",
+   "lambda": "1/s"
+  },
+  "scope": "A100-explog",
+  "req": "exponential decay only; the half-life does not depend on how much you started with",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "9aa3778e"
+ },
+ {
+  "f": "q=q_0*exp(-((t)/(tau)))",
+  "name": "charge remaining on a discharging capacitor",
+  "units": {
+   "q": "C",
+   "q_0": "C",
+   "t": "s",
+   "tau": "s"
+  },
+  "scope": "A100-explog",
+  "req": "a capacitor discharging through a resistor, where tau = R*C",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "a33dc3d5"
+ },
+ {
+  "f": "beta=10*log(((I)/(I_0)))",
+  "name": "sound intensity level in decibels",
+  "units": {
+   "beta": "1",
+   "I": "W/m^2",
+   "I_0": "W/m^2"
+  },
+  "scope": "A100-explog",
+  "req": "I_0 is the threshold of hearing, 1e-12 W/m^2, which is what makes 0 dB mean 'just audible'",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "52ac06fe",
+  "cval": {
+   "I_0": "1e-12"
+  }
+ },
+ {
+  "f": "I=I_0*exp(-mu*x)",
+  "name": "intensity remaining after absorption through a thickness",
+  "units": {
+   "I": "W/m^2",
+   "I_0": "W/m^2",
+   "mu": "1/m",
+   "x": "m"
+  },
+  "scope": "A100-explog",
+  "req": "a uniform absorber and a narrow beam; mu is the linear attenuation coefficient",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "917047f2"
+ },
+ {
+  "f": "A_act=lambda*N",
+  "name": "activity of a radioactive sample",
+  "units": {
+   "A_act": "1/s",
+   "lambda": "1/s",
+   "N": "1"
+  },
+  "scope": "A100-explog",
+  "req": "activity is decays per second, so it falls as the sample does",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "cecef3de"
  }
 ]

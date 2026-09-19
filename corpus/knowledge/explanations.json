@@ -1879,5 +1879,71 @@
   ],
   "grounded": false,
   "anchor": "A99 hand-written"
+ },
+ {
+  "formula": "N=N_0*exp(-lambda*t)",
+  "name": "number of undecayed nuclei after a time",
+  "variants": [
+   "Radioactive nuclei do not age. Each one has the same chance of going in the next second, so the population falls by the same FRACTION each second: N = N_0*exp(-lambda*t).",
+   "N = N_0*exp(-lambda*t) never quite reaches zero, which is why decay is quoted as a half-life rather than a finish time. Bigger lambda means a twitchier nucleus and a faster fall.",
+   "Start with N_0 nuclei and wait. The survivors are N = N_0*exp(-lambda*t). The curve is steep early simply because there are more left to decay, not because they decay faster."
+  ],
+  "grounded": false,
+  "anchor": "A100 hand-written"
+ },
+ {
+  "formula": "t_half=ln(2)/lambda",
+  "name": "half-life from the decay constant",
+  "variants": [
+   "Half-life is the time to lose half of whatever you have: t_half = ln(2)/lambda. The ln(2) is there because halving is what we chose to measure; the physics is all in lambda.",
+   "t_half = ln(2)/lambda does not mention how much you started with, and that is the whole point. A gram and a tonne of the same isotope halve in exactly the same time.",
+   "A short half-life means a large lambda, since t_half = ln(2)/lambda. Carbon-14 takes 5730 years; some nuclei manage it in microseconds."
+  ],
+  "grounded": false,
+  "anchor": "A100 hand-written"
+ },
+ {
+  "formula": "q=q_0*exp(-((t)/(tau)))",
+  "name": "charge remaining on a discharging capacitor",
+  "variants": [
+   "A capacitor empties fastest when it is fullest, because the charge left is what pushes the current. q = q_0*exp(-t/tau) is that feedback written down.",
+   "q = q_0*exp(-t/tau) falls to about 37 percent of q_0 after one tau, and tau is just R*C. A bigger resistor slows the leak; a bigger capacitor gives it more to leak.",
+   "After 5 tau there is under one percent of q_0 left, which is why circuits treat 5 tau as fully discharged. q = q_0*exp(-t/tau) never actually gets to zero."
+  ],
+  "grounded": false,
+  "anchor": "A100 hand-written"
+ },
+ {
+  "formula": "beta=10*log(((I)/(I_0)))",
+  "name": "sound intensity level in decibels",
+  "variants": [
+   "Hearing is logarithmic, so the decibel scale is too: beta = 10*log(I/I_0). Ten times the intensity is only 10 dB more, which is why a rock concert is not a thousand times louder than speech.",
+   "beta = 10*log(I/I_0) measures against I_0, the quietest audible sound. That is why 0 dB is the threshold of hearing rather than silence, and why a quiet room can read below zero.",
+   "Double the intensity and beta = 10*log(I/I_0) rises by about 3 dB, not by double. Adding a second identical speaker is a much smaller change than it sounds like it should be."
+  ],
+  "grounded": false,
+  "anchor": "A100 hand-written"
+ },
+ {
+  "formula": "I=I_0*exp(-mu*x)",
+  "name": "intensity remaining after absorption through a thickness",
+  "variants": [
+   "Each millimetre of absorber removes the same FRACTION of what reaches it, not the same amount, so I = I_0*exp(-mu*x). Doubling the shielding squares the reduction.",
+   "I = I_0*exp(-mu*x) is why lead shielding is quoted in half-value layers. A large mu means a strongly absorbing material and a beam that dies in a short distance.",
+   "The beam thins but never quite stops: I = I_0*exp(-mu*x) stays above zero for any finite x. That is the mathematical reason radiation shielding is about how much, not whether."
+  ],
+  "grounded": false,
+  "anchor": "A100 hand-written"
+ },
+ {
+  "formula": "A_act=lambda*N",
+  "name": "activity of a radioactive sample",
+  "variants": [
+   "Activity counts decays per second: A_act = lambda*N. It depends on how many nuclei are left, so it falls as the sample does, on exactly the same curve.",
+   "A_act = lambda*N explains why a tiny amount of a short-lived isotope can be more dangerous than a lot of a long-lived one. A large lambda makes up for a small N.",
+   "A_act = lambda*N is what a Geiger counter responds to, not the mass of the sample. Two samples with the same number of nuclei but different lambda read very differently."
+  ],
+  "grounded": false,
+  "anchor": "A100 hand-written"
  }
 ]

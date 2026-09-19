@@ -732,6 +732,31 @@ _PRECONDITION = {
     # mu_s <= ~1.5 for the best dry rubber-on-clean-steel; a rolling body cannot be driven past
     # a_t = mu_s * g ~ 15 m/s^2 without slipping, and machine spin-up rigs reach ~10^3 m/s^2 only
     # with positive engagement. 2e3 m/s^2 is generous for both and still excludes the absurd.
+    # A100. THE EXPONENT OF A DECAY IS A PRODUCT OF FREE GIVENS AND NOTHING BOUNDED IT.
+    #
+    # Found by reading generated documents, not by any check: lambda = 90 /s drawn against t = 5.73 s
+    # gives exp(-515.7) and an answer of 3.1e-224. That is not a bad tail, it is a document that
+    # teaches nothing -- every decay question whose exponent exceeds about 10 has the same answer,
+    # zero, whatever the physics.
+    #
+    # The window is [0.01, 5]: one percent decayed at the bottom, 99.3 percent at the top. Below it
+    # the answer is indistinguishable from the initial value and the relation is invisible; above it
+    # the answer is indistinguishable from zero and the relation is invisible again. The interesting
+    # region is exactly where a half-life or two has passed, which is what a textbook asks about.
+    #
+    # These are PRECONDITIONS, not derivations: three independently drawn values satisfy them often
+    # enough that nothing is dropped at a rate worth reporting. The projectile coupling is the
+    # cautionary case -- 98.12% firing and 58.77% of documents dropped after 24 retries, which is a
+    # check nearly deleting its own record rather than filtering it.
+    "N=N_0*exp(-lambda*t)":      (lambda v: 0.01 <= v["lambda"] * v["t"] <= 5.0,
+                                  "the decay exponent lambda*t in [0.01, 5]: 1% to 99.3% decayed, "
+                                  "which is the region where the relation is visible at all"),
+    "I=I_0*exp(-mu*x)":          (lambda v: 0.01 <= v["mu"] * v["x"] <= 5.0,
+                                  "the attenuation exponent mu*x in [0.01, 5]; beyond it the beam "
+                                  "is numerically gone and every answer is zero"),
+    "q=q_0*exp(-((t)/(tau)))":   (lambda v: 0.01 <= v["t"] / v["tau"] <= 5.0,
+                                  "elapsed time in [0.01, 5] time constants: 5*tau is when a "
+                                  "circuit is treated as fully discharged"),
     "a_CM=R*alpha":              (lambda v: v["R"] * v["alpha"] <= 2.0e3,
                                   "R*alpha IS the tangential acceleration a surface must transmit: past ~2e3 m/s^2 no traction or coupling holds"),
     "a_t=r*alpha":               (lambda v: v["r"] * v["alpha"] <= 2.0e3,
@@ -1239,6 +1264,12 @@ _RESULT_RANGE = {
                                 "MAGNITUDE is too; the ceiling is generous and only excludes the absurd"),
     "angle_atan":  (-1.5708, 1.5708, "atan returns to the first or fourth quadrant, so its result "
                                      "lies in [-pi/2, pi/2] whatever the ratio"),
+    # A100.
+    "count_nonneg": (0.0, 1.0e30, "a number of nuclei cannot be negative, and decay only ever "
+                                  "reduces it; the ceiling is above Avogadro and excludes only the absurd"),
+    "activity_bq":  (0.0, 1.0e24, "an activity in decays per second is non-negative"),
+    "duration_s":   (1.0e-9, 1.0e18, "a half-life runs from nanoseconds to longer than the "
+                                     "universe has existed, and is always positive"),
     # A simple magnifier magnifies, by the definition of the device. Was (1e-3, 1e4), under which
     # M < 1 on 49.9% of documents with a median of exactly 1.00 -- half the corpus stating that a
     # magnifier does not.
@@ -1273,6 +1304,22 @@ _RESULT_RANGE = {
 #
 # So the honest count is two numbers, and gen() prints both: 164/164 declared, 30 of them bounded.
 _RESULT_KIND = {
+    # A100 EXPONENTIAL AND LOGARITHMIC RECORDS. The store had ZERO of each, which meant radioactive
+    # decay, half-life, RC discharge, absorption and the decibel scale were all absent -- a whole
+    # branch of physics missing rather than a thin one.
+    #
+    # Every decay result is a FRACTION OF WHAT YOU STARTED WITH, so the bound is not a magnitude
+    # guess: exp of a negative number lies in (0, 1], and the result therefore lies in (0, initial].
+    # That is a real constraint and it fires on a sign error, which is the failure mode here -- an
+    # exponent whose sign flips turns decay into growth and the number explodes rather than shrinks.
+    'N=N_0*exp(-lambda*t)':                                    "count_nonneg",
+    'q=q_0*exp(-((t)/(tau)))':                                 None,
+    'I=I_0*exp(-mu*x)':                                        None,
+    'A_act=lambda*N':                                          "activity_bq",
+    't_half=ln(2)/lambda':                                     "duration_s",
+    # A decibel level is SIGNED: below the reference intensity the log is negative, and 0 dB is the
+    # threshold of hearing rather than silence. Bounding it positive would be false physics.
+    'beta=10*log(((I)/(I_0)))':                                None,
     # A99 VECTOR RECORDS. Each is a DECISION, and `None` here means "reviewed, no intrinsic bound",
     # never "nobody looked" -- a missing key is an assertion failure at import for exactly that
     # reason. A window whose only constraint is that its inputs were in range cannot fire, and

@@ -2243,5 +2243,73 @@
    "A_x": "m",
    "B_x": "m"
   }
+ },
+ {
+  "f": "N=N_0*exp(-lambda*t)",
+  "name": "number of undecayed nuclei after a time",
+  "scope": "A100-explog",
+  "source": "A100 exponential and log records",
+  "units": {
+   "N": "1",
+   "N_0": "1",
+   "lambda": "1/s",
+   "t": "s"
+  }
+ },
+ {
+  "f": "t_half=ln(2)/lambda",
+  "name": "half-life from the decay constant",
+  "scope": "A100-explog",
+  "source": "A100 exponential and log records",
+  "units": {
+   "t_half": "s",
+   "lambda": "1/s"
+  }
+ },
+ {
+  "f": "q=q_0*exp(-((t)/(tau)))",
+  "name": "charge remaining on a discharging capacitor",
+  "scope": "A100-explog",
+  "source": "A100 exponential and log records",
+  "units": {
+   "q": "C",
+   "q_0": "C",
+   "t": "s",
+   "tau": "s"
+  }
+ },
+ {
+  "f": "beta=10*log(((I)/(I_0)))",
+  "name": "sound intensity level in decibels",
+  "scope": "A100-explog",
+  "source": "A100 exponential and log records",
+  "units": {
+   "beta": "1",
+   "I": "W/m^2",
+   "I_0": "W/m^2"
+  }
+ },
+ {
+  "f": "I=I_0*exp(-mu*x)",
+  "name": "intensity remaining after absorption through a thickness",
+  "scope": "A100-explog",
+  "source": "A100 exponential and log records",
+  "units": {
+   "I": "W/m^2",
+   "I_0": "W/m^2",
+   "mu": "1/m",
+   "x": "m"
+  }
+ },
+ {
+  "f": "A_act=lambda*N",
+  "name": "activity of a radioactive sample",
+  "scope": "A100-explog",
+  "source": "A100 exponential and log records",
+  "units": {
+   "A_act": "1/s",
+   "lambda": "1/s",
+   "N": "1"
+  }
  }
 ]
