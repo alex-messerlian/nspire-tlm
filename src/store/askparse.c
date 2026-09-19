@@ -432,6 +432,34 @@ static int score_record(const ns_store2 *st, int r, const char *question,
         if (norm_expr(st->rec[r].formula, nf, (int)sizeof nf) >= 4 && strchr(nf, '=') &&
             norm_expr(question, nq, (int)sizeof nq) > 0 && strstr(nq, nf))
             c.score += 48 * (int)strlen(nf);
+
+        /* A110. THE RIGHT-HAND SIDE ON ITS OWN, because a CALCULUS question never writes the '='.
+         *
+         * The bonus above needs the whole relation, and a C1/C2/C3 question asks about an
+         * EXPRESSION: "what is the derivative of 0.5*m*(v)^(2) with respect to v". With no '=' it
+         * earned nothing here, and the expression's fragments then fuzzy-matched short glossary
+         * words. MEASURED on device: 0 of 40 derivative questions retrieved the right record, and
+         * all 40 returned the same one -- `ether`. A rate of exactly 0% with a CONSTANT wrong
+         * answer is a scorer defect, not a hard question, and the same question phrased as
+         * "derivative of kinetic energy with respect to v" retrieved correctly all along. The
+         * whole C1/C2/C3 tier -- 13,520 documents -- was unreachable through the device's own
+         * retrieval.
+         *
+         * The glossary bug this sits beside cannot come back through it: a glossary record's
+         * `formula` IS its term and carries no '=', so it has no right-hand side to match.
+         *
+         * AN OPERATOR IS REQUIRED, not merely length. Without it the RHS of `theta_r=theta_i` is a
+         * bare identifier and would match any question mentioning that variable, which is the
+         * fuzzy-noise failure this fixes, rearranged. */
+        const char *eq = strchr(nf, '=');
+        if (eq && norm_expr(question, nq, (int)sizeof nq) > 0) {
+            const char *rhs = eq + 1;
+            int has_op = 0;
+            for (const char *q = rhs; *q; q++)
+                if (*q == '*' || *q == '/' || *q == '+' || *q == '-' || *q == '^') has_op = 1;
+            if (has_op && strlen(rhs) >= 3 && strstr(nq, rhs))
+                c.score += 48 * (int)strlen(rhs);
+        }
     }
 
     /* A67. NAME COVERAGE. The score above is a SUM over matched name words, so a long name that
