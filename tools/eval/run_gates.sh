@@ -180,6 +180,8 @@ if ! _skip test_mutatectx; then $PY tools/eval/test_mutatectx.py >/dev/null 2>&1
 if ! _skip fit_cue; then $PY tools/eval/gate_fit_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "fit_cue" || { printf "  %-20s FAIL\n" "fit_cue"; fail=1; }; fi
 if ! _skip bare_pipe; then $PY tools/eval/gate_bare_pipe.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "bare_pipe" || { printf "  %-20s FAIL\n" "bare_pipe"; fail=1; }; fi
 if ! _skip explain_variants; then $PY tools/eval/gate_explain_variants.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "explain_variants" || { printf "  %-20s FAIL\n" "explain_variants"; fail=1; }; fi
+if ! _skip c3_physics; then $PY tools/eval/gate_c3_physics.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "c3_physics" || { printf "  %-20s FAIL\n" "c3_physics"; fail=1; }; fi
+if ! _skip probe_spacing; then $PY tools/eval/gate_probe_spacing.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "probe_spacing" || { printf "  %-20s FAIL\n" "probe_spacing"; fail=1; }; fi
 if ! _skip refusal_cue; then $PY tools/eval/gate_refusal_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "refusal_cue" || { printf "  %-20s FAIL\n" "refusal_cue"; fail=1; }; fi
 if ! _skip spare_given; then $PY tools/eval/gate_spare_given.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "spare_given" || { printf "  %-20s FAIL\n" "spare_given"; fail=1; }; fi
 if ! _skip d1_withheld; then $PY tools/eval/gate_d1_withheld.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "d1_withheld" || { printf "  %-20s FAIL\n" "d1_withheld"; fail=1; }; fi

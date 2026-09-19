@@ -18,7 +18,7 @@ THE PREDICATE IS THE PROPERTY, not a proxy for it: the relation printed in field
 span, compared to the relation passed as the first argument of the call. No normalisation, because
 these two strings are copied from the same source and any difference at all is the defect.
 """
-import json, pathlib, sys
+import json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "corpus/synth_sample.jsonl"
@@ -48,6 +48,21 @@ def scan(lines):
             rec = t.split("<r>", 1)[1].split(" | ", 1)[0]
             want = rec if whole else (rec.split("=", 1)[1] if "=" in rec else rec)
             got = t.split(tag, 1)[1].split("<arg>", 1)[0]
+            # A THIRD CASE ON THE SAME TOOL, SEPARATED BY ARITY. C2 is integ/2 and its integrand IS
+            # the record's RHS verbatim. C3 is integ/4 and BINDS the other givens to numbers, so the
+            # integrand can never equal the RHS -- 2,000 documents read as mismatches. Excluding C3
+            # would leave them unchecked, which is not the same as clean, so the assertion becomes
+            # the one that does hold: the integrand is the RHS with its symbols replaced by
+            # literals. Replace each parenthesised number and each non-integration identifier with
+            # one placeholder and the two must be equal.
+            if tool == "integ" and t.split(tag, 1)[1].split("</tool>", 1)[0].count("<arg>") == 3:
+                var = t.split(tag, 1)[1].split("<arg>")[1]
+                a = re.sub(r"\(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?\)", "#", got)
+                b = re.sub(rf"\b(?!{re.escape(var)}\b)[A-Za-z_][A-Za-z0-9_]*\b", "#", want)
+                b = re.sub(r"#\s*\(", "#(", b)
+                if a != b:
+                    bad.append((f"integ4: {b}", a, t[:110]))
+                break
             if want != got:
                 bad.append((f"{tool}: {want}", got, t[:110]))
             break

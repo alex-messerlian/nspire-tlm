@@ -77,6 +77,26 @@ def gen(model, prompt, maxlen=140):
                                  max_tokens=maxlen, sample=None)
 
 
+def _squash(s):
+    """Whitespace removed, because the TOKENIZER DECODES TAGS WITH SPACES.
+
+    THIS FUNCTION EXISTS BECAUSE ITS ABSENCE PRODUCED A PUBLISHED 0.0%. D7 and D8 reported
+    `called 0/12` and `right target 0/12` for every run, which read as a model that had learned
+    nothing from 19,728 R1 and C1 documents. The model was emitting
+
+        <tool> solve<arg> F=m*a<arg> m</tool><res> m=F/a</res><a> m=F/a -- same relation ...
+
+    which is CORRECT, and `"<tool>solve<arg>" in out` is False against it. The true figures on the
+    same checkpoint are called 6/12 = 50.0% and right target 6/12 = 50.0%.
+
+    The tell was in this file the whole time: the `stated result` arm three lines below each check
+    already compared with `.replace(" ", "")` and scored 50-58%, so one comparison in the function
+    was whitespace-insensitive and its neighbours were not. A rate of exactly 0% beside a rate of
+    50% on the same generations is the signature of an instrument, not an inability.
+    """
+    return re.sub(r"\s+", "", s)
+
+
 def rng_for(term):
     h = hashlib.sha256(("kprobe/v1:" + term).encode()).hexdigest()
     return random.Random(int(h[:16], 16))
@@ -296,12 +316,13 @@ def main():
             continue                      # retrieval found nothing; counted as a miss on all three
         out = gen(m, pre)
         a = answer_of(out)
-        if "<tool>solve<arg>" in out:
+        sq = _squash(out)
+        if "<tool>solve<arg>" in sq:
             called += 1
-            arg = out.split("<tool>solve<arg>", 1)[1]
+            arg = sq.split("<tool>solve<arg>", 1)[1]
             got_f = arg.split("<arg>", 1)[0]
             got_v = arg.split("<arg>", 1)[1].split("</tool>", 1)[0] if "<arg>" in arg else ""
-            if got_f == r["f"] and got_v == v:
+            if got_f == _squash(r["f"]) and got_v == _squash(v):
                 targeted += 1
         if a and want.replace(" ", "") in a.replace(" ", ""):
             answered += 1
@@ -348,12 +369,13 @@ def main():
             continue
         out = gen(m, pre)
         a = answer_of(out)
-        if "<tool>diff<arg>" in out:
+        sq = _squash(out)
+        if "<tool>diff<arg>" in sq:
             cal_called += 1
-            arg = out.split("<tool>diff<arg>", 1)[1]
+            arg = sq.split("<tool>diff<arg>", 1)[1]
             got_e = arg.split("<arg>", 1)[0]
             got_v = arg.split("<arg>", 1)[1].split("</tool>", 1)[0] if "<arg>" in arg else ""
-            if got_e == rhs and got_v == v:
+            if got_e == _squash(rhs) and got_v == _squash(v):
                 cal_targeted += 1
         if a and want.replace(" ", "") in a.replace(" ", ""):
             cal_answered += 1

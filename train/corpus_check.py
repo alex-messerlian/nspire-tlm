@@ -37,7 +37,10 @@ KNOWLEDGE_KINDS = {"K1", "K2", "K3"}
 # denominator. A second population arriving is not a rare event in this project; it is what every
 # week of it has produced. So the partition is NAMED now rather than implied, and the next tier
 # needs one line here instead of a debugging session before a training run.
-TOOL_TIER_KINDS = {"R1", "C1", "C2"}
+# C3 is sized by C3_DOSE over five declared accumulations, exactly as R1/C1/C2 are sized by
+# the store and their dose. Leaving it out counted its 2,000 documents against the N-sized
+# compute band, which is the band this guard exists to hold steady.
+TOOL_TIER_KINDS = {"R1", "C1", "C2", "C3"}
 SIZED_ELSEWHERE = KNOWLEDGE_KINDS | TOOL_TIER_KINDS
 BANDS = {"D1": (0.08, 0.12), "D2": (0.03, 0.07)}
 

@@ -3430,6 +3430,45 @@ def gen(n, seed=0):
         print(f"    {sum(sk2.values())} (record, variable) pairs skipped {dict(sk2)}: the tool "
               f"declined or rendered badly, and a document whose <res> is an error code teaches "
               f"the model to ask for what it cannot have")
+
+        # ---- C3 DEFINITE INTEGRALS ------------------------------------------------------------
+        # The bounds come from the SAME declared windows every given is drawn from. Passing the
+        # sampler in rather than letting calculus.py hold its own is the point: two declarations of
+        # one fact is the defect this repo has found four times (units_train, store.tns,
+        # units_holdout, _MICRO_CVAL), and a window invented beside the real one would be the fifth.
+        def _c3_draw(rec, var):
+            w = quantity_range(rec, var)
+            if not w:
+                return None                       # UNDECLARED: skipped and counted, never invented
+            lo, hi, integral, _why = w
+            return sample_in_range(rng, lo, hi, integral)
+
+        ddocs, dskip, dfire = _CA.build_definite(recs, _run_tool_text, rng, _c3_draw)
+        if CALCULUS < 1:
+            rng.shuffle(ddocs)
+            ddocs = ddocs[:int(len(ddocs) * CALCULUS)]
+        dj = case_jitter(ddocs, rng)
+        dkept = 0
+        for d in ddocs:
+            rec = span_of.get(d["head"])
+            if not rec:
+                continue
+            built.append({"head": d["head"], "kind": d["kind"], "ans": d["ans"],
+                          "text": f"<q>{d['q']}</q><r>{rec}{d['call']}"
+                                  f"<res>{d['res']}</res><a>{d['ans']}<end>"})
+            dkept += 1
+        sk3 = _c2.Counter(x[2] for x in dskip)
+        print(f"  C3 definite integrals: {dkept:,} documents over "
+              f"{len({d['head'] for d in ddocs}):,} records "
+              f"(arity-4 integ, which the corpus trained 0 times before this)")
+        print(f"    case jitter flipped {dj:,} ({100*dj/max(1,len(ddocs)):.1f}%)")
+        print(f"    {sum(sk3.values())} (record, variable) pairs skipped {dict(sk3)}")
+        # FIRING RATES, PRINTED. A bound nobody has watched fire is a claim and not a check, and a
+        # rule at 0.00% is decorative rather than strict -- `cap` is subsumed by the interval and
+        # the scoped given windows and is documented as such in calculus.py.
+        _at = max(1, dfire.pop("attempts"))
+        print("    precondition firing: " +
+              "  ".join(f"{k} {v:,} ({100*v/_at:.2f}%)" for k, v in dfire.items()))
     return built, dropped
 
 # ---- diversity metrics -------------------------------------------------------
