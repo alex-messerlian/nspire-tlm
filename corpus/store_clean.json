@@ -2247,5 +2247,98 @@
   "cval": {
    "h": "6.626e-34"
   }
+ },
+ {
+  "f": "v_x=v*cos(theta)",
+  "name": "x component of a vector",
+  "units": {
+   "v_x": "m/s",
+   "v": "m/s",
+   "theta": "1"
+  },
+  "scope": "A99-vector",
+  "req": "theta measured from the +x axis; the component is signed and goes negative past 90 degrees",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "884d3e9f"
+ },
+ {
+  "f": "v_y=v*sin(theta)",
+  "name": "y component of a vector",
+  "units": {
+   "v_y": "m/s",
+   "v": "m/s",
+   "theta": "1"
+  },
+  "scope": "A99-vector",
+  "req": "theta measured from the +x axis; the component is signed",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "739fda53"
+ },
+ {
+  "f": "v=sqrt(((v_x))^(2)+((v_y))^(2))",
+  "name": "magnitude of a vector from its components",
+  "units": {
+   "v": "m/s",
+   "v_x": "m/s",
+   "v_y": "m/s"
+  },
+  "scope": "A99-vector",
+  "req": "two perpendicular components; the magnitude is never negative",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "08697c33"
+ },
+ {
+  "f": "theta=atan(((v_y)/(v_x)))",
+  "name": "direction of a vector from its components",
+  "units": {
+   "theta": "1",
+   "v_y": "m/s",
+   "v_x": "m/s"
+  },
+  "scope": "A99-vector",
+  "req": "returns an angle in the first or fourth quadrant; add pi when v_x is negative",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "3f1808af"
+ },
+ {
+  "f": "W=F*d*cos(theta)",
+  "name": "work done by a force at an angle to the displacement",
+  "units": {
+   "W": "J",
+   "F": "N",
+   "d": "m",
+   "theta": "1"
+  },
+  "scope": "A99-vector",
+  "req": "the scalar product: only the component of F along d does work, so a perpendicular force does none",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "b4d24696"
+ },
+ {
+  "f": "tau=r*F*sin(theta)",
+  "name": "magnitude of torque from a force at an angle",
+  "units": {
+   "tau": "N*m",
+   "r": "m",
+   "F": "N",
+   "theta": "1"
+  },
+  "scope": "A99-vector",
+  "req": "the vector product magnitude: only the component of F perpendicular to r turns anything",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "faa3d71d"
+ },
+ {
+  "f": "R_x=A_x+B_x",
+  "name": "component of a resultant vector",
+  "units": {
+   "R_x": "m",
+   "A_x": "m",
+   "B_x": "m"
+  },
+  "scope": "A99-vector",
+  "req": "vectors add component by component; each component is signed",
+  "verified": "gates-passed-hand-coverage-unproven",
+  "rid": "ab4a4773"
  }
 ]

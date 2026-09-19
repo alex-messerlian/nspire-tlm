@@ -2164,5 +2164,84 @@
   },
   "scope": "m58382",
   "source": "store: core relation the eval set tests 7 times, annotated from the hand-curated store entry rather than re-derived"
+ },
+ {
+  "f": "v_x=v*cos(theta)",
+  "name": "x component of a vector",
+  "scope": "A99-vector",
+  "source": "A99 vector records",
+  "units": {
+   "v_x": "m/s",
+   "v": "m/s",
+   "theta": "1"
+  }
+ },
+ {
+  "f": "v_y=v*sin(theta)",
+  "name": "y component of a vector",
+  "scope": "A99-vector",
+  "source": "A99 vector records",
+  "units": {
+   "v_y": "m/s",
+   "v": "m/s",
+   "theta": "1"
+  }
+ },
+ {
+  "f": "v=sqrt(((v_x))^(2)+((v_y))^(2))",
+  "name": "magnitude of a vector from its components",
+  "scope": "A99-vector",
+  "source": "A99 vector records",
+  "units": {
+   "v": "m/s",
+   "v_x": "m/s",
+   "v_y": "m/s"
+  }
+ },
+ {
+  "f": "theta=atan(((v_y)/(v_x)))",
+  "name": "direction of a vector from its components",
+  "scope": "A99-vector",
+  "source": "A99 vector records",
+  "units": {
+   "theta": "1",
+   "v_y": "m/s",
+   "v_x": "m/s"
+  }
+ },
+ {
+  "f": "W=F*d*cos(theta)",
+  "name": "work done by a force at an angle to the displacement",
+  "scope": "A99-vector",
+  "source": "A99 vector records",
+  "units": {
+   "W": "J",
+   "F": "N",
+   "d": "m",
+   "theta": "1"
+  }
+ },
+ {
+  "f": "tau=r*F*sin(theta)",
+  "name": "magnitude of torque from a force at an angle",
+  "scope": "A99-vector",
+  "source": "A99 vector records",
+  "units": {
+   "tau": "N*m",
+   "r": "m",
+   "F": "N",
+   "theta": "1"
+  }
+ },
+ {
+  "f": "R_x=A_x+B_x",
+  "name": "component of a resultant vector",
+  "scope": "A99-vector",
+  "source": "A99 vector records",
+  "units": {
+   "R_x": "m",
+   "A_x": "m",
+   "B_x": "m"
+  }
  }
 ]

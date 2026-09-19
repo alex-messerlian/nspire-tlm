@@ -1802,5 +1802,82 @@
   ],
   "grounded": true,
   "anchor": "the OpenStax car-that-can-only-travel-at-certain-speeds analogy, and Planck's blackbody chunks feeding Einstein's photoelectric effect"
+ },
+ {
+  "formula": "v_x=v*cos(theta)",
+  "name": "x component of a vector",
+  "variants": [
+   "A vector pointing off at an angle still gets you somewhere sideways. How much is v_x = v*cos(theta). At theta = 0 it is all sideways; at a right angle the cosine is zero and none of it is.",
+   "Shine a light straight down on an arrow and the shadow it casts along the x axis is v_x = v*cos(theta). Tilt the arrow further and the shadow shrinks, which is the cosine doing its job.",
+   "v_x = v*cos(theta) splits a vector into the part that acts along x. Past 90 degrees the cosine turns negative, and so does v_x, which is the notation telling you it now points the other way."
+  ],
+  "grounded": false,
+  "anchor": "A99 hand-written"
+ },
+ {
+  "formula": "v_y=v*sin(theta)",
+  "name": "y component of a vector",
+  "variants": [
+   "The part of a vector that acts upward is v_y = v*sin(theta). At theta = 0 there is none of it, which is why a ball rolled flat along a table never leaves the table.",
+   "v_y = v*sin(theta) is the other shadow: how much of v points along y. Sine and cosine split one vector between two axes, and nothing is lost, because their squares add to one.",
+   "Launch something at theta and only v_y = v*sin(theta) fights gravity. The sideways part does not, which is why the angle you throw at decides how long it hangs in the air."
+  ],
+  "grounded": false,
+  "anchor": "A99 hand-written"
+ },
+ {
+  "formula": "v=sqrt(((v_x))^(2)+((v_y))^(2))",
+  "name": "magnitude of a vector from its components",
+  "variants": [
+   "Two perpendicular components make a right triangle, so the vector itself is the hypotenuse: v = sqrt(v_x^2 + v_y^2). Three sideways and four up is five, not seven.",
+   "v = sqrt(v_x^2 + v_y^2) is Pythagoras wearing a physics hat. The squares are why a component pointing backward counts the same as one pointing forward: a magnitude has no direction left in it.",
+   "Add the squares, take the root, and you have the size of the whole vector. v = sqrt(v_x^2 + v_y^2) is never negative, whatever signs v_x and v_y carry."
+  ],
+  "grounded": false,
+  "anchor": "A99 hand-written"
+ },
+ {
+  "formula": "theta=atan(((v_y)/(v_x)))",
+  "name": "direction of a vector from its components",
+  "variants": [
+   "The components tell you which way the vector points: theta = atan(v_y/v_x). It is the ratio that matters, not the size, so doubling both leaves the direction alone.",
+   "theta = atan(v_y/v_x) recovers the angle from the two shadows. It answers in the first or fourth quadrant only, so if v_x is negative you add half a turn yourself.",
+   "Steeper means more v_y for the same v_x, and theta = atan(v_y/v_x) is how that becomes an angle. A vector straight up has v_x = 0, where the ratio blows up and the angle is a right angle."
+  ],
+  "grounded": false,
+  "anchor": "A99 hand-written"
+ },
+ {
+  "formula": "W=F*d*cos(theta)",
+  "name": "work done by a force at an angle to the displacement",
+  "variants": [
+   "Only the part of a force that points along the motion does any work: W = F*d*cos(theta). Carry a bag across a room and you do none on it, because you push up and it goes sideways.",
+   "W = F*d*cos(theta) is a scalar product. Past a right angle the cosine goes negative and so does the work, which is exactly what friction does to something sliding to a stop.",
+   "Push at an angle and you waste some of it. The useful share is cos(theta), so W = F*d*cos(theta), and dragging a sled by a rope held low beats holding the rope high."
+  ],
+  "grounded": false,
+  "anchor": "A99 hand-written"
+ },
+ {
+  "formula": "tau=r*F*sin(theta)",
+  "name": "magnitude of torque from a force at an angle",
+  "variants": [
+   "Push a door at the handle and it swings; push it at the hinge and nothing happens. tau = r*F*sin(theta) says why: distance and force both count, and so does the angle between them.",
+   "tau = r*F*sin(theta) keeps only the part of the force perpendicular to r. Push straight along the arm and the sine is zero, so you get no turn at all however hard you shove.",
+   "Torque is a vector product, and its size is tau = r*F*sin(theta). Same force further out turns things harder, which is why a long wrench loosens what a short one will not."
+  ],
+  "grounded": false,
+  "anchor": "A99 hand-written"
+ },
+ {
+  "formula": "R_x=A_x+B_x",
+  "name": "component of a resultant vector",
+  "variants": [
+   "Vectors add one axis at a time: R_x = A_x + B_x. Walk east then west and the two components cancel, because each carries its own sign.",
+   "R_x = A_x + B_x is why vector addition is easy once you break things into components. Do the same along y and you have the whole resultant, with no triangles to draw.",
+   "Two forces on one object combine to R_x = A_x + B_x along x. Nothing here is special to force; displacement, velocity and momentum all add the same way."
+  ],
+  "grounded": false,
+  "anchor": "A99 hand-written"
  }
 ]

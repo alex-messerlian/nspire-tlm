@@ -644,6 +644,31 @@ _SCALE = {
   ("I=((((Delta_p_max))^(2))/(2*rho*v))", "v"): (100.0, 6000.0, "speed of sound in a real medium"),
 }
 
+# A99. THE ANGLES OF THE VECTOR RECORDS.
+#
+# Measured across 740 OpenStax physics modules: 6,719 vector arrows, 6,288 cross products, 1,996
+# unit-vector hats and 1,109 dot products, against 420 integrals and 1,677 derivatives. Vectors are
+# roughly six times more common in the textbooks than calculus, and the store had five records with
+# component notation and zero dot products. These seven records close that.
+#
+# An angle carries no unit, so _UNIT_RANGE cannot reach it and every one must be DECLARED here or
+# it falls through to the generic sampler -- which is how 51.8% of one split's givens came out as
+# small integers. The kind differs by record and the difference is physics, not tidiness:
+#
+#   COMPONENTS take angle_quadrant [0, pi/2]. Past pi/2 the component goes negative, which is
+#   correct physics and makes "find the x component" ambiguous about sign in a way a first course
+#   does not intend.
+#
+#   WORK AND TORQUE take angle_half [0, pi]. Both NEED the obtuse range: work is negative when a
+#   force opposes the displacement (friction, braking) and that is the case the cosine is there to
+#   express. Restricting it to the first quadrant would teach that work is always positive.
+_KIND.update({
+    ("v_x=v*cos(theta)",  "theta"): "angle_quadrant",
+    ("v_y=v*sin(theta)",  "theta"): "angle_quadrant",
+    ("W=F*d*cos(theta)",  "theta"): "angle_half",
+    ("tau=r*F*sin(theta)","theta"): "angle_half",
+})
+
 def quantity_range(rec, var):
     """(lo, hi, integral, why) for a SAMPLED given, or None if nothing is DECLARED for it.
 
@@ -1207,6 +1232,13 @@ _RESULT_RANGE = {
     "angle_from_normal": (0.0, math.pi/2, "a ray angle from the normal lies in [0, pi/2]"),
     "angle_arc":         (1.0e-4, 1.0e3, "an arc angle in radians: a milliradian to ~160 turns"),
     "quantum_number":    (1.0, 1000.0,   "a bound-state quantum number is a positive integer"),
+    # A99. Three windows for the vector records whose results DO have an intrinsic bound.
+    "speed_lab":   (0.0, 3.0e8, "a magnitude from squared components is non-negative, and no speed "
+                                "in this store exceeds c"),
+    "torque_mag":  (0.0, 1.0e9, "with theta in [0, pi] the sine is non-negative, so a torque "
+                                "MAGNITUDE is too; the ceiling is generous and only excludes the absurd"),
+    "angle_atan":  (-1.5708, 1.5708, "atan returns to the first or fourth quadrant, so its result "
+                                     "lies in [-pi/2, pi/2] whatever the ratio"),
     # A simple magnifier magnifies, by the definition of the device. Was (1e-3, 1e4), under which
     # M < 1 on 49.9% of documents with a median of exactly 1.00 -- half the corpus stating that a
     # magnifier does not.
@@ -1241,6 +1273,27 @@ _RESULT_RANGE = {
 #
 # So the honest count is two numbers, and gen() prints both: 164/164 declared, 30 of them bounded.
 _RESULT_KIND = {
+    # A99 VECTOR RECORDS. Each is a DECISION, and `None` here means "reviewed, no intrinsic bound",
+    # never "nobody looked" -- a missing key is an assertion failure at import for exactly that
+    # reason. A window whose only constraint is that its inputs were in range cannot fire, and
+    # asserting a sign that physics does not have is false physics wearing a gate's name.
+    #
+    # SIGNED, so no bound:
+    #   v_x, v_y   a component is signed; it is negative whenever the angle passes the axis
+    #   W          work is NEGATIVE when the force opposes the displacement, which is the whole
+    #              reason cos(theta) is in the relation -- friction and braking are that case
+    #   R_x        a resultant component is signed, being a sum of signed components
+    # BOUNDED:
+    #   v          a magnitude from squares is non-negative by construction, and a speed
+    #   tau        with theta in [0, pi] the sine is non-negative, so this magnitude is too
+    #   theta      atan returns to the first or fourth quadrant, so [-pi/2, pi/2]
+    'v_x=v*cos(theta)':                                        None,
+    'v_y=v*sin(theta)':                                        None,
+    'W=F*d*cos(theta)':                                        None,
+    'R_x=A_x+B_x':                                             None,
+    'v=sqrt(((v_x))^(2)+((v_y))^(2))':                         "speed_lab",
+    'tau=r*F*sin(theta)':                                      "torque_mag",
+    'theta=atan(((v_y)/(v_x)))':                               "angle_atan",
     'A=((1)/(2))*theta*(r)^(2)':                               None,
     'B=((mu_0*I)/(2*pi*R))':                                   None,
     'C=((Q)/(V))':                                             None,
