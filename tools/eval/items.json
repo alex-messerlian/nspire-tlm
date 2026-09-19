@@ -942,7 +942,7 @@
   ],
   "expect": "answer",
   "ref": [
-   "F=p/(1/A)",
+   "F=p*A",
    "300"
   ],
   "hand30": false
@@ -1092,7 +1092,7 @@
   ],
   "expect": "answer",
   "ref": [
-   "d=v/(1/t)",
+   "d=v*t",
    "7260"
   ],
   "hand30": false
@@ -1636,7 +1636,7 @@
   ],
   "expect": "symbolic",
   "ref": [
-   "d=v/(1/t)"
+   "d=v*t"
   ],
   "hand30": true
  },
@@ -1714,7 +1714,7 @@
   ],
   "expect": "symbolic",
   "ref": [
-   "W=P/(1/t)"
+   "W=P*t"
   ],
   "hand30": false
  },
@@ -1792,7 +1792,7 @@
   ],
   "expect": "symbolic",
   "ref": [
-   "m=rho/(1/V)"
+   "m=rho*V"
   ],
   "hand30": false
  },
@@ -1870,7 +1870,7 @@
   ],
   "expect": "symbolic",
   "ref": [
-   "vf=(a+vi/t)/(1/t)"
+   "vf=(a+vi/t)*t"
   ],
   "hand30": false
  },

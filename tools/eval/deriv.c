@@ -194,6 +194,23 @@ static node_t *simp(arena_t *a, node_t *n, int *changed, int depth) {
         break;
     case N_DIV:
         if (is_num(r, 1)) { *changed = 1; return l; }
+        /* a/(1/b) -> a*b. THE REARRANGEMENT READABILITY RULE.
+         *
+         * `solve` produces this shape on every record of the form X = Y/Z isolated for Y:
+         * "F=p/(1/A)" where a textbook writes "F=p*A". Both are correct and the first reads as a
+         * mistake -- which matters more than usual here, because these become TRAINING DATA. A
+         * model taught from "F=p/(1/A)" has learned to look unintelligent, and looking
+         * unintelligent is the specific complaint this work exists to fix.
+         *
+         * MEASURED over the store's 375 solve-for-X problems before the rule: 284 clean, 54 this
+         * exact shape, 37 refused. It is one pattern, not a long tail.
+         *
+         * Guarded on a zero denominator so 1/0 is not folded into existence; that case is an error
+         * upstream and must stay one. */
+        if (r && r->t == N_DIV && is_num(r->kid[0], 1) && !is_num(r->kid[1], 0)) {
+            *changed = 1;
+            return ar_bin(a, N_MUL, l, r->kid[1]);
+        }
         if (is_num(l, 0)) { *changed = 1; return ar_num(a, 0); }
         if (is_anynum(l) && is_anynum(r) && r->num != 0) { *changed = 1; return ar_num(a, l->num / r->num); }
         if (node_eq(l, r) && !is_num(l, 0)) { *changed = 1; return ar_num(a, 1); }
