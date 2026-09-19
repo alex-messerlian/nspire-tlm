@@ -2183,12 +2183,39 @@ WHY = ["Substituting into {f}.", "Directly from {f}.", "From {f}.", "Using {f}."
 # nothing (it walks r->cval independently of the input), so the target shape is "no STUDENT
 # given", not "no given". 27 of 164 records carry a constant and their prompts are not empty.
 # Verified against build/devprompt before either class was written.
-EXPLAIN_ASK_REL = ["explain {s}.", "explain {s} in a sentence.", "what is {s}?", "state {s}.",
-                   "what does {s} say?", "define {s}.", "explain what {s} means.",
-                   "in one sentence, what is {s}?"]
-EXPLAIN_ASK_Q   = ["what is {s}?", "define {s}.", "explain what {s} is.", "how do you find {s}?",
-                   "what does {s} depend on?", "explain how {s} is calculated.",
-                   "how is {s} related to the other quantities?"]
+# A112. WEIGHTED, BECAUSE EXPOSURES PER STRING DECIDE THE QUESTION SURFACE TOO.
+#
+# A82 measured the mechanism on the ANSWER side: one explanation seen ~29 times beats three seen
+# ~10 times each. It applies just as directly to the QUESTION, and the split is measurable on the
+# shipped checkpoint:
+#
+#     "explain <name>"    30/30 = 100.0% explained
+#     "what is <name>"    21/30 =  70.0% explained, 9 refused as an under-specified computation
+#
+# The cause is the frame mix, not the meaning. At ~27.6 EXPLAIN documents per record over 8 equal
+# frames, "explain" appears in THREE of them and is seen ~10 times per record; "what is" appears in
+# ONE and is seen ~3.4 times. The 100/70 split is that ratio.
+#
+# It matters more than the arithmetic suggests: "what is X" is what a student types and what the D1
+# device transcript asks, and two of its six items failed this way -- 'what is kinetic energy' and
+# 'what is acceleration' both answered "I cannot answer that: m is not given." The corpus separates
+# the two classes cleanly (0 shared openings between EXPLAIN and zero-given D1, and `missing:<var>`
+# on 100% of BOTH, so no field decides it) -- the model simply had not seen this opening enough.
+#
+# THE WEIGHT IS NOT A FREE PARAMETER. 3x takes "what is" from ~3.4 to ~8 exposures per record, just
+# above the ~10 at which "explain" is fully learned, without making the corpus a single register --
+# a bank that is 90% one opening teaches a register rather than a task, which is why this file's
+# frames were grouped by register in the first place. The matched control is d1_zero, which must be
+# reported beside explain and currently sits at 99.7% with room to give.
+_W = lambda frames: [f for f, w in frames for _ in range(w)]
+EXPLAIN_ASK_REL = _W([("explain {s}.", 1), ("explain {s} in a sentence.", 1),
+                      ("what is {s}?", 3), ("state {s}.", 1),
+                      ("what does {s} say?", 2), ("define {s}.", 1),
+                      ("explain what {s} means.", 1), ("in one sentence, what is {s}?", 1)])
+EXPLAIN_ASK_Q   = _W([("what is {s}?", 3), ("define {s}.", 1), ("explain what {s} is.", 1),
+                      ("how do you find {s}?", 1), ("what does {s} depend on?", 2),
+                      ("explain how {s} is calculated.", 1),
+                      ("how is {s} related to the other quantities?", 1)])
 # Every field these templates read is IN THE PROMPT: the formula and the units are the first two
 # fields of the record span, the condition is the fourth, and the subject is echoed from the
 # question the student typed. Nothing here is recalled -- the record's NAME is not in the prompt
@@ -2454,7 +2481,11 @@ def gen_knowledge(rng):
     return out
 
 # Upper edge of the explain roll band; 0.18 is the lower edge. See gen().
-EXPLAIN_HI   = float(os.environ.get("EXPLAIN_HI", "0.20"))
+# A112. 0.22 = 4%, restoring the A46 dose. At 2% each frame is seen ~3.4 times per record and the
+# demo phrasing was measured at 70%; doubling the band doubles every frame's exposures. The band is
+# taken from ANSWER, which is 61% of the corpus and can spare it, and the matched control d1_zero
+# (99.7%) is reported beside explain on every run so a gain here cannot hide a loss there.
+EXPLAIN_HI   = float(os.environ.get("EXPLAIN_HI", "0.22"))
 
 def case_jitter(items, rng):
     """Flip the first letter of a question, both directions, independently of its class.
