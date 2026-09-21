@@ -59,6 +59,18 @@ int main(int argc, char **argv) {
     }
     /* THE PICKER, at each of its three states. Rendering it here is how the layout was checked
      * without a device round-trip -- the same draw_picker the calculator runs. */
+    /* A127: the formula library -- the picker opened deliberately, not as a question. */
+    if (!strcmp(screen, "library")) {
+        CUR = -1; MX = 300; MY = 220;
+        app_event(&(in_event){.kind=IN_KEY,.key=K_LIB});
+        app_draw(); goto out;
+    }
+    if (!strcmp(screen, "libraryrec")) {
+        CUR = -1; MX = 300; MY = 220;
+        app_event(&(in_event){.kind=IN_KEY,.key=K_LIB});
+        app_event(&(in_event){.kind=IN_KEY,.key=K_ENTER});   /* open the first family */
+        app_draw(); goto out;
+    }
     if (!strncmp(screen, "pick", 4)) {
         snprintf(COMPOSE, sizeof COMPOSE, "A 3.0 kg block accelerates at 4.5 m/s^2. What net force?");
         COMPOSE_N = (int)strlen(COMPOSE);

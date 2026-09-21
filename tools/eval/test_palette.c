@@ -178,6 +178,67 @@ int main(void) {
         OK(!noins, "%-5s every tile inserts something (%d empty)", PAL_CAT[c].name, noins);
     }
 
+    /* A126. THE PLACEHOLDER IS A PROMISE TOO, and it belongs in this file for that reason: the
+     * tiles and the "Ask me about {topic}" rotation are the two places the app tells a student what
+     * it can do. A tile that inserts arithmetic the model cannot emit and a topic that resolves to
+     * nothing are the same defect.
+     *
+     * The old list carried 38 topics of which SEVENTEEN refused -- algebra, trigonometry,
+     * logarithms, matrices, sequences, quadratics, exponentials, limits, optimization, averages,
+     * distributions, regression, motion, circuits, magnetism among them. A student who followed the
+     * prompt and typed "distributions" was refused by the thing that invited them. */
+    printf("\n  -- every placeholder topic resolves to a record --\n");
+    {
+        const ns_store2 *st = app_store();
+        if (!st) {
+            printf("  SKIP  no store on disk -- NOT a pass\n"); F++;
+        } else {
+            int miss = 0; char first[96]; first[0] = 0;
+            for (int i = 0; i < ASK_N; i++) {
+                char q[128]; snprintf(q, sizeof q, "what is %s", ASK_ABOUT[i]);
+                static ns_ask a; ask_parse(q, &a);
+                int idx = -1;
+                if (!ask_confident(st, q, &a.in, &idx) || idx < 0) {
+                    if (!first[0]) snprintf(first, sizeof first, "%s", ASK_ABOUT[i]);
+                    miss++;
+                }
+            }
+            char m[160];
+            snprintf(m, sizeof m, "%d of %d resolve%s%s", ASK_N - miss, ASK_N,
+                     miss ? ", first miss: " : "", miss ? first : "");
+            OK(!miss, "placeholder topics the app can answer (%s)", m);
+
+            /* THE "TRY ONE" EXAMPLES ARE THE SAME PROMISE, one screen earlier and more prominent:
+             * a student taps one expecting it to work. Asserted here for the same reason. */
+            int tmiss = 0; char tfirst[96]; tfirst[0] = 0;
+            for (int i = 0; i < TRY_N; i++) {
+                static ns_ask a; ask_parse(TRY_Q[i], &a);
+                int idx = -1;
+                if (!ask_confident(st, TRY_Q[i], &a.in, &idx) || idx < 0) {
+                    if (!tfirst[0]) snprintf(tfirst, sizeof tfirst, "%s", TRY_Q[i]);
+                    tmiss++;
+                }
+            }
+            snprintf(m, sizeof m, "%d of %d resolve%s%s", TRY_N - tmiss, TRY_N,
+                     tmiss ? ", first miss: " : "", tmiss ? tfirst : "");
+            OK(!tmiss, "TRY ONE examples the app can answer (%s)", m);
+
+            /* AND THEY MUST FIT THE PANE. gfx_text does not wrap or ellipsize here -- it draws off
+             * the right edge -- so an example one word too long is silently cut on the device and
+             * nowhere else. The pane is GFX_W - SIDE_W wide and the row starts 18px in, with 6px
+             * of breathing room at the end. */
+            int wide = 0; char wfirst[96]; wfirst[0] = 0;
+            for (int i = 0; i < TRY_N; i++) {
+                if (gfx_text_w(TRY_Q[i], F_SM) > GFX_W - SIDE_W - 18 - 6) {
+                    if (!wfirst[0]) snprintf(wfirst, sizeof wfirst, "%s", TRY_Q[i]);
+                    wide++;
+                }
+            }
+            snprintf(m, sizeof m, "%d too wide%s%s", wide, wide ? ": " : "", wide ? wfirst : "");
+            OK(!wide, "TRY ONE examples fit the pane (%s)", m);
+        }
+    }
+
     printf("%s test_palette: %d failure%s\n", F ? "FAIL" : "PASS", F, F == 1 ? "" : "s");
     return F ? 1 : 0;
 }

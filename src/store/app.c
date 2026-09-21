@@ -558,25 +558,56 @@ static int ask_index(unsigned n);
  *
  * Tapping one LOADS it into the box rather than sending it. The format is the lesson; sending it
  * immediately would hide the very thing being demonstrated. */
+/* A127. THE EXAMPLES ADVERTISE THE RANGE, not one capability three times.
+ *
+ * All three used to be "Find X. given..." -- the compute case. A student reading them would never
+ * learn that this app explains a relation, rearranges one, or differentiates it, and those are the
+ * capabilities the last two months of work went into. The first screen is where a student decides
+ * what the thing is for.
+ *
+ * MEASURED: all four resolve confidently against the shipped store (ask_confident, build/store.tns).
+ * An example that refuses is worse than no example, which is the same rule ASK_ABOUT now follows,
+ * and test_palette asserts it for both. */
 static const char *TRY_Q[] = {
     "Find work. F = 12, d = 2.5",
-    "Find pressure. F = 400, A = 0.02",
-    "Find momentum. m = 1200, v = 15",
+    "What is kinetic energy?",
+    "solve F=m*a for m",
+    "derivative of m*g*h for h",   /* short enough to FIT: test_palette asserts it */
 };
 #define TRY_N ((int)(sizeof TRY_Q / sizeof TRY_Q[0]))
 static gfx_rect R_TRY[TRY_N];
 
+/* A126. EVERY TOPIC HERE IS ONE THE STORE ACTUALLY COVERS, and that was MEASURED rather than
+ * assumed. The placeholder rotates "Ask me about {topic}" -- it is an invitation, and an invitation
+ * to something the app refuses is worse than no invitation.
+ *
+ * The old list carried 38 topics of which SEVENTEEN resolved to nothing: algebra, trigonometry,
+ * logarithms, matrices, sequences, quadratics, exponentials, limits, optimization, averages,
+ * distributions, regression, motion, circuits, magnetism and more. A student who followed the
+ * prompt and typed "distributions" got a refusal. Others resolved but misleadingly -- "geometry"
+ * returned *non-Euclidean geometry*, "series" returned *in series* (the circuit sense).
+ *
+ * The brief is explicit that this is not a general maths tool: "we don't need all of math, we need
+ * the math that is part of physics." The pure-maths topics are gone for that reason and not only
+ * because they miss.
+ *
+ * Measured with ask_confident against the shipped store: 29 of 30 candidates resolve, and the one
+ * that did not ("a lens") is not here. Re-measure this list whenever the store changes -- a topic
+ * that stops resolving is an invitation the app can no longer accept. */
 static const char *ASK_ABOUT[] = {
-    "motion", "velocity", "acceleration", "forces",
-    "friction", "momentum", "energy", "work",
-    "power", "gravity", "circular motion", "waves",
-    "sound", "light", "optics", "heat",
-    "pressure", "electricity", "circuits", "magnetism",
-    "algebra", "geometry", "trigonometry", "logarithms",
-    "vectors", "matrices", "sequences", "series",
-    "quadratics", "exponentials", "derivatives", "integrals",
-    "limits", "optimization", "probability", "averages",
-    "distributions", "regression",
+    "velocity", "acceleration", "force", "friction",
+    "momentum", "energy", "work", "power",
+    "gravity", "circular motion", "waves", "sound",
+    "light", "optics", "heat", "pressure",
+    "a circuit", "resistance", "a magnetic field", "current",
+    "voltage", "torque", "kinetic energy", "potential energy",
+    "a spring", "refraction", "density", "impulse",
+    "frequency",
+    /* DERIVATIVES, INTEGRALS AND REARRANGEMENT ARE NOT HERE, and their absence is deliberate. The
+     * app does all three -- on a RELATION -- but the placeholder invites a bare-topic question, and
+     * "what is derivatives" resolves to nothing. Advertising them here would be the same
+     * overpromise the seventeen maths topics were. They are advertised where they can be phrased
+     * correctly: the CALC tab of the symbol palette, and the help section in Settings. */
 };
 #define ASK_N     ((int)(sizeof ASK_ABOUT / sizeof ASK_ABOUT[0]))
 
@@ -1825,7 +1856,7 @@ static const char *CURSOR[] = {
  * permanent row on a decision made on first run. */
 /* One number, used by the table below AND by the height that has to contain it. Two places knowing
  * the row count is how the sheet overflowed three times. */
-#define SHORTCUT_N 8
+#define SHORTCUT_N 10
 #define SHORTCUT_COLS 2
 /* Rounded UP, so an odd count still reserves the line its last entry sits on. */
 #define SHORTCUT_ROWS ((SHORTCUT_N + SHORTCUT_COLS - 1) / SHORTCUT_COLS)
@@ -1920,6 +1951,13 @@ static void draw_settings(void) {
             { "ctrl n", "New chat" },   { "ctrl s", "Search" },
             { "ctrl b", "Side panel" }, { "ctrl a", "Select all" },
             { "ctrl c", "Copy" },       { "ctrl v", "Paste" },
+            /* A127. THE TWO KEYS NOBODY COULD FIND. The symbol palette has been on the menu key
+             * since A?? and the formula library is now on the catalog key, and NEITHER was written
+             * down anywhere in the app. Reported from the device: the catalog key ("the book icon")
+             * appeared to do nothing, and the palette was found only by accident -- "okay, I see
+             * the table now in menu". A key binding that is not printed is a feature that does not
+             * exist for anyone who did not write it. */
+            { "menu", "Symbols" },      { "catalog", "Formulas" },
             { "ctrl esc", "Quit" },     { "esc", "Back" },
         };
         /* TWO COLUMNS. Eight rows in one column made the sheet 232px tall on a 240px screen: it
@@ -2131,6 +2169,7 @@ int app_set_now(unsigned ms) {
  * all: esc-goes-up-one-level is decidable without a calculator, and how it looks is not. */
 static pk_state PK;
 static int  PICK_ON;
+static int  LIB_MODE;   /* A127: the picker opened as a reference library, not as a question */
 static char PENDQ[sizeof COMPOSE];        /* the question, held while the relation is chosen */
 static gfx_rect R_PROW[PK_ROWS];
 
@@ -2247,7 +2286,10 @@ static void draw_picker(void) {
     char head[72];
     int rows, n, top;
     if (PK.level == PK_FAMILY) {
-        snprintf(head, sizeof head, "WHAT ARE YOU SOLVING FOR?");
+        /* A127. THE HEADING SAYS WHAT THIS IS. "WHAT ARE YOU SOLVING FOR?" was the app asking the
+         * student to do retrieval; the library is the student looking something up. Same rows,
+         * opposite direction, and the wording is the only thing that says which. */
+        snprintf(head, sizeof head, LIB_MODE ? "FORMULA LIBRARY" : "WHAT ARE YOU SOLVING FOR?");
         /* MODEL ROWS, NOT FAMILIES. The family level draws the suggestion rows ABOVE the families
          * and pk_row_family()/pk_row_is_sug() index over both, which is also what clamp() scrolls
          * over. Using the family count alone made this disagree with the scroller in two visible
@@ -2346,9 +2388,16 @@ static void draw_picker(void) {
                                 ? "enter pick   tab browse   type search   esc ask" :
         (PK.level == PK_FAMILY && PK.nsug)
                                 ? "enter open   tab suggest  type search   esc ask" :
-        (PK.level == PK_FAMILY) ? "enter open   type search   esc ask anyway" :
-        (n == 0)                ? "bksp edit    esc browse    a ask anyway"   :
-                                  "enter pick   type filter   esc back";
+        /* A127. THE LIBRARY SAYS WHAT IT DOES. "esc ask anyway" and "enter pick" are the picker's
+         * words -- the app asking which relation the student meant. In the library the student is
+         * looking something up and ENTER puts the formula in the box, so the legend says INSERT.
+         * A legend that describes the other mode is how a screen teaches the wrong thing. */
+        (PK.level == PK_FAMILY) ? (LIB_MODE ? "enter open   type search   esc close"
+                                            : "enter open   type search   esc ask anyway") :
+        (n == 0)                ? (LIB_MODE ? "bksp edit    esc back"
+                                            : "bksp edit    esc browse    a ask anyway") :
+                                  (LIB_MODE ? "enter insert   type filter   esc back"
+                                            : "enter pick   type filter   esc back");
     gfx_fill(X + 8, Y + H - 17, W - 16, 1, C_LINE);
     gfx_text(X + 10, Y + H - 14, legend, F_XS, C_INK3, C_SHEET);
 }
@@ -2372,6 +2421,22 @@ void app_draw(void) {
  * which would have left an untitled empty session in the list on every press. */
 static void start_new_chat(void) { CUR = -1; SCROLL = 0; compose_clear(); }
 static void open_search(void)    { SEARCH_ON = 1; SQ_N = 0; SQ[0] = 0; SSEL = 0; run_search(); }
+
+/* A127. THE FORMULA LIBRARY. The picker's browse machinery -- families, filter, scroll -- was left
+ * with NO CALLER when A125 removed it from the answer path, and a student pressing the catalog key
+ * found nothing. Both halves of that are fixed here: the code is reachable again and it is
+ * reachable DELIBERATELY, as a reference the student opens, never as a question the app asks.
+ *
+ * PICKING INSERTS, IT DOES NOT SEND. That is the whole difference from the old picker and it is
+ * why this is safe: the app is not asking "which relation did you mean" (the retrieval problem,
+ * handed to the student, which produced "p equals f times v" for a question about m = F/a). It is
+ * handing them the formula to look at or to ask about. */
+static void open_library(void) {
+    const ns_store2 *st = app_store();
+    if (!st) return;
+    pk_open(&PK, st, "");        /* no question: the family list, not a shortlist */
+    PICK_ON = 1; LIB_MODE = 1;
+}
 
 void app_event(const in_event *e) {
     if (e->kind == IN_MOVE)  {
@@ -2571,6 +2636,7 @@ void app_event(const in_event *e) {
             return;
         }
         if (k == K_SYM) { SYM_ON = !SYM_ON; SYM_SEL = 0; return; }
+        if (k == K_LIB) { open_library(); return; }     /* A127: the catalog key = the book icon */
 
         /* THE PICKER IS MODAL AND CONSUMES EVERY KEY. It is checked before the search sheet and
          * before ESC's own chain: an ESC that reached that chain would clear the composer or go
@@ -2579,8 +2645,16 @@ void app_event(const in_event *e) {
             const ns_store2 *st = app_store();
             int rec = -1;
             pk_action a = pk_key(&PK, st, k, &rec);
-            if (a == PK_ACT_PICKED && rec >= 0) picker_send(st->rec[rec].rid);
-            else if (a == PK_ACT_ASK_ANYWAY)    picker_send(0);
+            if (a == PK_ACT_PICKED && rec >= 0) {
+                if (LIB_MODE) {            /* A127: the library INSERTS; it never asks a question */
+                    compose_insert_str(st->rec[rec].formula);
+                    PICK_ON = 0; LIB_MODE = 0; FIELD_FOCUS = 1;
+                } else picker_send(st->rec[rec].rid);
+            }
+            else if (a == PK_ACT_ASK_ANYWAY) {
+                if (LIB_MODE) { PICK_ON = 0; LIB_MODE = 0; }   /* esc just closes the library */
+                else picker_send(0);
+            }
             return;
         }
         if (SEARCH_ON) {                       /* typing goes to the query, not the composer */

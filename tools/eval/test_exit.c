@@ -736,7 +736,25 @@ int main(void) {
     gfx_rect empty_field = R_FIELD;
     int mid = (TOP_H + (GFX_H - DOCK_H)) / 2;
     T("field is centred, not docked", empty_field.y < GFX_H - DOCK_H - 10, 1);
-    T("and sits near the vertical middle", empty_field.y > mid - 40 && empty_field.y < mid + 40, 1);
+    /* A127. THE BAND WAS A SNAPSHOT, NOT A PROPERTY. "within 40px of the vertical middle" was
+     * calibrated when TRY ONE held THREE examples. A fourth makes the block one row taller, the
+     * field rises ~8px with it, and the assertion failed at field.y=69 against a band starting at
+     * 73 -- a 4px miss that says nothing about whether the screen is right.
+     *
+     * What actually has to hold is asserted instead, and one of these is a real guard: the last
+     * example must clear the dock. gfx_text does not clip, so a fifth example would be drawn
+     * straight through the composer and this is the only thing that would say so. Measured now:
+     * last row ends at 188, dock starts at 197. */
+    T("field is below the title and on screen", empty_field.y > TOP_H && empty_field.y < GFX_H, 1);
+    T("examples start below the field",
+      R_TRY[0].y > empty_field.y + empty_field.h, 1);
+    /* VISIBLE, not merely un-clipped. The draw hides the examples ENTIRELY when they do not fit
+     * -- `if (show_try && ty + ... + lh * TRY_N <= bot - 2)`, else every R_TRY is zeroed -- so the
+     * failure mode of adding one example too many is that ALL of them vanish, with nothing on
+     * screen admitting it. My first version of this check asserted the last row clears the dock and
+     * could never fire: at 5 and at 7 examples it still passed, because by then the rows were not
+     * being drawn at all. The hidden-data class, caught in the assertion written to catch it. */
+    T("and the examples are actually drawn", R_TRY[TRY_N-1].w > 0, 1);
     T("send button rides with it", R_SEND.y > empty_field.y - 2 && R_SEND.y < empty_field.y + 20, 1);
 
     /* the field must actually be clickable where it was drawn */

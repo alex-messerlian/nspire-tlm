@@ -238,6 +238,10 @@ static int keypad_poll(void) {
          * inside an Ndless program it does nothing at all, so it is free -- and "this menu should
          * do something" is exactly right. */
         { &KEY_NSPIRE_MENU, K_SYM },
+        /* A127. The CATALOG key -- the book icon on the keypad, and the one a student presses
+         * looking for a list of formulas. On the OS it opens the function catalogue; inside an
+         * Ndless program it is free. */
+        { &KEY_NSPIRE_CAT, K_LIB },
         { &KEY_NSPIRE_SPACE, ' ' },
         /* PUNCTUATION, WITHOUT WHICH THE APP CANNOT BE USED AT ALL.
          *

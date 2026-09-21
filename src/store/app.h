@@ -136,6 +136,12 @@ typedef struct {
 #define K_LEFT 0x103
 #define K_RIGHT 0x104
 #define K_SYM  0x105    /* the menu key: opens the character palette */
+/* A127. THE CATALOG KEY OPENS THE FORMULA LIBRARY, and it is the key the user already pressed:
+ * on the Nspire keypad the catalog key IS the book icon. Reported as "when I'm clicking the book
+ * icon, I'm still not seeing any table or gallery to select anything" -- because nothing was bound
+ * to it. The icon band in the sidebar is full (3 x 24px on an 80px panel; a fourth does not fit at
+ * any legible size), so the library lives on the key a student reaches for anyway. */
+#define K_LIB  0x106    /* the catalog key: opens the formula library */
 #define K_BACK 0x08
 /* Chords. Ctrl is a modifier on the Nspire keypad, so the poll reports these as their own codes
  * rather than as a flag -- the app never has to know how the hardware spells "held". */
