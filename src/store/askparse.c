@@ -764,10 +764,31 @@ int ask_pick(const ns_store2 *st, const char *question, const ns_input *in, int 
 /* Scan one `= <number>` starting at `p`. Returns the end of the number, or NULL if there isn't
  * one. Shared by the parser and the stripper so they cannot disagree about what a value is --
  * they did disagree in the first draft, and the question kept a fragment the parser had taken. */
+/* A128. "f is 2" IS AN ASSIGNMENT, and not accepting it cost a real device session.
+ *
+ * Reported: after "solve F=m*a for m" the follow-up typed was "if f is two and a is six solve for
+ * m", and the answer was nonsense. The cause is here. With '=' the device builds
+ *
+ *     <q>... Given F = 2, a = 6.</q><r>F=m*a | ... | missing:m | ...
+ *
+ * and the model computes. With "is", NOTHING is parsed: the words stay in the question, the given
+ * list is empty and `missing:m` still says a value is wanted -- a prompt that contradicts itself,
+ * which is the shape that produced the garbage.
+ *
+ * "is" is what a student types, and this device's keypad makes '=' a deliberate reach. Accepting
+ * it is safe for the reason the number test already provides: eat_assign requires DIGITS after the
+ * operator, so "what is force" and "what is kinetic energy" cannot match -- the word after "is" is
+ * not a number. That is the same structural predicate the rest of this file relies on rather than
+ * a list of question words to exclude.
+ *
+ * NOT "of", "at" or "to": those attach to units and prepositions far more often than to values
+ * ("at 5 m/s" is a value, "at rest" is not), and the measured cost of a wrong given is a confident
+ * answer to a question nobody asked. One operator, the one that was actually typed. */
 static const char *eat_assign(const char *p) {
     while (*p == ' ') p++;
-    if (*p != '=') return 0;
-    p++;
+    if (p[0] == 'i' && p[1] == 's' && (p[2] == ' ' || p[2] == '\t')) p += 2;
+    else if (*p == '=') p++;
+    else return 0;
     while (*p == ' ') p++;
     if (*p == '-' || *p == '+') p++;
     int digits = 0;
@@ -792,8 +813,10 @@ void ask_parse(const char *question, ns_ask *a) {
         int nlen = (int)(c - ns);
         const char *vs = c;
         while (*vs == ' ') vs++;
-        if (*vs != '=') continue;                       /* not an assignment; resume after the word */
-        vs++;
+        /* A128: '=' or the word "is". eat_assign below re-checks and requires digits. */
+        if (*vs == '=') vs++;
+        else if (vs[0] == 'i' && vs[1] == 's' && (vs[2] == ' ' || vs[2] == '\t')) vs += 2;
+        else continue;                                  /* not an assignment; resume after the word */
         while (*vs == ' ') vs++;
         const char *end = eat_assign(c);
         if (!end) { c = vs; continue; }

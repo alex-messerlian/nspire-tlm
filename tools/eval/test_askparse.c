@@ -253,6 +253,36 @@ int main(int argc, char **argv) {
         }
     }
 
+    /* A128. "f is 2" PARSES; "what is force" DOES NOT. Both directions, because accepting the word
+     * "is" is only safe while eat_assign still requires DIGITS after it -- if that test is ever
+     * relaxed, "what is force" starts assigning `what = force` and every explain question breaks.
+     * The device session that motivated this typed "if f is two and a is six solve for m". */
+    {
+        struct { const char *q; int want; const char *v0; const char *x0; } A[] = {
+            { "if f is 2 and a is 6 solve for m", 2, "f", "2" },
+            { "find work when F is 12 and d is 2.5", 2, "F", "12" },
+            { "v is 3.5", 1, "v", "3.5" },
+            { "t is 1.2e-3", 1, "t", "1.2e-3" },
+            { "what is force", 0, 0, 0 },
+            { "what is kinetic energy", 0, 0, 0 },
+            { "what is the derivative of m*g*h for h", 0, 0, 0 },
+        };
+        for (unsigned i = 0; i < sizeof A / sizeof A[0]; i++) {
+            static ns_ask a; ask_parse(A[i].q, &a);
+            char m[200];
+            snprintf(m, sizeof m, "nvals=%d%s%s%s%s", a.in.nvals,
+                     a.in.nvals ? " first " : "", a.in.nvals ? a.in.var[0] : "",
+                     a.in.nvals ? "=" : "", a.in.nvals ? a.in.val[0] : "");
+            ck(a.in.nvals == A[i].want, A[i].q, m);
+            if (A[i].want && a.in.nvals) {
+                char m2[200];
+                snprintf(m2, sizeof m2, "%s=%s", a.in.var[0], a.in.val[0]);
+                char w[200]; snprintf(w, sizeof w, "%s=%s", A[i].v0, A[i].x0);
+                ck(!strcmp(m2, w), A[i].q, m2);
+            }
+        }
+    }
+
     printf("\n%s  %d/%d\n", fails ? "FAIL" : "PASS", ran - fails, ran);
     return fails ? 1 : 0;
 }
