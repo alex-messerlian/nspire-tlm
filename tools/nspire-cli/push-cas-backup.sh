@@ -13,6 +13,13 @@
 # different experiment.
 set -eu
 cd "$(dirname "$0")/../.."
+# THE SCRIPT SUPPLIES ITS OWN LIBRARY PATH. tools/nspire-cli/nsp is a COMMITTED binary linked
+# against an absolute path from this repo's former name (/Users/.../nspire-slm/...), which does not
+# exist any more, so it aborts with a dyld error before doing anything. Exporting the variable in
+# the caller's shell does NOT help: macOS SIP strips DYLD_* when it execs /bin/sh, so it never
+# reaches nsp. Setting it here, after the cd, is the only place that works for every caller.
+DYLD_LIBRARY_PATH="$PWD/vendor/libnspire/_install/lib:${DYLD_LIBRARY_PATH:-}"
+export DYLD_LIBRARY_PATH
 NSP=tools/nspire-cli/nsp
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 fail=0
