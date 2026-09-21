@@ -26,6 +26,11 @@ static void T2(const char *n, const char *got, const char *want) {
     printf("  %s  %-46s got=\"%s\" want=\"%s\"\n", ok ? "PASS" : "FAIL", n, got, want);
 }
 static void key(int k) { in_event e; memset(&e,0,sizeof e); e.kind=IN_KEY; e.key=k; app_event(&e); }
+/* A129: the pad. hover=1 because a finger resting on the pad is hover, not press. */
+static void move(int x, int y) {
+    in_event e; memset(&e,0,sizeof e);
+    e.kind = IN_MOVE; e.x = x; e.y = y; e.hover = 1; app_event(&e);
+}
 static void click(int x, int y) { in_event e; memset(&e,0,sizeof e); e.kind=IN_CLICK; e.x=x; e.y=y; app_event(&e); }
 /* app_init() clears the chat state but NOT the view state, so SIDEBAR, the cursor and HOVER
  * survived reset() and leaked between cases. A click in one test that happens to land on
@@ -807,6 +812,58 @@ int main(void) {
     {   int caught = 1;   /* old: CHATS[NCHATS] = new, memmove(&CHATS[0], &CHATS[1], ...) */
         printf("  %s  mutant: appending put a NEW session at the bottom of \"Recents\"\n",
                caught ? "CAUGHT" : "MISSED"); }
+
+    /* A129. THE POINTER DRIVES THE MODAL LISTS. On the CX II the touchpad IS the arrow ring and a
+     * light edge press is a CONTACT, so K_UP/K_DOWN never fire and both lists were reported as
+     * "impossible and very challenging to scroll and then to click stuff". These assert the PAD
+     * path specifically; the key path is covered above and is unchanged. */
+    printf("\n  -- the touchpad drives the library and the palette --\n");
+    {
+        reset(); CUR = -1; compose_clear();
+        key(K_LIB);
+        T("catalog opens the library", PICK_ON && LIB_MODE, 1);
+        app_draw();
+        int rows = 0;
+        for (int i = 0; i < PK_ROWS; i++) if (R_PROW[i].w) rows++;
+        T("the library drew rows", rows > 2, 1);
+
+        move(R_PROW[2].x + 4, R_PROW[2].y + 3);
+        T("hovering a row selects it", PK.sel, PK.scroll + 2);
+
+        /* SCROLLING IS TESTED INSIDE A FAMILY, NOT AT THE FAMILY LIST. All 13 families fit the
+         * sheet, so at that level there is correctly nothing to scroll and my first version of
+         * this assertion was wrong about the code rather than the other way round. A family with
+         * more records than rows is where the behaviour exists. */
+        PK.sel = PK.scroll; key(K_ENTER);          /* into the first family */
+        app_draw();
+        rows = 0;
+        for (int i = 0; i < PK_ROWS; i++) if (R_PROW[i].w) rows++;
+        T("the family overflows the sheet", PK.nhit > rows, 1);
+
+        int before = PK.scroll;
+        move(R_PROW[rows-1].x + 4, R_PROW[rows-1].y + R_PROW[rows-1].h + 4);
+        T("moving past the last row scrolls down", PK.scroll > before, 1);
+        app_draw();
+        int mid = PK.scroll;
+        move(R_PROW[0].x + 4, R_PROW[0].y - 4);
+        T("moving above the first row scrolls back", PK.scroll < mid, 1);
+        app_draw();
+        int nreq = HS_NREQ;
+        for (int i = 0; i < PK_ROWS; i++) if (R_PROW[i].w) {
+            app_event(&(in_event){ .kind = IN_CLICK, .x = R_PROW[i].x + 4, .y = R_PROW[i].y + 3 });
+            break;
+        }
+        T("clicking a formula CLOSES the library", PICK_ON, 0);
+        T("...and inserts rather than asking", HS_NREQ, nreq);
+        T("...putting the formula in the box", COMPOSE_N > 0, 1);
+    }
+    {
+        reset(); CUR = -1; compose_clear();
+        key(K_SYM); SYM_CAT = 0; SYM_SEL = 0; app_draw();
+        move(R_SYM[3].x + 4, R_SYM[3].y + 3);
+        T("hovering a palette tile selects it", SYM_SEL, 3);
+        key(K_ESC);
+    }
 
     printf("\n  %s: exit paths, %d failure(s)\n\n", F ? "FAIL" : "PASS", F);
     gfx_free();

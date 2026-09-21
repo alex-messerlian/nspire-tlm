@@ -2441,6 +2441,44 @@ static void open_library(void) {
 void app_event(const in_event *e) {
     if (e->kind == IN_MOVE)  {
         MX = e->x; MY = e->y; HOVER = e->hover;
+        /* A129. THE POINTER DRIVES THE MODAL LISTS, because on this hardware it is the only thing
+         * that reliably can.
+         *
+         * THE CX II HAS NO ARROW KEYS. The touchpad IS the arrow ring, and a light press on its
+         * edge is a CONTACT, not a keypress -- so it moves the cursor and K_UP/K_DOWN never fire.
+         * The picker and the palette were built around those keys, which is why both were reported
+         * as "impossible and very challenging to scroll and then to click stuff".
+         *
+         * Two behaviours, and together they make a list usable with nothing but the pad:
+         *   HOVER SELECTS -- the highlight follows the finger, so what a click will do is visible
+         *     before the click, which is also what makes clicking feel accurate.
+         *   THE EDGES SCROLL -- moving past the last drawn row scrolls by one, and past the first
+         *     scrolls back. Without this a list longer than the sheet is simply unreachable, which
+         *     is the same hidden-data failure as a list that stops drawing.
+         *
+         * Keys still work exactly as before; this is additive. */
+        if (PICK_ON) {
+            int rows = 0;
+            for (int i = 0; i < PK_ROWS; i++) if (R_PROW[i].w) rows++;
+            int hit_row = -1;
+            for (int i = 0; i < rows; i++)
+                if (inside(R_PROW[i], MX, MY)) { hit_row = i; break; }
+            if (hit_row >= 0) {
+                PK.sel = PK.scroll + hit_row;
+            } else if (rows > 0) {
+                /* Past the ends of the drawn list: scroll rather than do nothing. */
+                const gfx_rect *first = &R_PROW[0], *last = &R_PROW[rows - 1];
+                int n = (PK.level == PK_FAMILY) ? PK.nsug + PK.nfam : PK.nhit;
+                if (MY > last->y + last->h && MX >= last->x && MX <= last->x + last->w) {
+                    if (PK.scroll + rows < n) { PK.scroll++; if (PK.sel < PK.scroll) PK.sel = PK.scroll; }
+                } else if (MY < first->y && MX >= first->x && MX <= first->x + first->w) {
+                    if (PK.scroll > 0) { PK.scroll--; if (PK.sel >= PK.scroll + rows) PK.sel = PK.scroll + rows - 1; }
+                }
+            }
+        } else if (SYM_ON) {
+            for (int i = 0; i < pal_n(); i++)
+                if (R_SYM[i].w && inside(R_SYM[i], MX, MY)) { SYM_SEL = i; break; }
+        }
         /* Press starts a selection, press-and-move extends it, release leaves it standing. The
          * selection outlives the drag deliberately: ctrl+c comes after the finger lifts. */
         if (e->pressed && !DRAGGING)      { DRAGGING = 1; sel_begin(MX, MY); }
@@ -2517,8 +2555,17 @@ void app_event(const in_event *e) {
                 /* ONE PATH for both levels: pk_key decides what the row means, so a suggestion
                  * clicked and a suggestion entered cannot diverge. The earlier version branched on
                  * level here and would have opened a family for a clicked suggestion. */
-                if (pk_key(&PK, st, K_ENTER, &rec) == PK_ACT_PICKED && rec >= 0)
-                    picker_send(st->rec[rec].rid);
+                if (pk_key(&PK, st, K_ENTER, &rec) == PK_ACT_PICKED && rec >= 0) {
+                    /* A129. THE CLICK PATH HAD TO LEARN LIB_MODE TOO. A127 taught the KEY path that
+                     * the library inserts rather than sends and left this one sending -- so
+                     * clicking a formula asked a question about it instead of putting it in the
+                     * box. Two paths to one action and only one of them was updated, which is the
+                     * defect this repo keeps paying for; they now agree because both end here. */
+                    if (LIB_MODE) {
+                        compose_insert_str(st->rec[rec].formula);
+                        PICK_ON = 0; LIB_MODE = 0; FIELD_FOCUS = 1;
+                    } else picker_send(st->rec[rec].rid);
+                }
                 return;
             }
             /* A CLICK OUTSIDE DOES NOTHING. The search sheet closes on one, which is right there
