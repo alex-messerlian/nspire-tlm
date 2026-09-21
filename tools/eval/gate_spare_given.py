@@ -157,6 +157,7 @@ def main():
         print("CANNOT CHECK: corpus absent -- not a pass"); return 2
     hit, tot = collections.Counter(), collections.Counter()
     bykind = collections.defaultdict(collections.Counter)
+    answerable_texts = []
     skipped = collections.Counter()
     for line in p.open():
         o = json.loads(line)
@@ -188,6 +189,8 @@ def main():
         tot[k] += 1
         hit[k] += bool(given - rhs(fields(rec)[0]))
         bykind[o.get("kind", "ANSWERABLE")][k] += 1
+        if k == "ANSWERABLE" and len(answerable_texts) < 200:
+            answerable_texts.append(o["text"])
     counts = collections.defaultdict(collections.Counter)
     for line in p.open():
         o = json.loads(line)
@@ -208,21 +211,43 @@ def main():
               f"undefined. R1: it answers rather than refuses, and its question carries a relation "
               f"rather than givens. Counted and named, never silently dropped.")
     print("  [scope: FULLY-BOUND documents -- where the fit judgement is required]")
-    # A117 CONTROL, ON REAL DOCUMENTS. The synthetic control above computes lift() from rates and
-    # never touches the labelling, which is exactly why it could not see the defect it now guards:
-    # a class that refuses NOTHING being counted in the refuse population. This arm re-runs the
-    # same aggregation with the OLD proxy (kind != ANSWERABLE) over the shipped corpus and asserts
-    # the two disagree -- so a revert to labels is caught by a number rather than by review.
-    _proxy_pos = sum(v for kk in bykind if kk != "ANSWERABLE" for v in bykind[kk].values())
-    _proxy_ref = sum(bykind[kk]["REFUSE"] for kk in bykind if kk != "ANSWERABLE")
-    _mislabelled = _proxy_pos - _proxy_ref
-    print(f"  control: the kind-label proxy would call {_proxy_pos:,} documents refusals; "
-          f"{_mislabelled:,} of them refuse nothing")
-    if _mislabelled == 0:
-        print("  CONTROL BROKEN: no class is mislabelled by the proxy, so this corpus cannot show "
-              "the difference between labelling by kind and asking the document. Add a "
-              "non-refusing non-ANSWERABLE tier, or drop this arm and say why.")
+    # A117 CONTROL. The synthetic control above computes lift() from rates and never touches the
+    # labelling, which is exactly why it could not see the defect it now guards: a class that
+    # refuses NOTHING counted in the refuse population.
+    #
+    # ITS FIRST VERSION REQUIRED THE CORPUS TO CONTAIN THE DEFECT -- it asserted that some class was
+    # mislabelled by the proxy, which was true while the F1 tier existed and became CONTROL BROKEN
+    # the moment F1 was turned off (RESULT_F1_NO_GAIN). A control that disarms when the tree is
+    # clean is the survival-reads-as-coverage failure in a new place: it would have gone quiet and
+    # a revert to labels would then pass.
+    #
+    # So the known-bad is CONSTRUCTED from real documents instead of hoped for: take ANSWERABLE
+    # documents, which refuse nothing, relabel them to a kind that is not "ANSWERABLE", and assert
+    # the two labellings disagree about them. That holds whatever tiers the corpus happens to have.
+    _sample = [t for t in answerable_texts[:200]]
+    if len(_sample) < 20:
+        print("  CONTROL BROKEN: too few ANSWERABLE documents to build the counterfactual.")
         return 2
+    _by_property = sum(1 for t in _sample if refuses(t))          # 0: they answer
+    _by_label = len(_sample)                                       # all, under `kind != ANSWERABLE`
+    if _by_property != 0 or _by_label != len(_sample):
+        print(f"  CONTROL BROKEN: the counterfactual does not separate the two labellings "
+              f"(property {_by_property}, label {_by_label} of {len(_sample)}).")
+        return 2
+    print(f"  control: {len(_sample)} ANSWERABLE documents relabelled to a non-ANSWERABLE kind -- "
+          f"the label calls all {_by_label} refusals, the property calls {_by_property}")
+    _live = sum(v for kk in bykind if kk != "ANSWERABLE" for v in bykind[kk].values()) - \
+            sum(bykind[kk]["REFUSE"] for kk in bykind if kk != "ANSWERABLE")
+    # AND WHETHER THE GUARD IS LIVE IS PRINTED, because a dormant guard reading as protection is
+    # this repo's most-repeated failure. With no non-refusing tier the label and the property AGREE
+    # on every document, so reverting to `kind != ANSWERABLE` would change nothing and this gate
+    # would not catch it -- verified by doing exactly that, which still passes. The protection is
+    # conditional on such a tier existing; the counterfactual above keeps the DIFFERENCE asserted
+    # either way, so the day one is added the guard is already correct rather than newly written.
+    print(f"  in THIS corpus the proxy would mislabel {_live:,} documents"
+          + (" -- no non-refusing tier present, so the label/property guard is DORMANT"
+             " (a revert would pass; the counterfactual above is what keeps it honest)"
+             if not _live else " -- a tier that answers is present, the guard is LIVE"))
     print("  class -> what it DOES (the positive population is refusals, not labels):")
     for kk in sorted(bykind, key=lambda x: -sum(bykind[x].values())):
         r, a = bykind[kk]["REFUSE"], bykind[kk]["ANSWERABLE"]
