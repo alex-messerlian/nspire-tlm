@@ -110,6 +110,8 @@ def lr_at(s):
     if s<WARM: return LR*s/WARM
     p=(s-WARM)/max(1,STEPS-WARM); return 0.1*LR+0.9*LR*0.5*(1+math.cos(math.pi*p))
 curve=[]; win=[]; t0=time.time()
+import time
+_T0 = time.time()
 for s in range(STEPS):
     for gp in opt.param_groups: gp["lr"]=lr_at(s)
     i=np.random.randint(0,len(tr)-SEQ-1,BS)
@@ -121,6 +123,16 @@ for s in range(STEPS):
     torch.nn.utils.clip_grad_norm_(m.parameters(),1.0); opt.step()
     win.append(l.item())
     if s and s%500==0: curve.append(sum(win)/len(win)); win.clear()
+    # A118 HEARTBEAT. The loss curve printed only at the END, so a run that WEDGED looked exactly
+    # like a run that was working. Measured cost of that: a training run sat 7h29m in state `UN`
+    # -- uninterruptible wait, 22 seconds of CPU consumed in the whole period -- inside the Metal
+    # driver, and nothing said so. The same driver had already killed seed 3 of the previous band
+    # with a command-buffer fault, so this is a known failure mode of this machine and not a
+    # surprise. "Silence is indistinguishable from a hang" is a standing rule here and the trainer
+    # was the one place still violating it.
+    if s % 200 == 0:
+        print(f"    step {s}/{STEPS}  loss {l.item():.4f}  {(time.time()-_T0)/60:.1f} min",
+              flush=True)
 # THE CHECKPOINT RECORDS THE CORPUS IT SAW. Without this, a harness has to guess -- and
 # train/remeasure.py guessed by importing corpus/generate.py, so when the generator went from 78
 # relations to 141 the stratification silently began labelling relations TRAINED that this
