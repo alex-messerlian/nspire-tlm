@@ -97,6 +97,18 @@ def _squash(s):
     return re.sub(r"\s+", "", s)
 
 
+# A121. N=12 WAS TOO SMALL AND IT MISLED ME THREE TIMES IN ONE SESSION.
+#
+# D7 measured 12/12 on two seeds of one corpus and read as 100%. At n=60 the same arm spans
+# 75%-100% ACROSS SEEDS on a single corpus -- so the two-seed agreement was a coincidence of a
+# sample too small to show the spread, and I used it to conclude (a) that F1 caused a regression,
+# (b) that the corpus values caused it, before the discriminating run showed it was SEED variance
+# all along. D8 is the same: 12/12 against n=50 readings of 100% and 76%.
+#
+# n=40 costs about 90 seconds more per probe and resolves a 20 pp difference; 12 cannot resolve 40.
+D7_N = int(os.environ.get("D7_N", "40"))
+
+
 def rng_for(term):
     h = hashlib.sha256(("kprobe/v1:" + term).encode()).hexdigest()
     return random.Random(int(h[:16], 16))
@@ -295,7 +307,7 @@ def main():
         ("kprobe/r1/v1:" + rv[0]["f"] + ":" + rv[1]).encode()).hexdigest())
     called = targeted = answered = usable = 0
     for r, v in pairs:
-        if usable >= 12:
+        if usable >= D7_N:
             break
         want = subprocess.run([str(ROOT / "tools/eval/evalcli"),
                         f"<tool>solve<arg>{r['f']}<arg>{v}</tool>"],
@@ -351,7 +363,7 @@ def main():
     cpairs.sort(key=lambda z: hashlib.sha256(
         ("kprobe/c1/v1:" + z[0]["f"] + ":" + z[3]).encode()).hexdigest())
     for r, lhs, rhs, v in cpairs:
-        if cal_n >= 12:
+        if cal_n >= D7_N:
             break
         w = subprocess.run([str(ROOT / "tools/eval/evalcli"),
                             f"<tool>diff<arg>{rhs}<arg>{v}</tool>"],
