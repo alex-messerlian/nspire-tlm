@@ -92,12 +92,20 @@ def main():
         q = o["text"].split("<q>", 1)[1].split("</q>", 1)[0]
         if not q.startswith(pre):
             bad += 1
-    print(f"  F1 documents in the corpus: {n:,}")
-    if n == 0:
-        print("\n  FAIL: zero F1 documents. The device now prepends the earlier turns, so a prompt "
-              "shape with no training documents is exactly what RESULT_CANNOT_EXPLAIN describes. "
-              "Regenerate with FOLLOWUP=1.")
-        return 1
+    # ZERO F1 DOCUMENTS IS NOW A PASS, AND THAT IS A MEASURED REVERSAL OF THIS GATE'S OWN PREMISE.
+    #
+    # It used to fail here, on the RESULT_FOLLOWUP_UNWIRED argument that a two-turn prompt is an
+    # untrained shape and the halves must ship together. docs/RESULT_F1_NO_GAIN.md tested that at
+    # n=80 on matched items: a checkpoint with ZERO follow-up documents recomputes 75.0% correctly
+    # against 66.2% WITH the tier, names the unit 98.7% against 92.3%, and calls the tool 98.8%
+    # against 97.5%. No arm significant, none favouring the tier.
+    #
+    # The reasoning was sound and the premise was wrong -- after ask_build strips it, the device's
+    # follow-up prompt is mostly the shape the model already knows. What this gate still asserts is
+    # the part that IS load-bearing and is checked above: the context reaches RETRIEVAL, and a
+    # restated value overrides. The corpus half is optional and its absence is not a defect.
+    print(f"  F1 documents in the corpus: {n:,}  "
+          f"({'tier on' if n else 'tier OFF -- measured at no gain, RESULT_F1_NO_GAIN.md'})")
     if bad:
         print(f"\n  FAIL: {bad} F1 questions do not start with the device's own prefix {pre!r}.")
         return 1

@@ -2408,7 +2408,15 @@ CALCULUS = float(os.environ.get("CALCULUS", "1"))
 # A115. FOLLOW-UPS. docs/RESULT_FOLLOWUP_UNWIRED.md: app_context() builds a conversation history and
 # nothing calls it, and a second turn's prompt shape occurs in 0 of 239,853 documents. The two
 # halves ship together -- this is the corpus half.
-FOLLOWUP = float(os.environ.get("FOLLOWUP", "1"))
+# MEASURED AT 0, not assumed. docs/RESULT_F1_NO_GAIN.md: at n=80 on matched items the tier buys
+# NOTHING -- recompute accuracy 75.0% -> 66.2%, units 98.7% -> 92.3%, tool-calling 98.8% -> 97.5%,
+# no arm significant and none favouring it. The premise it was built on (a two-turn prompt is an
+# untrained shape) was wrong: after ask_build strips it, the device's follow-up prompt is mostly
+# the shape the model already knows, and a checkpoint with ZERO F1 documents handles it at 75.0%.
+# The DEVICE half stays wired -- without app_context every turn is turn one and that 75% does not
+# exist. The tier stays behind the flag because a compute-only rebalance is a live hypothesis D9
+# can now test.
+FOLLOWUP = float(os.environ.get("FOLLOWUP", "0"))
 
 # WRITTEN EXPLANATIONS for the 164 compute records, keyed by formula. Three variants each, every
 # one under 215 chars, pure ASCII, using only variables the record declares, grounded in that
