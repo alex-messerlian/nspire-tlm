@@ -326,6 +326,7 @@ static const pal_cat PAL_CAT[] = {
 #define SYM_MAX 25                  /* tiles a category may hold; R_SYM is sized to it */
 #define SYM_COLS 5
 static int SYM_ON, SYM_SEL, SYM_CAT;
+static gfx_rect R_SYMSHEET;   /* A123: the palette's own sheet, so a click inside it cannot close it */
 static gfx_rect R_SYM[SYM_MAX];
 static gfx_rect R_CAT[CAT_N];
 
@@ -2171,8 +2172,29 @@ static void open_picker(void) {
             return;
         }
     }
-    pk_open(&PK, st, PENDQ);      /* ranks the shortlist and places the cursor */
-    PICK_ON = 1;
+    /* A125. THE PICKER NEVER APPEARS IN THE ANSWER PATH. The fallback is a REFUSAL, not a prompt.
+     *
+     * Asked for twice, in these words: "It should never present the option for someone to select
+     * something, delete it, just delete it. It should either say an answer or it doesn't know."
+     *
+     * And it was not only unwanted, it was actively harmful. The student cannot know which record
+     * is right -- that is the retrieval problem, handed to them -- and a wrong pick produces a
+     * confident answer about the wrong relation. Reported from the device: picking from the
+     * shortlist after a rearrangement gave "p equals f times v" for a question about m = F/a.
+     *
+     * WHAT MAKES THE REFUSAL SAFE IS A124, NOT OPTIMISM. Before it, calculus and rearrangement
+     * questions were confident 0% of the time, so deleting the picker would have turned every one
+     * of them into "I cannot answer that". With the relation-carried rule they are confident, and
+     * the fallback now catches what it should: out-of-scope questions and word problems.
+     *
+     *     rule                     in-scope   out-of-scope false positives
+     *     coverage only (before)      73.3%          2.2%
+     *     + relation carried          93.3%          1.6%
+     *
+     * picker_send(0) is Form C -- the prompt with no record, which the corpus trains as a refusal
+     * and which measured 100.0% refused and 0.0% confident answers on 88 questions the store
+     * cannot serve. It is the same path esc always took. */
+    picker_send(0);
 }
 
 static void draw_symbols(void) {
@@ -2183,6 +2205,7 @@ static void draw_symbols(void) {
     const int X = (GFX_W - W) / 2, Y = (GFX_H - H) / 2;
     gfx_fill(0, 0, GFX_W, GFX_H, C_SCRIM);
     gfx_rrect(X, Y, W, H, 8, C_SHEET);
+    R_SYMSHEET = (gfx_rect){ X, Y, W, H };
     gfx_text(X + 10, Y + 5, "INSERT", F_XS, C_INK3, C_SHEET);
 
     /* Category tabs. SYM_SEL == -1 parks the cursor here, so UP from the first row reaches them
@@ -2406,7 +2429,19 @@ void app_event(const in_event *e) {
                 if (R_SYM[i].w && inside(R_SYM[i], MX, MY)) {
                     compose_insert_str(pal_at(i)); SYM_ON = 0; return;
                 }
-            SYM_ON = 0; return;                /* a tap outside closes: nothing is pending */
+            /* A123. ONLY A CLICK OUTSIDE THE SHEET CLOSES. It used to close on ANY click that was
+             * not a tile or a tab, and on this hardware that is most of them:
+             *
+             *   THE CX II HAS NO ARROW KEYS. The touchpad IS the arrow ring, and ns_pointer_feed
+             *   turns a low-travel contact into an IN_CLICK -- so a student pressing the pad's
+             *   edge to move RIGHT or DOWN lands a click at the cursor's position, which is
+             *   usually the gap between tiles, and the palette vanished.
+             *
+             * Reported from the device as "it keeps exiting when I'm in there and trying to either
+             * go right or down with the arrows". A click inside the sheet but on nothing now does
+             * nothing, which is what a modal sheet should do anyway. */
+            if (!inside(R_SYMSHEET, MX, MY)) { SYM_ON = 0; }
+            return;
         }
         if (PICK_ON) {                         /* modal: a click lands on a row or nowhere */
             const ns_store2 *st = app_store();

@@ -10,6 +10,10 @@
 #include <string.h>
 #include "../../src/store/app.c"
 
+/* A125. What build/hoststub.c records for app_request, so "the send happened and carried
+ * the question" is observable on the host. device_app.c only cross-compiles. */
+extern char HS_LASTQ[512]; extern char HS_LASTR[64]; extern int HS_NREQ;
+
 static int F;
 static void T(const char *n, int got, int want) {
     int ok = got == want;
@@ -336,15 +340,26 @@ int main(void) {
     key('h'); key('i');
     key(K_ENTER);
     T("enter sends when the box has text", COMPOSE_N, 0);
-    /* ENTER NOW OPENS THE RELATION PICKER rather than sending straight away -- decision E, and
-     * the composer is emptied into PENDQ, which is why the assertion above still reads 0. The
-     * picker is MODAL, so leaving it open here swallowed every key the rest of this file sends:
-     * six later cases failed with no defect in them. Asserting the new state and then leaving it
-     * is the fix; the picker's own behaviour is covered by test_pickui. */
-    T("enter opens the relation picker", PICK_ON, 1);
-    T("and the question is held, not lost", PENDQ[0] != 0, 1);
-    key(K_ESC);                       /* family list: esc is "ask anyway" -> Form C, picker closes */
-    T("esc at the family list closes it", PICK_ON, 0);
+    /* A125. ENTER SENDS. IT DOES NOT OPEN A PICKER, AND IT MUST NEVER OPEN ONE AGAIN.
+     *
+     * This used to assert PICK_ON == 1: decision E made enter open a relation shortlist so the
+     * student could choose. That was removed on a direct instruction -- "it should never present
+     * the option for someone to select something, delete it, just delete it. It should either say
+     * an answer or it doesn't know" -- and because it was harmful: the student cannot know which
+     * record is right (that IS the retrieval problem, handed to them), and a wrong pick produces a
+     * confident answer about the wrong relation.
+     *
+     * The composer still empties into PENDQ, which is why the assertion above reads 0, and the
+     * question must survive there: a send that loses the question is the failure this line guards.
+     * Where the question GOES is now decided by ask_confident -- a record when the question names
+     * or carries one, and Form C (no record, a trained refusal) otherwise. */
+    T("enter does NOT open a picker", PICK_ON, 0);
+    /* PENDQ is CLEARED because the question was SENT, not held. It used to survive here only
+     * because the picker was waiting on a choice. What must be true now is that the question
+     * reached the transcript rather than vanishing from the composer -- the send that loses the
+     * question is the failure this line has always guarded, and the place to see it moved. */
+    T("and the question reached app_request, not lost", HS_NREQ > 0 && HS_LASTQ[0] != 0, 1);
+    T2("...carrying what was typed", HS_LASTQ, "hi");
 
     /* -- the caret, and editing anywhere but the end --
      *
@@ -388,6 +403,22 @@ int main(void) {
     SYM_CAT = 0; SYM_SEL = 0;
     key(K_SYM);
     T("menu opens the palette", SYM_ON, 1);
+    /* A123. A CLICK INSIDE THE SHEET BUT ON NOTHING MUST NOT CLOSE IT.
+     *
+     * THE CX II HAS NO ARROW KEYS -- the touchpad IS the arrow ring, and ns_pointer_feed turns a
+     * low-travel contact into an IN_CLICK. So a student pressing the pad's edge to move right or
+     * down lands a click in the gap BETWEEN tiles, and the palette used to vanish. Reported from
+     * the device as "it keeps exiting when I'm in there and trying to go right or down".
+     *
+     * The click is aimed at the sheet's own top-left corner, which is inside R_SYMSHEET and is not
+     * a tile or a tab -- exactly the gap the old code treated as "outside". */
+    app_draw();                                  /* R_SYMSHEET is set by draw_symbols */
+    app_event(&(in_event){ .kind = IN_CLICK, .x = R_SYMSHEET.x + 2, .y = R_SYMSHEET.y + 2 });
+    T("a click inside the sheet does not close it", SYM_ON, 1);
+    app_event(&(in_event){ .kind = IN_CLICK, .x = R_SYMSHEET.x - 8, .y = R_SYMSHEET.y - 8 });
+    T("a click OUTSIDE the sheet still closes it", SYM_ON, 0);
+    key(K_SYM); SYM_CAT = 0; SYM_SEL = 0;        /* reopen for the insertion checks below */
+
     const char *t0 = pal_at(0);
     key(K_ENTER);
     T("enter inserts the selected token", SYM_ON, 0);

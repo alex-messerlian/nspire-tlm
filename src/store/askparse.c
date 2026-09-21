@@ -637,6 +637,43 @@ int ask_qcover(const ns_store2 *st, int r, const char *question) {
     return (100 * q.match) / q.total;
 }
 
+/* A124. THE QUESTION CARRYING THE RELATION IS CERTAINTY, and word coverage cannot see it.
+ *
+ * ask_qcover asks what FRACTION OF THE QUESTION'S WORDS the record's name accounts for. That is a
+ * good test for "what is hookes law" and it is structurally unable to pass a calculus or
+ * rearrangement question, because those carry an EXPRESSION and a verb the record name never
+ * contains. Measured on the shipped store, before this:
+ *
+ *     what is hookes law                                    YES
+ *     find work when f=12 d=2.5                             YES
+ *     what is the derivative of 0.5*m*(v)^(2) w.r.t. v      no
+ *     solve F=m*a for m                                     no
+ *     derivative of kinetic energy with respect to v        no
+ *     integral of -k*x with respect to x                    no
+ *
+ * ZERO of four. Every calculus and rearrangement question fell through, and what it fell through
+ * TO was the picker -- so the device asked the student to choose, they chose wrong, and the answer
+ * was garbage. Reported from the device as "for the derivative one, it said it cannot solve because
+ * there's no record, and it even popped up that selection thing again".
+ *
+ * A75 and A110 already score a record whose RELATION or whose RIGHT-HAND SIDE appears verbatim in
+ * the question. That is a far stronger signal than name coverage -- the student has typed the
+ * formula -- so it is certainty in its own right, and it is checked here as an alternative rather
+ * than folded into the coverage fraction, which would dilute both. */
+static int question_carries_relation(const ns_store2 *st, int r, const char *question) {
+    char nf[160], nq[640];
+    if (norm_expr(st->rec[r].formula, nf, (int)sizeof nf) < 4) return 0;
+    if (!strchr(nf, '=')) return 0;               /* a glossary term is not a relation (A75) */
+    if (norm_expr(question, nq, (int)sizeof nq) <= 0) return 0;
+    if (strstr(nq, nf)) return 1;                 /* the whole relation */
+    const char *rhs = strchr(nf, '=') + 1;        /* or its right-hand side, which is what a
+                                                   * derivative or an integral question writes */
+    int has_op = 0;
+    for (const char *q = rhs; *q; q++)
+        if (*q == '*' || *q == '/' || *q == '+' || *q == '-' || *q == '^') has_op = 1;
+    return has_op && strlen(rhs) >= 3 && strstr(nq, rhs) != 0;
+}
+
 int ask_confident(const ns_store2 *st, const char *question, const ns_input *in, int *idx_out) {
     if (idx_out) *idx_out = -1;
     if (!st || !question) return 0;
@@ -644,6 +681,19 @@ int ask_confident(const ns_store2 *st, const char *question, const ns_input *in,
     int n = ask_rank_scored(st, question, in, ASK_NOUN, out, sc, 2);
     if (n < 1) return 0;
     if (idx_out) *idx_out = out[0];
+    if (question_carries_relation(st, out[0], question)) return 1;
+    /* A VERBATIM RECORD NAME WAS TRIED AS A THIRD CERTAINTY RULE AND MEASURED OUT. It would have
+     * caught the one worded calculus question that still falls through ("derivative of kinetic
+     * energy with respect to v", which ranks this record first and scores 0 on coverage). Measured
+     * against the 2,000 certified out-of-scope stems it took false positives from 1.6% to 19.8% --
+     * one in five out-of-scope questions would get a record and an answer. Record names are
+     * ordinary physics nouns and a length gate did not save it. Left out deliberately:
+     *
+     *     rule                     in-scope   out-of-scope
+     *     coverage only               73.3%          2.2%
+     *     + relation carried          93.3%          1.6%      <- shipped, better on BOTH
+     *     + verbatim name            100.0%         19.8%
+     */
     return ask_qcover(st, out[0], question) >= ASK_CONFIDENT_MIN;
 }
 

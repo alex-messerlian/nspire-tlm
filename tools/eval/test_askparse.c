@@ -209,16 +209,30 @@ int main(int argc, char **argv) {
      * actually typed -- and not synthetic ones: a control built on a made-up record tests the
      * mechanism and not the property.
      *
-     * The NOT-CONFIDENT cases are the two shapes that must reach the picker. "Solve F=m*a for a."
-     * is the one that made this measurement honest: it reduces to a single content word, "solve",
-     * which fuzzy-matches the record named "lens/mirror equation (SOLVED version)", and under
-     * full-weight fuzzy matching it read as a 100%-explained question. Seven word problems had
-     * that shape and they are why coverage first measured INVERSELY correlated with retrieval@1.
-     * If the fuzzy half-weight is ever removed, this line fails. */
+     * A124 MOVED THE TWO REARRANGEMENT CASES FROM NOT-CONFIDENT TO CONFIDENT, and the reason is a
+     * different signal rather than a relaxed threshold. "Solve F=m*a for a." is the case that made
+     * this measurement honest: it reduces to a single content word, "solve", which fuzzy-matches
+     * the record named "lens/mirror equation (SOLVED version)", and under full-weight fuzzy
+     * matching it read as a 100%-explained question. That failure mode is still real and is still
+     * what ask_qcover must not do -- if the fuzzy half-weight is ever removed, coverage breaks
+     * again. What changed is that the question CARRIES THE RELATION: "F=m*a" is the record's own
+     * formula, typed by the student, and question_carries_relation now says so directly. Both
+     * resolve to the RIGHT record, which the old path never did.
+     *
+     * Measured over the 2,000 certified out-of-scope stems, the two rules together are better on
+     * BOTH axes than coverage alone: in-scope 73.3% -> 93.3%, false positives 2.2% -> 1.6%. A third
+     * rule (a verbatim record name) reached 100% in-scope and 19.8% false positives and was
+     * rejected; see askparse.c.
+     *
+     * The NOT-CONFIDENT cases that REMAIN are the two that must still refuse: an out-of-scope
+     * question and a word problem. Those are the shapes where a record would be invented. */
     {   int idx;
         const char *CONF[] = { "what is hookes law", "newton second law", "explain hokes law",
                                "what is kinetic energy", "find work when f=12 d=2.5",
-                               "what is acceleration" };
+                               "what is acceleration",
+                               /* A124: the question carries the relation, so it is certainty */
+                               "Solve F=m*a for a.", "Solve v=d/t for d.",
+                               "what is the derivative of 0.5*m*(v)^(2) with respect to v" };
         for (unsigned i = 0; i < sizeof CONF / sizeof CONF[0]; i++) {
             static ns_ask a; ask_parse(CONF[i], &a);
             int c = ask_confident(&ST, CONF[i], &a.in, &idx);
@@ -227,8 +241,6 @@ int main(int argc, char **argv) {
             ck(c == 1, CONF[i], m);
         }
         const char *NOPE[] = {
-            "Solve F=m*a for a.",                       /* one content word, fuzzy, degenerate   */
-            "Solve v=d/t for d.",
             "Find the gradient of f(x,y,z) = xy + yz + xz at point P(1,2,3).",  /* out of scope  */
             "A sled is pushed 84 m in 7 s at constant speed. Find the speed.",  /* word problem  */
         };
