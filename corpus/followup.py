@@ -91,19 +91,24 @@ def _free(rhs, lhs):
             if x not in _FN and x != lhs]
 
 
-def build(recs, prompt_of, run_tool, rng, draw, holds, unit_of, dose=None):
+def build(recs, prompt_of, run_tool, rng, givens_of, redraw, holds, derives, unit_of,
+          dose=None):
     """F1 documents.
 
     prompt_of(text)     -> the device's full "<q>...</q><r>..." prefix, or None.
     run_tool(call)      -> the runtime's <res> string.
-    draw(rec, var)      -> a sampled value, or None when nothing is DECLARED for it.
-    holds(rec, vals)    -> generate.preconditions_hold. A NEW TIER THAT DRAWS GIVENS MUST APPLY THE
-                           SHARED CROSS-VARIABLE PRECONDITIONS. The first version did not, and the
-                           hand-read immediately produced a heat engine with Q_c = 519 against
-                           Q_h = 24.2 -- negative work, a refrigerator -- and an output work of
-                           -127.3 J after friction. BOTH records already carry a correct
-                           precondition in _PRECONDITION; this tier simply never asked. Same class
-                           as every other "the check exists and the new consumer does not call it".
+    givens_of(rec, vs)  -> generate.draw_givens: drawn, DERIVED and precondition-checked as ONE
+                           operation. A116: this tier first asked for a SAMPLER and applied the
+                           preconditions itself, which skipped _DERIVE -- so the pendulum record
+                           drew L and T independently and stated a local gravity of 0.00048 and of
+                           652.8 m/s^2. The fix is not another parameter here, it is that a tier
+                           needing givens asks for GIVENS.
+    redraw(rec, var)    -> one fresh value for the restated variable in a CHANGE follow-up.
+    holds(rec, vals)    -> generate.preconditions_hold, re-checked after that restatement.
+    derives(rec)        -> True when the record has a _DERIVE coupling. Such a record gets CONCEPT
+                           follow-ups only: changing ONE given while the others stand is exactly
+                           what the derivation exists to prevent, so "recompute with L = 2" on a
+                           pendulum is an ill-posed question however the arithmetic comes out.
     unit_of(rec)        -> generate.lhs_unit. NOT `units[lhs]`: a dimensionless record must render
                            BARE ("0.25", not "0.25 1") and lhs_unit is where that ruling lives.
     """
@@ -126,16 +131,11 @@ def build(recs, prompt_of, run_tool, rng, draw, holds, unit_of, dose=None):
             if made >= dose:
                 break
             fired["attempts"] += 1
-            vals = {}
-            for v in free:
-                x = draw(r, v)
-                if x is None:
-                    break
-                vals[v] = x
-            else:
-                if not holds(r, vals):
-                    fired["precondition"] += 1
-                    continue
+            vals = givens_of(r, free)
+            if vals is None:
+                fired["precondition"] += 1
+                continue
+            if True:
                 u = unit_of(r)
                 g = ", ".join(f"{v} = {_fmt(x)}" for v, x in vals.items())
                 q1 = rng.choice(ASK1).format(n=name, g=g)
@@ -144,11 +144,20 @@ def build(recs, prompt_of, run_tool, rng, draw, holds, unit_of, dose=None):
                 # difference of two heats. Wrong supervision that every structural check passes:
                 # the document is well-formed, the record is right, the prose is fluent, and the
                 # physics is not about that relation. Only a leading minus is a sign convention.
-                kind = rng.choice(["change", "change", "dep"] + (["units"] if u else []) +
+                kind = rng.choice((["change", "change"] if not derives(r) else []) + ["dep"] +
+                                  (["units"] if u else []) +
                                   (["neg"] if rhs.lstrip().startswith("-") else []))
                 if kind == "change":
-                    vk = rng.choice(free)
-                    nx = draw(r, vk)
+                    # A CONSTANT IS NOT RESTATED. redraw() returns None for g, c, h, G -- correctly,
+                    # a constant of nature is not a draw -- and picking one wasted 12.26% of
+                    # attempts. It is also the wrong question: "recompute with g = 4" is not a
+                    # follow-up a student asks.
+                    cand = [v for v in free if redraw(r, v) is not None]
+                    if not cand:
+                        fired["no-window"] += 1
+                        continue
+                    vk = rng.choice(cand)
+                    nx = redraw(r, vk)
                     if nx is None or _fmt(nx) == _fmt(vals[vk]):
                         fired["no-window"] += 1
                         continue

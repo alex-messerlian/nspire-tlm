@@ -78,8 +78,18 @@ def audit(m, n=N, seed=11):
     # The subject was read from the document's own `head` rather than parsed back out of the
     # question -- the first attempt parsed it and reported 40 false defects, because it could not
     # strip a trailing "explain briefly." or an appended given.
+    # F1 IS EXEMPT FOR EXACTLY THE SAME REASON, and measured the same way. A follow-up asks about
+    # the relation rather than for a quantity -- "what are the units on that?", "what does it
+    # depend on?" -- and this gate identifies a mined fragment by the first six characters of its
+    # lead, so "What are" collides with an honest hand-written frame once again.
+    #
+    # MEASURED BEFORE EXEMPTING: over the shipped corpus, 221 of 4,132 F1 questions contain "what
+    # are", and ALL 221 are the single frame "what are the units on that?" from
+    # corpus/followup.py's ASK_UNITS. None is mined, and there are 4 hand-written unit frames in
+    # total. An exemption asserted rather than measured is how a real defect gets protected from
+    # the next audit, which is why the count is here rather than the claim.
     docs = [d for d in docs if (d.get("kind") if isinstance(d, dict) else None) not in
-            ("K1", "K2", "K3")]
+            ("K1", "K2", "K3", "F1")]
     qs = [mm.group(1) for mm in (re.search(r"<q>(.*?)</q>", text(d)) for d in docs) if mm]
     if not qs:
         # ABSENCE IS A FAILURE, NOT A SKIP: a generator emitting no <q> span would otherwise

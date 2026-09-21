@@ -1120,6 +1120,39 @@ def preconditions_hold(rec, vals):
         return True            # the record does not have those variables; not this check's call
 
 
+def draw_givens(r, vs, rng, tries=24):
+    """Every given for `r`: drawn, DERIVED, and retried until the precondition holds. None if it
+    cannot be satisfied.
+
+    THE THREE STEPS ARE ONE OPERATION AND MUST NOT BE SPLIT. A116: the F1 tier drew values with
+    quantity_range/sample_in_range and applied preconditions_hold, and skipped _DERIVE entirely --
+    so `g=4*pi^2*L/T^2` drew L and T independently and stated a local gravity of 0.00048 and of
+    652.8 m/s^2. _derive_pendulum_T exists precisely because a pendulum's period is not independent
+    of its length, and it had been written, tested and measured (68.50% firing before it).
+
+    That is the same class as the precondition bypass one function over, and patching F1 again
+    would have left the third consumer to make the same omission. So the sequence lives here and
+    both callers use it: a new tier that needs givens asks for givens, not for a sampler.
+
+    _const_for is inside too. Without it a record carrying g, c, h or G returns None from
+    quantity_range -- correctly, a constant is not a draw -- and a caller that treats None as
+    "skip" silently loses every record with a constant in it.
+    """
+    def _draw(v):
+        c = _const_for(r, v)
+        if c is not None: return c
+        rr = quantity_range(r, v)
+        return sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else sample_value(rng)
+
+    _der = _DERIVE.get(r.get("f"))
+    for _ in range(tries):
+        vals = {v: _draw(v) for v in vs}
+        if _der is not None: vals = _der(vals, rng)
+        if preconditions_hold(r, vals): return vals
+    return None
+
+
+
 def sample_in_range(rng, lo, hi, integral):
     """Draw from the empirical pool, restricted to the range; fall back to a uniform draw when the
     pool offers nothing there, so a narrow window cannot silently empty the distribution."""
@@ -2526,19 +2559,8 @@ def gen(n, seed=0):
         r = rng.choice(recs)
         lhs, rhs = r["f"].split("=", 1)
         vs = sorted({v for v in VAR.findall(rhs)} - {"pi", "e"})
-        def _draw(v):
-            c = _const_for(r, v)
-            if c is not None: return c
-            rr = quantity_range(r, v)
-            return sample_in_range(rng, rr[0], rr[1], rr[2]) if rr else sample_value(rng)
-        vals = {v: _draw(v) for v in vs}
-        _der = _DERIVE.get(r.get("f"))
-        if _der is not None: vals = _der(vals, rng)
-        for _try in range(24):                     # bounded: a precondition that can never hold
-            if preconditions_hold(r, vals): break  # must not spin, and the doc is dropped below
-            vals = {v: _draw(v) for v in vs}
-            if _der is not None: vals = _der(vals, rng)
-        if not preconditions_hold(r, vals):
+        vals = draw_givens(r, vs, rng)
+        if vals is None:
             continue                               # cannot satisfy it -- drop, never teach it
         expr = VAR.sub(lambda m: f"({vals[m.group(1)]})" if m.group(1) in vals else m.group(1), rhs)
         free = [v for v in vs if _const_for(r, v) is None]
@@ -3520,11 +3542,15 @@ def gen(n, seed=0):
                                capture_output=True, text=True)
             return next((l for l in r.stdout.split("\n") if l.startswith("<q>")), None)
 
-        fdocs, fskip, ffire = _FU.build(recs, _devprompt, _run_tool_text, rng,
-                                        lambda rec, var: (lambda w: sample_in_range(
-                                            rng, w[0], w[1], w[2]) if w else None)(
-                                            quantity_range(rec, var)),
-                                        preconditions_hold, lhs_unit)
+        def _redraw(rec, var):
+            w = quantity_range(rec, var)
+            return sample_in_range(rng, w[0], w[1], w[2]) if w else None
+
+        fdocs, fskip, ffire = _FU.build(
+            recs, _devprompt, _run_tool_text, rng,
+            lambda rec, vs: draw_givens(rec, vs, rng),          # drawn, DERIVED, checked
+            _redraw, preconditions_hold,
+            lambda rec: rec.get("f") in _DERIVE, lhs_unit)
         if FOLLOWUP < 1:
             rng.shuffle(fdocs)
             fdocs = fdocs[:int(len(fdocs) * FOLLOWUP)]

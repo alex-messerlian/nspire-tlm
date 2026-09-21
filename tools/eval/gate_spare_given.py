@@ -30,6 +30,40 @@ VAR = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 RESV = {"pi", "e", "sin", "cos", "tan", "asin", "acos", "atan", "sqrt", "log", "ln", "exp", "abs"}
 MAX_LIFT = 12.0   # pp of precision above the base rate. 100% precision was a lift of 85.1.
 
+
+# A117. THE POSITIVE CLASS IS "THIS DOCUMENT REFUSES", NOT "kind != ANSWERABLE".
+#
+# Every precision figure below asks: does <cue> predict a REFUSAL. The class label was standing in
+# for that, and it was a PROXY -- true only while D1 and D2 were the sole record-bearing classes
+# that were not ANSWERABLE. The gate's own R1 exclusion says so in as many words ("it answers
+# rather than refuses, so counting it in the refuse population inverts the gate's own definition")
+# and fixes that one case by hand.
+#
+# It expired when F1 arrived. Measured on the shipped corpus, over the documents this gate
+# actually scores (fully-bound, record-bearing; the knowledge tier is excluded upstream by
+# no_relation, which I first mis-measured as mislabelled -- the gate's own control prints the real
+# figure so the claim cannot drift again):
+#
+#     class          docs   refusals
+#     ANSWERABLE  188,028        0     correctly negative
+#     F1            6,192        0     counted POSITIVE, refuses nothing
+#     D2            3,117    3,117     correctly positive
+#     D1              306      306     correctly positive
+#
+# F1's 6,192 tipped "TOTAL givens <= 2" from under the ratchet to +12.7 pp, and the gate then
+# blamed the corpus. With the property instead of the label the same arm reads -1.3 pp: the cue was
+# the labelling, not the documents. Asking the document what it DOES subsumes the hand-written R1
+# exclusion and every tier added after this one.
+_REFUSAL = re.compile(r"cannot answer|is not given|no matching relation", re.I)
+
+
+def refuses(doc_text):
+    """True when the ANSWER span declines. The property the precision figures are about."""
+    a = doc_text.split("<a>", 1)[1] if "<a>" in doc_text else ""
+    return bool(_REFUSAL.search(a))
+
+
+
 # PRESENCE AND COUNT ARE DIFFERENT FAMILIES AND CLOSING ONE SAYS NOTHING ABOUT THE OTHER.
 # A43 equalised PRESENCE -- the lift fell from +85.1 to +1.2 -- and the cue MOVED to COUNT: a
 # mismatch inherits the wrong record's variables AND the added spare, so `spare count >= 2 ->
@@ -122,6 +156,7 @@ def main():
     if not p.exists():
         print("CANNOT CHECK: corpus absent -- not a pass"); return 2
     hit, tot = collections.Counter(), collections.Counter()
+    bykind = collections.defaultdict(collections.Counter)
     skipped = collections.Counter()
     for line in p.open():
         o = json.loads(line)
@@ -147,11 +182,12 @@ def main():
             continue
         if FULLY_BOUND_ONLY and "missing:none" not in rec:
             continue                       # the fit judgement is only required when bound
-        k = o.get("kind", "ANSWERABLE")
+        k = "REFUSE" if refuses(o["text"]) else "ANSWERABLE"
         q = o["text"].split("<q>")[1].split("</q>")[0]
         given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", q))
         tot[k] += 1
         hit[k] += bool(given - rhs(fields(rec)[0]))
+        bykind[o.get("kind", "ANSWERABLE")][k] += 1
     counts = collections.defaultdict(collections.Counter)
     for line in p.open():
         o = json.loads(line)
@@ -162,7 +198,8 @@ def main():
             continue
         q = o["text"].split("<q>")[1].split("</q>")[0]
         given = set(re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*=", q))
-        counts[o.get("kind", "ANSWERABLE")][min(len(given - rhs(fields(rec)[0])), 3)] += 1
+        counts["REFUSE" if refuses(o["text"]) else "ANSWERABLE"][
+            min(len(given - rhs(fields(rec)[0])), 3)] += 1
 
     if skipped:
         print(f"  SCOPE: {sum(skipped.values()):,} documents excluded, by class, with reasons: "
@@ -171,7 +208,26 @@ def main():
               f"undefined. R1: it answers rather than refuses, and its question carries a relation "
               f"rather than givens. Counted and named, never silently dropped.")
     print("  [scope: FULLY-BOUND documents -- where the fit judgement is required]")
-    print("  spare-variable rate by class (a question supplying a variable the record does not use):")
+    # A117 CONTROL, ON REAL DOCUMENTS. The synthetic control above computes lift() from rates and
+    # never touches the labelling, which is exactly why it could not see the defect it now guards:
+    # a class that refuses NOTHING being counted in the refuse population. This arm re-runs the
+    # same aggregation with the OLD proxy (kind != ANSWERABLE) over the shipped corpus and asserts
+    # the two disagree -- so a revert to labels is caught by a number rather than by review.
+    _proxy_pos = sum(v for kk in bykind if kk != "ANSWERABLE" for v in bykind[kk].values())
+    _proxy_ref = sum(bykind[kk]["REFUSE"] for kk in bykind if kk != "ANSWERABLE")
+    _mislabelled = _proxy_pos - _proxy_ref
+    print(f"  control: the kind-label proxy would call {_proxy_pos:,} documents refusals; "
+          f"{_mislabelled:,} of them refuse nothing")
+    if _mislabelled == 0:
+        print("  CONTROL BROKEN: no class is mislabelled by the proxy, so this corpus cannot show "
+              "the difference between labelling by kind and asking the document. Add a "
+              "non-refusing non-ANSWERABLE tier, or drop this arm and say why.")
+        return 2
+    print("  class -> what it DOES (the positive population is refusals, not labels):")
+    for kk in sorted(bykind, key=lambda x: -sum(bykind[x].values())):
+        r, a = bykind[kk]["REFUSE"], bykind[kk]["ANSWERABLE"]
+        print(f"    {kk:11s} {r + a:>8,} docs   refuses {100*r/max(1,r+a):5.1f}%")
+    print("  spare-variable rate by population (a question supplying a variable the record does not use):")
     for k in sorted(tot):
         print(f"    {k:11s} {100*hit[k]/tot[k]:5.1f}%   ({hit[k]:,}/{tot[k]:,})")
     refuse_k = sum(hit[k] for k in tot if k != "ANSWERABLE")
@@ -219,7 +275,8 @@ def main():
             q = o["text"].split("<q>")[1].split("</q>")[0]
             if (no_relation(rc) and not rc.startswith("none")) or o.get("kind") == "R1":
                 continue                   # knowledge tier and R1: see the exclusions above
-            k = "D3" if rc.startswith("none") else o.get("kind", "ANSWERABLE")
+            k = "D3" if rc.startswith("none") else (
+                "REFUSE" if refuses(o["text"]) else "ANSWERABLE")
             # D3 IS EXCLUDED FROM THE ABSENCE CHECK, AND THAT IS A SCOPE DECISION, NOT AN
             # OMISSION. src/store/assemble.c:109 emits the literal "none | ... | fit:low" whenever
             # the picker finds nothing, so a D3's RECORD SPAN already announces it perfectly -- a
