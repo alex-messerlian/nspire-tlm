@@ -47,11 +47,22 @@ int main(void) {
         total += p->n;
         OK(p->n > 0 && p->n <= SYM_MAX, "%-5s holds %d tiles (max %d)", p->name, p->n, SYM_MAX);
         OK(p->name && p->name[0], "%-5s has a name", p->name ? p->name : "(null)");
+        /* A122. THE TWO STRINGS ARE NOW DIFFERENT THINGS AND EACH GETS ITS OWN RULE.
+         *
+         *   it[i]  is INSERTED into the question. It must be ASCII, for the reason below, and its
+         *          LENGTH is unconstrained -- it goes into the composer, not into a cell, so
+         *          "antiderivative of " is fine and was failing a check meant for the tile.
+         *   lab[i] is DRAWN on the tile. It is what must fit, and it may be a glyph as long as the
+         *          FONT carries it (U+222B does; test_notation is what catches one that does not).
+         *
+         * Before CALC the two were one string, so one rule covered both and applying the cell
+         * constraint to the insertion was free. It is not free any more. */
         int bad_ascii = 0, empty = 0, toolong = 0;
         for (int i = 0; i < p->n; i++) {
             const char *t = p->it[i];
-            if (!t || !t[0]) { empty++; continue; }
-            if (strlen(t) > 12) toolong++;
+            const char *l = (p->lab && p->lab[i]) ? p->lab[i] : t;
+            if (!t || !t[0] || !l || !l[0]) { empty++; continue; }
+            if (strlen(l) > 12) toolong++;
             for (const char *q = t; *q; q++)
                 if ((unsigned char)*q > 0x7F) bad_ascii++;
         }
@@ -60,7 +71,7 @@ int main(void) {
          * and spells Greek out, so a glyph tile would insert a string the model has never read.
          * gfx_text also draws NOTHING for a glyph the font lacks -- see test_notation. */
         OK(!bad_ascii, "%-5s every tile is ASCII (%d violations)", p->name, bad_ascii);
-        OK(!toolong, "%-5s every tile fits a cell (%d over 12 chars)", p->name, toolong);
+        OK(!toolong, "%-5s every LABEL fits a cell (%d over 12 chars)", p->name, toolong);
     }
     OK(total >= 60, "%d tiles across %d categories", total, CAT_N);
 
@@ -158,8 +169,13 @@ int main(void) {
         /* and the label must fit the cell it is centred in, or it renders over its neighbour */
         int clipped = 0;
         for (int i = 0; i < pal_n(); i++)
-            if (gfx_text_w(pal_at(i), F_UI) > R_SYM[i].w) clipped++;
+            if (gfx_text_w(pal_lab(i), F_UI) > R_SYM[i].w) clipped++;
         OK(!clipped, "%-5s no label wider than its cell (%d)", PAL_CAT[c].name, clipped);
+        /* AND THE INSERTION IS WHAT LANDS IN THE QUESTION. A tile that draws correctly and inserts
+         * nothing is the shape this split makes newly possible, so it is asserted directly. */
+        int noins = 0;
+        for (int i = 0; i < pal_n(); i++) if (!pal_at(i) || !pal_at(i)[0]) noins++;
+        OK(!noins, "%-5s every tile inserts something (%d empty)", PAL_CAT[c].name, noins);
     }
 
     printf("%s test_palette: %d failure%s\n", F ? "FAIL" : "PASS", F, F == 1 ? "" : "s");

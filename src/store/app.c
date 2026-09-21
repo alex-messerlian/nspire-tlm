@@ -237,7 +237,11 @@ static int TEXT_X, TEXT_Y, TEXT_W;   /* the composer's last laid-out text origin
  * cos -- so those four are offered and nothing else. Same reasoning as the note above: a tile is a
  * promise, and a palette with log( or integral on it would promise arithmetic this model has never
  * been trained to emit. Units and subscripts are the ones the store measures as most frequent. */
-typedef struct { const char *name; const char *const *it; int n; } pal_cat;
+/* A122. A TILE MAY DISPLAY ONE THING AND INSERT ANOTHER. `lab` is NULL for every category that
+ * existed before this, where the glyph and the insertion are the same string. CALC needs the split:
+ * the tile reads as an integral sign and what goes into the question is the words the model was
+ * trained on. */
+typedef struct { const char *name; const char *const *it; const char *const *lab; int n; } pal_cat;
 
 static const char *const PAL_GREEK[] = {
     "alpha", "beta", "gamma", "delta", "epsilon",
@@ -269,13 +273,53 @@ static const char *const PAL_CONST[] = {
     "q_e", "m_e", "m_p", "sigma", "atm",
 };
 
+/* A122. CALCULUS, AND THE COMMENT ABOVE THIS BLOCK USED TO FORBID IT.
+ *
+ * It said: "the CORPUS TRAINS EXACTLY ONE FUNCTION, 197,608 of 197,608 calls, so the model never
+ * emits diff, integ or solve however they are offered. A menu with an integral on it would promise
+ * arithmetic this model does not do." That was true when it was written and it EXPIRED. Measured on
+ * the shipped corpus: 24,080 of 215,531 tool calls (10.4%) are solve, diff or integ, and on device
+ * the model emits the right `solve` call on 60 of 60 probed relations and the right `diff` call on
+ * 50 of 50. The promise is now one the model keeps.
+ *
+ * THE TILES ARE THE PHRASES THE CORPUS ACTUALLY TRAINS, measured rather than invented -- the same
+ * rule the categories above follow ("every entry is something the store or the knowledge tier
+ * actually writes"). Frequencies over the 24,080 calculus and rearrangement questions:
+ *
+ *     solve 18.1%   derivative of 13.8%   with respect to 12.3%   rearrange 7.5%
+ *     differentiate 7.4%   integrate 6.9%   from 4.5%   isolate 3.8%
+ *     antiderivative 2.3%   integral of 2.3%
+ *
+ * THE INTEGRAL SIGN IS A REAL GLYPH. U+222B is in font_data.h (checked, not assumed), so the tile
+ * reads as an integral and inserts the WORDS -- the question reaches the model as the student typed
+ * it, and "integral of" is what 2.3% of the training questions say while the glyph appears in none.
+ *
+ * NO CONTOUR INTEGRAL. U+222E is absent from the font AND there is no closed-path integration in
+ * TOOL_SPEC's seven functions, so a tile for it would promise arithmetic that does not exist --
+ * which is the exact failure the comment above this one was written to prevent. Recorded here so
+ * the next person does not have to rediscover both halves.
+ *
+ * NO PARTIAL DERIVATIVE either, though U+2202 IS in the font: `diff` is single-variable and the
+ * corpus trains no partial. The glyph being available is not the test. */
+static const char *const PAL_CALC[] = {
+    "integral of ", "integrate ", "antiderivative of ", "derivative of ", "differentiate ",
+    "with respect to ", "from ", "to ", "area under ",
+    "solve ", "rearrange ", "isolate ",
+};
+static const char *const PAL_CALC_LAB[] = {
+    "∫",       "∫ dx",  "antider",           "d/dx",          "differ",
+    "w.r.t.",        "from",     "to",  "area",
+    "solve",         "rearr",       "isolate",
+};
+
 #define CAT(a) { #a, PAL_##a, (int)(sizeof PAL_##a / sizeof PAL_##a[0]) }
 static const pal_cat PAL_CAT[] = {
-    { "GREEK", PAL_GREEK, (int)(sizeof PAL_GREEK / sizeof PAL_GREEK[0]) },
-    { "MATH",  PAL_MATH,  (int)(sizeof PAL_MATH  / sizeof PAL_MATH[0]) },
-    { "SUB",   PAL_VARS,  (int)(sizeof PAL_VARS  / sizeof PAL_VARS[0]) },
-    { "UNITS", PAL_UNITS, (int)(sizeof PAL_UNITS / sizeof PAL_UNITS[0]) },
-    { "CONST", PAL_CONST, (int)(sizeof PAL_CONST / sizeof PAL_CONST[0]) },
+    { "GREEK", PAL_GREEK, 0, (int)(sizeof PAL_GREEK / sizeof PAL_GREEK[0]) },
+    { "MATH",  PAL_MATH,  0, (int)(sizeof PAL_MATH  / sizeof PAL_MATH[0]) },
+    { "CALC",  PAL_CALC,  PAL_CALC_LAB, (int)(sizeof PAL_CALC / sizeof PAL_CALC[0]) },
+    { "SUB",   PAL_VARS,  0, (int)(sizeof PAL_VARS  / sizeof PAL_VARS[0]) },
+    { "UNITS", PAL_UNITS, 0, (int)(sizeof PAL_UNITS / sizeof PAL_UNITS[0]) },
+    { "CONST", PAL_CONST, 0, (int)(sizeof PAL_CONST / sizeof PAL_CONST[0]) },
 };
 #undef CAT
 #define CAT_N   ((int)(sizeof PAL_CAT / sizeof PAL_CAT[0]))
@@ -293,6 +337,11 @@ static const pal_cat *pal_cur(void) {
 }
 static int pal_n(void) { const pal_cat *c = pal_cur(); return c->n > SYM_MAX ? SYM_MAX : c->n; }
 static const char *pal_at(int i) { return pal_cur()->it[i]; }
+/* What the TILE shows. Falls back to the insertion, which is what every pre-A122 category wants. */
+static const char *pal_lab(int i) {
+    const pal_cat *c = pal_cur();
+    return (c->lab && c->lab[i]) ? c->lab[i] : c->it[i];
+}
 
 static void compose_clear(void) { COMPOSE_N = 0; COMPOSE[0] = 0; COMPOSE_SEL = 0; COMPOSE_C = 0; }
 
@@ -2158,8 +2207,8 @@ static void draw_symbols(void) {
         R_SYM[i] = b;
         int sel = (i == SYM_SEL);
         if (sel) gfx_rrect(b.x, b.y, b.w, b.h, 4, C_SEL);
-        int tw = gfx_text_w(pal_at(i), F_UI);
-        gfx_text(b.x + (b.w - tw) / 2, b.y + 3, pal_at(i), F_UI, C_INK, sel ? C_SEL : C_SHEET);
+        int tw = gfx_text_w(pal_lab(i), F_UI);
+        gfx_text(b.x + (b.w - tw) / 2, b.y + 3, pal_lab(i), F_UI, C_INK, sel ? C_SEL : C_SHEET);
     }
     gfx_text(X + 10, Y + H - 13, "enter insert   tab category   esc close", F_XS, C_INK3, C_SHEET);
 }
