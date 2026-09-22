@@ -103,11 +103,22 @@ int main(int argc, char **argv) {
      * chain hash that would otherwise be copied by hand off a calculator LCD, which is exactly the
      * transcription this project has already lost a CAS timing to.
      *
-     * Its OWN small file, not an append to /documents/bench/results.txt: that log reached 114 KB
-     * and then failed to pull six consecutive times with "Invalid packet received" while a LARGER
-     * file pulled cleanly, so the fault was the file. A few hundred bytes, written fresh each run. */
+     * Its OWN small file, not an append to the bench results log: that log reached 114 KB and
+     * then failed to pull six consecutive times with "Invalid packet received" while a LARGER
+     * file pulled cleanly, so the fault was the file. A few hundred bytes, written fresh each run.
+     *
+     * A140. IN /documents/tlm/, NOT /documents/bench/. push-all.sh created /bench unconditionally
+     * until that was made conditional on PUSH_BENCH; the directory then stopped existing, fopen
+     * returned NULL, and a real device run of this oracle produced nothing but a screen-only
+     * chain hash -- a 16-hex-digit bit-exactness verdict that could only be recovered by reading
+     * it off the display and retyping it, where one wrong nibble inverts the conclusion.
+     *
+     * THIRD INSTANCE of this exact defect: bench/common.h wrote there, this wrote there, and both
+     * were silently unwritable. /documents/tlm/ holds the model, so any device that can run this
+     * at all has it. The missing abstraction is a single "where do device results go" helper;
+     * that is recorded as debt rather than resolved here. */
     {
-        FILE *g = fopen("/documents/bench/golden.txt.tns", "w");
+        FILE *g = fopen("/documents/tlm/golden_dev.txt.tns", "w");
         if (g) {
             fprintf(g, "model=%s\nvocab=%d seq_len=%d GS=%d\n", model, V, SL, FIXED_GS);
             for (int step = 0; step < NT; step++) {
@@ -121,14 +132,14 @@ int main(int argc, char **argv) {
             /* THE WHOLE STEP-0 VECTOR, so the divergence can be measured rather than described.
              * 4096 floats is 16 KB -- small enough to pull reliably, unlike the 114 KB CAS log
              * that failed six consecutive transfers. */
-            FILE *b = fopen("/documents/bench/logits0.bin.tns", "wb");
+            FILE *b = fopen("/documents/tlm/logits0.bin.tns", "wb");
             if (b) {
                 float *l0v = rq_forward(toks[0] % V, 0);
                 fwrite(l0v, sizeof(float), (size_t)V, b);
                 fclose(b);
-                printf("wrote /documents/bench/logits0.bin.tns\n");
+                printf("wrote /documents/tlm/logits0.bin.tns\n");
             }
-            printf("wrote /documents/bench/golden.txt.tns\n");
+            printf("wrote /documents/tlm/golden_dev.txt.tns\n");
         } else {
             printf("WARNING: could not write the result file; the CHAIN above is screen-only\n");
         }
