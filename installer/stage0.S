@@ -150,7 +150,7 @@ endos:
 .word 0x0
 
 respath:
-.asciz "A:\\documents\\ndless\\ndless_resources.tns"
+.asciz "A:\\documents\\chattlm\\chattlm_support.tns"
 
 .align 2
 oflags:

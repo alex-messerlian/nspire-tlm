@@ -1469,7 +1469,7 @@ int llama2_main(int argc, char *argv[]) {
     // parameter validation/overrides
 #ifdef _TINSPIRE
     if (rng_seed <= 0) {
-        printf("FATAL: no seed given; time() hangs on Ndless\n");
+        printf("FATAL: no seed given; time() hangs on this calculator\n");
         return 1;
     }
     printf("args parsed, seed=%llu\n", rng_seed);

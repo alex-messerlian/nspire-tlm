@@ -19,7 +19,10 @@ ndless_installer.elf: stage0.o
 installer_payload.lua: ndless_installer.bin
 	../vendor/Ndless/ndless/src/tools/LuaBin/luabin ndless_installer.bin - installer noescape > $@
 
-Problem1.xml: installer_payload.lua
+# A133. THE UI FILES ARE PREREQUISITES. This read `Problem1.xml: installer_payload.lua`, so
+# rewriting gui.lua left make saying "Nothing to be done" and the built document still carried the
+# previous UI. Caught by rewriting the whole screen and getting a byte-identical .tns back.
+Problem1.xml: installer_payload.lua gui.lua ipc.lua installer.lua Problem1_template.xml template.sed
 	sed -f template.sed Problem1_template.xml | sed -f template.sed | sed -f template.sed > Problem1.xml
 
 $(DISTDIR)/ChatTLM_Setup.tns: Problem1.xml

@@ -93,6 +93,12 @@ for _sp in corpus/split_fit.json corpus/split_fit_ho.json corpus/split_fit_m.jso
     need_fresh "$_sp" "$STORE" "rebuild the arm splits (fit_judgement.py / answer_control.py / d1_arm.py / build_splits.py)"
 done
 need_file build/tok4096.tok  "python3 tools/tok_pack.py"
+
+# A134. gate_brand reads the BUILT loader, so a stale one would be checked and pass while the
+# shipped file still said Ndless. Same shape as gate_stale_figures over a corpus nobody
+# regenerated, except this build product is the deliverable.
+need_file  build/chattlm_support.tns "make -C resources"
+need_fresh build/chattlm_support.tns resources/brand.py "make -C resources"
 need_file tools/eval/shapecli "make tests   # the structural call check, ARCHITECTURE.md s6"
 if [ "$prereq_missing" -ne 0 ]; then
     echo "GATE SUITE DID NOT RUN -- prerequisites above are missing."
@@ -182,6 +188,9 @@ if ! _skip bare_pipe; then $PY tools/eval/gate_bare_pipe.py >/dev/null 2>&1 && p
 if ! _skip explain_variants; then $PY tools/eval/gate_explain_variants.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "explain_variants" || { printf "  %-20s FAIL\n" "explain_variants"; fail=1; }; fi
 if ! _skip c3_physics; then $PY tools/eval/gate_c3_physics.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "c3_physics" || { printf "  %-20s FAIL\n" "c3_physics"; fail=1; }; fi
 if ! _skip installer_exploit; then $PY tools/eval/gate_installer_exploit.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "installer_exploit" || { printf "  %-20s FAIL\n" "installer_exploit"; fail=1; }; fi
+if ! _skip installer_lua; then $PY tools/eval/gate_installer_lua.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "installer_lua" || { printf "  %-20s FAIL\n" "installer_lua"; fail=1; }; fi
+if ! _skip syscalls; then $PY tools/eval/gate_syscalls.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "syscalls" || { printf "  %-20s FAIL\n" "syscalls"; fail=1; }; fi
+if ! _skip brand; then $PY tools/eval/gate_brand.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "brand" || { printf "  %-20s FAIL\n" "brand"; fail=1; }; fi
 if ! _skip probe_spacing; then $PY tools/eval/gate_probe_spacing.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "probe_spacing" || { printf "  %-20s FAIL\n" "probe_spacing"; fail=1; }; fi
 if ! _skip followup; then $PY tools/eval/gate_followup.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "followup" || { printf "  %-20s FAIL\n" "followup"; fail=1; }; fi
 if ! _skip refusal_cue; then $PY tools/eval/gate_refusal_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "refusal_cue" || { printf "  %-20s FAIL\n" "refusal_cue"; fail=1; }; fi

@@ -1,3 +1,20 @@
+-- ChatTLM Setup -- the screen a student sees on a calculator that has never run ChatTLM.
+--
+-- This file is a REPLACEMENT for Ndless's installer GUI and is a modified MPL 1.1 file; it stays
+-- under MPL 1.1 and its source ships in this directory. installer.lua and ipc.lua are Ndless's,
+-- unmodified. stage0.S differs on ONE line -- the path it loads the support file from --
+-- and tools/eval/gate_installer_exploit.py fails if any other line of it ever differs.
+--
+-- WHY IT IS A REWRITE AND NOT AN EDIT. The first attempt kept Ndless's renderer and changed only
+-- the strings, and the result was reported as "identical to what the original was ... I still see
+-- all their original stuff ... their whatever weird code looking UI". That was fair: the matrix
+-- rain, the bitmap-font boxes and the scrolling credits marquee ARE the UI, and the words are a
+-- small part of it. This draws ChatTLM's own screen instead, with the app's palette.
+--
+-- ATTRIBUTION LIVES IN THE SOURCE, NOT ON THE SCREEN. MPL 1.1 binds notices in the source of a
+-- modified file; it does not require a credit line in a product's UI. This header, installer/
+-- README.md and resources/README.md carry it in full. The screen is ChatTLM's.
+
 platform.apilevel = "1.0"
 
 -----------------
@@ -21,553 +38,187 @@ end
 
 -- ZZZ_IPC_LUA_ZZZ
 
-----------
--- FONT --
-----------
-do
-    local CHAR_HEIGHT = 12
-    local CHAR_WIDTH  = 8
-    
-    local charMap_ascii = {
-        [0x21] = {  0,  24,  60,  60,  60,  24,  24,   0,  24,  24,   0,   0},
-        [0x22] = { 54,  54,  54,  20,   0,   0,   0,   0,   0,   0,   0,   0},
-        [0x23] = {  0, 108, 108, 108, 254, 108, 108, 254, 108, 108,   0,   0},
-        [0x24] = { 24,  24, 124, 198, 192, 120,  60,   6, 198, 124,  24,  24},
-        [0x25] = {  0,   0,   0,  98, 102,  12,  24,  48, 102, 198,   0,   0},
-        [0x26] = {  0,  56, 108,  56,  56, 118, 246, 206, 204, 118,   0,   0},
-        [0x27] = { 12,  12,  12,  24,   0,   0,   0,   0,   0,   0,   0,   0},
-        [0x28] = {  0,  12,  24,  48,  48,  48,  48,  48,  24,  12,   0,   0},
-        [0x29] = {  0,  48,  24,  12,  12,  12,  12,  12,  24,  48,   0,   0},
-        [0x2a] = {  0,   0,   0, 108,  56, 254,  56, 108,   0,   0,   0,   0},
-        [0x2b] = {  0,   0,   0,  24,  24, 126,  24,  24,   0,   0,   0,   0},
-        [0x2c] = {  0,   0,   0,   0,   0,   0,   0,  12,  12,  12,  24,   0},
-        [0x2d] = {  0,   0,   0,   0,   0, 254,   0,   0,   0,   0,   0,   0},
-        [0x2e] = {  0,   0,   0,   0,   0,   0,   0,   0,  24,  24,   0,   0},
-        [0x2f] = {  0,   0,   2,   6,  12,  24,  48,  96, 192, 128,   0,   0},
-        [0x30] = {  0, 124, 198, 206, 222, 246, 230, 198, 198, 124,   0,   0},
-        [0x31] = {  0,  24, 120,  24,  24,  24,  24,  24,  24, 126,   0,   0},
-        [0x32] = {  0, 124, 198, 198,  12,  24,  48,  96, 198, 254,   0,   0},
-        [0x33] = {  0, 124, 198,   6,   6,  60,   6,   6, 198, 124,   0,   0},
-        [0x34] = {  0,  12,  28,  60, 108, 204, 254,  12,  12,  12,   0,   0},
-        [0x35] = {  0, 254, 192, 192, 192, 252,   6,   6, 198, 124,   0,   0},
-        [0x36] = {  0, 124, 198, 192, 192, 252, 198, 198, 198, 124,   0,   0},
-        [0x37] = {  0, 254, 198,  12,  24,  48,  48,  48,  48,  48,   0,   0},
-        [0x38] = {  0, 124, 198, 198, 198, 124, 198, 198, 198, 124,   0,   0},
-        [0x39] = {  0, 124, 198, 198, 198, 126,   6,   6, 198, 124,   0,   0},
-        [0x3a] = {  0,   0,   0,  12,  12,   0,   0,  12,  12,   0,   0,   0},
-        [0x3b] = {  0,   0,   0,  12,  12,   0,   0,  12,  12,  12,  24,   0},
-        [0x3c] = {  0,  12,  24,  48,  96, 192,  96,  48,  24,  12,   0,   0},
-        [0x3d] = {  0,   0,   0,   0, 254,   0, 254,   0,   0,   0,   0,   0},
-        [0x3e] = {  0,  96,  48,  24,  12,   6,  12,  24,  48,  96,   0,   0},
-        [0x3f] = {  0, 124, 198, 198,  12,  24,  24,   0,  24,  24,   0,   0},
-        [0x40] = {  0, 124, 198, 198, 222, 222, 222, 220, 192, 126,   0,   0},
-        [0x41] = {  0,  56, 108, 198, 198, 198, 254, 198, 198, 198,   0,   0},
-        [0x42] = {  0, 252, 102, 102, 102, 124, 102, 102, 102, 252,   0,   0},
-        [0x43] = {  0,  60, 102, 192, 192, 192, 192, 192, 102,  60,   0,   0},
-        [0x44] = {  0, 248, 108, 102, 102, 102, 102, 102, 108, 248,   0,   0},
-        [0x45] = {  0, 254, 102,  96,  96, 124,  96,  96, 102, 254,   0,   0},
-        [0x46] = {  0, 254, 102,  96,  96, 124,  96,  96,  96, 240,   0,   0},
-        [0x47] = {  0, 124, 198, 198, 192, 192, 206, 198, 198, 124,   0,   0},
-        [0x48] = {  0, 198, 198, 198, 198, 254, 198, 198, 198, 198,   0,   0},
-        [0x49] = {  0,  60,  24,  24,  24,  24,  24,  24,  24,  60,   0,   0},
-        [0x4a] = {  0,  60,  24,  24,  24,  24,  24, 216, 216, 112,   0,   0},
-        [0x4b] = {  0, 198, 204, 216, 240, 240, 216, 204, 198, 198,   0,   0},
-        [0x4c] = {  0, 240,  96,  96,  96,  96,  96,  98, 102, 254,   0,   0},
-        [0x4d] = {  0, 198, 198, 238, 254, 214, 214, 214, 198, 198,   0,   0},
-        [0x4e] = {  0, 198, 198, 230, 230, 246, 222, 206, 206, 198,   0,   0},
-        [0x4f] = {  0, 124, 198, 198, 198, 198, 198, 198, 198, 124,   0,   0},
-        [0x50] = {  0, 252, 102, 102, 102, 124,  96,  96,  96, 240,   0,   0},
-        [0x51] = {  0, 124, 198, 198, 198, 198, 198, 198, 214, 124,   6,   0},
-        [0x52] = {  0, 252, 102, 102, 102, 124, 120, 108, 102, 230,   0,   0},
-        [0x53] = {  0, 124, 198, 192,  96,  56,  12,   6, 198, 124,   0,   0},
-        [0x54] = {  0, 126,  90,  24,  24,  24,  24,  24,  24,  60,   0,   0},
-        [0x55] = {  0, 198, 198, 198, 198, 198, 198, 198, 198, 124,   0,   0},
-        [0x56] = {  0, 198, 198, 198, 198, 198, 198, 108,  56,  16,   0,   0},
-        [0x57] = {  0, 198, 198, 214, 214, 214, 254, 238, 198, 198,   0,   0},
-        [0x58] = {  0, 198, 198, 108,  56,  56,  56, 108, 198, 198,   0,   0},
-        [0x59] = {  0, 102, 102, 102, 102,  60,  24,  24,  24,  60,   0,   0},
-        [0x5a] = {  0, 254, 198, 140,  24,  48,  96, 194, 198, 254,   0,   0},
-        [0x5b] = {  0, 124,  96,  96,  96,  96,  96,  96,  96, 124,   0,   0},
-        [0x5c] = {  0,   0, 128, 192,  96,  48,  24,  12,   6,   2,   0,   0},
-        [0x5d] = {  0, 124,  12,  12,  12,  12,  12,  12,  12, 124,   0,   0},
-        [0x5e] = { 16,  56, 108, 198,   0,   0,   0,   0,   0,   0,   0,   0},
-        [0x5f] = {  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255},
-        [0x60] = { 24,  24,  24,  12,   0,   0,   0,   0,   0,   0,   0,   0},
-        [0x61] = {  0,   0,   0,   0, 120,  12, 124, 204, 220, 118,   0,   0},
-        [0x62] = {  0, 224,  96,  96, 124, 102, 102, 102, 102, 252,   0,   0},
-        [0x63] = {  0,   0,   0,   0, 124, 198, 192, 192, 198, 124,   0,   0},
-        [0x64] = {  0,  28,  12,  12, 124, 204, 204, 204, 204, 126,   0,   0},
-        [0x65] = {  0,   0,   0,   0, 124, 198, 254, 192, 198, 124,   0,   0},
-        [0x66] = {  0,  28,  54,  48,  48, 252,  48,  48,  48, 120,   0,   0},
-        [0x67] = {  0,   0,   0,   0, 118, 206, 198, 198, 126,   6, 198, 124},
-        [0x68] = {  0, 224,  96,  96, 108, 118, 102, 102, 102, 230,   0,   0},
-        [0x69] = {  0,  24,  24,   0,  56,  24,  24,  24,  24,  60,   0,   0},
-        [0x6a] = {  0,  12,  12,   0,  28,  12,  12,  12,  12, 204, 204, 120},
-        [0x6b] = {  0, 224,  96,  96, 102, 108, 120, 108, 102, 230,   0,   0},
-        [0x6c] = {  0,  56,  24,  24,  24,  24,  24,  24,  24,  60,   0,   0},
-        [0x6d] = {  0,   0,   0,   0, 108, 254, 214, 214, 198, 198,   0,   0},
-        [0x6e] = {  0,   0,   0,   0, 220, 102, 102, 102, 102, 102,   0,   0},
-        [0x6f] = {  0,   0,   0,   0, 124, 198, 198, 198, 198, 124,   0,   0},
-        [0x70] = {  0,   0,   0,   0, 220, 102, 102, 102, 124,  96,  96, 240},
-        [0x71] = {  0,   0,   0,   0, 118, 204, 204, 204, 124,  12,  12,  30},
-        [0x72] = {  0,   0,   0,   0, 220, 102,  96,  96,  96, 240,   0,   0},
-        [0x73] = {  0,   0,   0,   0, 124, 198, 112,  28, 198, 124,   0,   0},
-        [0x74] = {  0,  48,  48,  48, 252,  48,  48,  48,  54,  28,   0,   0},
-        [0x75] = {  0,   0,   0,   0, 204, 204, 204, 204, 204, 118,   0,   0},
-        [0x76] = {  0,   0,   0,   0, 198, 198, 198, 108,  56,  16,   0,   0},
-        [0x77] = {  0,   0,   0,   0, 198, 198, 214, 214, 254, 108,   0,   0},
-        [0x78] = {  0,   0,   0,   0, 198, 108,  56,  56, 108, 198,   0,   0},
-        [0x79] = {  0,   0,   0,   0, 198, 198, 198, 206, 118,   6, 198, 124},
-        [0x7a] = {  0,   0,   0,   0, 254, 140,  24,  48,  98, 254,   0,   0},
-        [0x7b] = {  0,  14,  24,  24,  24, 112,  24,  24,  24,  14,   0,   0},
-        [0x7c] = {  0,  24,  24,  24,  24,   0,  24,  24,  24,  24,   0,   0},
-        [0x7d] = {  0, 112,  24,  24,  24,  14,  24,  24,  24, 112,   0,   0},
-        [0x7e] = {  0, 118, 220,   0,   0,   0,   0,   0,   0,   0,   0,   0},
-        
-        [0xb0] = { 17,  68,  17,  68,  17,  68,  17,  68,  17,  68,  17,  68},
-        [0xb1] = { 85, 170,  85, 170,  85, 170,  85, 170,  85, 170,  85, 170},
-        [0xb2] = {221, 119, 221, 119, 221, 119, 221, 119, 221, 119, 221, 119},
-        [0xb3] = { 24,  24,  24,  24,  24,  24,  24,  24,  24,  24,  24,  24},
-        [0xb4] = { 24,  24,  24,  24,  24,  24, 248,  24,  24,  24,  24,  24},
-        [0xb5] = { 24,  24,  24,  24, 248,  24, 248,  24,  24,  24,  24,  24},
-        [0xb6] = { 54,  54,  54,  54,  54,  54, 246,  54,  54,  54,  54,  54},
-        [0xb7] = {  0,   0,   0,   0,   0,   0, 254,  54,  54,  54,  54,  54},
-        [0xb8] = {  0,   0,   0,   0, 248,  24, 248,  24,  24,  24,  24,  24},
-        [0xb9] = { 54,  54,  54,  54, 246,   6, 246,  54,  54,  54,  54,  54},
-        [0xba] = { 54,  54,  54,  54,  54,  54,  54,  54,  54,  54,  54,  54},
-        [0xbb] = {  0,   0,   0,   0, 254,   6, 246,  54,  54,  54,  54,  54},
-        [0xbc] = { 54,  54,  54,  54, 246,   6, 254,   0,   0,   0,   0,   0},
-        [0xbd] = { 54,  54,  54,  54,  54,  54, 254,   0,   0,   0,   0,   0},
-        [0xbe] = { 24,  24,  24,  24, 248,  24, 248,   0,   0,   0,   0,   0},
-        [0xbf] = {  0,   0,   0,   0,   0,   0, 248,  24,  24,  24,  24,  24},
-        [0xc0] = { 24,  24,  24,  24,  24,  24,  31,   0,   0,   0,   0,   0},
-        [0xc1] = { 24,  24,  24,  24,  24,  24, 255,   0,   0,   0,   0,   0},
-        [0xc2] = {  0,   0,   0,   0,   0,   0, 255,  24,  24,  24,  24,  24},
-        [0xc3] = { 24,  24,  24,  24,  24,  24,  31,  24,  24,  24,  24,  24},
-        [0xc4] = {  0,   0,   0,   0,   0,   0, 255,   0,   0,   0,   0,   0},
-        [0xc5] = { 24,  24,  24,  24,  24,  24, 255,  24,  24,  24,  24,  24},
-        [0xc6] = { 24,  24,  24,  24,  31,  24,  31,  24,  24,  24,  24,  24},
-        [0xc7] = { 54,  54,  54,  54,  54,  54,  55,  54,  54,  54,  54,  54},
-        [0xc8] = { 54,  54,  54,  54,  55,  48,  63,   0,   0,   0,   0,   0},
-        [0xc9] = {  0,   0,   0,   0,  63,  48,  55,  54,  54,  54,  54,  54},
-        [0xca] = { 54,  54,  54,  54, 247,   0, 255,   0,   0,   0,   0,   0},
-        [0xcb] = {  0,   0,   0,   0, 255,   0, 247,  54,  54,  54,  54,  54},
-        [0xcc] = { 54,  54,  54,  54,  55,  48,  55,  54,  54,  54,  54,  54},
-        [0xcd] = {  0,   0,   0,   0, 255,   0, 255,   0,   0,   0,   0,   0},
-        [0xce] = { 54,  54,  54,  54, 247,   0, 247,  54,  54,  54,  54,  54},
-        [0xcf] = { 24,  24,  24,  24, 255,   0, 255,   0,   0,   0,   0,   0},
-        [0xd0] = { 54,  54,  54,  54,  54,  54, 255,   0,   0,   0,   0,   0},
-        [0xd1] = {  0,   0,   0,   0, 255,   0, 255,  24,  24,  24,  24,  24},
-        [0xd2] = {  0,   0,   0,   0,   0,   0, 255,  54,  54,  54,  54,  54},
-        [0xd3] = { 54,  54,  54,  54,  54,  54,  63,   0,   0,   0,   0,   0},
-        [0xd4] = { 24,  24,  24,  24,  31,  24,  31,   0,   0,   0,   0,   0},
-        [0xd5] = {  0,   0,   0,   0,  31,  24,  31,  24,  24,  24,  24,  24},
-        [0xd6] = {  0,   0,   0,   0,   0,   0,  63,  54,  54,  54,  54,  54},
-        [0xd7] = { 54,  54,  54,  54,  54,  54, 255,  54,  54,  54,  54,  54},
-        [0xd8] = { 24,  24,  24,  24, 255,  24, 255,  24,  24,  24,  24,  24},
-        [0xd9] = { 24,  24,  24,  24,  24,  24, 248,   0,   0,   0,   0,   0},
-        [0xda] = {  0,   0,   0,   0,   0,   0,  31,  24,  24,  24,  24,  24},
-        [0xdb] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-        [0xdc] = {  0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255},
-        [0xdd] = {240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240},
-        [0xde] = { 15,  15,  15,  15,  15,  15,  15,  15,  15,  15,  15,  15},
-        [0xdf] = {255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0},
-        
-    }
-    
-    local charMapImages = {}
-    
-    local TEXT_FG    = "\224\139" --green
-    local TEXT_BG    = "la"       --alpha
-    local IMG_HEADER = "\8\0\0\0\12\0\0\0\0\0\0\0\16\0\0\0\16\0\1\0"
-    
-    local function rowToImageRow(row)
-        local r = ""
-        for i=1, CHAR_WIDTH do
-            r = (row % 2 == 0 and TEXT_BG or TEXT_FG) .. r
-            row = math.floor(row / 2)
-        end
-        return r
-    end
-    
-    local function charToImage(charData)
-        local r = IMG_HEADER
-        for i=1, CHAR_HEIGHT do
-            r = r .. rowToImageRow(charData[i])
-        end
-        return image.new(r)
-    end
-    
-    local function genCharImages()
-        for i=0, 255 do
-           if charMap_ascii[i] then
-            charMapImages[i] = charToImage(charMap_ascii[i])
-           end
-        end
-    end
-    
-    local function drawChar(gc, char, x, y)
-       local img = charMapImages[char:byte()]
-       if img then
-	       gc:drawImage(img, x, y)
-	   end
-    end
-    
-    function drawGrid(gc)
-        local y=0
-        for n=0, 15 do
-            local c = string.format("%X", n)
-            drawChar(gc, c, (n+2)*CHAR_WIDTH, 0)
-            drawChar(gc, c, 0, (n+2)*CHAR_HEIGHT)
-        end
-        
-        for y=0, 15 do
-            for x=0, 15 do
-                local c = y * 16 + x
-                local i = charMapImages[c]
-                if i then
-                    gc:drawImage(i, (x+2)*CHAR_WIDTH, (y+2)*CHAR_HEIGHT)
-                end
-            end
-        end
-    end
-    
-    function drawMonoString(gc, str, x, y, s, n)
-        local s = s or 1
-        local l = #str
-        local n = n or s+l
-        
-        
-        local p = 0
-        for i=s, n do
-            p = p + 1
-            local o = ((i-1) % l) + 1
-            local char = str:sub(o, o)
-            if char == "\n" then
-                y = y + CHAR_HEIGHT
-                p = 0
-            else
-                drawChar(gc, char, x + p * CHAR_WIDTH - CHAR_WIDTH, y)    
-            end
-        end
-    end
-    
-    genCharImages()
+-------------
+-- PALETTE --
+-------------
+-- src/store/app.c PAL_LIGHT, so the setup screen and the app are one product rather than two.
+local INK   = {0x0B, 0x0B, 0x0B}     -- P_INK
+local INK2  = {0x5B, 0x5B, 0x5B}     -- P_INK2
+local INK3  = {0x8F, 0x8F, 0x8F}     -- P_INK3
+local LINE  = {0xE5, 0xE5, 0xE5}     -- P_LINE
+local CARD  = {0xF4, 0xF4, 0xF4}     -- P_BUBBLE
+local BG    = {0xFF, 0xFF, 0xFF}     -- P_BG
+local OKFG  = {0x18, 0x6A, 0x3B}     -- P_RESFG
+local ERFG  = {0xA8, 0x34, 0x2C}     -- P_ERRFG
+
+local function col(gc, c) gc:setColorRGB(c[1], c[2], c[3]) end
+
+local function text(gc, s, x, y, c, size, style)
+    gc:setFont("sansserif", style or "r", size or 10)
+    col(gc, c)
+    gc:drawString(s, x, y, "top")
 end
 
-local function addSpaces(str, n)
-    return str .. string.rep(" ", n-#str)
+local function centre(gc, s, y, c, size, style)
+    gc:setFont("sansserif", style or "r", size or 10)
+    local w = gc:getStringWidth(s)
+    col(gc, c)
+    gc:drawString(s, (320 - w) / 2, y, "top")
 end
 
-local function bI(str)
-    return (str:gsub("/%-", "\201\205")
-	      :gsub("%-\\", "\205\187")
-	      :gsub("\\_", "\200\205")
-	      :gsub("_/", "\205\188")
-	      :gsub("%+%-","\204\205")
-	      :gsub("%-%+", "\205\185")
-	      :gsub("%-", "\205")
-	      :gsub("|", "\186")  
-          :gsub("%$", "\219")   
-	   )
-end
-
-
-
-
-------------------
--- Text Content --
-------------------
-
-local s_credits      = "Ndless brought to you by the Ndless team! @Vogtinator, @Satyamedh, @sasdallas, @icosahedr.n, @timmycraft, @cherpixel, @jimbauwens - Many thanks to all past contributors and testers: geogeo, ExtendeD, bsl, critor, Excale, Goplat, hoffa, Legimet, Levak, debrouxl, lkj, tangrs, Adriweb, drakeerv, NightHawk, NspireUartLover and others! ndless.me - github.com/ndless-nspire      "
-
-local s_ndless_cxii_a =  bI([[
-        /----------\ 
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| ChatTLM one-time setup   |
-|                          |
-| Installs Ndless, which   |
-| ChatTLM needs to run.    |
-| Built for OS 6.2 - 6.4   |
-| Press any key to begin   |
-| >$                       |
-\_------------------------_/
-]])
-
-local s_ndless_cxii_b = bI([[
-        /----------\
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| ChatTLM one-time setup   |
-|                          |
-| Installs Ndless, which   |
-| ChatTLM needs to run.    |
-| Built for OS 6.2 - 6.4   |
-| Press any key to begin   |
-| >                        |
-\_------------------------_/
-]])
-
-local s_ndless_cx_a =  bI([[
-        /----------\ 
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| ChatTLM needs a          |
-| TI-Nspire CX II.         |
-|                          |
-| This calculator is not   |
-| supported by this build. |
-|                          |
-| >$                       |
-\_------------------------_/
-]])
-
-local s_ndless_cx_b = bI([[
-        /----------\ 
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| ChatTLM needs a          |
-| TI-Nspire CX II.         |
-|                          |
-| This calculator is not   |
-| supported by this build. |
-|                          |
-| >                        |
-\_------------------------_/
-]])
-
-local s_ndless_installing = bI([[
-        /----------\
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| INSTALLING               |
-|                          |
-| Setting up ChatTLM...    |
-| This takes a moment.     |
-|                          |
-|                          |
-| > exec()                 |
-\_------------------------_/
-]])
-
-
-local s_ndless_install_done = bI([[
-        /----------\
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| READY                    |
-|                          |
-| ChatTLM is installed.    |
-|                          |
-| Open ChatTLM from the    |
-| Documents screen.        |
-| > closeDoc()             |
-\_------------------------_/
-]])
-
-local s_ndless_install_failed = bI([[
-        /----------\
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| DID NOT INSTALL          |
-|                          |
-| Setup could not finish.  |
-|                          |
-| Restart the calculator   |
-| and open this again.     |
-|                          |
-\_------------------------_/
-]])
-
-local s_ndless_missing_resources_file = bI([[
-        /----------\
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| MISSING A FILE           |
-|                          |
-| ndless_resources.tns is  |
-| not in the ndless        |
-| folder. Copy the whole   |
-| ChatTLM folder across    |
-| and try again.           |
-\_------------------------_/
-]])
-
-local s_ndless_invalid_os = bI([[
-        /----------\
-/-------+ ChatTLM  +-------\
-|       \_--------_/       |
-| UNSUPPORTED OS           |
-|                          |
-| This build works on      |
-| OS 6.2.0 - 6.4.0 only.   |
-|                          |
-| A newer OS needs a new   |
-| ChatTLM release.         |
-\_------------------------_/
-]])
-
----------------------
--- End of font.lua --
----------------------
-
-local mColorsH = {0x002B00, 0x003B00, 0x004B00, 0x005B00, 0x008F11, 0x00FF41}
-local mColorsL = {0x000000, 0x000000, 0x001B00, 0x002B00, 0x004000, 0x006000}
-
-mColorsH[0] = 0
-mColorsL[0] = 0
-
-local oMap = {}
-
-function makeOffsetMap(c, r)
-    local last = -1
-    oMap = {}
-    
-    for i=1, c do
-        local o 
-        --repeat
-            o = math.floor(math.random()*r)
-        --until math.abs(o-last) > 2
-        last = o
-        oMap[i] = o
-    end 
-end
-
-local current = 1
-
-local tailSize    = 6 -- needs to be max #mColorsH
-local gridSize    = 12
-local blockSize   = 6
-local blockOffset = math.floor((gridSize - blockSize)/2)
-
-local width  = 320
-local height = 240
-
-local columns = math.floor(width / gridSize)
-local rows    = math.floor(height / gridSize)
-
-local b_w = 8 * 27
-local b_h = 9 * 12
-local b_x = (width  - b_w) / 2
-local b_y = (height - b_h) / 2
-
-makeOffsetMap(columns, rows)
-
-local current = 0
-local fade    = false
-local blink   = true
-local max     = #mColorsH
-local status  = "ready"
-local failed  = false
-local cxii    = false
-local trigger = false
+-----------
+-- STATE --
+-----------
+local status = "ready"
+local failed = nil
+local cxii   = false
+local tick   = 0
 local install_ts = 0
 
+-- Body copy per state. Kept as data so the screen is one layout rather than four.
+local BODY = {
+    -- THE RESTART IS EXPECTED AND THE SCREEN SAYS SO BEFORE IT HAPPENS.
+    --
+    -- Measured on hardware: three attempts, two restarted the calculator, the third installed.
+    -- That is Ndless's own documented behaviour -- its README says "if it fails or reboots, try
+    -- again until it works", twice -- and our exploit files are byte-identical to theirs, so it is
+    -- not something we introduced. What we CAN fix is that an unexplained reset reads as a broken
+    -- product. Warned about in advance it reads as a retry, which is what it is.
+    ready = {
+        "This installs the support files",
+        "ChatTLM needs in order to run.",
+        "",
+        "The calculator may restart. That",
+        "is normal - open this again if it",
+        "does. It can take a few tries.",
+    },
+    installing = {
+        "Installing. This takes a moment",
+        "and the calculator may restart.",
+    },
+    install_done = {
+        "ChatTLM is installed and should",
+        "open by itself.",
+    },
+}
+local FAIL_BODY = {
+    -- THE VERSION NOTE, on our own screen and in plain words rather than an error code.
+    os_invalid = {
+        "This build supports OS 6.2.0 to",
+        "6.4.0 only. A newer OS needs a",
+        "newer ChatTLM release.",
+    },
+    no_resources = {
+        "chattlm_support.tns is missing",
+        "from the chattlm folder. Copy",
+        "the whole folder across again.",
+    },
+    setup = {
+        "Setup could not start. Restart",
+        "the calculator and open this",
+        "document again.",
+    },
+}
+
 function on.paint(gc)
-    local offsetX, offsetY = 0,0
-    if status == "install_failed" then
-        offsetY = -27
-        offsetX = -2
+    col(gc, BG)
+    gc:fillRect(0, 0, 320, 240)
+
+    -- Header: the product name, then a rule. Same proportions as the app's own title row.
+    text(gc, "ChatTLM", 18, 20, INK, 16, "b")
+    col(gc, LINE)
+    gc:fillRect(18, 44, 284, 1)
+
+    local heading, hcol
+    if status == "ready" then
+        heading, hcol = "One-time setup", INK2
+    elseif status == "install_done" then
+        heading, hcol = "Ready", OKFG
+    elseif status == "install_failed" then
+        heading, hcol = "Did not install", ERFG
     else
-        gc:begin()
+        heading, hcol = "Setting up", INK2
+    end
+    text(gc, heading, 18, 54, hcol, 11, "b")
+
+    -- Body
+    local body
+    if status == "install_failed" then
+        body = FAIL_BODY[failed] or FAIL_BODY.setup
+    elseif status == "install_start" or status == "install_requested" then
+        body = BODY.installing
+    else
+        body = BODY[status] or BODY.ready
     end
 
-    gc:fillRect(0,0, 320, 240)
-    
-    gc:setColorRGB(0x002000)
-    gc:fillRect(offsetX + b_x + 8 * 8, offsetY + b_y - 12, 11 * 8, 12)
-    gc:fillRect(offsetX + b_x, offsetY + b_y, b_w, b_h)
-    
-    for c = 1, columns do
-        local mc = current + oMap[c]
-        local x1 = c * gridSize - gridSize + blockOffset
-        
-        for i=1, tailSize do
-            local pos = (i + mc) % rows
-            local y1 = pos * gridSize + blockOffset
-            
-            local inBox = (x1 >= b_x - 8 and x1 + blockSize <= b_x + b_w + 8 and y1 >= b_y - 8 and y1 + blockSize <= b_y + b_h + 8) or y1 > 220
-            local col = inBox and mColorsL[math.min(i, max)] or mColorsH[math.min(i, max)]
-            
-          
-            gc:setColorRGB(col)
-            gc:fillRect(offsetX + x1, offsetX + y1, blockSize, blockSize)
-        end
+    local y = 78
+    if not cxii and status == "ready" then
+        body = { "ChatTLM needs a TI-Nspire CX II.", "This calculator is not supported." }
+    end
+    for i = 1, #body do
+        text(gc, body[i], 18, y, INK2, 10)
+        y = y + 15
     end
 
-    local msg
+    -- The action card. On `ready` it is the prompt; while installing it is a progress bar.
+    local cy = 152
+    col(gc, CARD)
+    gc:fillRect(18, cy, 284, 30)
+    col(gc, LINE)
+    gc:drawRect(18, cy, 284, 30)
 
     if status == "ready" then
-        msg = blink and (cxii and s_ndless_cxii_a or s_ndless_cx_a) or (cxii and s_ndless_cxii_b or s_ndless_cx_b)
-    elseif status == "install_start" or status == "install_requested" then
-        msg = s_ndless_installing
-    elseif status == "install_done" then
-        msg = s_ndless_install_done
-    elseif status == "install_failed" then
-        if failed == "os_invalid" then
-            msg = s_ndless_invalid_os
-        elseif failed == "no_resources" then
-            msg = s_ndless_missing_resources_file
+        if cxii then
+            centre(gc, "Press any key to begin", cy + 9, INK, 11, "b")
         else
-            msg = s_ndless_install_failed
+            centre(gc, "Nothing to do", cy + 9, INK3, 11, "b")
         end
+    elseif status == "install_start" or status == "install_requested" then
+        -- A bar that moves, so a long step does not read as a freeze.
+        local w = 264
+        local p = (tick % 40) / 40
+        col(gc, LINE)
+        gc:fillRect(28, cy + 13, w, 4)
+        col(gc, INK2)
+        gc:fillRect(28 + p * (w - 60), cy + 13, 60, 4)
+    elseif status == "install_done" then
+        centre(gc, "Opening ChatTLM", cy + 9, OKFG, 11, "b")
     else
-        msg = "Status:" .. tostring(status)
+        centre(gc, "Open this document again", cy + 9, ERFG, 11, "b")
     end
-    
-    drawMonoString(gc, msg, offsetX + b_x - 8, offsetY + b_y - 16)
-    
-    local counter_offset = 30
-    local credit_pos = current < counter_offset and 0 or math.floor((current - counter_offset) / 2)
-    drawMonoString(gc, s_credits, 0, 226+(fade and current-fade or 0), credit_pos + 1, credit_pos+40)
+
+    -- Footer: the supported range, always visible.
+    text(gc, "Built for OS 6.2.0 - 6.4.0", 18, 202, INK3, 9)
 end
 
 function on.timer()
     ipc_tick()
+    tick = tick + 1
 
-    if fade then
-        max = math.max(max - 1, 0) 
-    end
-    
-    current = current + 1
-    
-    if current % 6 == 0 then
-        blink = not blink
-    end
-
-    local now = timer.getMilliSecCounter()
-
-    if status == "install_start" and current - fade > 15 then
+    if status == "install_start" and tick > 4 then
         status     = "install_requested"
-        install_ts = now
-
-        if not cxii and trigger == "3" then
-            ipc_send("install_start", "cx")
-        elseif not cxii and trigger == "4" then
-            ipc_send("install_start", "cxw")
-        else 
+        install_ts = timer.getMilliSecCounter()
+        if cxii then
             ipc_send("install_start")
+        else
+            ipc_send("install_start", "cx")
         end
     end
 
-    --timeout because the other script probably crashed...
-    if status == "install_requested" and (now - install_ts) > 10000 then
+    if status == "install_requested"
+       and (timer.getMilliSecCounter() - install_ts) > 10000 then
         status = "install_failed"
+        failed = "setup"
     end
-    
-    --platform.window:invalidate()
-    platform.window:setFocus(false)
-    platform.window:setFocus(true)
+
+    platform.window:invalidate()
 end
 
 function on.charIn(ch)
-    if not cxii and ch ~= "3" and ch ~= "4" then return end
-    if not status == "ready" then return end
-
-    fade    = current
-    status  = "install_start"
-    trigger = ch
+    if status ~= "ready" then return end
+    if not cxii then return end
+    status = "install_start"
+    tick   = 0
 end
 
 on.arrowKey  = on.charIn
@@ -580,13 +231,12 @@ function on.create()
     cxii = getDeviceType() == "cx2"
     timer.start(0.08)
 
-    ipc_subscribe("install_done", function (d) 
+    ipc_subscribe("install_done", function (d)
         status = d
     end)
 
-    ipc_subscribe("install_failed", function (f, reason) 
+    ipc_subscribe("install_failed", function (f, reason)
         status = f
         failed = reason
     end)
 end
-

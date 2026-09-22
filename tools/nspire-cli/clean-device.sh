@@ -8,12 +8,16 @@
 #
 # WHAT SURVIVES, and why each one:
 #   /chattlm.tns                     the app, opened from My Documents
-#   /ndless/startup/chattlm.tns      the copy Ndless runs at power-on (ploaderhook.c:484)
-#   /ndless/ChatTLM_Setup.tns        our branded installer, for a calculator without Ndless
-#   /ndless/ndless_installer_*.tns   THEIR installer, kept DELIBERATELY as a fallback -- ours has
-#                                    not yet been run on hardware, and removing the proven one
-#                                    before that would leave a reset calculator with no way back
-#   /ndless/ndless_resources.tns     required by either installer
+#   /chattlm/startup/chattlm.tns     the copy the loader runs at power-on (ploaderhook.c:484)
+#   /chattlm/ChatTLM_Setup.tns       our setup document, for a calculator with no loader yet
+#   /chattlm/chattlm_support.tns     the loader itself. A134: the exploit reads this exact path
+#                                    (installer/stage0.S respath) and the file was NEVER pushed,
+#                                    so setup only worked where Ndless was already installed.
+#   /ndless/ndless_installer_*.tns   THEIR installer, kept DELIBERATELY as a fallback, together
+#   /ndless/ndless_resources.tns     with the file it needs. Ours has not been run on hardware
+#                                    since the A134 path change, and removing the proven route
+#                                    before that would leave a reset calculator with no way back.
+#                                    Delete both once our setup has installed from scratch once.
 #   /tlm/{store,tok4096,model4096}   the model data; device_app needs all three in one directory
 #   /tlm/chats.tns.tns               the student's saved sessions -- user data, not ours to delete
 #   /tlm/feedback.tns.tns            same
@@ -78,7 +82,7 @@ drop /NspireLogs.zip
 
 echo
 echo "--- what is left ---"
-for d in / /ndless /ndless/startup /tlm; do
+for d in / /chattlm /chattlm/startup /ndless /ndless/startup /tlm; do
     echo "  $d"
     $NSP ls "$d" 2>/dev/null | sed 's/^/      /'
 done

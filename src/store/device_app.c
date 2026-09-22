@@ -360,7 +360,7 @@ static int argmax(const float *v, int n) { int b = 0; for (int i = 1; i < n; i++
  * So resolve at runtime instead: try each candidate directory and keep the first where the STORE
  * opens. Probing the store rather than the directory means a half-populated directory does not win.
  * The chosen prefix is reported into the log so a wrong pick is visible without a round-trip. */
-static const char *DATA_DIRS[] = { "/documents/tlm/", "/documents/slm/", "/documents/ndless/",
+static const char *DATA_DIRS[] = { "/documents/chattlm/", "/documents/tlm/", "/documents/slm/", "/documents/ndless/",
                                    "/documents/bench/", "/documents/" };
 static char DATA_DIR[32];
 static int  MODEL_OK = 0;          /* set by rq_probe at startup; gates the send path */
@@ -792,7 +792,7 @@ int main(void) {
                     MODEL_OK = 0;
                     snprintf(MODEL_WHY, sizeof MODEL_WHY,
                              "Not enough free RAM: the model needs %ld bytes in one block. "
-                             "Reboot, re-run Ndless, open this app first.", msz);
+                             "Restart the calculator and open ChatTLM first.", msz);
                 } else {
                     free(trial);
                 }

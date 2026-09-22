@@ -1,0 +1,47 @@
+diff --git a/ndless-sdk/libndls/assert_ndless_rev.c b/ndless-sdk/libndls/assert_ndless_rev.c
+index 41938e6..3216a1e 100644
+--- a/ndless-sdk/libndls/assert_ndless_rev.c
++++ b/ndless-sdk/libndls/assert_ndless_rev.c
+@@ -23,7 +23,7 @@
+ 
+ void assert_ndless_rev(unsigned required_rev) {
+ 	if (required_rev > nl_ndless_rev()) {
+-		show_msgbox("Ndless update required", "Your version of Ndless is too old for this program. Update Ndless! http://ndlessly.wordpress.com/ndless/");
++		show_msgbox("ChatTLM", "ChatTLM's support files are out of date.\nRun ChatTLM Setup again to update them.");
+ 		exit(0);
+ 	}
+ }
+diff --git a/ndless-sdk/libndls/config.c b/ndless-sdk/libndls/config.c
+index 2a56255..a5b54d3 100644
+--- a/ndless-sdk/libndls/config.c
++++ b/ndless-sdk/libndls/config.c
+@@ -120,7 +120,7 @@ close_quit:
+ }
+ 
+ static int cfg_locate_cfg_file(char *dst_path, size_t dst_path_size) {
+-	return locate("ndless.cfg.tns", dst_path, dst_path_size);
++	return locate("chattlm.cfg.tns", dst_path, dst_path_size);
+ }
+ 
+ void cfg_open(void) {
+@@ -173,6 +173,6 @@ void cfg_register_fileext_file(const char *filepath, const char *ext, const char
+ void cfg_register_fileext(const char *ext, const char *prgm) {
+ 	char path[300];
+ 	if (cfg_locate_cfg_file(path, sizeof(path)))
+-		snprintf(path, sizeof(path), "%s%s", get_documents_dir(), "ndless/ndless.cfg.tns");
++		snprintf(path, sizeof(path), "%s%s", get_documents_dir(), "chattlm/chattlm.cfg.tns");
+ 	cfg_register_fileext_file(path, ext, prgm);
+ }
+diff --git a/ndless-sdk/libsyscalls/stdlib.cpp b/ndless-sdk/libsyscalls/stdlib.cpp
+index 43fc3fa..c89f5e4 100644
+--- a/ndless-sdk/libsyscalls/stdlib.cpp
++++ b/ndless-sdk/libsyscalls/stdlib.cpp
+@@ -274,7 +274,7 @@ void abort()
+ 		}
+ 
+ 		nocpp:
+-		_show_msgbox("Ndless", "The application crashed", 0);
++		_show_msgbox("ChatTLM", "ChatTLM stopped unexpectedly.", 0);
+ 	}
+ 
+ 	_exit(-1);

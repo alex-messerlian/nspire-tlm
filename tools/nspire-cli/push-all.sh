@@ -143,6 +143,15 @@ newer_than build/chattlm.tns        $(echo src/store/*.c src/store/*.h src/runq_
 newer_than build/transfer/store.tns.tns     corpus/store_clean.json
 newer_than build/transfer/tok4096.tok.tns   build/tok4096.tok
 
+# A134. The loader and the setup document. Both are built outside the repo-root Makefile, and the
+# loader in particular is the file the exploit reads BY HARDCODED PATH -- a stale one here is a
+# calculator that installs an old ChatTLM and reports success.
+newer_than build/chattlm_support.tns  resources/brand.py resources/Makefile \
+                                      vendor/Ndless/ndless-sdk/lib/libsyscalls.a \
+                                      vendor/Ndless/ndless-sdk/lib/libndls.a
+newer_than build/ChatTLM_Setup.tns    installer/gui.lua installer/stage0.S installer/installer.lua \
+                                      installer/ipc.lua installer/Problem1_template.xml
+
 # ...AND ASK MAKE, because the hand-written lists above are a copy of the Makefiles' prerequisites
 # and a copy goes stale. Measured: eval_device.tns was listed against device_main.c and eval.h only,
 # while tools/eval/Makefile builds it from $(CORE) -- eleven files including dispatch.c. A change to
@@ -158,6 +167,8 @@ ask_make() {   # ask_make <dir> <target> <label>
         echo "  STALE (make): $3 is out of date against its own Makefile prerequisites"; stale=1; }
 }
 ask_make .          build/chattlm.tns        build/chattlm.tns
+ask_make resources  "$PWD/build/chattlm_support.tns" build/chattlm_support.tns
+ask_make installer  ../build/ChatTLM_Setup.tns       build/ChatTLM_Setup.tns
 if [ "${PUSH_BENCH:-0}" = "1" ]; then
 ask_make tools/eval eval_device.tns          tools/eval/eval_device.tns
 ask_make src        llama2.tns               src/llama2.tns
@@ -211,8 +222,8 @@ echo "--- ChatTLM (8.2 MB: ~40 s to push, ~40 s to verify) ---"
 send build/chattlm.tns             /chattlm.tns
 # A130. THE STARTUP COPY IS PUSHED TOO, AND IT IS THE ONE THE CALCULATOR ACTUALLY RUNS.
 #
-# Ndless runs every document in /ndless/startup at boot (ploaderhook.c:484, file_each on
-# "./ndless/startup"), so a copy of the app lives there and that copy is what a student sees when
+# The loader runs every document in /chattlm/startup at boot (ploaderhook.c:484, file_each on
+# "./chattlm/startup"), so a copy of the app lives there and that copy is what a student sees when
 # they turn the calculator on. This script pushed ONLY /chattlm.tns.
 #
 # The two happened to be identical when this was noticed -- verified by pulling both and comparing
@@ -223,14 +234,19 @@ send build/chattlm.tns             /chattlm.tns
 # over.
 #
 # Pushed from the same local file, so they cannot diverge.
-send build/chattlm.tns             /ndless/startup/chattlm.tns
-# A131. THE SETUP DOCUMENT, in the ndless folder beside the resources it needs.
+send build/chattlm.tns             /chattlm/startup/chattlm.tns
+# A131/A134. THE SETUP DOCUMENT AND THE SUPPORT FILE IT LOADS.
 #
-# This is the one file a student opens on a calculator that has never run ChatTLM: it installs
-# Ndless with our wording and states the supported OS range before anything runs. Pushed here so a
-# working device always carries the thing that would rebuild it from nothing -- after a reset, the
-# calculator still has this document and the student does not have to go and find Ndless.
-send build/ChatTLM_Setup.tns       /ndless/ChatTLM_Setup.tns
+# ChatTLM_Setup.tns is the one file a student opens on a calculator that has never run ChatTLM.
+# It states the supported OS range, then runs an exploit whose payload reads exactly one path:
+#   A:\documents\chattlm\chattlm_support.tns   (installer/stage0.S, respath)
+#
+# A134. THAT SUPPORT FILE WAS NEVER PUSHED. The setup document was described as "bundling" the
+# loader and did not contain it -- it loaded a file this script never sent, so setup only ever
+# worked on a calculator where Ndless had already been installed BY HAND. On a fresh one it could
+# not work at all, and the failure looks like a flaky exploit rather than a missing file.
+send build/ChatTLM_Setup.tns       /chattlm/ChatTLM_Setup.tns
+send build/chattlm_support.tns     /chattlm/chattlm_support.tns
 send build/transfer/store.tns.tns  /tlm/store.tns.tns
 send build/transfer/tok4096.tok.tns /tlm/tok4096.tok.tns
 send build/transfer/model4096.bin.tns /tlm/model4096.bin.tns

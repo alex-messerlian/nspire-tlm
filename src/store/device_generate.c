@@ -51,7 +51,7 @@ static char GDIR[32] = "/documents/tlm/";
     say("printf works from this TU");
 
     ns_store2 st; ns_tok tk;
-    {   static const char *D[] = { "/documents/tlm/", "/documents/slm/", "/documents/ndless/" };
+    {   static const char *D[] = { "/documents/chattlm/", "/documents/tlm/", "/documents/slm/", "/documents/ndless/" };
         int found = 0;
         for (unsigned i = 0; i < sizeof D / sizeof D[0] && !found; i++) {
             char pb[80]; snprintf(pb, sizeof pb, "%sstore.tns.tns", D[i]);
