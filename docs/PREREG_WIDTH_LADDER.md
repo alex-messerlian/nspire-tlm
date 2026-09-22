@@ -18,7 +18,23 @@ paper should say so.
 
 ## Design
 
-**Varied:** `DIM` in {176, 264}. d352 already exists (`train/archive_a112/math1.pt`).
+**Varied:** `DIM` in {176, 264, 352}.
+
+**AMENDED BEFORE ANY LADDER RUN, and the amendment is the point of having run a smoke test.**
+The first design reused the shipped d352 checkpoint as the third point. It cannot be reused: the
+shipped model carries `corpus_sha 24c64532f724c6c8` and the corpus on disk is now
+`acdc7b70cef192b7` -- regenerated earlier today. The relation coverage is unchanged (1,619 heads
+both sides), so the two corpora are the same *experiment*, but they are not the same *documents*.
+
+Comparing a new d176 against that d352 would move width and corpus together and would measure
+neither. This is the stratum-drift failure recorded in the project log, where a harness inferred its
+labels from a generator that had moved and the headline did not budge because the headline did
+not depend on the labels. Here the cost of getting it wrong is an entire figure in the paper.
+
+So **d352 is retrained on the current corpus** as part of the ladder. The shipped model is
+untouched and remains the d352 trained on `24c64532f724c6c8`; the ladder is a separate,
+internally consistent set of three. Every number in the ladder figure will carry
+`corpus_sha acdc7b70cef192b7`, and the ladder's d352 is NOT the shipped model's score.
 
 **Held constant, all of it:** `LAYERS=6 HEADS=8 SEQ=512 BS=24 LR=3e-4 STEPS=8000 SEED=1`,
 `corpus_sha 24c64532f724c6c8`, `tok_sha c60e1250c64df27e`. Both dims divide 8, so the head count
@@ -43,7 +59,11 @@ Bands are set now. A miss is a finding to explain, not a number to retune.
 | `refuse` | 100.0% | 85-100% | 60-100% |
 | `explain` in-distribution | 83.5% | 55-80% | 25-65% |
 | `fit` | 1.1% | 0-10% | 0-10% |
-| final loss | 0.7960 | 0.83-0.95 | 0.95-1.20 |
+| final loss | 0.7960 (shipped, different corpus) | 0.83-0.95 | 0.95-1.20 |
+
+The d352 row above is the SHIPPED model's score on the OLD corpus and is shown only as the prior
+that set these bands. The ladder's own d352 will be measured on the current corpus and is the
+number the figure uses.
 
 The `d1` bands are deliberately wide because **nobody has measured this and a narrow band would
 be invented**. The interesting outcomes are the two edges:
@@ -69,5 +89,6 @@ explicitly so that a good d264 result cannot quietly become a shipping decision 
 
     RUN=w176 SEED=1 DIM=176 LAYERS=6 HEADS=8 SEQ=512 BS=24 STEPS=8000 .venv-tok/bin/python train/select_run.py
     RUN=w264 SEED=1 DIM=264 LAYERS=6 HEADS=8 SEQ=512 BS=24 STEPS=8000 .venv-tok/bin/python train/select_run.py
+    RUN=w352 SEED=1 DIM=352 LAYERS=6 HEADS=8 SEQ=512 BS=24 STEPS=8000 .venv-tok/bin/python train/select_run.py
 
 Then `score_arms` against each, with `TOK=` pinned to the tokenizer they were trained with.
