@@ -13,11 +13,14 @@
 #   /chattlm/chattlm_support.tns     the loader itself. A134: the exploit reads this exact path
 #                                    (installer/stage0.S respath) and the file was NEVER pushed,
 #                                    so setup only worked where Ndless was already installed.
-#   /ndless/ndless_installer_*.tns   THEIR installer, kept DELIBERATELY as a fallback, together
-#   /ndless/ndless_resources.tns     with the file it needs. Ours has not been run on hardware
-#                                    since the A134 path change, and removing the proven route
-#                                    before that would leave a reset calculator with no way back.
-#                                    Delete both once our setup has installed from scratch once.
+#   /ndless/ndless_installer_*.tns   THEIR installer and the file it needs. The condition for
+#   /ndless/ndless_resources.tns     removing these -- "once our setup has installed from scratch
+#                                    once" -- WAS MET on 2026-09-21: the loader was removed via
+#                                    our own uninstall dialog and ChatTLM Setup reinstalled it
+#                                    from nothing. They are now removed by this script.
+#                                    Keep a copy on the HOST (ndless/ in the main checkout); the
+#                                    reason to hold them was recovery, and the host has that
+#                                    covered without putting two installers in front of a student.
 #   /tlm/{store,tok4096,model4096}   the model data; device_app needs all three in one directory
 #   /tlm/chats.tns.tns               the student's saved sessions -- user data, not ours to delete
 #   /tlm/feedback.tns.tns            same
@@ -78,6 +81,11 @@ drop /tlm/caslog.txt.tns
 drop /tlm/casnext.txt.tns
 drop /tlm/casnext3.txt.tns
 drop /ndless/slmlog.txt.tns
+# A136. The upstream installer pair, now that our own setup has installed from nothing (see the
+# header). Two setup documents on one calculator is the confusion this script exists to remove,
+# and the host keeps a copy for recovery.
+drop /ndless/ndless_installer_4.5.5-6.2.0-6.4.0.tns
+drop /ndless/ndless_resources.tns
 drop /NspireLogs.zip
 
 echo

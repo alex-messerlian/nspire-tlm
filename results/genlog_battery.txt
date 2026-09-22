@@ -1,0 +1,51 @@
+== generate ==
+printf works from this TU
+store 1619 records, vocab 4085
+prompt: <q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high
+prompt tokens: 54
+loading model...
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+model loaded, vocab 4096
+timer: RUNNING (182 ticks over a busy loop)
+AHB 198 MHz -> CPU ~396 MHz (battery, VALID)
+prefill 53 tokens: 781003 ticks = 23.834 s
+decode  24 tokens: 404110 ticks = 12.332 s
+DECODE THROUGHPUT: 1.946 tok/s
+ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 198 
+TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 s
+== done ==

@@ -150,13 +150,29 @@ static inline const char *power_state_guess(uint32_t hz) {
 /* ---- Result logging ------------------------------------------------------------------------ */
 /* Ndless writes to the calculator filesystem; the .tns extension is mandatory for the file to be
  * visible to the OS file browser, which is how the operator retrieves it. */
-#define BENCH_LOG_PATH "/documents/bench/results.txt.tns"
+/* A136. THE LOG LIVES BESIDE THE MODEL, not in a directory of its own.
+ *
+ * This was /documents/bench/results.txt.tns. push-all.sh used to create /bench unconditionally;
+ * when that was made conditional on PUSH_BENCH the directory stopped existing, fopen returned
+ * NULL, every fprintf was skipped by its `if (g_log)` guard -- and bench_close STILL PRINTED
+ * "log: /documents/bench/results.txt.tns", so the screen reported a file that was never written.
+ * A whole battery run of bench_forward was lost that way, and the operator had no way to know
+ * until the pull came back empty.
+ *
+ * /documents/tlm/ is where the model, store and tokenizer live, so any device that can run a
+ * bench at all has it. */
+#define BENCH_LOG_PATH "/documents/tlm/bench_results.txt.tns"
 
 static FILE *g_log = NULL;
 
 static inline void bench_open(const char *bench_name) {
     screen_init();
     g_log = fopen(BENCH_LOG_PATH, "a");
+    /* A failed open is announced. "cannot write" and "wrote fine" must not look the same, which
+     * is exactly how the lost run looked. */
+    if (!g_log)
+        printf("WARNING: cannot open %s -- RESULTS ARE SCREEN ONLY, photograph them\n",
+               BENCH_LOG_PATH);
     uint32_t hz = cpu_clock_hz();
     printf("=== %s ===\n", bench_name);
     printf("cpu %lu Hz (%s)\n", (unsigned long)hz, power_state_guess(hz));
@@ -194,9 +210,13 @@ static inline void bench_result(const char *key, const char *fmt, ...) {
 }
 
 static inline void bench_close(void) {
+    int had_log = (g_log != NULL);
     if (g_log) { fflush(g_log); fclose(g_log); g_log = NULL; }
     screen_flush();
-    printf("\nlog: %s\nPress any key.\n", BENCH_LOG_PATH);
+    /* Report what actually happened. The unconditional version of this line claimed a log file
+     * existed on a run where fopen had failed, which is how a battery measurement was lost. */
+    printf("\n%s\nPress any key.\n",
+           had_log ? "log: " BENCH_LOG_PATH : "NO LOG WRITTEN -- photograph this screen");
     wait_key_pressed();
 }
 

@@ -291,6 +291,29 @@ setup: | $(BUILD)
 
 device: $(BUILD)/chattlm.tns
 
+# A136. THE THROUGHPUT INSTRUMENT HAD NO BUILD RULE.
+#
+# src/store/device_generate.c is the only thing in the repo that measures decode tok/s end to end,
+# and it is the number the project's whole frontier claim rests on. It has a main(), it is not in
+# DEV_SRC, and nothing built it -- so the headline measurement could not be taken. Third instance
+# of the unbuildable-binary class after provcli and tlmui, and the worst-placed one.
+#
+# It is worth more than a timing: it reads the PLL and prints whether the CPU is at 396 MHz
+# (battery, VALID) or 288 MHz (USB, INVALID), so a tethered run identifies itself instead of
+# producing a quietly wrong number.
+GEN_SRC := src/store/device_generate.c src/store/loader.c src/store/assemble.c \
+           src/store/tokenizer.c src/store/picker.c src/store/shapecheck.c \
+           src/runq_nspire.c src/nspire.c include/nspire_screen.c
+
+bench/bench_generate.tns: $(GEN_SRC) $(EVAL_CORE) $(APP_HDR)
+	@PATH="$(DEVPATH)"; export PATH; \
+	 nspire-gcc $(NSPFLAGS) -o bench/bench_generate.elf $(GEN_SRC) $(EVAL_CORE) -lm && \
+	 genzehn --input bench/bench_generate.elf --output bench/bench_generate.zehn \
+	         --name bench_generate && \
+	 make-prg bench/bench_generate.zehn $@ && \
+	 rm -f bench/bench_generate.zehn bench/bench_generate.elf && \
+	 echo "  $@  $$(wc -c < $@ | tr -d ' ') bytes"
+
 $(BUILD)/chattlm.tns: $(DEV_SRC) $(EVAL_CORE) $(APP_HDR) | $(BUILD)
 	@command -v nspire-gcc >/dev/null 2>&1 || export PATH="$(DEVPATH)"; \
 	 PATH="$(DEVPATH)"; export PATH; \
