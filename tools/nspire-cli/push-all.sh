@@ -67,16 +67,22 @@ $NSP info
 # NOTE: mkdir at the documents ROOT fails on the device (returns 0xFF0F). A two-component path
 # works and creates parents, so this is how /bench and /models get made.
 echo "--- directories ---"
-$NSP mkdir /bench/.mk  >/dev/null 2>&1 || true
-$NSP mkdir /models/.mk >/dev/null 2>&1 || true
-$NSP mkdir /tlm/.mk    >/dev/null 2>&1 || true
-$NSP rmdir /bench/.mk  >/dev/null 2>&1 || true
-$NSP rmdir /models/.mk >/dev/null 2>&1 || true
-$NSP rmdir /tlm/.mk    >/dev/null 2>&1 || true
-$NSP ls /bench  >/dev/null 2>&1 || { echo "  FATAL: /bench does not exist"; exit 1; }
-$NSP ls /models >/dev/null 2>&1 || { echo "  FATAL: /models does not exist"; exit 1; }
-$NSP ls /tlm    >/dev/null 2>&1 || { echo "  FATAL: /tlm does not exist"; exit 1; }
-echo "  /bench, /models and /tlm present"
+# A134b. THE LIST IS DERIVED FROM WHAT IS ACTUALLY SENT, not hardcoded.
+#
+# It used to name /bench /models /tlm unconditionally. Two defects in one line: /chattlm and
+# /chattlm/startup were never created, so the first push after the rename failed partway through
+# with "Path does not exist" -- AFTER writing /chattlm.tns; and /bench and /models were recreated
+# on every run even with PUSH_BENCH unset, which is the root clutter clean-device.sh exists to
+# remove. A directory is made here only if a file is going into it.
+DIRS="/chattlm/startup /tlm"
+[ "${PUSH_BENCH:-0}" = "1" ]  && DIRS="$DIRS /bench"
+[ "${PUSH_LEGACY:-0}" = "1" ] && DIRS="$DIRS /models"
+for d in $DIRS; do
+    $NSP mkdir "$d/.mk" >/dev/null 2>&1 || true
+    $NSP rmdir "$d/.mk" >/dev/null 2>&1 || true
+    $NSP ls "$d" >/dev/null 2>&1 || { echo "  FATAL: $d does not exist"; exit 1; }
+done
+echo "  present:$DIRS"
 
 # ---- GS GATE ---------------------------------------------------------------------------------
 # Refuse to push a checkpoint the binary cannot load.
