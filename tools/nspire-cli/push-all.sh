@@ -121,6 +121,10 @@ newer_than() {   # newer_than <artefact> <source>...
         fi
     done
 }
+# A132. THE FRESHNESS CHECKS FOLLOW WHAT IS ACTUALLY BEING PUSHED. Demanding a fresh benchmark
+# binary on a run that does not send one is a FATAL on something the transfer does not touch, and
+# the fix it prints ("make bench") is then irrelevant to what failed.
+if [ "${PUSH_BENCH:-0}" = "1" ]; then
 newer_than bench/bench_forward.tns bench/bench_forward.c bench/common.h src/runq_nspire.c src/nspire.c
 newer_than bench/bench_cas.tns      bench/bench_cas.c bench/common.h
 newer_than bench/bench_platform.tns bench/bench_platform.c bench/common.h
@@ -128,13 +132,14 @@ newer_than bench/bench_mem.tns      bench/bench_mem.c bench/common.h
 newer_than bench/bench_mac.tns      bench/bench_mac.c bench/common.h
 newer_than bench/bench_flash.tns    bench/bench_flash.c bench/common.h
 newer_than bench/bench_rtc.tns      bench/bench_rtc.c bench/common.h
+newer_than tools/eval/eval_device.tns tools/eval/device_main.c tools/eval/eval.h
+newer_than src/llama2.tns             src/nspire_main.c src/runq_nspire.c src/nspire.c
+fi
 newer_than build/chattlm.tns        $(echo src/store/*.c src/store/*.h src/runq_nspire.c src/nspire.c)
 # These two have their own Makefiles (tools/eval/, src/) and are NOT built by the repo-root `make`.
 # They were absent from a fresh worktree while push-all.sh sent them unconditionally under `set -e`,
 # so the transfer would have aborted mid-run after the device had already been half-written. Named
 # here so the failure arrives BEFORE anything is sent, with the command that fixes it.
-newer_than tools/eval/eval_device.tns tools/eval/device_main.c tools/eval/eval.h
-newer_than src/llama2.tns             src/nspire_main.c src/runq_nspire.c src/nspire.c
 newer_than build/transfer/store.tns.tns     corpus/store_clean.json
 newer_than build/transfer/tok4096.tok.tns   build/tok4096.tok
 
@@ -153,11 +158,13 @@ ask_make() {   # ask_make <dir> <target> <label>
         echo "  STALE (make): $3 is out of date against its own Makefile prerequisites"; stale=1; }
 }
 ask_make .          build/chattlm.tns        build/chattlm.tns
+if [ "${PUSH_BENCH:-0}" = "1" ]; then
 ask_make tools/eval eval_device.tns          tools/eval/eval_device.tns
 ask_make src        llama2.tns               src/llama2.tns
 for _b in forward cas platform mem mac flash rtc; do
     ask_make . "bench/bench_${_b}.tns" "bench/bench_${_b}.tns"
 done
+fi
 
 if [ "$stale" -ne 0 ]; then
     echo "  FATAL: at least one program is stale or missing. Pushing a stale binary measures the"
@@ -173,7 +180,18 @@ if [ "$stale" -ne 0 ]; then
 fi
 echo "  staleness gate: every program is newer than its sources"
 
-echo "--- programs ---"
+# A132. THE BENCHMARKS AND THE LEGACY MODELS ARE OPT-IN NOW.
+#
+# This script pushed 12 benchmark programs, two engines and 33 MB of stories15M checkpoints on
+# EVERY run. The calculator's document list reached 22 entries at the root and a student -- or a
+# judge -- could not find chattlm among them. Reported as "I can't find it".
+#
+# A one-off tidy would not have held: the next push put all of it back, so the clutter was a
+# property of this script rather than of the device. Default is now the DEMO set: the app, the
+# setup document, the model data. `PUSH_BENCH=1` restores the measurement tools when a measurement
+# is actually being taken, which is the only time they are needed and takes about two minutes.
+if [ "${PUSH_BENCH:-0}" = "1" ]; then
+echo "--- programs (PUSH_BENCH=1) ---"
 send tools/eval/eval_device.tns  /eval_device.tns
 send src/llama2.tns              /llama2.tns
 send bench/bench_platform.tns    /bench_platform.tns
@@ -183,6 +201,7 @@ send bench/bench_flash.tns       /bench_flash.tns
 send bench/bench_rtc.tns         /bench_rtc.tns
 send bench/bench_cas.tns         /bench_cas.tns
 send bench/bench_forward.tns  /bench_forward.tns
+fi
 
 # ChatTLM: the demo. Nothing staged this set before -- push-all.sh created /bench and /models and
 # never touched build/transfer/, so a fresh device had no /tlm at all and the app exited at boot.
@@ -216,9 +235,11 @@ send build/transfer/store.tns.tns  /tlm/store.tns.tns
 send build/transfer/tok4096.tok.tns /tlm/tok4096.tok.tns
 send build/transfer/model4096.bin.tns /tlm/model4096.bin.tns
 
-echo "--- model (17 MB: ~60 s to push, ~60 s to verify) ---"
+if [ "${PUSH_LEGACY:-0}" = "1" ]; then
+echo "--- legacy stories15M model (17 MB: ~60 s to push, ~60 s to verify) ---"
 send models/stories15M_q80.bin   /models/stories15M_q80.bin.tns
 send models/tokenizer.bin        /models/tokenizer.bin.tns
+fi
 
 echo
 if [ "$fail" -ne 0 ]; then
