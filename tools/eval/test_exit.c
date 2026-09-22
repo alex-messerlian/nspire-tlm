@@ -751,15 +751,12 @@ int main(void) {
      * straight through the composer and this is the only thing that would say so. Measured now:
      * last row ends at 188, dock starts at 197. */
     T("field is below the title and on screen", empty_field.y > TOP_H && empty_field.y < GFX_H, 1);
-    T("examples start below the field",
-      R_TRY[0].y > empty_field.y + empty_field.h, 1);
-    /* VISIBLE, not merely un-clipped. The draw hides the examples ENTIRELY when they do not fit
-     * -- `if (show_try && ty + ... + lh * TRY_N <= bot - 2)`, else every R_TRY is zeroed -- so the
-     * failure mode of adding one example too many is that ALL of them vanish, with nothing on
-     * screen admitting it. My first version of this check asserted the last row clears the dock and
-     * could never fire: at 5 and at 7 examples it still passed, because by then the rows were not
-     * being drawn at all. The hidden-data class, caught in the assertion written to catch it. */
-    T("and the examples are actually drawn", R_TRY[TRY_N-1].w > 0, 1);
+    /* A135. The TRY ONE assertions lived here. The examples are gone -- removed after device use,
+     * where a click landing just below the composer ran an example nobody asked for. What the two
+     * checks were really protecting is that nothing is drawn into the dock, so that is asserted
+     * directly now and does not depend on a feature existing. */
+    T("nothing in the empty state reaches the dock",
+      empty_field.y + empty_field.h < GFX_H - DOCK_H, 1);
     T("send button rides with it", R_SEND.y > empty_field.y - 2 && R_SEND.y < empty_field.y + 20, 1);
 
     /* the field must actually be clickable where it was drawn */

@@ -208,34 +208,10 @@ int main(void) {
                      miss ? ", first miss: " : "", miss ? first : "");
             OK(!miss, "placeholder topics the app can answer (%s)", m);
 
-            /* THE "TRY ONE" EXAMPLES ARE THE SAME PROMISE, one screen earlier and more prominent:
-             * a student taps one expecting it to work. Asserted here for the same reason. */
-            int tmiss = 0; char tfirst[96]; tfirst[0] = 0;
-            for (int i = 0; i < TRY_N; i++) {
-                static ns_ask a; ask_parse(TRY_Q[i], &a);
-                int idx = -1;
-                if (!ask_confident(st, TRY_Q[i], &a.in, &idx) || idx < 0) {
-                    if (!tfirst[0]) snprintf(tfirst, sizeof tfirst, "%s", TRY_Q[i]);
-                    tmiss++;
-                }
-            }
-            snprintf(m, sizeof m, "%d of %d resolve%s%s", TRY_N - tmiss, TRY_N,
-                     tmiss ? ", first miss: " : "", tmiss ? tfirst : "");
-            OK(!tmiss, "TRY ONE examples the app can answer (%s)", m);
-
-            /* AND THEY MUST FIT THE PANE. gfx_text does not wrap or ellipsize here -- it draws off
-             * the right edge -- so an example one word too long is silently cut on the device and
-             * nowhere else. The pane is GFX_W - SIDE_W wide and the row starts 18px in, with 6px
-             * of breathing room at the end. */
-            int wide = 0; char wfirst[96]; wfirst[0] = 0;
-            for (int i = 0; i < TRY_N; i++) {
-                if (gfx_text_w(TRY_Q[i], F_SM) > GFX_W - SIDE_W - 18 - 6) {
-                    if (!wfirst[0]) snprintf(wfirst, sizeof wfirst, "%s", TRY_Q[i]);
-                    wide++;
-                }
-            }
-            snprintf(m, sizeof m, "%d too wide%s%s", wide, wide ? ": " : "", wide ? wfirst : "");
-            OK(!wide, "TRY ONE examples fit the pane (%s)", m);
+            /* A135. Two TRY ONE assertions stood here -- that each example resolves against
+             * the store, and that each fits the pane. The examples were removed after device use
+             * (a click just below the composer ran one by accident). The same promise is still
+             * asserted one screen over, for the placeholder topics, immediately above. */
         }
     }
 

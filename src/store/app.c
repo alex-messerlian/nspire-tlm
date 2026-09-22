@@ -568,14 +568,10 @@ static int ask_index(unsigned n);
  * MEASURED: all four resolve confidently against the shipped store (ask_confident, build/store.tns).
  * An example that refuses is worse than no example, which is the same rule ASK_ABOUT now follows,
  * and test_palette asserts it for both. */
-static const char *TRY_Q[] = {
-    "Find work. F = 12, d = 2.5",
-    "What is kinetic energy?",
-    "solve F=m*a for m",
-    "derivative of m*g*h for h",   /* short enough to FIT: test_palette asserts it */
-};
-#define TRY_N ((int)(sizeof TRY_Q / sizeof TRY_Q[0]))
-static gfx_rect R_TRY[TRY_N];
+/* A135. TRY_Q used to live here -- four tappable example questions under the composer. Removed
+ * after device use: they sat directly below the box, so a click that fell short of the box ran a
+ * question the student had not asked, and that happened repeatedly. The bottom key row already
+ * names menu, symbols, catalog and formulas, which covers the discoverability this was for. */
 
 /* A126. EVERY TOPIC HERE IS ONE THE STORE ACTUALLY COVERS, and that was MEASURED rather than
  * assumed. The placeholder rotates "Ask me about {topic}" -- it is an invitation, and an invitation
@@ -1646,9 +1642,12 @@ static void draw_main(void) {
          * constant to that block pushed the layout into its `cy0 < top + 6` clamp at four lines,
          * the cancellation stopped being exact, and the bottom edge started moving. test_exit
          * caught it -- the assertion is older than this feature and names the reason. */
-        int show_try = !COMPOSE_N;
-        int tryh = show_try ? gfx_font_h(F_XS) + 4 + TRY_N * lh + 10 : 0;
-        int blk = hh + gap + compose_field_h(w) + tryh;
+        /* A135. THE "TRY ONE" EXAMPLES ARE GONE. Reported from the device: "I keep accidentally
+         * clicking it. It's ugly." Accidental activation is the part that matters -- the list sat
+         * directly under the composer, so a click that missed the box low ran a question the
+         * student never asked for. The key row along the bottom (menu, symbols, catalog,
+         * formulas) already tells them what the app can do, which was this block's other job. */
+        int blk = hh + gap + compose_field_h(w);
         int cy0 = top + (bot - top - blk) / 2;
         if (cy0 < top + 6) cy0 = top + 6;
 
@@ -1659,24 +1658,7 @@ static void draw_main(void) {
         draw_composer(x0, w, cy0 + hh + gap);
         EMPTY_COMPOSER = 1;
 
-        /* The examples sit UNDER the box, where they read as things to try rather than as the
-         * app's own suggestions about this session. Vetted to fit: no ellipsis at this width. */
-        {   int ty = cy0 + hh + gap + compose_field_h(w) + 10;
-            if (show_try && ty + gfx_font_h(F_XS) + 4 + lh * TRY_N <= bot - 2) {
-                gfx_text(x0 + 14, ty, "TRY ONE", F_XS, C_INK3, C_BG);
-                ty += gfx_font_h(F_XS) + 4;
-                for (int i = 0; i < TRY_N; i++) {
-                    int tw = gfx_text_w(TRY_Q[i], F_SM);
-                    R_TRY[i] = (gfx_rect){ x0 + 12, ty - 2, tw + 12, lh };
-                    int hot = HOVER && inside(R_TRY[i], MX, MY);
-                    if (hot) gfx_rrect(R_TRY[i].x, R_TRY[i].y, R_TRY[i].w, R_TRY[i].h, 4, C_SEL);
-                    gfx_text(x0 + 18, ty, TRY_Q[i], F_SM, C_INK2, hot ? C_SEL : C_BG);
-                    ty += lh;
-                }
-            } else {
-                for (int i = 0; i < TRY_N; i++) R_TRY[i] = (gfx_rect){0,0,0,0};
-            }
-        }
+        (void)lh;
     } else {
         app_chat *c = &CHATS[CUR];
         int lh0 = gfx_font_h(F_UI) + 2, total = 6;
@@ -2624,17 +2606,6 @@ void app_event(const in_event *e) {
          * message was never sent -- a containment bug, not a hit-testing one, introduced the
          * moment the field became clickable at all. */
         if (hit(R_SEND, MX, MY) && COMPOSE_N && !BUSY) { open_picker(); return; }
-        /* An example LOADS, it does not send. The format is the lesson, so the student has to see
-         * it sitting in the box -- and can edit the numbers before asking. */
-        for (int i = 0; i < TRY_N; i++) {
-            if (!R_TRY[i].w || !inside(R_TRY[i], MX, MY)) continue;
-            compose_clear();
-            COMPOSE_N = (int)snprintf(COMPOSE, sizeof COMPOSE, "%s", TRY_Q[i]);
-            if (COMPOSE_N >= (int)sizeof COMPOSE) COMPOSE_N = (int)sizeof COMPOSE - 1;
-            COMPOSE_C = COMPOSE_N;
-            FIELD_FOCUS = 1;
-            return;
-        }
         /* Clicking the box makes it the typing target. Typing already went there, but nothing on
          * screen said so, so the bar looked inert until a character appeared in it. */
         if (inside(R_FIELD, MX, MY)) {

@@ -101,26 +101,79 @@ def main():
         return function(self, ...) _calls[#_calls+1] = k; return 10 end
     end }
     gcstub = setmetatable({}, mt)
+    -- A135. THE ARGUMENTS ARE RECORDED, NOT JUST THE METHOD NAMES.
+    --
+    -- Counting calls proved the screen drew SOMETHING. It could not see that the screen drew
+    -- things ON TOP OF EACH OTHER AND OFF THE BOTTOM, which is what it actually did: photographed
+    -- on device, the last body line was half-covered by the action card and the footer was past
+    -- the edge of the pane. 546 draw calls, gate green, screen wrong.
+    _geom = {}
+    mt.__index = function(t, k)
+        if not API[k] then error("gc has no method '" .. tostring(k) .. "'", 2) end
+        return function(self, a, b, c, d)
+            _calls[#_calls+1] = k
+            if k == "drawString" then
+                _geom[#_geom+1] = { m = "s", x = b, y = c, t = tostring(a) }
+            elseif k == "fillRect" then
+                _geom[#_geom+1] = { m = "r", x = a, y = b, w = c, h = d }
+            end
+            return 10
+        end
+    end
     """)
     paint = L.globals()["on"]["paint"]
     STATES = [("ready", None), ("install_start", None), ("install_requested", None),
               ("install_done", None), ("install_failed", "os_invalid"),
               ("install_failed", "no_resources"), ("install_failed", "setup")]
+    # The Lua pane is NOT the 240 px screen: the document tab bar takes the top, leaving roughly
+    # this much. A footer at y=202 was past it on real hardware.
+    PANE_H, TEXT_H = 212, 12
+    clipped = []
     for st, reason in STATES:
         L.execute(f'status = "{st}"; failed = {("nil" if reason is None else chr(34)+reason+chr(34))}')
         for cx in ("true", "false"):
-            L.execute(f"cxii = {cx}")
+            L.execute(f"cxii = {cx}; _geom = {{}}")
             try:
                 paint(L.globals()["gcstub"])
             except Exception as e:
                 print(f"\n  FAIL: on.paint raised in state {st}"
                       f"{'/' + reason if reason else ''} (cxii={cx})\n    {e}")
                 return 1
+            where = f"{st}{'/' + reason if reason else ''} cxii={cx}"
+            g = [dict(r) for r in L.globals()["_geom"].values()]
+            # The action card: the one filled rect 284 wide. Body and footer are drawn at x=18;
+            # the card's own label is centred, so an x of 18 inside the card band is a collision.
+            card = next((r for r in g if r["m"] == "r" and r.get("w") == 284 and r.get("h") == 30),
+                        None)
+            for r in g:
+                if r["m"] != "s":
+                    continue
+                if r["y"] + TEXT_H > PANE_H:
+                    clipped.append(f"{where}: {r['t'][:28]!r} at y={r['y']:.0f} runs past the pane")
+                if card and r["x"] == 18 and card["y"] - 2 <= r["y"] < card["y"] + card["h"]:
+                    clipped.append(f"{where}: {r['t'][:28]!r} at y={r['y']:.0f} is under the card")
+            # LINES MUST NOT OVERLAP EACH OTHER. This case was added because a control survived:
+            # gui.lua tightens its line height to make a tall body fit, so pushing the body down
+            # produced 8 px spacing -- inside the pane, clear of the card, and unreadable. A
+            # bounds check alone cannot see that, and "it fits" was exactly the wrong conclusion.
+            col = sorted((r for r in g if r["m"] == "s" and r["x"] == 18), key=lambda r: r["y"])
+            for a, b in zip(col, col[1:]):
+                gap = b["y"] - a["y"]
+                if 0 < gap < TEXT_H:
+                    clipped.append(f"{where}: {a['t'][:20]!r} and {b['t'][:20]!r} are {gap:.0f} px "
+                                   f"apart, closer than the {TEXT_H} px line height")
     n = len(list(L.globals()["_calls"]))
     print(f"    on.paint runs in all {len(STATES)} states x 2 device kinds ({n} draw calls made)")
     if n < 50:
         print("  FAIL: suspiciously few draw calls -- the screen is probably drawing nothing.")
         return 1
+
+    if clipped:
+        print(f"\n  FAIL: {len(clipped)} string(s) drawn where they cannot be read:")
+        for c in clipped[:10]:
+            print(f"    {c}")
+        return 1
+    print(f"    every string fits the {PANE_H} px pane and clears the action card")
 
     print("\n  PASS: loads, every callback defined, on.create clean, on.paint runs in every state. "
           "NOT checked here: whether the real device accepts these draw calls -- that needs hardware.")

@@ -84,13 +84,20 @@ local BODY = {
     -- again until it works", twice -- and our exploit files are byte-identical to theirs, so it is
     -- not something we introduced. What we CAN fix is that an unexplained reset reads as a broken
     -- product. Warned about in advance it reads as a retry, which is what it is.
+    -- A135. SIX LINES DID NOT FIT. Photographed on device: the last line was cut off mid-height
+    -- by the action card, and the footer was cut off by the bottom of the Lua pane. The pane is
+    -- shorter than the 240 px screen -- the document tab bar takes the top -- so the usable area
+    -- is about 212 px, not 240. Four lines at 15 px from y=78 ends at 138, clear of the card
+    -- at 152.
+    -- FIVE LINES, NOT SIX. Six forced the auto-shrink below to 11 px spacing, which fits the pane
+    -- and is unreadable -- caught by gate_installer_lua, which grew that case because a control
+    -- survived the bounds check.
     ready = {
         "This installs the support files",
         "ChatTLM needs in order to run.",
         "",
-        "The calculator may restart. That",
-        "is normal - open this again if it",
-        "does. It can take a few tries.",
+        "A restart is normal. Open this",
+        "again if it happens.",
     },
     installing = {
         "Installing. This takes a moment",
@@ -151,17 +158,31 @@ function on.paint(gc)
         body = BODY[status] or BODY.ready
     end
 
-    local y = 78
+    -- A135. THE LAYOUT IS COMPUTED, NOT HARDCODED, because the hardcoded one was wrong on device.
+    --
+    -- Photographed: the sixth body line was half-hidden behind the action card and the footer was
+    -- cut off by the bottom of the pane. The Lua pane is NOT the full 240 px screen -- the
+    -- document tab bar takes the top -- so roughly 212 px is usable and 78 + 6*15 = 168 ran past
+    -- the card at 152 with nothing on screen admitting it. Same silent-truncation class this
+    -- project has now hit in the session list, the search sheet and here.
+    --
+    -- So: the card is placed from the bottom, the body is given the space above it, and the line
+    -- height tightens if the body is tall. A body that still would not fit is reported rather
+    -- than drawn through.
+    local FOOT_Y, CARD_H = 186, 30
+    local cy   = FOOT_Y - 8 - CARD_H          -- 148
+    local y    = 76
     if not cxii and status == "ready" then
         body = { "ChatTLM needs a TI-Nspire CX II.", "This calculator is not supported." }
     end
+    local lh = 15
+    if #body * lh > (cy - 4) - y then lh = math.floor(((cy - 4) - y) / #body) end
     for i = 1, #body do
         text(gc, body[i], 18, y, INK2, 10)
-        y = y + 15
+        y = y + lh
     end
 
     -- The action card. On `ready` it is the prompt; while installing it is a progress bar.
-    local cy = 152
     col(gc, CARD)
     gc:fillRect(18, cy, 284, 30)
     col(gc, LINE)
@@ -169,7 +190,12 @@ function on.paint(gc)
 
     if status == "ready" then
         if cxii then
-            centre(gc, "Press any key to begin", cy + 9, INK, 11, "b")
+            -- A135. IT SAID "Press any key to begin" AND KEYS DID NOT WORK. Reported from the
+            -- device: pressing keys did nothing, clicking the card did. The document does not
+            -- hold keyboard focus until something is clicked, so on.charIn never fires first --
+            -- which makes the label an instruction that cannot be followed. The key handlers stay
+            -- wired (they work once focused), but the card now says the thing that always works.
+            centre(gc, "Click here to begin", cy + 9, INK, 11, "b")
         else
             centre(gc, "Nothing to do", cy + 9, INK3, 11, "b")
         end
@@ -187,8 +213,8 @@ function on.paint(gc)
         centre(gc, "Open this document again", cy + 9, ERFG, 11, "b")
     end
 
-    -- Footer: the supported range, always visible.
-    text(gc, "Built for OS 6.2.0 - 6.4.0", 18, 202, INK3, 9)
+    -- Footer: the supported range, always visible. At 202 it fell off the bottom of the pane.
+    text(gc, "Built for OS 6.2.0 - 6.4.0", 18, FOOT_Y, INK3, 9)
 end
 
 function on.timer()
