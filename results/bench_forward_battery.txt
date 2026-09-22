@@ -1,0 +1,84 @@
+
+=== bench_forward ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+model=/documents/tlm/model4096.bin.tns
+log_routed=yes -- engine traces will appear below
+probe=ok
+stage=rq_build: entering read_checkpoint + malloc_run_state
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+stage=rq_build: returned
+vocab=4096
+part1=time per token vs layer count, same weights
+t_per_token_L=1 layers = 3551 ticks = 108367 us
+t_per_token_L=2 layers = 5582 ticks = 170349 us
+t_per_token_L=3 layers = 7612 ticks = 232299 us
+t_per_token_L=4 layers = 9644 ticks = 294311 us
+t_per_token_L=5 layers = 11676 ticks = 356323 us
+t_per_token_L=6 layers = 13713 ticks = 418487 us
+per_layer_ticks=2032.114
+per_layer_us=62015
+INTERCEPT_ticks=1517.266
+INTERCEPT_us=46303
+INTERCEPT_note=this is F0 MEASURED. The table assumed ~180000 us at d288 L6.
+part1b=time per token vs POSITION, fixed L=6 -- settles the KV term
+seq_len=512
+t_per_token_pos=pos 8 = 13986 ticks = 426818 us
+t_per_token_pos=pos 129 = 18552 ticks = 566162 us
+t_per_token_pos=pos 250 = 23210 ticks = 708312 us
+t_per_token_pos=pos 371 = 27868 ticks = 850463 us
+t_per_token_pos=pos 492 = 32513 ticks = 992218 us
+part1b_note=fit a line to these: the SLOPE is the per-position cost (attention + KV traffic) and the INTERCEPT is the position-independent cost. Extrapolate to C/2 for a mean-position tok/s, or to C for 
+stage=embedding        2 ticks      61 us    0%  FIXED
+stage=rmsnorm         72 ticks    2197 us    0%  per-layer
+stage=quantize       107 ticks    3265 us    0%  per-layer
+stage=qkv matmul    2327 ticks   71014 us   16%  per-layer
+stage=RoPE           697 ticks   21270 us    5%  per-layer
+stage=kv write         4 ticks     122 us    0%  per-layer
+stage=attention     1262 ticks   38513 us    9%  per-layer
+stage=softmax         61 ticks    1861 us    0%  per-layer
+stage=ffn matmul    7627 ticks  232757 us   55%  per-layer
+stage=classifier    1501 ticks   45806 us   10%  FIXED
+stage=final norm       6 ticks     183 us    0%  FIXED
+stage=final quant      8 ticks     244 us    0%  FIXED
+stage_sum=13674 ticks (417297 us)
+wall_total=13712 ticks (418457 us)
+unattributed=38 ticks -- loop overhead and anything not instrumented
+FIXED_stages_us=46295 -- embedding + final norm + final quant + classifier
+PERLAYER_stages_us=371002 total over 6 layers = 61833 us/layer
+CROSS_CHECK_1=FIXED_stages_us should equal INTERCEPT_us. A disagreement means the model of the forward pass is wrong, and that is the finding.
+CROSS_CHECK_2=PERLAYER_stages_us/layer should equal per_layer_us from the regression. A disagreement means per-layer cost is NOT uniform in L, which is the table's load-bearing assumption.
