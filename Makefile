@@ -353,6 +353,15 @@ bench/bench_forward.elf: bench/bench_forward.c bench/common.h src/runq_nspire.c 
 	 nspire-gcc $(BENCHFLAGS) -DTLM_PROFILE -o $@ \
 	   bench/bench_forward.c src/runq_nspire.c src/nspire.c include/nspire_screen.c -lnspireio -lm
 
+# bench_sweep links the engine for the same reason bench_forward does, but WITHOUT -DTLM_PROFILE:
+# it times whole forward passes across shapes and the per-stage counters would only add overhead
+# to every one of them.
+bench/bench_sweep.elf: bench/bench_sweep.c bench/common.h src/runq_nspire.c src/nspire.c \
+                       include/nspire_screen.c
+	@PATH="$(DEVPATH)"; export PATH; \
+	 nspire-gcc $(BENCHFLAGS) -o $@ \
+	   bench/bench_sweep.c src/runq_nspire.c src/nspire.c include/nspire_screen.c -lnspireio -lm
+
 # bench_ask walks the app's ENTER path stage by stage with a flushed marker before each call, so a
 # process that vanishes leaves its last reached stage in the log. It links the store, the parser,
 # the tokenizer AND the engine, which is why it cannot use the bench/%.elf rule.
