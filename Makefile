@@ -283,6 +283,12 @@ $(BUILD)/golden_dev.tns: tools/eval/golden_forward.c tools/eval/golden_dev_shim.
 
 
 # ---- device ----------------------------------------------------------------------------------
+# A131. THE SETUP DOCUMENT. Built by installer/'s own Makefile, which needs the SDK on PATH the
+# same way the device target does. Named here so `make device` produces everything a fresh
+# calculator needs, rather than leaving the one file a NEW user opens first to be remembered.
+setup: | $(BUILD)
+	@PATH="$(DEVPATH)"; export PATH; $(MAKE) -s -C installer
+
 device: $(BUILD)/chattlm.tns
 
 $(BUILD)/chattlm.tns: $(DEV_SRC) $(EVAL_CORE) $(APP_HDR) | $(BUILD)

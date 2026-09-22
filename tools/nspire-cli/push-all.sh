@@ -190,6 +190,28 @@ send bench/bench_forward.tns  /bench_forward.tns
 # accepts a prefix only when store, tokenizer AND model all open under it.
 echo "--- ChatTLM (8.2 MB: ~40 s to push, ~40 s to verify) ---"
 send build/chattlm.tns             /chattlm.tns
+# A130. THE STARTUP COPY IS PUSHED TOO, AND IT IS THE ONE THE CALCULATOR ACTUALLY RUNS.
+#
+# Ndless runs every document in /ndless/startup at boot (ploaderhook.c:484, file_each on
+# "./ndless/startup"), so a copy of the app lives there and that copy is what a student sees when
+# they turn the calculator on. This script pushed ONLY /chattlm.tns.
+#
+# The two happened to be identical when this was noticed -- verified by pulling both and comparing
+# sha256 -- so nothing was wrong yet. That is luck, not a mechanism: the next push would have
+# updated the root copy and left the boot copy behind, and the device would have kept running the
+# old app while every hash check on the new one passed. A stale binary that reports itself as
+# freshly transferred is the exact failure this script's verify step exists to prevent, one path
+# over.
+#
+# Pushed from the same local file, so they cannot diverge.
+send build/chattlm.tns             /ndless/startup/chattlm.tns
+# A131. THE SETUP DOCUMENT, in the ndless folder beside the resources it needs.
+#
+# This is the one file a student opens on a calculator that has never run ChatTLM: it installs
+# Ndless with our wording and states the supported OS range before anything runs. Pushed here so a
+# working device always carries the thing that would rebuild it from nothing -- after a reset, the
+# calculator still has this document and the student does not have to go and find Ndless.
+send build/ChatTLM_Setup.tns       /ndless/ChatTLM_Setup.tns
 send build/transfer/store.tns.tns  /tlm/store.tns.tns
 send build/transfer/tok4096.tok.tns /tlm/tok4096.tok.tns
 send build/transfer/model4096.bin.tns /tlm/model4096.bin.tns

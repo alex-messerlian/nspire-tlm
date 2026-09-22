@@ -181,6 +181,7 @@ if ! _skip fit_cue; then $PY tools/eval/gate_fit_cue.py >/dev/null 2>&1 && print
 if ! _skip bare_pipe; then $PY tools/eval/gate_bare_pipe.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "bare_pipe" || { printf "  %-20s FAIL\n" "bare_pipe"; fail=1; }; fi
 if ! _skip explain_variants; then $PY tools/eval/gate_explain_variants.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "explain_variants" || { printf "  %-20s FAIL\n" "explain_variants"; fail=1; }; fi
 if ! _skip c3_physics; then $PY tools/eval/gate_c3_physics.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "c3_physics" || { printf "  %-20s FAIL\n" "c3_physics"; fail=1; }; fi
+if ! _skip installer_exploit; then $PY tools/eval/gate_installer_exploit.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "installer_exploit" || { printf "  %-20s FAIL\n" "installer_exploit"; fail=1; }; fi
 if ! _skip probe_spacing; then $PY tools/eval/gate_probe_spacing.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "probe_spacing" || { printf "  %-20s FAIL\n" "probe_spacing"; fail=1; }; fi
 if ! _skip followup; then $PY tools/eval/gate_followup.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "followup" || { printf "  %-20s FAIL\n" "followup"; fail=1; }; fi
 if ! _skip refusal_cue; then $PY tools/eval/gate_refusal_cue.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "refusal_cue" || { printf "  %-20s FAIL\n" "refusal_cue"; fail=1; }; fi
