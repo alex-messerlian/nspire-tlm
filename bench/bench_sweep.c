@@ -41,12 +41,22 @@ FILE *g_nspire_log = 0;
 
 /* Smallest first, so a shape that cannot load does not cost the rows after it. The repeated
  * shape is deliberate -- see the header. */
+/* EVERY DIM HERE IS A MULTIPLE OF 88, and that is a constraint, not a preference.
+ *
+ * FIXED_GS is 88 in src/runq_nspire.c, compile-time, so the hot loop loses two __divsi3 per
+ * group. A checkpoint quantised at any other group is refused at load. The first version of this
+ * sweep used d192/d256/d416, whose tensor lengths take groups 96/64/64, and THREE OF FIVE SHAPES
+ * WERE UNLOADABLE -- "GS 96, built for 88". dim*dim must divide 88 = 2^3 * 11 (so dim divisible
+ * by 44) and heads need dim divisible by 8, which leaves multiples of 88.
+ *
+ * No shape above the ceiling is listed. heap_ceiling() measures that directly and to the
+ * kilobyte; shipping a 24 MB checkpoint to watch it fail was both indirect and, as it turned out,
+ * untransferable -- the push stalled at 7.5 minutes having used 0.11 s of CPU. */
 static const char *SHAPES[] = {
     "m352.bin.tns",   /* control A: same shape, seed 1 */
-    "m192.bin.tns",
-    "m256.bin.tns",
-    "m416.bin.tns",
-    "m512.bin.tns",   /* expected ABOVE the single-malloc ceiling */
+    "m176.bin.tns",
+    "m264.bin.tns",
+    "m440.bin.tns",
     "m352b.bin.tns",  /* control B: same shape, seed 99 */
 };
 #define NSHAPES ((int)(sizeof SHAPES / sizeof SHAPES[0]))
@@ -59,9 +69,51 @@ static const int POS[] = { 8, 256 };
 
 static char PATHBUF[96];
 
+/* THE CEILING, MEASURED DIRECTLY RATHER THAN INFERRED FROM A FILE THAT WILL NOT LOAD.
+ *
+ * src/nspire.c loads a checkpoint with ONE contiguous malloc of the file size, so the binding
+ * constraint on model size is the largest single allocation, not total free heap. Finding it by
+ * shipping an over-sized checkpoint and watching it fail is indirect, needs a 24 MB transfer, and
+ * answers only "bigger than this one". A binary search over malloc answers it to the kilobyte.
+ *
+ * It is called TWICE, and the difference between the two calls is the finding. This project once
+ * recorded 21.56 MiB from a probe on a fresh heap and later measured 4.83 MiB in a program that
+ * had done ordinary work first -- a factor of 4.5, and the fresh-heap number was the denominator
+ * of every capacity claim in the repo. A ceiling is a property of a moment, not of the device.
+ */
+static size_t heap_ceiling(void) {
+    size_t lo = 0, hi = 48u << 20;          /* 48 MB is comfortably past any plausible answer */
+    while (hi - lo > 4096) {
+        size_t mid = lo + (hi - lo) / 2;
+        void *p = malloc(mid);
+        if (p) { free(p); lo = mid; } else { hi = mid; }
+    }
+    return lo;
+}
+
 int main(void) {
     bench_open("bench_sweep");
     g_nspire_log = bench_log();
+
+    {   size_t c = heap_ceiling();
+        bench_result("heap_ceiling_fresh", "%lu B = %lu.%02lu MiB (largest single malloc, before "
+                     "any model is loaded)", (unsigned long)c,
+                     (unsigned long)(c >> 20), (unsigned long)(((c & 0xFFFFF) * 100) >> 20));
+
+        /* THE HEAP DOES NOT COME BACK AFTER A CRASH, AND A SWEEP ON A DEPLETED HEAP LOOKS LIKE A
+         * RESULT. Measured: 21.64 MiB on one run and 5.02 MiB on the next, same program, same
+         * device -- because the run in between died inside read_checkpoint, which exit()s, and
+         * its ~19 MB was never returned. On the depleted run EVERY shape reported DOES NOT FIT,
+         * which reads as a finding about model size and is a finding about the previous crash.
+         *
+         * So the operator is told, in the log, at the top, before any row that would mislead. */
+        if (c < (16u << 20))
+            bench_result("HEAP DEPLETED", "only %lu.%02lu MiB available. A fresh boot gives over "
+                         "21 MiB. Something -- most likely a program that exit()ed mid-load -- is "
+                         "still holding memory. REBOOT THE CALCULATOR AND RUN THIS AGAIN; the "
+                         "rows below are about this heap, not about these models.",
+                         (unsigned long)(c >> 20), (unsigned long)(((c & 0xFFFFF) * 100) >> 20));
+    }
 
     bench_result("note", "%s", "random weights: TIMING ONLY. These say nothing about quality "
                                "and must never be scored.");
@@ -86,17 +138,49 @@ int main(void) {
             }
         }
 
-        /* --- CAN THE HEAP HOLD IT, RIGHT NOW? ---
-         * This is the cliff. The bare-probe heap figure this project measured on a fresh heap was
-         * 4.5x larger than what the running program could get, so the question is asked HERE,
-         * after the bench's own allocations, rather than taken from a table. */
-        {   void *p = malloc((size_t)fsz);
-            if (!p) {
-                bench_result("shape", "%s DOES NOT FIT (%ld B): malloc of the file size failed "
-                                      "in situ. THIS IS THE CEILING, measured.", SHAPES[i], fsz);
+        /* --- CAN THE HEAP HOLD THE FILE **AND** THE KV CACHE, RIGHT NOW? ---
+         *
+         * THE BINDING CONSTRAINT IS NOT THE SINGLE-MALLOC CEILING. This repo's standing note says
+         * "the binding ceiling is B1, the largest single allocation, not B2 total heap", because
+         * the checkpoint is loaded with one contiguous malloc. That is true of the checkpoint and
+         * false of the program: malloc_run_state then asks for an fp32 KV cache of
+         * 2 * n_layers * seq_len * kv_dim * 4 bytes, which at d440 is 10.3 MiB on top of a
+         * 16.6 MiB file. The sum is what binds, and the KV term grows with dim AND with seq_len.
+         *
+         * Measured the hard way: the first run of this sweep DIED on d440 with a truncated log
+         * and no error line, because rq_build's failure path exit()s. Checking a single malloc of
+         * the file size was not enough -- it passed, and the program died anyway.
+         *
+         * Both blocks are held at once, because holding them one at a time answers a question
+         * nobody asked. */
+        {   unsigned char h[64];
+            FILE *f = fopen(PATHBUF, "rb");
+            if (!f || fread(h, 1, sizeof h, f) != sizeof h) {
+                if (f) fclose(f);
+                bench_result("shape", "%s UNREADABLE header", SHAPES[i]);
                 continue;
             }
-            free(p);
+            fclose(f);
+            int dim, hid, nl, nh, nkv, voc, seq;
+            memcpy(&dim, h + 8, 4);  memcpy(&hid, h + 12, 4); memcpy(&nl, h + 16, 4);
+            memcpy(&nh, h + 20, 4);  memcpy(&nkv, h + 24, 4); memcpy(&voc, h + 28, 4);
+            memcpy(&seq, h + 32, 4);
+            size_t kv_dim = (size_t)dim * nkv / nh;
+            size_t kv_bytes = 2u * (size_t)nl * (size_t)seq * kv_dim * sizeof(float);
+
+            void *a = malloc((size_t)fsz);
+            void *b = a ? malloc(kv_bytes) : NULL;
+            int fits = a && b;
+            free(b); free(a);
+            bench_result("need", "%s dim=%d hidden=%d L=%d seq=%d file=%ld B kv=%lu B total=%lu B %s",
+                         SHAPES[i], dim, hid, nl, seq, fsz, (unsigned long)kv_bytes,
+                         (unsigned long)((size_t)fsz + kv_bytes), fits ? "FITS" : "DOES NOT FIT");
+            if (!fits) {
+                bench_result("shape", "%s SKIPPED -- file + KV cache do not fit in situ. "
+                                      "THIS IS THE CEILING, and it is the SUM, not the file.",
+                             SHAPES[i]);
+                continue;
+            }
         }
 
         rq_build(PATHBUF);
@@ -125,7 +209,26 @@ int main(void) {
                      POS[1], (unsigned long)(us[1] ? 1000000000u / us[1] : 0));
 
         rq_free();
+
+        /* THE CEILING AFTER EVERY SHAPE, so a leak is a measurement instead of a silence.
+         *
+         * The first version of this sweep died on its fourth load with a truncated log and no
+         * error line -- free_run_state was leaking the int8 KV cache on every build/free cycle
+         * (A139), and nothing printed said so. A ceiling that walks downward across rows names
+         * that immediately; a flat one is evidence the engine really does give the memory back. */
+        {   size_t c = heap_ceiling();
+            bench_result("heap_after", "%s -> %lu B = %lu.%02lu MiB", SHAPES[i],
+                         (unsigned long)c, (unsigned long)(c >> 20),
+                         (unsigned long)(((c & 0xFFFFF) * 100) >> 20)); }
     }
+
+    /* The same question again, now that the sweep has loaded and freed several checkpoints. If
+     * this is far below the fresh figure, the ceiling that matters is this one -- and every
+     * capacity claim taken from a fresh-heap probe is an overestimate. */
+    {   size_t c = heap_ceiling();
+        bench_result("heap_ceiling_after", "%lu B = %lu.%02lu MiB (largest single malloc AFTER "
+                     "the sweep; compare with heap_ceiling_fresh)", (unsigned long)c,
+                     (unsigned long)(c >> 20), (unsigned long)(((c & 0xFFFFF) * 100) >> 20)); }
 
     bench_result("controls", "%s", "m352 and m352b are the SAME shape with different weights. "
                                    "If their rows differ, decode cost is not weight-independent "

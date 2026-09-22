@@ -182,6 +182,17 @@ void free_run_state(RunState* s) {
     free(s->logits);
     free(s->key_cache);
     free(s->value_cache);
+#ifdef KV_INT8
+    /* A139. UNDER KV_INT8 THESE FOUR ARE THE REAL ALLOCATIONS and key_cache/value_cache above are
+     * NULL, so without this the whole int8 KV cache leaks on every build/free cycle. The shipped
+     * build does not define KV_INT8, so nothing shipped ever leaked -- but the path exists, it is
+     * one -D away, and a leak that only appears under a build flag is the kind that gets found in
+     * production. Fixed while the memory behaviour was under a microscope rather than later. */
+    free(s->key_cache_q);
+    free(s->value_cache_q);
+    free(s->key_scale);
+    free(s->value_scale);
+#endif
 }
 
 // ----------------------------------------------------------------------------

@@ -28,7 +28,29 @@ def hidden_for(dim: int) -> int:
     return math.ceil((8 * dim / 3) / 256) * 256
 
 
-def pick_group(lengths) -> int:
+def pick_group(lengths, force: int | None = None) -> int:
+    """With `force`, demand exactly that group and fail loudly if it does not divide.
+
+    THE ENGINE'S GROUP SIZE IS COMPILE-TIME. src/runq_nspire.c sets FIXED_GS 88 so the hot loop
+    loses two __divsi3 per group, which matters on a core with no divider. A checkpoint built at
+    any other group is refused at load with "GS n, built for 88" -- measured: a first sweep
+    shipped d192/d256/d416 at groups 96/64/64 and three of five shapes were unloadable.
+
+    So the shape ladder is not free. dim*dim must divide 88 = 2^3 * 11, which needs dim divisible
+    by 44, and the head count needs dim divisible by 8: dim must be a multiple of 88.
+    """
+    if force is not None:
+        bad = sorted(L for L in lengths if L % force)
+        if bad:
+            raise SystemExit(
+                f"ABORT: group {force} does not divide tensor lengths {bad}. The engine is built "
+                f"for FIXED_GS {force} and would refuse this checkpoint at load. For heads=8, "
+                f"dim must be a multiple of 88.")
+        return force
+    return _largest_group(lengths)
+
+
+def _largest_group(lengths) -> int:
     """Largest g <= GROUP_MAX dividing every tensor length.
 
     Same rule as tools/legacy_to_q80.py, including its floor. That tool once halved until it
@@ -43,7 +65,7 @@ def pick_group(lengths) -> int:
     return g
 
 
-def build(dim, layers, heads, vocab, seq, seed, out: Path):
+def build(dim, layers, heads, vocab, seq, seed, out: Path, group_force=None):
     hidden = hidden_for(dim)
     if dim % heads:
         raise SystemExit(f"dim {dim} is not divisible by {heads} heads")
@@ -54,7 +76,7 @@ def build(dim, layers, heads, vocab, seq, seed, out: Path):
     quant_lens = ([vocab * dim]
                   + [dim * dim] * (4 * layers)          # wq wk wv wo
                   + [dim * hidden] * (3 * layers))      # w1 w2 w3
-    group = pick_group(set(quant_lens))
+    group = pick_group(set(quant_lens), group_force)
 
     with out.open("wb") as o:
         o.write(struct.pack("I", MAGIC))
@@ -95,6 +117,9 @@ if __name__ == "__main__":
     p.add_argument("--vocab", type=int, default=4096)
     p.add_argument("--seq", type=int, default=512)
     p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--group", type=int, default=88,
+                   help="demand this group size; 88 is what the engine is built for. "
+                        "Pass 0 to let the largest valid group be chosen instead.")
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args()
-    build(a.dim, a.layers, a.heads, a.vocab, a.seq, a.seed, a.out)
+    build(a.dim, a.layers, a.heads, a.vocab, a.seq, a.seed, a.out, a.group or None)
