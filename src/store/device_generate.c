@@ -116,11 +116,22 @@ static char GDIR[32] = "/documents/tlm/";
           (ahb * 2 >= 380) ? "(battery, VALID)" : "(USB? INVALID if <380)"); }
 
     int tok = ids[0], pos = 0, produced = 0;
-    static int out[64];
+    /* A142. SIZED TO THE CAP. This was out[64] while the loop below ran to 120 -- a 56-int
+     * overrun on a device with no memory protection, which would have corrupted whatever
+     * followed it rather than faulting. Caught before the push, by reading the loop bound and
+     * the buffer together. */
+    #define GEN_MAX 120
+    static int out[GEN_MAX];
     uint32_t t0 = MMIO32(T32 + T_VAL);
     while (pos < n - 1) { rq_forward(tok, pos); pos++; tok = ids[pos]; }
     uint32_t t1 = MMIO32(T32 + T_VAL);
-    for (int s2 = 0; s2 < 24; s2++) {
+    /* A142. 120, NOT 24. Twenty-four tokens compared host-to-device 24/24 identical, which
+     * is the right measurement and too small a sample to bound anything: a 0.048 logit
+     * deviation flips an argmax whenever the top two candidates are within it, and 24
+     * draws cannot see a tail that thin. 120 costs about a minute more of decode and is
+     * the same run. The tok/s figure is unaffected -- it is a rate, computed over whatever
+     * number of tokens were produced. */
+    for (int s2 = 0; s2 < GEN_MAX; s2++) {
         float *lg = rq_forward(tok, pos);
         pos++;
         tok = argmax(lg, V);
@@ -138,11 +149,13 @@ static char GDIR[32] = "/documents/tlm/";
         uint32_t milli = (uint32_t)((unsigned long long)produced * 32768ull * 1000ull / ddec);
         say("DECODE THROUGHPUT: %u.%03u tok/s", milli / 1000u, milli % 1000u);
     }
-    { char line[300]; int p2 = 0;
-      for (int i = 0; i < produced && p2 < 270; i++)
+    /* Room for GEN_MAX ids. At 300 bytes with a 270-byte guard this silently truncated the id
+     * list, which is the one artefact the host comparison needs verbatim. */
+    { static char line[GEN_MAX * 7]; int p2 = 0;
+      for (int i = 0; i < produced && p2 < (int)sizeof line - 8; i++)
           p2 += snprintf(line + p2, sizeof line - p2, "%d ", out[i]);
       say("ids: %s", line); }
-    { static char txt[1024];
+    { static char txt[4096];
       ns_tok_decode(&tk, out, produced, txt, sizeof txt);
       say("TEXT: %s", txt); }
 restore:
