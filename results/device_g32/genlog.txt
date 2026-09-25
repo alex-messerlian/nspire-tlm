@@ -1,0 +1,312 @@
+
+== generate ==
+printf works from this TU
+store 1619 records, vocab 4085
+prompt: <q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high
+prompt tokens: 54
+loading model...
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+model loaded, vocab 4096
+timer: RUNNING (176 ticks over a busy loop)
+AHB 198 MHz -> CPU ~396 MHz (battery, VALID)
+prefill 53 tokens: 780510 ticks = 23.819 s
+decode  33 tokens: 563310 ticks = 17.190 s
+DECODE THROUGHPUT: 1.919 tok/s
+ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 198 24 449 229 39 78 25 94 24 10 
+TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 s. Using v=d/t.<end>
+== done ==
+
+== generate ==
+printf works from this TU
+store 1619 records, vocab 4085
+prompt: <q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high
+prompt tokens: 54
+loading model...
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+model loaded, vocab 4096
+timer: RUNNING (165 ticks over a busy loop)
+AHB 198 MHz -> CPU ~396 MHz (battery, VALID)
+prefill 53 tokens: 779911 ticks = 23.800 s
+decode  33 tokens: 562893 ticks = 17.178 s
+DECODE THROUGHPUT: 1.921 tok/s
+ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 198 24 449 229 39 78 25 94 24 10 
+TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 s. Using v=d/t.<end>
+== done ==
+
+== generate ==
+printf works from this TU
+store 1619 records, vocab 4085
+prompt: <q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high
+prompt tokens: 54
+loading model...
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+model loaded, vocab 4096
+timer: RUNNING (181 ticks over a busy loop)
+AHB 198 MHz -> CPU ~396 MHz (battery, VALID)
+prefill 53 tokens: 778930 ticks = 23.771 s
+decode  33 tokens: 562234 ticks = 17.158 s
+DECODE THROUGHPUT: 1.923 tok/s
+ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 198 24 449 229 39 78 25 94 24 10 
+TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 s. Using v=d/t.<end>
+== done ==
+
+== generate ==
+printf works from this TU
+store 1619 records, vocab 4085
+prompt: <q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high
+prompt tokens: 54
+loading model...
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+model loaded, vocab 4096
+timer: RUNNING (181 ticks over a busy loop)
+AHB 198 MHz -> CPU ~396 MHz (battery, VALID)
+prefill 53 tokens: 788863 ticks = 24.074 s
+decode  33 tokens: 568666 ticks = 17.354 s
+DECODE THROUGHPUT: 1.901 tok/s
+decode split: in rq_forward 567692 ticks = 17324 ms, in argmax 973 ticks = 29 ms, other 1 ticks
+ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 198 24 449 229 39 78 25 94 24 10 
+TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 s. Using v=d/t.<end>
+parity 0 prompt: <q>A 3 kg cart accelerates at 4 m/s^2. Find the net force. Given m = 3, a = 4.</q><r>F=m*a | F:N m:kg a:m/s^2 | missing:none | constant mass in an inertial frame; it fails on a rocket burning its own fuel | fit:high
+parity 0 ids: 5 1969 6 364 29 24 26 312 30 24 26 19 7 150 0 30 5 302 0 4 280 189 225 24 504 291 280 39 87 20 75 24 10 
+parity 1 prompt: <q>A 20 N force pushes a box 5 m. How much work is done? Given F = 20, d = 5.</q><r>W=F*d | W:J F:N d:m | missing:none | standard conditions | fit:high
+parity 1 ids: 5 1969 6 364 31 24 26 312 31 24 26 19 7 150 0 30 5 302 0 4 300 189 225 444 24 300 39 48 20 78 316 350 24 10 
+parity 2 prompt: <q>A 0.5 kg ball moves at 12 m/s. Find its momentum. Given m = 0.5, v = 12.</q><r>p=m*v | p:kg*m/s m:kg v:m/s | missing:none | standard conditions | fit:high
+parity 2 ids: 5 1969 6 364 26 24 31 312 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 794 20 87 25 93 24 449 226 39 87 20 96 24 10 
+parity 3 prompt: <q>A current of 2 A flows through a 6 ohm resistor. Find the voltage. Given I = 2, R = 6.</q><r>V=I*R | V:V I:A R:ohm | missing:none | ohmic material at constant temperature; a diode does not obey it | fit:high
+parity 3 ids: 5 1969 6 364 28 24 26 312 32 24 26 19 7 150 0 30 5 302 0 4 339 189 225 24 34 339 24 449 339 39 51 20 60 24 10 
+parity 4 prompt: <q>A spring with k = 50 N/m is stretched 0.2 m. Find the force. Given k = 50, x = 0.2.</q><r>F=-k*x | F:N k:N/m x:m | missing:none | restoring force, signed: negative means opposite to the displacement | fit:high
+parity 4 ids: 5 1969 6 596 18 1174 24 26 312 26 24 28 19 7 150 0 30 5 302 0 4 280 189 225 24 34 400 24 449 280 1297 85 20 98 24 10 
+== done ==
+
+== generate ==
+printf works from this TU
+store 1619 records, vocab 4085
+prompt: <q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high
+prompt tokens: 54
+loading model...
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+model loaded, vocab 4096
+timer: RUNNING (163 ticks over a busy loop)
+AHB 198 MHz -> CPU ~396 MHz (battery, VALID)
+prefill 53 tokens: 979976 ticks = 29.906 s
+decode  35 tokens: 731249 ticks = 22.315 s
+DECODE THROUGHPUT: 1.568 tok/s
+decode split: in rq_forward 730284 ticks = 22286 ms, in argmax 963 ticks = 29 ms, other 2 ticks
+ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 197 25 93 24 449 229 39 78 25 94 24 10 
+TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 m/s. Using v=d/t.<end>
+turn 0 kind: answer
+turn 0 prompt: <q>Using find I_S. Given I_P = 8.54, N_P = 780, N_S = 2430.</q><r>I_S=((N_P)/(N_S))*I_P | I_S:A N_P:1 N_S:1 I_P:A | missing:none | standard conditions | fit:high
+turn 0 ids: 5 1969 6 150 325 818 26 24 26 363 507 29 24 26 1878 34 24 784 19 7 8 1409 24 30 376 348 3299 9 4 3765 316 1409 24 826 324 24 438 494 291 287 73 61 278 56 73 58 261 56 73 61 551 51 73 58 24 10 
+turn 0 text: <tool> eval<arg> (((780.0))/((243.0)))*(8.54)</tool><res> 27.41234568</res><a> That gives 27.41 A. This follows from I_S=((N_P)/(N_S))*I_P.<end>
+turn 0 timing: prompt 80 tokens, first output 1538348 ticks = 46.946 s, turn 2796726 ticks = 85.349 s, 56 ids, 1 calls
+turn 1 kind: answer
+turn 1 prompt: <q>Take What was the motionally induced emf? Given l = 0.057, v = 1.35, B = 0.196..</q><r>epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:none | standard conditions | fit:high
+turn 1 ids: 5 1969 6 364 26 24 2303 312 26 24 3149 312 27 24 527 19 7 8 274 24 2498 429 576 9 4 274 24 2498 429 339 24 500 1013 39 44 20 86 20 96 24 10 
+turn 1 text: <tool> eval<arg> (0.196)*(0.057)*(1.35)</tool><res> 0.0150822</res><a> 0.01508 V. From epsilon=B*l*v.<end>
+turn 1 timing: prompt 64 tokens, first output 1203078 ticks = 36.715 s, turn 2067991 ticks = 63.110 s, 41 ids, 1 calls
+turn 2 kind: answer
+turn 2 prompt: <q>Take Estimate V. Given R = 223.61, I = 74.54..</q><r>V=I*R | V:V I:A R:ohm | missing:none | ohmic material at constant temperature; a diode does not obey it | fit:high
+turn 2 ids: 5 1969 6 364 959 24 784 312 2922 24 1073 19 7 8 3796 629 24 575 885 9 4 339 189 3796 1515 339 24 449 339 39 51 20 60 24 10 
+turn 2 text: <tool> eval<arg> (74.54)*(223.61)</tool><res> 16667.8894</res><a> V = 16670 V. Using V=I*R.<end>
+turn 2 timing: prompt 62 tokens, first output 1162118 ticks = 35.465 s, turn 1888205 ticks = 57.623 s, 35 ids, 1 calls
+turn 3 kind: answer
+turn 3 prompt: <q>Where compute angular acceleration. Given Delta_omega = 56.533, Delta_t = 689.</q><r>alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:none | standard conditions | fit:high
+turn 3 ids: 5 1969 6 150 325 707 24 31 445 363 32 640 24 26 533 7 8 274 24 429 28 374 396 798 344 9 4 274 24 429 28 374 225 25 93 72 28 24 739 278 264 73 435 261 264 73 94 204 316 350 24 10 
+turn 3 text: <tool> eval<arg> (((56.533))/((689.0)))</tool><res> 0.08205079826</res><a> 0.08205 1/s^2. alpha=((Delta_omega)/(Delta_t)) gives it.<end>
+turn 3 timing: prompt 66 tokens, first output 1244265 ticks = 37.971 s, turn 2367668 ticks = 72.255 s, 52 ids, 1 calls
+turn 4 kind: extra value
+turn 4 prompt: <q>Given determine I. Given m = 31.89, P = 559, A = 0.202.</q><r>I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:none | standard conditions | fit:high
+turn 4 ids: 5 1969 6 150 325 657 35 24 26 363 630 24 640 533 7 8 1131 24 31 509 1674 741 9 4 3765 316 1131 24 888 300 25 87 72 28 24 438 494 291 287 278 58 261 43 204 24 10 
+turn 4 text: <tool> eval<arg> (((559.0))/((31.89)))</tool><res> 17.52900596</res><a> That gives 17.53 W/m^2. This follows from I=((P)/(A)).<end>
+turn 4 timing: prompt 58 tokens, first output 1080907 ticks = 32.986 s, turn 2045421 ticks = 62.421 s, 46 ids, 1 calls
+turn 5 kind: value withheld
+turn 5 prompt: <q>A system has Estimate f. Given v = 9700000, d_i = 39.6..</q><r>f=((d_i*d_o)/(d_o+d_i)) | f:m d_i:m d_o:m | missing:d_o | paraxial rays, close to the axis | fit:high
+turn 5 ids: 4 287 432 407 315 36 222 73 83 246 390 520 24 10 
+turn 5 text: <a> I cannot answer that: d_i is not given.<end>
+turn 5 timing: prompt 76 tokens, first output 1453258 ticks = 44.349 s, turn 1733237 ticks = 52.894 s, 14 ids, 0 calls
+turn 6 kind: no values
+turn 6 prompt: <q>determine pressure.</q><r>p=((F)/(A)) | p:Pa F:N A:m^2 | missing:F | standard conditions | fit:high
+turn 6 ids: 4 287 432 407 315 36 280 246 390 520 24 305 381 209 280 292 324 293 873 226 24 10 
+turn 6 text: <a> I cannot answer that: F is not given. Enter F and A to compute p.<end>
+turn 6 timing: prompt 35 tokens, first output 630441 ticks = 19.239 s, turn 1041140 ticks = 31.773 s, 22 ids, 0 calls
+turn 7 kind: explain
+turn 7 prompt: <q>How is I related to the other quantities?</q><r>I=I_0*exp(-mu*x) | I:W/m^2 I_0:W/m^2 mu:1/m x:m | missing:I_0 | a uniform absorber and a narrow beam; mu is the linear attenuation coefficient | fit:high
+turn 7 ids: 4 3058 2440 306 276 187 230 3333 1620 314 1794 1719 205 862 280 60 2461 62 2496 230 526 2764 816 350 22 390 205 862 1499 22 766 287 189 287 73 26 20 824 90 18 23 1711 20 98 828 355 283 2695 212 205 656 785 212 4008 205 314 2421 24 10 
+turn 7 text: <a> Each millimetre of absorber removes the same FRACTION of what reaches it, not the same amount, so I = I_0*exp(-mu*x). Doubling the shielding squares the reduction.<end>
+turn 7 timing: prompt 83 tokens, first output 1602817 ticks = 48.914 s, turn 2943710 ticks = 89.834 s, 59 ids, 0 calls
+== done ==

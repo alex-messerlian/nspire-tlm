@@ -48,7 +48,7 @@
  * and tools/nspire-cli/push-all.sh compares the two before sending. Changing this means
  * re-exporting the checkpoint.
  */
-#define FIXED_GS 32
+#define FIXED_GS 88
 #endif
 #define GS FIXED_GS   /* compile-time: removes two __divsi3 per group */
 #else

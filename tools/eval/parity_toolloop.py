@@ -33,8 +33,25 @@ def turns(log_text):
     return out, run
 
 
+def device_table():
+    """The turns bench_generate runs, read from its OWN source -- the question list exists once."""
+    src = (ROOT / "src/store/device_generate.c").read_text()
+    body = src[src.index("static const struct { const char *kind, *f, *q; } TT[] = {"):]
+    body = body[:body.index("};")]
+    unq = lambda x: x.replace('\\"', '"').replace("\\\\", "\\")
+    return [tuple(unq(g) for g in m) for m in
+            re.findall(r'\{\s*"((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)"\s*\}', body)]
+
+
 def main(path):
     T, run = turns(pathlib.Path(path).read_text())
+    table = device_table()
+    if len(table) != len(T):
+        raise SystemExit(f"ABORT: {len(table)} turns in device_generate.c, {len(T)} in the log")
+    host_prompts = S.device_prompts([{"q": q, "record": f} for _, f, q in table])
+    asm_same = sum(hp == t.get("prompt") for hp, (_, t) in zip(host_prompts, sorted(T.items())))
+    print(f"prompt assembly: host (build/devasm) equals the device's logged prompt on "
+          f"{asm_same}/{len(T)} turns")
     if not re.search(r"battery, VALID", run):
         print("NOTE: this run is not marked battery-valid; parity does not depend on the clock, "
               "timings do")
@@ -63,7 +80,7 @@ def main(path):
               f"{verdict}")
         print(f"      {t.get('timing', '(no timing line)')}")
     print(f"whole turns identical: {same_turns}/{len(picks)}; device ids compared: {total}")
-    return 0 if same_turns == len(picks) else 1
+    return 0 if same_turns == len(picks) and asm_same == len(T) else 1
 
 
 if __name__ == "__main__":

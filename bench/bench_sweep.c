@@ -41,28 +41,24 @@ FILE *g_nspire_log = 0;
 
 /* Smallest first, so a shape that cannot load does not cost the rows after it. The repeated
  * shape is deliberate -- see the header. */
-/* EVERY DIM HERE IS A MULTIPLE OF 32, AND SO IS EVERY HIDDEN WIDTH (A151).
+/* THE SHIPPED LAYOUT: GROUP 88, HIDDEN WIDTH PADDED TO A MULTIPLE OF 88 (A151, A153).
  *
- * FIXED_GS is compile-time in src/runq_nspire.c, and since A151 rq_probe refuses any checkpoint
- * whose ROW lengths (dim and hidden) the group does not divide: quantize() and matmul() ignore a
- * row's remainder. The old group 88 divided every tensor but not the 1,024-wide rows of the shipped
- * model, which ignored 56 of 1,024 hidden inputs per layer. Group 32 admits, at eight heads, every
- * width whose 8/3-rounded hidden width is a multiple of 32: 192, 224, 256, ..., 448.
+ * FIXED_GS is compile-time in src/runq_nspire.c, and rq_probe refuses any checkpoint whose ROW
+ * lengths (dim and hidden) the group does not divide: quantize() and matmul() ignore a row's
+ * remainder. The shipped model's hidden width (1,024) is padded with zeros to 1,056 so that group 88
+ * divides every row; the function is unchanged. A uniform group of 32 also fixes it and was measured
+ * (results/device_g32/): correct, and 27% slower per token, because every group adds soft-float
+ * scale work. Every shape here is padded the same way (tools/make_shape.py).
  *
- * The trained model is read from the app's own folder rather than kept as a second 11.7 MB copy in
- * /sweep: a name starting with '/' is used as given.
- *
- * m384 is the memory test. Its checkpoint (13.1 MiB) and its KV cache (9.0 MiB) each fit under the
- * largest single block (21.53 MiB) and together exceed it, so whether it loads measures the two-block
- * limit that has only been bracketed (between 21.53 and 26.87 MiB). LAST, because if it passes the
- * memory test it is loaded for real. */
+ * With group 88, eight heads admit widths 176 and 352 only; 264 runs with six heads (head size 44)
+ * and 440 with ten. The trained model is read from the app's own folder: a name starting with '/'
+ * is used as given. m440h10 is LAST: it is the memory test, and if it passed it would be loaded. */
 static const char *SHAPES[] = {
-    "/documents/tlm/model4096.bin.tns", /* control A: the TRAINED shipped d352, group 32 */
-    "m192.bin.tns",
-    "m256.bin.tns",
-    "m320.bin.tns",
+    "/documents/tlm/model4096.bin.tns", /* control A: the TRAINED shipped d352 */
+    "m176.bin.tns",
+    "m264h6.bin.tns",
     "m352b.bin.tns",  /* control B: same shape as A, random weights, seed 99 */
-    "m384.bin.tns",   /* the two-block memory test -- see above */
+    "m440h10.bin.tns",
 };
 #define NSHAPES ((int)(sizeof SHAPES / sizeof SHAPES[0]))
 

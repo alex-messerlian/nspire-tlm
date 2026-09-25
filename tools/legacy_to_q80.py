@@ -78,6 +78,34 @@ def main(src, dst):
     if leftover:
         print(f"WARNING: {len(leftover)} trailing bytes unread -- layout assumption may be wrong")
 
+    # ---- A153: pad the hidden width to a multiple of the engine's group, exactly ----
+    # The engine groups each row from its start, so every row length must be a multiple of the
+    # group (A151). Rows are `dim` wide for every matrix except w2, whose rows are `hidden_dim`
+    # wide. Shrinking the group to one that divides both (32 at dim 352 / hidden 1024) is correct
+    # but costs 27% per token on this core, measured: each group adds soft-float scale work. So
+    # instead the hidden width is padded to a multiple of the group with ZERO weights:
+    #   w1, w3 (hidden rows x dim): new rows are zero, so the new hidden units are silu(0)*0 = 0;
+    #   w2     (dim rows x hidden): each row gains zero columns, which multiply those zeros.
+    # The function computed is unchanged. Q80_PAD_TO names the group; unset, nothing is padded.
+    pad_to = int(os.environ.get("Q80_PAD_TO", "0"))
+    if pad_to and hidden_dim % pad_to:
+        hp = -(-hidden_dim // pad_to) * pad_to
+        extra = hp - hidden_dim
+        z = array.array('f', bytes(4 * dim * extra))
+        w1 = [t + z for t in w1]
+        w3 = [t + z for t in w3]
+        w2p = []
+        for t in w2:
+            r = array.array('f')
+            zr = array.array('f', bytes(4 * extra))
+            for row in range(dim):
+                r.extend(t[row * hidden_dim:(row + 1) * hidden_dim]); r.extend(zr)
+            w2p.append(r)
+        w2 = w2p
+        print(f"PADDED hidden {hidden_dim} -> {hp} with zeros (a multiple of {pad_to}); "
+              f"+{3 * n_layers * dim * extra:,} stored parameters, the same function")
+        hidden_dim = hp
+
     # ---- write v2 ----
     # GROUP SELECTION. THE OLD LOOP HALVED UNTIL IT DIVIDED, AND SILENTLY BOTTOMED OUT AT 1.
     #

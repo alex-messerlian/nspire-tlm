@@ -40,7 +40,7 @@ ck = torch.load(sys.argv[1], map_location="cpu", weights_only=False)
 m = Transformer(ModelArgs(**ck["args"])); m.load_state_dict(ck["model"]); m.eval()
 ex.legacy_export(m, "build/model_dev_legacy.bin")
 EOF
-$PY tools/legacy_to_q80.py build/model_dev_legacy.bin build/model_dev_gs.bin | tail -2
+Q80_PAD_TO=$GS $PY tools/legacy_to_q80.py build/model_dev_legacy.bin build/model_dev_gs.bin | tail -3
 rm -f build/model_dev_legacy.bin
 
 echo "== staging the transfer set =="

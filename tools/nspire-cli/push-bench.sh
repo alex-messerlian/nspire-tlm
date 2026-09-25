@@ -5,9 +5,8 @@
 # sweep shapes to /sweep. Refuses to send a device binary older than its sources: a host `make` does
 # not rebuild these, so a stale one looks valid and measures a different program.
 #
-# FLASH: the group-88 sweep shapes (about 74 MB) and the group-32 set (about 46 MB) do not fit
-# together. The old files are REMOVED BY EXACT NAME -- only the ones this project created, and all of
-# them are refused by the group-32 engine anyway (rq_probe, A151). Nothing else is touched.
+# FLASH: two sweep sets do not fit together, so shapes from other sessions are REMOVED BY EXACT
+# NAME -- only files this project created in /sweep. Nothing else is touched.
 set -eu
 cd "$(dirname "$0")/../.."
 DYLD_LIBRARY_PATH="$PWD/vendor/libnspire/_install/lib:${DYLD_LIBRARY_PATH:-}"
@@ -39,8 +38,11 @@ send() {     # send <local> <remote>, read back and compare
     fi
 }
 
-echo "--- removing the group-88 sweep shapes (refused by the group-32 engine) ---"
-for f in m176 m264 m264h6 m352 m352b m440 m440h10; do
+echo "--- removing this project's sweep shapes that are not in the current set ---"
+# By EXACT NAME, only files this project has ever pushed to /sweep, and only those not being sent
+# now (the current set is overwritten by the push below). Nothing else on the device is touched.
+for f in m176 m192 m256 m264 m264h6 m320 m352 m352b m384 m440 m440h10; do
+    [ -f "build/sweep/$f.bin.tns" ] && continue
     $NSP rm "/sweep/$f.bin.tns" >/dev/null 2>&1 && echo "  removed /sweep/$f.bin.tns" || true
 done
 $NSP mkdir /sweep/.mk >/dev/null 2>&1 || true
@@ -51,7 +53,7 @@ send bench/bench_forward.tns  /bench_forward.tns
 send bench/bench_sweep.tns    /bench_sweep.tns
 send bench/bench_generate.tns /bench_generate.tns
 send build/golden_dev.tns     /golden_dev.tns
-echo "--- sweep shapes (group 32) ---"
+echo "--- sweep shapes ---"
 for f in build/sweep/*.bin.tns; do send "$f" "/sweep/$(basename "$f")"; done
 $NSP ls /sweep || true
 [ "$fail" = 0 ] && echo "ALL VERIFIED" || { echo "SOME FILES DID NOT VERIFY -- re-run"; exit 1; }

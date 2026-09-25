@@ -78,6 +78,11 @@ def _largest_group(lengths) -> int:
 
 def build(dim, layers, heads, vocab, seq, seed, out: Path, group_force=None):
     hidden = hidden_for(dim)
+    # A153: the shipped layout PADS the hidden width to a multiple of the engine's group (exactly:
+    # zero rows in w1/w3, zero columns in w2 -- tools/legacy_to_q80.py). A timing shape must have the
+    # layout the shipped model has, so it is padded the same way.
+    if group_force and hidden % group_force:
+        hidden = -(-hidden // group_force) * group_force
     if dim % heads:
         raise SystemExit(f"dim {dim} is not divisible by {heads} heads")
     rng = random.Random(seed)
