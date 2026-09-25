@@ -28,3 +28,15 @@ build/model_*.bin
 overnight.log
 probe_*.txt
 d2_*.txt
+
+# figure-generation environment (paper/requirements-figures.txt)
+paper/.venv-fig/
+
+# paper build outputs (regenerable)
+paper/latex/main.pdf
+paper/latex/*.aux
+paper/latex/*.bbl
+paper/latex/*.blg
+paper/latex/*.log
+paper/latex/*.out
+paper/figures/*.png
