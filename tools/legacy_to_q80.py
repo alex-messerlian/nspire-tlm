@@ -8,9 +8,11 @@ the same grouping and rounding rules have to be reimplemented on-device eventual
 Legacy layout: 7 int32 header, then fp32 tensors in a fixed order (see llama2.c export.py).
 V2 layout:     256-byte header, fp32 norms, then per-tensor int8 values followed by fp32 scales.
 """
-import struct, sys, array, pathlib
+import os, struct, sys, array, pathlib
 
-GROUP = 96
+# Q80_GROUP overrides the ceiling -- used by the row-alignment control (docs/RESULT_CORRECTNESS.md),
+# which needs a group that divides every ROW length, not only every tensor length.
+GROUP = int(os.environ.get("Q80_GROUP", 96))
 
 def read_f32(f, n):
     a = array.array('f')
@@ -93,7 +95,7 @@ def main(src, dst):
     if not shared:
         _lens.add(len(out_w))
     group = max((g for g in range(1, GROUP + 1) if all(L % g == 0 for L in _lens)), default=1)
-    GROUP_FLOOR = 32
+    GROUP_FLOOR = min(32, GROUP)
     if group < GROUP_FLOOR:
         raise SystemExit(
             f"ABORT: no group size <= {GROUP} divides every tensor length {sorted(_lens)}; the "
@@ -104,6 +106,19 @@ def main(src, dst):
         print(f"GROUP {group} (not {GROUP}): {GROUP} does not divide every tensor length. "
               f"{1 + 4/group:.4f} bytes/param against {1 + 4/GROUP:.4f} -- "
               f"{100*((1+4/group)/(1+4/GROUP)-1):+.2f}%")
+
+    # THE ENGINE GROUPS PER ROW, NOT PER TENSOR. runq_nspire.c's quantize() and matmul() walk each
+    # row in steps of GS from the row's start and ignore any remainder, so a group that divides every
+    # tensor LENGTH (the test above) but not every ROW length silently drops the tail of each row and
+    # applies the neighbouring group's scale to part of each chunk. Row lengths are `dim` (every
+    # matrix but w2) and `hidden_dim` (w2). At dim 352, hidden 1024, group 88 this drops 56 of 1024
+    # hidden units in every layer, and it cost the shipped model 9.2 points of strict answer
+    # accuracy (docs/RESULT_CORRECTNESS.md). Reported here, loudly, until the engine is fixed.
+    bad_rows = sorted({n for n in (dim, hidden_dim) if n % group})
+    if bad_rows:
+        print(f"WARNING: group {group} does not divide row length(s) {bad_rows}. The engine will "
+              f"skip {', '.join(f'{n % group} of every {n}' for n in bad_rows)} inputs per row and "
+              f"misalign scales. See docs/RESULT_CORRECTNESS.md.")
 
     o = open(dst, 'wb')
     o.write(struct.pack('I', 0x616b3432))               # magic "ak42"

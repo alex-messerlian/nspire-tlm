@@ -1,0 +1,2200 @@
+{
+ "model": "build/int8/w352s2_g16.bin",
+ "label": "train/w352s2.pt",
+ "decoding": "greedy-int8",
+ "prompt_path": "device",
+ "arms": {
+  "d1": {
+   "k": 120,
+   "n": 120,
+   "unreachable": 0,
+   "pct": 100.0,
+   "rows": [
+    {
+     "prompt": "<q>A system has Estimate f. Given v = 9700000, d_i = 39.6..</q><r>f=((d_i*d_o)/(d_o+d_i)) | f:m d_i:m d_o:m | missing:d_o | paraxial rays, close to the axis | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes f from d_i and d_o, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Given estimate the energy of the nth level of a particle in a box. Given E_1 = 2.46e-21, m1 = 2.87e+28.</q><r>K=(n)^(2)*E_1 | K:J n:1 E_1:J | missing:n | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: n is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Measurements give Calculate x. Given t = 12.7, N_P = 1940..</q><r>x=v_0x*t | x:m v_0x:m/s t:s | missing:v_0x | projectile with no air resistance, so the horizontal velocity never changes | fit:high",
+     "gen": "<a> I cannot answer that: v_0x is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Assume What was K? Given m = 1368, Delta_S_h = -1660..</q><r>K=0.5*m*(v)^(2) | K:J m:kg v:m/s | missing:v | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find the x component. Measurements give. Given theta = 0.42, m = 8450..</q><r>v_x=v*cos(theta) | v_x:m/s v:m/s theta:1 | missing:v | theta measured from the +x axis; the component is signed and goes negative past 90 degrees | fit:high",
+     "gen": "<a> I cannot answer that: v is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has What was theta_2? Given n_2 = 1.41, n_1 = 2.56, A_x = 290..</q><r>theta_2=asin(((n_1*sin(theta_1))/(n_2))) | theta_2:1 n_1:1 theta_1:1 n_2:1 | missing:theta_1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta_1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute total entropy change of system and surroundings. Given Delta_S_c = 0.646, F_i = 1252.5..</q><r>Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:Delta_S_h | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_S_h is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute W. Measurements give. Given F = 991, m_R = 3.2..</q><r>W=F*d | W:J F:N d:m | missing:d | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: d is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>With estimate alpha. Given omega_0 = 1732, r = 24.12.</q><r>alpha=((a_t)/(r)) | alpha:1/s^2 a_t:m/s^2 r:m | missing:a_t | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: a_t is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>With determine W. Given theta = 0.65, F = 3, Delta_p_max = 0.742.</q><r>W=F*d*cos(theta) | W:J F:N d:m theta:1 | missing:d | the scalar product: only the component of F along d does work, so a perpendicular force does none | fit:high",
+     "gen": "<a> I cannot answer that: d is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>If what was the height? Given E = 1.56e-14, t = 0.014, v_0 = 31.48, g = 9.81.</q><r>y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | y:m y_0:m v_0:m/s t:s g:m/s^2 | missing:y_0 | free fall with no air resistance and constant g, upward positive | fit:high",
+     "gen": "<a> I cannot answer that: y_0 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was magnetic force? Given Q_h = 89.8, q = 0.000129, B = 0.109..</q><r>F=q*v*B | F:N q:C v:m/s B:T | missing:v | velocity perpendicular to the field; otherwise only the perpendicular component counts | fit:high",
+     "gen": "<a> I cannot answer that: v is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute velocity. Given t = 58.1, v_0 = 0.238, r = 3.15..</q><r>v=v_0+a*t | v:m/s v_0:m/s a:m/s^2 t:s | missing:a | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: a is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>You are told Calculate charge remaining. Given I = 9, t = 45.4, tau = 9.41..</q><r>q=q_0*exp(-((t)/(tau))) | q:C q_0:C t:s tau:s | missing:q_0 | a capacitor discharging through a resistor, where tau = R*C | fit:high",
+     "gen": "<a> I cannot answer that: q_0 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Consider a case where What is A_act? Given N = 10, P = 124..</q><r>A_act=lambda*N | A_act:1/s lambda:1/s N:1 | missing:lambda | activity is decays per second, so it falls as the sample does | fit:high",
+     "gen": "<a> I cannot answer that: lambda is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find F_net. Consider a case. Given I = 4.6, a = 0.494..</q><r>F_net=m*a | F_net:N m:kg a:m/s^2 | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes F_net from m and a, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was acceleration from force and mass? The values. Given theta = 0.225, F = 0.373..</q><r>a=((F)/(m)) | a:m/s^2 F:N m:kg | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has What is F? Given r = 66400000000, m1 = 1.97e+21, theta_i = 0.13., G = 6.674e-11.</q><r>F=G*m1*m2/(r)^(2) | F:N G:N*m^2/kg^2 m1:kg m2:kg r:m | missing:m2 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m2 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has What is acceleration of two blocks connected over a pulley? Given m_1 = 171.9, a_t = 0.717., g = 9.81.</q><r>a=((m_2)/(m_1+m_2))*g | a:m/s^2 m_2:kg m_1:kg g:m/s^2 | missing:m_2 | frictionless table, massless pulley and string | fit:high",
+     "gen": "<a> I cannot answer that: m_2 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Where what is I? Given r = 30, P = 5.33.</q><r>I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:A | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: A is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Suppose What is the angular acceleration? Given Delta_omega = 23.1, m_2 = 342..</q><r>alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:Delta_t | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_t is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Consider a case where Estimate angular magnification m of a simple magnifier. Given theta_image = 0.147, K_B = 742.1..</q><r>M=((theta_image)/(theta_object)) | M:1 theta_image:1 theta_object:1 | missing:theta_object | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta_object is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Where compute the displacement. Given x_i = 0.946, T = 80.2.</q><r>Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x_f is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has Find F. Given x = 0.556, d_i = 2.3..</q><r>F=-k*x | F:N k:N/m x:m | missing:k | restoring force, signed: negative means opposite to the displacement | fit:high",
+     "gen": "<a> I cannot answer that: k is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was angular acceleration from tangential acceleration? Starting. Given a_t = 3.59, m = 82.41..</q><r>alpha=((a_t)/(r)) | alpha:1/s^2 a_t:m/s^2 r:m | missing:r | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: r is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find net force. Given E = 1.02e-15, Delta_p = 5.19..</q><r>F_net=((Delta_p)/(Delta_t)) | F_net:N Delta_p:kg*m/s Delta_t:s | missing:Delta_t | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_t is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate energy stored in a capacitor. The values are. Given F = 501.5, C = 4.42e-12.</q><r>U_E=((1)/(2))*C*(V)^(2) | U_E:J C:F V:V | missing:V | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>The values are Estimate F. Given r = 12200000000, m2 = 5.87e+27, a = 3.4., G = 6.674e-11.</q><r>F=G*m1*m2/(r)^(2) | F:N G:N*m^2/kg^2 m1:kg m2:kg r:m | missing:m1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from what is angular position? Given V = 707, r = 9.504.</q><r>theta=((s)/(r)) | theta:1 s:m r:m | missing:s | theta in radians, which is what makes arc length equal r times the angle | fit:high",
+     "gen": "<a> I cannot answer that: s is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Measurements give Determine spring constant from force and extension. Given I_2 = 1.52, x = 0.54..</q><r>k=((F)/(x)) | k:N/m F:N x:m | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find the area. Given r = 2.439, I = 1.78..</q><r>A=((1)/(2))*theta*(r)^(2) | A:m^2 theta:1 r:m | missing:theta | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Using compute omega. Given Delta_t = 612.5, r = 0.09.</q><r>omega=((Delta_theta)/(Delta_t)) | omega:1/s Delta_theta:1 Delta_t:s | missing:Delta_theta | average angular speed over the interval, in radians per second | fit:high",
+     "gen": "<a> I cannot answer that: Delta_theta is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with find the drift velocity. Given E = 149.2, theta = 2.31.</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:B | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: B is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate time constant. Given R = 243, a = 0.261..</q><r>tau=R*C | tau:s R:ohm C:F | missing:C | series RC circuit | fit:high",
+     "gen": "<a> I cannot answer that: C is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine acceleration. Consider a case where. Given Delta_t = 2.52, m1 = 1.76e+23.</q><r>a=((Delta_v)/(Delta_t)) | a:m/s^2 Delta_v:m/s Delta_t:s | missing:Delta_v | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_v is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Suppose . What is the gravitational acceleration? Given T = 997, E = 9.63e-15.</q><r>g=((4*(pi)^(2)*L)/((T)^(2))) | g:m/s^2 L:m T:s | missing:L | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: L is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>If estimate length. Given Delta_E_int = 1125, f_1 = 79.3.</q><r>L=((v_w)/(4*f_1)) | L:m v_w:m/s f_1:Hz | missing:v_w | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v_w is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute drift velocity. Given T_c = 307.2, B = 0.431..</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:E | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: E is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>The values are Calculate I_1. Given I_2 = 6.44, a = 10.7..</q><r>I_1=I_2+I_3 | I_1:A I_2:A I_3:A | missing:I_3 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I_3 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute the de broglie wavelength from mass and speed. Assume. Given I = 0.819, v = 176., h = 6.626e-34.</q><r>lambda=((h)/(m*v)) | lambda:m h:J*s m:kg v:m/s | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was the spring constant? The values. Given F = 1.49, v = 800..</q><r>k=((F)/(x)) | k:N/m F:N x:m | missing:x | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For what is average speed? Given m = 50.71, t = 169.98.</q><r>v=d/t | v:m/s d:m t:s | missing:d | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: d is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Given determine the force from rate of momentum change. Given Delta_t = 91.35, m = 0.092, a = 0.057.</q><r>F=((m*Delta_v)/(Delta_t)) | F:N m:kg Delta_v:m/s Delta_t:s | missing:Delta_v | constant mass, and Delta_t is the interval over which the force acts | fit:high",
+     "gen": "<a> I cannot answer that: Delta_v is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>The values are What is normal force? Given theta_image = 0.266, m = 5.196., g = 9.81.</q><r>N=m*g*cos(theta) | N:N m:kg g:m/s^2 theta:1 | missing:theta | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with determine U. Given m = 356, v_0 = 3.01, g = 9.81.</q><r>U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:h | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: h is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>With compute rms current from impedance. Given V_rms = 0.99, v = 6.</q><r>I_rms=V_rms/Z | I_rms:A V_rms:V Z:ohm | missing:Z | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Z is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>With what was E? Given t = 312, B = 48.98.</q><r>E=P*t | E:J P:W t:s | missing:P | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: P is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute intensity for a spherical wave. Measurements give. Given r = 9.33, Delta_E_int = 2.38..</q><r>I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+     "gen": "<a> I cannot answer that: P is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Take . Compute rms current from impedance. Given Z = 132.651, lambda = 3.87e-10.</q><r>I_rms=V_rms/Z | I_rms:A V_rms:V Z:ohm | missing:V_rms | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V_rms is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Where compute I_0. Given V_0 = 328.2, v = 3280000.</q><r>I_0=((V_0)/(Z)) | I_0:A V_0:V Z:ohm | missing:Z | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Z is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate fringe spacing in double-slit interference. Suppose. Given d = 0.009, q_0 = 95, lambda = 9.32e-08.</q><r>Delta_y=x*lambda/d | Delta_y:m x:m lambda:m d:m | missing:x | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is beat frequency? Given f_1 = 209, v_x = 4..</q><r>f_beat=|f_2-f_1| | f_beat:Hz f_2:Hz f_1:Hz | missing:f_2 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f_2 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Using find the work done by a constant force. Given C_V = 43.34, d = 2.588.</q><r>W=F*d | W:J F:N d:m | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>If what is equivalent resistance of two resistors in series? Given m = 5700, R_1 = 0.11.</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_2 | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<a> I cannot answer that: R_2 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine velocity. In a setup. Given omega = 397, F = 0.313..</q><r>v_CM=R*omega | v_CM:m/s R:m omega:1/s | missing:R | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: R is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Suppose . Compute v_d. Given P = 464, A = 3.39e-05, n = 8.5e+28, q = 1.602e-19.</q><r>v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find velocity in free fall, upward positive. Given N_P = 2256, v_0 = 6.07., g = 9.81.</q><r>v=v_0-g*t | v:m/s v_0:m/s g:m/s^2 t:s | missing:t | free fall with no air resistance, upward positive, before impact | fit:high",
+     "gen": "<a> I cannot answer that: t is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find density. The values. Given lambda = 589.3, V = 388..</q><r>rho=((m)/(V)) | rho:kg/m^3 m:kg V:m^3 | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine energy from power and time. Given V_rms = 19.51, t = 2065..</q><r>E=P*t | E:J P:W t:s | missing:P | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: P is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from what was tau? Given Q = 5.18e-06, C = 3.14e-05.</q><r>tau=R*C | tau:s R:ohm C:F | missing:R | series RC circuit | fit:high",
+     "gen": "<a> I cannot answer that: R is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was F? Measurements give. Given k = 611, V_0 = 787..</q><r>F=-k*x | F:N k:N/m x:m | missing:x | restoring force, signed: negative means opposite to the displacement | fit:high",
+     "gen": "<a> I cannot answer that: x is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>You are told What is equivalent resistance of two resistors in parallel? Given R_1 = 1.008, I_0 = 4..</q><r>R_eqv=((1)/(1/R_1+1/R_2)) | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_2 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: R_2 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Take Determine the total mechanical energy. Given U = 209, Delta_p_max = 0.39..</q><r>E=K+U | E:J K:J U:J | missing:K | conservative forces only; friction makes E fall rather than hold | fit:high",
+     "gen": "<a> I cannot answer that: K is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was the length of a closed tube from its fundamental? In a setup. Given v_w = 867, k = 431.6..</q><r>L=((v_w)/(4*f_1)) | L:m v_w:m/s f_1:Hz | missing:f_1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f_1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Given determine P. Given R = 335, m = 0.275.</q><r>P=(((V)^(2))/(R)) | P:W V:V R:ohm | missing:V | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Consider a case where Find U_E. Given C = 2.52e-12, C_V = 17.98..</q><r>U_E=((1)/(2))*C*(V)^(2) | U_E:J C:F V:V | missing:V | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Consider a case where Find v_d. Given E = 310, V = 1.387..</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:B | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: B is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is I? A system. Given x = 9, I_0 = 589, m = 0.085..</q><r>I=I_0*exp(-mu*x) | I:W/m^2 I_0:W/m^2 mu:1/m x:m | missing:mu | a uniform absorber and a narrow beam; mu is the linear attenuation coefficient | fit:high",
+     "gen": "<a> I cannot answer that: mu is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has Estimate total mechanical energy. Given K = 117, tau = 28.35..</q><r>E=K+U | E:J K:J U:J | missing:U | conservative forces only; friction makes E fall rather than hold | fit:high",
+     "gen": "<a> I cannot answer that: U is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate F. Given n = 4, a = 1.44..</q><r>F=m*a | F:N m:kg a:m/s^2 | missing:m | constant mass in an inertial frame; it fails on a rocket burning its own fuel | fit:high",
+     "gen": "<a> I cannot answer that: m is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from determine area of a sector. Given theta = 0.49, P = 521.</q><r>A=((1)/(2))*theta*(r)^(2) | A:m^2 theta:1 r:m | missing:r | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: r is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Using determine acceleration from force and mass. Given Delta_S_h = -9.39, F = 0.89.</q><r>a=((F)/(m)) | a:m/s^2 F:N m:kg | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with estimate F. Given r = 2490000, m2 = 1.25e+29, f_O = 4570000000000000, G = 6.674e-11.</q><r>F=G*m1*m2/(r)^(2) | F:N G:N*m^2/kg^2 m1:kg m2:kg r:m | missing:m1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For determine N. Given t = 64.3, N_0 = 520.8, r = 0.431.</q><r>N=N_0*exp(-lambda*t) | N:1 N_0:1 lambda:1/s t:s | missing:lambda | a large sample, so the average is smooth; lambda is the decay constant, not a wavelength | fit:high",
+     "gen": "<a> I cannot answer that: lambda is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from calculate the centripetal acceleration. Given m = 1450, v = 84.4.</q><r>a_c=(((v)^(2))/(r)) | a_c:m/s^2 v:m/s r:m | missing:r | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: r is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with calculate W. Given Q_h = 19.7, Q = 535.77.</q><r>W=Q_h-Q_c | W:J Q_h:J Q_c:J | missing:Q_c | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Q_c is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>You are told What was the horizontal position under constant velocity? Given v_x = 2.64, I = 12.31, t = 8.5..</q><r>x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:x_0 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x_0 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute W_out. Given V = 16.3, W_in = 1.032..</q><r>W_out=W_in-W_f | W_out:J W_in:J W_f:J | missing:W_f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: W_f is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>The values are What was E? Given lambda = 5.28e-10, U = 3.99..</q><r>E=K+U | E:J K:J U:J | missing:K | conservative forces only; friction makes E fall rather than hold | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes E from K and U, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate the mass. Consider a case. Given A = 0.375, rho = 889..</q><r>m=rho*V | m:kg rho:kg/m^3 V:m^3 | missing:V | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Suppose Determine P. Given k = 410, I = 23.6..</q><r>P=(I)^(2)*R | P:W I:A R:ohm | missing:R | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: R is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with find U. Given m = 154, K = 29.05, x = 0.548.</q><r>U=((1)/(2))*m*(omega)^(2)*(x)^(2) | U:J m:kg omega:1/s x:m | missing:omega | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: omega is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute v_x. Consider a case. Given theta = 0.054, m = 6.25..</q><r>v_x=v*cos(theta) | v_x:m/s v:m/s theta:1 | missing:v | theta measured from the +x axis; the component is signed and goes negative past 90 degrees | fit:high",
+     "gen": "<a> I cannot answer that: v is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute d. Consider a case. Given y_2 = 417, x_2 = 64.7, y_1 = 925, v_w = 775..</q><r>d=sqrt(((x_2-x_1))^(2)+((y_2-y_1))^(2)) | d:m x_2:m x_1:m y_2:m y_1:m | missing:x_1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x_1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from find frequency of a mass-spring system in shm. Given P = 1274, m = 24.77.</q><r>f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:k | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: k is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from estimate the velocity. Given t = 1.229, a = 0.138, Delta_m = 4.55e-27.</q><r>v=v_0+a*t | v:m/s v_0:m/s a:m/s^2 t:s | missing:v_0 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v_0 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Using compute omega. Given F = 9.832, t = 22.1.</q><r>omega=((theta)/(t)) | omega:1/s theta:1 t:s | missing:theta | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate v_t. Suppose. Given omega = 1.12, E = 4.99e-15.</q><r>v_t=r*omega | v_t:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: r is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find the resultant velocity. Given v_0 = 18.9, v_wy = 1.96..</q><r>v_toty=v_wy+v_p | v_toty:m/s v_wy:m/s v_p:m/s | missing:v_p | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v_p is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is F? Given m2 = 4.02e+29, r = 10200000000, I = 8.66., G = 6.674e-11.</q><r>F=G*m1*m2/(r)^(2) | F:N G:N*m^2/kg^2 m1:kg m2:kg r:m | missing:m1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Assume Calculate period. Given k = 51.11, W = 1.034..</q><r>T=2*pi*sqrt(((m)/(k))) | T:s m:kg k:N/m | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine charge remaining. Given t = 32.58, f_s = 2480000000, tau = 264..</q><r>q=q_0*exp(-((t)/(tau))) | q:C q_0:C t:s tau:s | missing:q_0 | a capacitor discharging through a resistor, where tau = R*C | fit:high",
+     "gen": "<a> I cannot answer that: q_0 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with estimate the intensity at a second distance as a spherical wave expands. Given r_2 = 266, I_1 = 1.61, I_3 = 0.656.</q><r>I_2=I_1*((((r_1)/(r_2))))^(2) | I_2:W/m^2 I_1:W/m^2 r_1:m r_2:m | missing:r_1 | isotropic source, nothing absorbing the wave between the two distances | fit:high",
+     "gen": "<a> I cannot answer that: r_1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>The values are What was the magnitude of a vector from its components? Given v_x = 14.92, E = 5150..</q><r>v=sqrt(((v_x))^(2)+((v_y))^(2)) | v:m/s v_x:m/s v_y:m/s | missing:v_y | two perpendicular components; the magnitude is never negative | fit:high",
+     "gen": "<a> I cannot answer that: v_y is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate acceleration. Given E = 126.7, m = 10.25..</q><r>a=((F)/(m)) | a:m/s^2 F:N m:kg | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Take . Estimate beat frequency from two waves that differ in frequency. Given f_2 = 780, q = 1.09e-05.</q><r>f_beat=|f_2-f_1| | f_beat:Hz f_2:Hz f_1:Hz | missing:f_1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f_1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute V. Starting from. Given r = 0.147, p = 3.45e-26, k_e = 8.988e9.</q><r>V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:q | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: q is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For calculate P. Given omega = 1332, m = 0.477.</q><r>P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: tau is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has Estimate the quantum energy. Given N_P = 568, n = 11., h = 6.626e-34.</q><r>E=n*h*f | E:J n:1 h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>You are told Determine I. Given Delta_p_max = 5.11, B = 13.7, v = 269..</q><r>I=((((Delta_p_max))^(2))/(2*rho*v)) | I:W/m^2 Delta_p_max:Pa rho:kg/m^3 v:m/s | missing:rho | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: rho is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute energy change associated. For. Given U_coul = -1.47e-18, m = 0.321, E_transfer = 1.05e-19.</q><r>U_form=E_transfer+U_coul+U_ex | U_form:J E_transfer:J U_coul:J U_ex:J | missing:U_ex | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: U_ex is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Using calculate fringe spacing. Given d = 0.008, vf = 17.14, lambda = 6.81e-08.</q><r>Delta_y=x*lambda/d | Delta_y:m x:m lambda:m d:m | missing:x | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was the displacement? You are told. Given x_f = 2540, K_B = 1.73..</q><r>Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_i | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x_i is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For what was the velocity of center of mass of rolling object? Given omega = 10.53, v = 264.</q><r>v_CM=R*omega | v_CM:m/s R:m omega:1/s | missing:R | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: R is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was the acceleration? Given F_o = 0.328, alpha = 33.52..</q><r>a_CM=R*alpha | a_CM:m/s^2 R:m alpha:1/s^2 | missing:R | rolling without slipping; in a burnout alpha is large while a_CM is near zero | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes a_CM from R and alpha, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>If what was beat frequency from two waves that differ in frequency? Given f_1 = 57.9, Delta_E_LK = 3.01e-16.</q><r>f_beat=|f_2-f_1| | f_beat:Hz f_2:Hz f_1:Hz | missing:f_2 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f_2 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has Calculate the height of free fall. Given y_0 = 37.6, Delta_v = 374, t = 441., g = 9.81.</q><r>y=y_0+v_0*t-((1)/(2))*g*(t)^(2) | y:m y_0:m v_0:m/s t:s g:m/s^2 | missing:v_0 | free fall with no air resistance and constant g, upward positive | fit:high",
+     "gen": "<a> I cannot answer that: v_0 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is F? Assume. Given l = 0.433, x = 0.099..</q><r>F=-k*x | F:N k:N/m x:m | missing:k | restoring force, signed: negative means opposite to the displacement | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes F from k and x, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Measurements give Find period. Given m = 160.7, n_2 = 1.481..</q><r>T=2*pi*sqrt(((m)/(k))) | T:s m:kg k:N/m | missing:k | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: k is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine the average ac power. Given theta_image = 1.4, I_rms = 35.7..</q><r>P_ave=I_rms*V_rms | P_ave:W I_rms:A V_rms:V | missing:V_rms | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V_rms is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has Calculate R_x. Given B_x = 6, m_R = 0.389..</q><r>R_x=A_x+B_x | R_x:m A_x:m B_x:m | missing:A_x | vectors add component by component; each component is signed | fit:high",
+     "gen": "<a> I cannot answer that: A_x is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Given find tau. Given F = 23.2, lambda = 7.98e-12.</q><r>tau=r*F | tau:N*m r:m F:N | missing:r | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: r is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>If find period. Given k = 576, f_2 = 42.87.</q><r>T=2*pi*sqrt(((m)/(k))) | T:s m:kg k:N/m | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is wave speed? In a setup. Given lambda = 2.47, K = 61..</q><r>v=((lambda)/(T)) | v:m/s lambda:m T:s | missing:T | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: T is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Where determine arc length. Given r = 24.11, m = 1.7.</q><r>s=r*theta | s:m r:m theta:1 | missing:theta | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate the intensity at a second distance as a spherical wave expands. Given r_1 = 172.8, v_wy = 5.42, r_2 = 0.014..</q><r>I_2=I_1*((((r_1)/(r_2))))^(2) | I_2:W/m^2 I_1:W/m^2 r_1:m r_2:m | missing:I_1 | isotropic source, nothing absorbing the wave between the two distances | fit:high",
+     "gen": "<a> I cannot answer that: I_1 is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has Estimate k. Given x = 0.363, v_y = 13..</q><r>k=((F)/(x)) | k:N/m F:N x:m | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find v_y. Assume. Given a = 21, theta = 0.109..</q><r>v_y=v*sin(theta) | v_y:m/s v:m/s theta:1 | missing:v | theta measured from the +x axis; the component is signed | fit:high",
+     "gen": "<a> I cannot answer that: v is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from what is path length difference? Given Delta_p = 3.1, d = 0.01.</q><r>Delta_l=d*sin(theta) | Delta_l:m d:m theta:1 | missing:theta | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Consider a case where Determine d_CM. Given R = 0.97, x_0 = 239..</q><r>d_CM=R*theta | d_CM:m R:m theta:1 | missing:theta | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta is not given.<end>",
+     "ok": true
+    }
+   ]
+  },
+  "d1_zero": {
+   "k": 102,
+   "n": 102,
+   "unreachable": 0,
+   "pct": 100.0,
+   "rows": [
+    {
+     "prompt": "<q>determine pressure.</q><r>p=((F)/(A)) | p:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given. Enter F and A to compute p.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate energy stored.</q><r>U_E=((1)/(2))*C*(V)^(2) | U_E:J C:F V:V | missing:C | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: C is not given. Enter C and V to compute U_E.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find the energy. Measurements give. Given h = 6.626e-34.</q><r>E_f=h*f | E_f:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f is not given. Enter f to compute E_f.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute input work.</q><r>W_i=F_i*d_i | W_i:J F_i:N d_i:m | missing:F_i | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F_i is not given. Enter F_i and d_i to compute W_i.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine the input work.</q><r>W_i=F_i*d_i | W_i:J F_i:N d_i:m | missing:F_i | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F_i is not given. Enter F_i and d_i to compute W_i.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute number of undecayed nuclei after a time.</q><r>N=N_0*exp(-lambda*t) | N:1 N_0:1 lambda:1/s t:s | missing:N_0 | a large sample, so the average is smooth; lambda is the decay constant, not a wavelength | fit:high",
+     "gen": "<a> I cannot answer that: N_0 is not given. Enter N_0, lambda and t to compute N.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>in a setup with estimate electric potential. Given k_e = 8988000000.</q><r>V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:q | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: q is not given. Enter q and r to compute V.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find drag force.</q><r>F_D=((1)/(2))*C*rho*A*(v)^(2) | F_D:N C:1 rho:kg/m^3 A:m^2 v:m/s | missing:C | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: C is not given. Enter C, rho, A and v to compute F_D.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate the power from force and velocity.</q><r>P=F*v | P:W F:N v:m/s | missing:F | force along the direction of motion; otherwise only the component along v does work | fit:high",
+     "gen": "<a> I cannot answer that: F is not given. Enter F and v to compute P.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate the velocity.</q><r>v=f*lambda | v:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f is not given. Enter f and lambda to compute v.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine R_x.</q><r>R_x=A_x+B_x | R_x:m A_x:m B_x:m | missing:A_x | vectors add component by component; each component is signed | fit:high",
+     "gen": "<a> I cannot answer that: A_x is not given. Enter A_x and B_x to compute R_x.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute P.</q><r>P=((W)/(t)) | P:W W:J t:s | missing:W | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: W is not given. Enter W and t to compute P.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find V.</q><r>V=((U_E)/(q)) | V:V U_E:J q:C | missing:U_E | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: U_E is not given. Enter U_E and q to compute V.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate f_1.</q><r>f_1=((v)/(4*L)) | f_1:Hz v:m/s L:m | missing:v | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v is not given. Enter v and L to compute f_1.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate work done by a force at an angle to the displacement.</q><r>W=F*d*cos(theta) | W:J F:N d:m theta:1 | missing:F | the scalar product: only the component of F along d does work, so a perpendicular force does none | fit:high",
+     "gen": "<a> I cannot answer that: F is not given. Enter F, d and theta to compute W.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate E. Given. Given h = 6.626e-34.</q><r>E=h*f | E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f is not given. Enter f to compute E.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate the gravitational acceleration from a pendulum period.</q><r>g=((4*(pi)^(2)*L)/((T)^(2))) | g:m/s^2 L:m T:s | missing:L | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: L is not given. Enter L and T to compute g.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>assume Compute n. Given c = 299800000..</q><r>n=((c)/(v)) | n:1 c:m/s v:m/s | missing:v | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v is not given. Enter v to compute n.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate E. Given c = 299800000..</q><r>E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:Delta_m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_m is not given. Enter Delta_m to compute E.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has . Determine T_F. Given k_B = 1.381e-23.</q><r>T_F=((E_F)/(k_B)) | T_F:K E_F:J k_B:J/K | missing:E_F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: E_F is not given. Enter E_F to compute T_F.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate Delta_U.</q><r>Delta_U=Q-W | Delta_U:J Q:J W:J | missing:Q | physics sign convention: W is work done BY the system, so it SUBTRACTS. Chemistry writes Delta_U = q + w for work done ON the system; both appear in the training prose, so the convention is stated here rather than assumed | fit:high",
+     "gen": "<a> I cannot answer that: Q is not given. Enter Q and W to compute Delta_U.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate the rms current from impedance.</q><r>I_rms=V_rms/Z | I_rms:A V_rms:V Z:ohm | missing:V_rms | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V_rms is not given. Enter V_rms and Z to compute I_rms.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>measurements give . Estimate E. Given h = 6.626e-34.</q><r>E=h*f | E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f is not given. Enter f to compute E.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find the horizontal position under constant velocity.</q><r>x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:x_0 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x_0 is not given. Enter x_0, v_x and t to compute x.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate the vertical position.</q><r>y=y_0+((1)/(2))(v_0y+v_y)t | y:m y_0:m v_0y:m/s v_y:m/s t:s | missing:y_0 | constant acceleration, so the average velocity is half the sum of the ends | fit:high",
+     "gen": "<a> I cannot answer that: y_0 is not given. Enter y_0, v_0y, v_y and t to compute y.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>given compute v_d. Given q = 1.602e-19, n = 8.5e+28.</q><r>v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I is not given.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine P.</q><r>P=((W)/(t)) | P:W W:J t:s | missing:W | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: W is not given. Enter W and t to compute P.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate wave speed.</q><r>v=((omega)/(k)) | v:m/s omega:1/s k:1/m | missing:omega | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: omega is not given. Enter omega and k to compute v.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute the angular acceleration.</q><r>alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:Delta_omega | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_omega is not given. Enter Delta_omega and Delta_t to compute alpha.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate acceleration.</q><r>a=((F)/(m)) | a:m/s^2 F:N m:kg | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given. Enter F and m to compute a.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute s_i.</q><r>s_i=(((n_2)/(n_1)))*s_o | s_i:m n_2:1 n_1:1 s_o:m | missing:n_2 | flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT. | fit:high",
+     "gen": "<a> I cannot answer that: n_2 is not given. Enter n_2, n_1 and s_o to compute s_i.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find Q.</q><r>Q=Delta_E_int+W | Q:J Delta_E_int:J W:J | missing:Delta_E_int | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_E_int is not given. Enter Delta_E_int and W to compute Q.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine rho.</q><r>rho=((m)/(V)) | rho:kg/m^3 m:kg V:m^3 | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given. Enter m and V to compute rho.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine I_S.</q><r>I_S=((N_P)/(N_S))*I_P | I_S:A N_P:1 N_S:1 I_P:A | missing:N_P | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: N_P is not given. Enter N_P, N_S and I_P to compute I_S.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine V. A system. Given k_e = 8988000000..</q><r>V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:q | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: q is not given. Enter q and r to compute V.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine v.</q><r>v=d/t | v:m/s d:m t:s | missing:d | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: d is not given. Enter d and t to compute v.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate output work.</q><r>W_o=F_o*d_o | W_o:J F_o:N d_o:m | missing:F_o | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F_o is not given. Enter F_o and d_o to compute W_o.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine angle of rotation.</q><r>Delta_theta=((Delta_s)/(r)) | Delta_theta:1 Delta_s:m r:m | missing:Delta_s | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_s is not given. Enter Delta_s and r to compute Delta_theta.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from estimate the sound intensity level. Given I_0 = 1e-12.</q><r>beta=10*log(((I)/(I_0))) | beta:1 I:W/m^2 I_0:W/m^2 | missing:I | I_0 is the threshold of hearing, 1e-12 W/m^2, which is what makes 0 dB mean 'just audible' | fit:high",
+     "gen": "<a> I cannot answer that: I is not given. Enter I to compute beta.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate C.</q><r>C=((Q)/(V)) | C:F Q:C V:V | missing:Q | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Q is not given. Enter Q and V to compute C.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate the total mass from rocket and propellant.</q><r>m=m_R+m_g | m:kg m_R:kg m_g:kg | missing:m_R | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m_R is not given. Enter m_R and m_g to compute m.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with compute photon energy. Given h = 6.626e-34.</q><r>E=h*f | E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f is not given. Enter f to compute E.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate x.</q><r>x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:x_0 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x_0 is not given. Enter x_0, v_x and t to compute x.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Suppose . Calculate the drift velocity. Given n = 8.5e+28, q = 1.602e-19.</q><r>v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I is not given. Enter I and A to compute v_d.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate angular acceleration.</q><r>alpha=((a_t)/(r)) | alpha:1/s^2 a_t:m/s^2 r:m | missing:a_t | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: a_t is not given. Enter a_t and r to compute alpha.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find fringe spacing.</q><r>Delta_y=x*lambda/d | Delta_y:m x:m lambda:m d:m | missing:x | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x is not given. Enter x, lambda and d to compute Delta_y.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate equivalent resistance.</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<a> I cannot answer that: R_1 is not given. Enter R_1 and R_2 to compute R_eqv.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate momentum change from a velocity change.</q><r>Delta_p=m*Delta_v | Delta_p:kg*m/s m:kg Delta_v:m/s | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given. Enter m and Delta_v to compute Delta_p.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate rms current.</q><r>I_rms=V_rms/Z | I_rms:A V_rms:V Z:ohm | missing:V_rms | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V_rms is not given. Enter V_rms and Z to compute I_rms.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine tau.</q><r>tau=r*F*sin(theta) | tau:N*m r:m F:N theta:1 | missing:r | the vector product magnitude: only the component of F perpendicular to r turns anything | fit:high",
+     "gen": "<a> I cannot answer that: r is not given. Enter r, F and theta to compute tau.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute I.</q><r>I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:P | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: P is not given. Enter P and A to compute I.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>if determine C_p. Given R = 8.314.</q><r>C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: C_V is not given. Enter C_V to compute C_p.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has Find T_tof. Given g = 9.81..</q><r>T_tof=((2(v_0*sin(theta_0)))/(g)) | T_tof:s v_0:m/s theta_0:1 g:m/s^2 | missing:v_0 | projectile returning to its launch height, no air resistance | fit:high",
+     "gen": "<a> I cannot answer that: v_0 is not given. Enter v_0 and theta_0 to compute T_tof.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate B. If. Given mu_0 = 1.257e-06.</q><r>B=((mu_0*I)/(2*pi*R)) | B:T mu_0:T*m/A I:A R:m | missing:I | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I is not given. Enter I and R to compute B.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate the average ac power from rms current and voltage.</q><r>P_ave=I_rms*V_rms | P_ave:W I_rms:A V_rms:V | missing:I_rms | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I_rms is not given. Enter I_rms and V_rms to compute P_ave.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate angular velocity.</q><r>omega=v/r | omega:1/s v:m/s r:m | missing:v | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v is not given. Enter v and r to compute omega.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>suppose . Determine lambda. Given h = 6.626e-34.</q><r>lambda=((h)/(m*v)) | lambda:m h:J*s m:kg v:m/s | missing:m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m is not given. Enter m and v to compute lambda.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find W_out.</q><r>W_out=W_in-W_f | W_out:J W_in:J W_f:J | missing:W_in | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: W_in is not given. Enter W_in and W_f to compute W_out.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>starting from find T_F. Given k_B = 1.381e-23.</q><r>T_F=((E_F)/(k_B)) | T_F:K E_F:J k_B:J/K | missing:E_F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: E_F is not given. Enter E_F to compute T_F.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute P_ave.</q><r>P_ave=I_rms*V_rms | P_ave:W I_rms:A V_rms:V | missing:I_rms | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I_rms is not given. Enter I_rms and V_rms to compute P_ave.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate photon frequency. Given. Given h = 6.626e-34.</q><r>f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:Delta_E_LK | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_E_LK is not given. Enter Delta_E_LK to compute f.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute f_beat.</q><r>f_beat=|f_2-f_1| | f_beat:Hz f_2:Hz f_1:Hz | missing:f_2 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f_2 is not given. Enter f_2 and f_1 to compute f_beat.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute I.</q><r>I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:P | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: P is not given. Enter P and A to compute I.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute P.</q><r>P=(((V)^(2))/(R)) | P:W V:V R:ohm | missing:V | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: V is not given. Enter V and R to compute P.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine P_ave.</q><r>P_ave=I_rms*V_rms | P_ave:W I_rms:A V_rms:V | missing:I_rms | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: I_rms is not given. Enter I_rms and V_rms to compute P_ave.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine the angular magnification m.</q><r>M=((theta_image)/(theta_object)) | M:1 theta_image:1 theta_object:1 | missing:theta_image | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta_image is not given. Enter theta_image and theta_object to compute M.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate the binding energy. A system has. Given h = 6.626e-34.</q><r>E_b=h*f_O | E_b:J h:J*s f_O:Hz | missing:f_O | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f_O is not given. Enter f_O to compute E_b.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>measurements give Compute frequency from wavelength. Given c = 299800000..</q><r>f=((c)/(lambda)) | f:Hz c:m/s lambda:m | missing:lambda | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: lambda is not given. Enter lambda to compute f.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute tau.</q><r>tau=R*C | tau:s R:ohm C:F | missing:R | series RC circuit | fit:high",
+     "gen": "<a> I cannot answer that: R is not given. Enter R and C to compute tau.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine the wave speed.</q><r>v=((omega)/(k)) | v:m/s omega:1/s k:1/m | missing:omega | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: omega is not given. Enter omega and k to compute v.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>find R_x.</q><r>R_x=A_x+B_x | R_x:m A_x:m B_x:m | missing:A_x | vectors add component by component; each component is signed | fit:high",
+     "gen": "<a> I cannot answer that: A_x is not given. Enter A_x and B_x to compute R_x.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find the molar heat capacity. The values. Given R = 8.314..</q><r>C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: C_V is not given. Enter C_V to compute C_p.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>find the direction.</q><r>theta=atan(((v_y)/(v_x))) | theta:1 v_y:m/s v_x:m/s | missing:v_y | returns an angle in the first or fourth quadrant; add pi when v_x is negative | fit:high",
+     "gen": "<a> I cannot answer that: v_y is not given. Enter v_y and v_x to compute theta.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find the pressure.</q><r>p=((F)/(A)) | p:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given. Enter F and A to compute p.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate the drag force.</q><r>F_D=((1)/(2))*C*rho*A*(v)^(2) | F_D:N C:1 rho:kg/m^3 A:m^2 v:m/s | missing:C | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: C is not given. Enter C, rho, A and v to compute F_D.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine the angular velocity.</q><r>omega_f=omega_0+alpha*t | omega_f:1/s omega_0:1/s alpha:1/s^2 t:s | missing:omega_0 | constant angular acceleration | fit:high",
+     "gen": "<a> I cannot answer that: omega_0 is not given. Enter omega_0, alpha and t to compute omega_f.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate binding energy. Given c = 299800000..</q><r>E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:Delta_m | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_m is not given. Enter Delta_m to compute E.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>using find energy. Given h = 6.626e-34.</q><r>E_f=h*f | E_f:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: f is not given. Enter f to compute E_f.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute the equivalent resistance.</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<a> I cannot answer that: R_1 is not given. Enter R_1 and R_2 to compute R_eqv.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine the heat transferred.</q><r>Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:m | no phase change over the interval; at the melting point dT stays flat | fit:high",
+     "gen": "<a> I cannot answer that: m is not given. Enter m, c and dT to compute Q.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute the angular acceleration from tangential acceleration.</q><r>alpha=((a_t)/(r)) | alpha:1/s^2 a_t:m/s^2 r:m | missing:a_t | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: a_t is not given. Enter a_t and r to compute alpha.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate the pressure.</q><r>p=((F)/(A)) | p:Pa F:N A:m^2 | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given. Enter F and A to compute p.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>if calculate p. Given h = 6.626e-34.</q><r>p=((h)/(lambda)) | p:kg*m/s h:J*s lambda:m | missing:lambda | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: lambda is not given. Enter lambda to compute p.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute torque.</q><r>tau=r*F | tau:N*m r:m F:N | missing:r | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: r is not given. Enter r and F to compute tau.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Find equivalent resistance of two resistors in parallel.</q><r>R_eqv=((1)/(1/R_1+1/R_2)) | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: R_1 is not given. Enter R_1 and R_2 to compute R_eqv.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate the mass.</q><r>m=rho*V | m:kg rho:kg/m^3 V:m^3 | missing:rho | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: rho is not given. Enter rho and V to compute m.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate centripetal acceleration.</q><r>a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: v is not given. Enter v and r to compute a.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine quantum number.</q><r>n=((K/E_1))^(1/2) | n:1 K:J E_1:J | missing:K | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: K is not given. Enter K and E_1 to compute n.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate n.</q><r>n=((K/E_1))^(1/2) | n:1 K:J E_1:J | missing:K | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: K is not given. Enter K and E_1 to compute n.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate total mass from rocket and propellant.</q><r>m=m_R+m_g | m:kg m_R:kg m_g:kg | missing:m_R | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: m_R is not given. Enter m_R and m_g to compute m.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute the intensity.</q><r>I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+     "gen": "<a> I cannot answer that: P is not given. Enter P and r to compute I.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>determine displacement.</q><r>Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_f | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: x_f is not given. Enter x_f and x_i to compute Delta_x.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>find the displacement under uniform acceleration.</q><r>d=vi*t+0.5*a*(t)^(2) | d:m vi:m/s t:s a:m/s^2 | missing:vi | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: vi is not given. Enter vi, t and a to compute d.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute the wavelength.</q><r>lambda_n=((lambda)/(n)) | lambda_n:m lambda:m n:1 | missing:lambda | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: lambda is not given. Enter lambda and n to compute lambda_n.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate alpha.</q><r>alpha=((Delta_omega)/(Delta_t)) | alpha:1/s^2 Delta_omega:1/s Delta_t:s | missing:Delta_omega | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_omega is not given. Enter Delta_omega and Delta_t to compute alpha.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>calculate the tangential speed.</q><r>v_t=r*omega | v_t:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: r is not given. Enter r and omega to compute v_t.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate g.</q><r>g=((4*(pi)^(2)*L)/((T)^(2))) | g:m/s^2 L:m T:s | missing:L | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: L is not given. Enter L and T to compute g.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute total mechanical energy.</q><r>E=K+U | E:J K:J U:J | missing:K | conservative forces only; friction makes E fall rather than hold | fit:high",
+     "gen": "<a> I cannot answer that: K is not given. Enter K and U to compute E.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Calculate the magnetic force.</q><r>F=q*v*B | F:N q:C v:m/s B:T | missing:q | velocity perpendicular to the field; otherwise only the perpendicular component counts | fit:high",
+     "gen": "<a> I cannot answer that: q is not given. Enter q, v and B to compute F.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Estimate output work.</q><r>W_o=F_o*d_o | W_o:J F_o:N d_o:m | missing:F_o | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F_o is not given. Enter F_o and d_o to compute W_o.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>estimate electric potential of a point charge. Starting. Given k_e = 8988000000..</q><r>V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:q | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: q is not given. Enter q and r to compute V.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>compute the acceleration.</q><r>a=((Delta_v)/(Delta_t)) | a:m/s^2 Delta_v:m/s Delta_t:s | missing:Delta_v | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_v is not given. Enter Delta_v and Delta_t to compute a.<end>",
+     "ok": true
+    }
+   ]
+  },
+  "refuse": {
+   "k": 0,
+   "n": 0,
+   "unreachable": 40
+  },
+  "fit": {
+   "k": 19,
+   "n": 120,
+   "unreachable": 0,
+   "pct": 15.833333333333334,
+   "rows": [
+    {
+     "prompt": "<q>If what is theta_r? Given m_2 = 71.8, m_1 = 944, g = 9.81.</q><r>a=((m_2)/(m_1+m_2))*g | a:m/s^2 m_2:kg m_1:kg g:m/s^2 | missing:none | frictionless table, massless pulley and string | fit:high",
+     "gen": "<tool> eval<arg> (((71.8))/((944.0)+(71.8)))*(9.81)</tool><res> 0.6934022445</res><a> That gives 0.6934 m/s^2. This follows from a=((m_2)/(m_1+m_2))*g.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Determine the average ac power from rms current and voltage. Given Delta_S_h = -12, Delta_S_c = 234.6..</q><r>Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (-12.0)+(234.6)</tool><res> 222.6</res><a> Delta_S_tot = 222.6 J/K. Substituting into Delta_S_tot=Delta_S_h+Delta_S_c.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>With estimate x component. Given E_F = 2.1e-19, k_B = 1.381e-23.</q><r>T_F=((E_F)/(k_B)) | T_F:K E_F:J k_B:J/K | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((2.1e-19))/((1.381e-23)))</tool><res> 15206.37219</res><a> That gives 15206.372 K. Using T_F=((E_F)/(k_B)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>For what was spring constant from force and extension? Given Delta_E_LK = 2.7e-17, h = 6.626e-34.</q><r>f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((2.7e-17))/(6.626e-34)</tool><res> 4.074856625e+16</res><a> The spring constant from force and extension is 4.074856625e+16 Hz. Using f=(Delta_E_LK)/h.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>For calculate v. Given Delta_E = 8.01e-15, c = 2.998e8.</q><r>m=Delta_E/(c)^(2) | m:kg Delta_E:J c:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (8.01e-15)/((299800000.0))^(2)</tool><res> 8.911878544e-32</res><a> 8.911878544e-32 kg. Using m=Delta_E/(c)^(2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with compute motionally induced emf. Given v_y = 1, v_x = 4.</q><r>theta=atan(((v_y)/(v_x))) | theta:1 v_y:m/s v_x:m/s | missing:none | returns an angle in the first or fourth quadrant; add pi when v_x is negative | fit:high",
+     "gen": "<tool> eval<arg> atan((((1.0))/((4.0))))</tool><res> 0.2449786631</res><a> That gives 0.245. theta=atan(((v_y)/(v_x))) gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Compute the fringe spacing in double-slit interference. A system. Given lambda = 0.045., c = 2.998e8.</q><r>f=((c)/(lambda)) | f:Hz c:m/s lambda:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((299800000.0))/((0.045)))</tool><res> 6662222222</res><a> That gives 6662222222 Hz. Using f=((c)/(lambda)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>For what is v? Given q = 9.35e-07, r = 3.89, k_e = 8.988e9.</q><r>V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((8988000000.0)*(9.35e-07))/((3.89)))</tool><res> 2160.354756</res><a> That gives 2160 V. Directly from V=((k_e*q)/(r)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>If estimate C_V. Given B = 0.667, m = 9.109e-31, q = 1.602e-19.</q><r>T=((2*pi*m)/(q*B)) | T:s m:kg q:C B:T | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((2*pi*(9.109e-31))/((1.602e-19)*(0.667)))</tool><res> 5.356267088e-11</res><a> That gives 5.356267088e-11 s. This follows from T=((2*pi*m)/(q*B)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>If what is magnitude of torque from a force at an angle? Given x_0 = 37.5, v_x = 43.54, t = 530.93.</q><r>x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes x from x_0, v_x and t, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was P? Starting. Given R_1 = 0.733, R_2 = 0.675..</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:none | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<tool> eval<arg> (0.733)+(0.675)</tool><res> 1.408</res><a> 1.408 ohm. This follows from R_eqv=R_1+R_2.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>For what was v_toty? Given v = 42.08, r = 0.156.</q><r>a_c=(((v)^(2))/(r)) | a_c:m/s^2 v:m/s r:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((((42.08))^(2))/((0.156)))</tool><res> 11350.81026</res><a> That gives 11350 m/s^2. This follows from a_c=(((v)^(2))/(r)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Determine acceleration. Given R = 0.244, theta = 1.72..</q><r>d_CM=R*theta | d_CM:m R:m theta:1 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.244)*(1.72)</tool><res> 0.41968</res><a> The acceleration is 0.4199 m. This follows from d_CM=R*theta.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>The values are Calculate I_rms. Given f = 21.6, lambda = 2.186..</q><r>v=f*lambda | v:m/s f:Hz lambda:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (21.6)*(2.186)</tool><res> 47.2176</res><a> 47.22 m/s. Using v=f*lambda.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Given find the mass from energy equivalence. Given U_E = 6.15e-05, q = 8.04e-09.</q><r>V=((U_E)/(q)) | V:V U_E:J q:C | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((6.15e-05))/((8.04e-09)))</tool><res> 7649.253731</res><a> That gives 7649 V. Using V=((U_E)/(q)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with calculate charge remaining on a discharging capacitor. Given Delta_m = 1.12e-29, c = 2.998e8.</q><r>E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes E from Delta_m and c, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>You are told Compute energy quantum. Given E = 138, B = 8.2..</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (138.0)/(8.2)</tool><res> 16.82926829</res><a> v_d = 16.83 m/s. Substituting into v_d=E/B.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Find the energy change associated. Starting. Given v = 778, L = 3.71..</q><r>f_1=((v)/(4*L)) | f_1:Hz v:m/s L:m | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes f_1 from v and L, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Measurements give What is the period of a particle's motion in a magnetic field? Given lambda = 1, N = 2..</q><r>A_act=lambda*N | A_act:1/s lambda:1/s N:1 | missing:none | activity is decays per second, so it falls as the sample does | fit:high",
+     "gen": "<tool> eval<arg> (1.0)*(2.0)</tool><res> 2</res><a> A_act = 2 1/s. A_act=lambda*N gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Measurements give What was angular frequency? Given v_0 = 656, a = 63.55, t = 2.62..</q><r>v=v_0+a*t | v:m/s v_0:m/s a:m/s^2 t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (656.0)+(63.55)*(2.62)</tool><res> 822.501</res><a> v = 822.5 m/s. From v=v_0+a*t.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with what is the beat frequency? Given m = 149.07, v = 178.7.</q><r>K=0.5*m*(v)^(2) | K:J m:kg v:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> 0.5*(149.07)*((178.7))^(2)</tool><res> 2380177.584</res><a> K = 2380177.584 J. This follows from K=0.5*m*(v)^(2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Consider a case where What is pressure? Given V = 7.557, R = 340..</q><r>P=(((V)^(2))/(R)) | P:W V:V R:ohm | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((((7.557))^(2))/((340.0)))</tool><res> 0.1679654382</res><a> P = 0.1679 W. Using P=(((V)^(2))/(R)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with find V_rms. Given d_i = 12.4, d_o = 4.66.</q><r>f=((d_i*d_o)/(d_o+d_i)) | f:m d_i:m d_o:m | missing:none | paraxial rays, close to the axis | fit:high",
+     "gen": "<tool> eval<arg> (((12.4)*(4.66))/((4.66)+(12.4)))</tool><res> 3.387104338</res><a> 3.387 m. From f=((d_i*d_o)/(d_o+d_i)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Using what was C? Given Delta_p_max = 78, rho = 35.73, v = 772.</q><r>I=((((Delta_p_max))^(2))/(2*rho*v)) | I:W/m^2 Delta_p_max:Pa rho:kg/m^3 v:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((((78.0)))^(2))/(2*(58.73)*(772.0)))</tool><res> 0.06709372566</res><a> 0.06709 W/m^2. Using I=((((Delta_p_max))^(2))/(2*rho*v)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Measurements give Determine de broglie wavelength. Given f = 65200000000000., h = 6.626e-34.</q><r>E=h*f | E:J h:J*s f:Hz | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (6.626e-34)*(65200000000000.0)</tool><res> 4.320152e-20</res><a> The de broglie wavelength is 4.320152e-20 J. E=h*f gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Using find the total entropy change of system and surroundings. Given k = 28.8, m = 1.07.</q><r>f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes f from k and m, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For compute capacitance. Given k = 456, x = 0.737.</q><r>F=-k*x | F:N k:N/m x:m | missing:none | restoring force, signed: negative means opposite to the displacement | fit:high",
+     "gen": "<tool> eval<arg> -(456.0)*(0.737)</tool><res> -336.072</res><a> That gives -336.1 N. Using F=-k*x.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>You are told Compute a_t. Given d = 4.286, t = 101.3..</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (4.286)/(101.3)</tool><res> 0.04230997038</res><a> 0.04231 m/s. From v=d/t.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Where determine capacitance. Given r = 0.826, theta = 0.515.</q><r>s=r*theta | s:m r:m theta:1 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.826)*(0.515)</tool><res> 0.42539</res><a> s = 0.4254 m. Directly from s=r*theta.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Given what is intensity remaining after absorption through a thickness? Given W = 1040, t = 42.87.</q><r>P=((W)/(t)) | P:W W:J t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((1040.0))/((42.87)))</tool><res> 24.25938885</res><a> The intensity remaining after absorption through a thickness is 24.26 W/m^2. Using P=((W)/(t)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Take Compute B. Given v = 886.29, L = 5.48..</q><r>f_1=((v)/(4*L)) | f_1:Hz v:m/s L:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((886.29))/(4*(5.48)))</tool><res> 40.43293796</res><a> 40.43 Hz. f_1=((v)/(4*L)) gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What was the angular velocity? In a setup with. Given E = 5.79e-18, h = 6.626e-34.</q><r>Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:none | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
+     "gen": "<tool> eval<arg> (((6.626e-34))/((5.79e-18)))</tool><res> 1.144386874e-16</res><a> That gives 1.144386874e-16 s. Delta_t=((h)/(E)) gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>The values are Compute F_c. Given F_net = 0.68, a = 50.71..</q><r>m=F_net/a | m:kg F_net:N a:m/s^2 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.68)/(50.71)</tool><res> 0.01340958391</res><a> That gives 0.01341 kg. Directly from m=F_net/a.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Compute V. Given r = 0.06, F = 132.8..</q><r>tau=r*F | tau:N*m r:m F:N | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.06)*(132.8)</tool><res> 7.968</res><a> 7.968 N*m. Directly from tau=r*F.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Using what was power? Given omega = 2.18, k = 375.</q><r>v=((omega)/(k)) | v:m/s omega:1/s k:1/m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((2.18))/((375.0)))</tool><res> 0.005813333333</res><a> That gives 0.005813 m/s. From v=((omega)/(k)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Starting from what is the angular magnification m of a simple magnifier? Given v_x = 1, v_y = 6.</q><r>v=sqrt(((v_x))^(2)+((v_y))^(2)) | v:m/s v_x:m/s v_y:m/s | missing:none | two perpendicular components; the magnitude is never negative | fit:high",
+     "gen": "<tool> eval<arg> sqrt((((1.0)))^(2)+(((6.0)))^(2))</tool><res> 6.08276253</res><a> v = 6.083 m/s. From v=sqrt(((v_x))^(2)+((v_y))^(2)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Assume Find motionally induced emf. Given theta = 3.35, t = 625..</q><r>omega=((theta)/(t)) | omega:1/s theta:1 t:s | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes omega from theta and t, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Assume Estimate F. Given d = 235, t = 9.79..</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (235.0)/(9.79)</tool><res> 24.0040858</res><a> 24.01 m/s. Substituting into v=d/t.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>A system has What is tangential acceleration? Given l = 0.616, l_0 = 6.37..</q><r>x=l-l_0 | x:m l:m l_0:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.616)-(6.37)</tool><res> -5.754</res><a> That gives -5.754 m. Directly from x=l-l_0.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Estimate omega. Measurements give. Given v = 24.7, r = 1.74..</q><r>a_c=(((v)^(2))/(r)) | a_c:m/s^2 v:m/s r:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((((24.7))^(2))/((1.74)))</tool><res> 350.6264368</res><a> 350.6 m/s^2. This follows from a_c=(((v)^(2))/(r)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Determine F_net. Given I = 1.274, R = 1.3..</q><r>V=I*R | V:V I:A R:ohm | missing:none | ohmic material at constant temperature; a diode does not obey it | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes V from I and R, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Take . Determine R_eqv. Given n = 3, E_1 = 1.32e-19.</q><r>K=(n)^(2)*E_1 | K:J n:1 E_1:J | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((3.0))^(2)*(1.32e-19)</tool><res> 1.188e-18</res><a> That gives 1.188e-18 J. Directly from K=(n)^(2)*E_1.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with determine rms voltage. Given Delta_S_h = -0.00137, Delta_S_c = 368.</q><r>Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (-0.00137)+(368.0)</tool><res> 367.99863</res><a> The total entropy change is 367 J/K. Substituting into Delta_S_tot=Delta_S_h+Delta_S_c.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What is P? Given E = 145.5, B = 0.44..</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (14.5)/(0.44)</tool><res> 32.95454545</res><a> That gives 32.95 m/s. From v_d=E/B.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Assume . Estimate displacement. Given Delta_m = 1.21e-29, c = 2.998e8.</q><r>E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((1.21e-29))((299800000.0))^(2)</tool><res> 1.087548484e-12</res><a> The displacement is 1.087548484e-12 J. Directly from E=(Delta_m)(c)^(2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Suppose What is the heat transferred? Given E = 5780, B = 9.7..</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes v_d from E and B, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute omega. A system. Given m = 0.101, Delta_v = 800, Delta_t = 0.843..</q><r>F=((m*Delta_v)/(Delta_t)) | F:N m:kg Delta_v:m/s Delta_t:s | missing:none | constant mass, and Delta_t is the interval over which the force acts | fit:high",
+     "gen": "<tool> eval<arg> (((0.101)*(800.0))/((0.843)))</tool><res> 95.84816133</res><a> That gives 95.85 N. Substituting into F=((m*Delta_v)/(Delta_t)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What was absolute pressure? Given x = 0.121, lambda = 2.27e-08, d = 0.01..</q><r>Delta_y=x*lambda/d | Delta_y:m x:m lambda:m d:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.121)*(2.27e-08)/(0.01)</tool><res> 2.7467e-07</res><a> That gives 2.7467e-07 m. From Delta_y=x*lambda/d.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Compute the length. Take. Given Delta_m = 6.41e-30, c = 2.998e8.</q><r>E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((6.41e-30))((299800000.0))^(2)</tool><res> 5.761310564e-13</res><a> The binding energy is 5.761310564e-13 J. Using E=(Delta_m)(c)^(2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Calculate the centripetal acceleration. Given v_0 = 2.75, theta_0 = 0.238., g = 9.81.</q><r>T_tof=((2(v_0*sin(theta_0)))/(g)) | T_tof:s v_0:m/s theta_0:1 g:m/s^2 | missing:none | projectile returning to its launch height, no air resistance | fit:high",
+     "gen": "<tool> eval<arg> ((2((2.75)*sin((0.238))))/((9.81)))</tool><res> 0.1321791152</res><a> That gives 0.1313 s. Using T_tof=((2(v_0*sin(theta_0)))/(g)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>The values are What is electrical power? Given v = 3.7, theta = 0.524..</q><r>v_x=v*cos(theta) | v_x:m/s v:m/s theta:1 | missing:none | theta measured from the +x axis; the component is signed and goes negative past 90 degrees | fit:high",
+     "gen": "<tool> eval<arg> (3.7)*cos((0.524))</tool><res> 3.203551471</res><a> That gives 3.201 m/s. From v_x=v*cos(theta).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Where estimate the displacement under uniform acceleration. Given E_transfer = 7.47e-19, U_coul = -5.25e-19, U_ex = 5.5e-20.</q><r>U_form=E_transfer+U_coul+U_ex | U_form:J E_transfer:J U_coul:J U_ex:J | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (7.47e-19)+(-5.25e-19)+(5.5e-20)</tool><res> 2.77e-19</res><a> That gives 2.77e-19 J. Using U_form=E_transfer+U_coul+U_ex.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Calculate area of a sector. The values. Given T_c = 270.3, T_h = 407..</q><r>Eff_C=1-((T_c)/(T_h)) | Eff_C:1 T_c:K T_h:K | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> 1-(((270.3))/((407.0)))</tool><res> 0.3358722359</res><a> That gives 0.3387. Directly from Eff_C=1-((T_c)/(T_h)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Find C. Consider a case. Given R_1 = 74, R_2 = 272..</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:none | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<tool> eval<arg> (74.0)+(272.0)</tool><res> 346</res><a> That gives 346 ohm. From R_eqv=R_1+R_2.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Calculate the angle of rotation. In a setup. Given r = 2.165, theta = 7.7..</q><r>s=r*theta | s:m r:m theta:1 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (2.165)*(7.7)</tool><res> 16.6705</res><a> The angle of rotation is 16.67 m. Directly from s=r*theta.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Assume Determine the path length difference for waves from two slits to a common point on a screen. Given Delta_v = 46.85, Delta_t = 4.5..</q><r>a=((Delta_v)/(Delta_t)) | a:m/s^2 Delta_v:m/s Delta_t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((46.85))/((4.5)))</tool><res> 10.41111111</res><a> That gives 10.41 m/s^2. Substituting into a=((Delta_v)/(Delta_t)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Where what is the tangential acceleration? Given F_o = 270, d_o = 66.8.</q><r>W_o=F_o*d_o | W_o:J F_o:N d_o:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (270.0)*(66.8)</tool><res> 18036</res><a> The tangential acceleration is 18040 m. Directly from W_o=F_o*d_o.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Where compute displacement. Given E_transfer = 8.43e-20, U_coul = -5.22e-19, U_ex = 5.78e-20.</q><r>U_form=E_transfer+U_coul+U_ex | U_form:J E_transfer:J U_coul:J U_ex:J | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (8.43e-20)+(-5.22e-19)+(5.78e-20)</tool><res> -3.799e-19</res><a> U_form = -3.799e-19 J. Using U_form=E_transfer+U_coul+U_ex.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Estimate I. Given F = 38.6, m = 6300..</q><r>a=((F)/(m)) | a:m/s^2 F:N m:kg | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((38.6))/((6300.0)))</tool><res> 0.006126984127</res><a> That gives 0.006127 m/s^2. Directly from a=((F)/(m)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Given compute I_1. Given V = 2.98, I = 12.5.</q><r>P=V*I | P:W V:V I:A | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (2.98)*(12.5)</tool><res> 37.25</res><a> That gives 37.25 W. P=V*I gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Where what is the half-life? Given Delta_E = 6.03e-11, c = 2.998e8.</q><r>m=Delta_E/(c)^(2) | m:kg Delta_E:J c:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (6.03e-11)/((299800000.0))^(2)</tool><res> 6.708942275e-28</res><a> m = 6.708942275e-28 kg. Directly from m=Delta_E/(c)^(2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>A system has What was the fundamental frequency of a closed tube? Given Delta_p = 129.1, Delta_t = 379..</q><r>F_net=((Delta_p)/(Delta_t)) | F_net:N Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((129.1))/((379.0)))</tool><res> 0.3406332454</res><a> The fundamental frequency of a closed tube is 0.3406 N. Using F_net=((Delta_p)/(Delta_t)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>If what was F? Given x = 6.88, lambda = 1.91e-09, d = 0.01.</q><r>Delta_y=x*lambda/d | Delta_y:m x:m lambda:m d:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (6.88)*(1.91e-09)/(0.01)</tool><res> 1.31408e-06</res><a> That gives 1.31408e-06 m. Directly from Delta_y=x*lambda/d.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Compute the motionally induced emf. Given W = 10.6, t = 0.654..</q><r>P=((W)/(t)) | P:W W:J t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((10.6))/((0.654)))</tool><res> 16.20795107</res><a> The motionally induced emf is 16.21 W. Using P=((W)/(t)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Consider a case where . Estimate magnetic field. Given lambda = 9.2e-10, h = 6.626e-34, c = 2.998e8.</q><r>E=((h*c)/(lambda)) | E:J h:J*s c:m/s lambda:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((6.626e-34)*(299800000.0))/((9.2e-10)))</tool><res> 2.159211739e-16</res><a> That gives 2.159211739e-16 J. This follows from E=((h*c)/(lambda)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Consider a case where Estimate the angular speed. Given I_0 = 0.28..</q><r>I_rms=((I_0)/(sqrt(2))) | I_rms:A I_0:A | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((0.28))/(sqrt(2)))</tool><res> 0.1979898987</res><a> I_rms = 0.1979 A. Using I_rms=((I_0)/(sqrt(2))).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>For estimate F. Given R = 1.7, alpha = 14.14.</q><r>a_CM=R*alpha | a_CM:m/s^2 R:m alpha:1/s^2 | missing:none | rolling without slipping; in a burnout alpha is large while a_CM is near zero | fit:high",
+     "gen": "<tool> eval<arg> (1.7)*(14.14)</tool><res> 24.038</res><a> 24.04 m/s^2. Directly from a_CM=R*alpha.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>For determine time. Given m = 20.5, h = 4250, g = 9.81.</q><r>U=m*g*h | U:J m:kg g:m/s^2 h:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (20.5)*(9.81)*(4250.0)</tool><res> 854696.25</res><a> That gives 854796.25 J. Using U=m*g*h.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>If determine v. Given r = 3.1, alpha = 0.801.</q><r>a_t=r*alpha | a_t:m/s^2 r:m alpha:1/s^2 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (3.1)*(0.801)</tool><res> 2.4831</res><a> That gives 2.483 m/s^2. This follows from a_t=r*alpha.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What is I_S? Given m = 64.1, Delta_v = 6.56, Delta_t = 6.44..</q><r>F=((m*Delta_v)/(Delta_t)) | F:N m:kg Delta_v:m/s Delta_t:s | missing:none | constant mass, and Delta_t is the interval over which the force acts | fit:high",
+     "gen": "<tool> eval<arg> (((64.1)*(6.56))/((6.44)))</tool><res> 65.29440994</res><a> 65.29 N. Substituting into F=((m*Delta_v)/(Delta_t)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Assume What was electric potential of a point charge? Given R = 4.6..</q><r>f=((R)/(2)) | f:m R:m | missing:none | paraxial rays, close to the axis; a far off-axis ray misses the focus | fit:high",
+     "gen": "<tool> eval<arg> (((4.6))/(2))</tool><res> 2.3</res><a> That gives 2.3 m. From f=((R)/(2)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Starting from determine the total entropy change of system and surroundings. Given F = 255, v = 188.</q><r>P=F*v | P:W F:N v:m/s | missing:none | force along the direction of motion; otherwise only the component along v does work | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes P from F and v, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In a setup with what is tangential speed? Given K = 39.95, U = 58.8.</q><r>E=K+U | E:J K:J U:J | missing:none | conservative forces only; friction makes E fall rather than hold | fit:high",
+     "gen": "<tool> eval<arg> (39.95)+(58.8)</tool><res> 98.75</res><a> E = 98.75 J. E=K+U gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>If calculate d. Given rho = 11.7, V = 0.065.</q><r>m=rho*V | m:kg rho:kg/m^3 V:m^3 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (11.7)*(0.065)</tool><res> 0.7605</res><a> 0.7605 kg. Directly from m=rho*V.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Calculate q. For. Given R = 135.87, C = 2.53e-05.</q><r>tau=R*C | tau:s R:ohm C:F | missing:none | series RC circuit | fit:high",
+     "gen": "<tool> eval<arg> (135.87)*(2.53e-05)</tool><res> 0.003437511</res><a> 0.003438 s. Using tau=R*C.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Take Calculate E. Given R = 0.282, theta = 1.75..</q><r>d_CM=R*theta | d_CM:m R:m theta:1 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.282)*(1.75)</tool><res> 0.4935</res><a> 0.4935 m. From d_CM=R*theta.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>You are told . Estimate I_1. Given E = 4.83e-14, h = 6.626e-34.</q><r>Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:none | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
+     "gen": "<tool> eval<arg> (((6.626e-34))/((4.83e-14)))</tool><res> 1.37184265e-20</res><a> That gives 1.37184265e-20 s. Substituting into Delta_t=((h)/(E)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Where determine p. Given k = 2.56, m = 83.4.</q><r>f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((1)/(2*pi))*sqrt((((2.56))/((83.4))))</tool><res> 0.02788412937</res><a> That gives 0.02788 Hz. Directly from f=((1)/(2*pi))*sqrt(((k)/(m))).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Calculate displacement of center of mass of rolling object. Consider a case. Given m = 0.368, v = 357.8..</q><r>K=0.5*m*(v)^(2) | K:J m:kg v:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> 0.5*(0.368)*((357.8))^(2)</tool><res> 23555.83456</res><a> That gives 23560 J. Directly from K=0.5*m*(v)^(2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Estimate binding energy of an electron. You are told. Given d_i = 6, d_o = 33.3..</q><r>f=((d_i*d_o)/(d_o+d_i)) | f:m d_i:m d_o:m | missing:none | paraxial rays, close to the axis | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes f from d_i and d_o, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Starting from compute time constant. Given v_0 = 222, a = 233.43, t = 351.58.</q><r>v=v_0+a*t | v:m/s v_0:m/s a:m/s^2 t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (222.0)+(233.43)*(351.58)</tool><res> 82291.3194</res><a> That gives 82290 m/s. This follows from v=v_0+a*t.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Take What was the period of a particle's motion in a magnetic field? Given v = 1.6, theta = 0.285..</q><r>v_y=v*sin(theta) | v_y:m/s v:m/s theta:1 | missing:none | theta measured from the +x axis; the component is signed | fit:high",
+     "gen": "<tool> eval<arg> (1.6)*sin((0.285))</tool><res> 0.4498519221</res><a> That gives 0.4499 m/s. Substituting into v_y=v*sin(theta).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>With calculate lambda. Given v_wy = 7.71, v_p = 158.89.</q><r>v_toty=v_wy+v_p | v_toty:m/s v_wy:m/s v_p:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (7.71)+(158.89)</tool><res> 166.6</res><a> That gives 166.6 m/s. From v_toty=v_wy+v_p.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Compute R_x. Given lambda = 0.018., c = 2.998e8.</q><r>f=((c)/(lambda)) | f:Hz c:m/s lambda:m | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes f from c and lambda, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute output work. Given v_wy = 6.91, v_p = 91.1..</q><r>v_toty=v_wy+v_p | v_toty:m/s v_wy:m/s v_p:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (6.91)+(91.1)</tool><res> 98.01</res><a> That gives 98.01 m/s. From v_toty=v_wy+v_p.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Starting from compute the fermi temperature. Given W = 505.4, t = 191.2.</q><r>P=((W)/(t)) | P:W W:J t:s | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes P from W and t, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is output work? Starting. Given theta_image = 0.433, theta_object = 0.28..</q><r>M=((theta_image)/(theta_object)) | M:1 theta_image:1 theta_object:1 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((0.433))/((0.28)))</tool><res> 1.546428571</res><a> 1.546. M=((theta_image)/(theta_object)) gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Consider a case where Estimate the displacement. Given k = 7.71, x = 0.193..</q><r>F=-k*x | F:N k:N/m x:m | missing:none | restoring force, signed: negative means opposite to the displacement | fit:high",
+     "gen": "<tool> eval<arg> -(7.71)*(0.193)</tool><res> -1.48803</res><a> That gives -1.488 N. Using F=-k*x.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What is drift velocity? Given m_R = 288, m_g = 800..</q><r>m=m_R+m_g | m:kg m_R:kg m_g:kg | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (288.0)+(800.0)</tool><res> 1088</res><a> 1088 kg. m=m_R+m_g gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Consider a case where What was t_half? Given Delta_p_max = 5.26, rho = 46.85, v = 338..</q><r>I=((((Delta_p_max))^(2))/(2*rho*v)) | I:W/m^2 Delta_p_max:Pa rho:kg/m^3 v:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes I from Delta_p_max, rho and v, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Determine the height of free fall. Consider a case. Given v_0 = 23.24, t = 283.15., g = 9.81.</q><r>v=v_0-g*t | v:m/s v_0:m/s g:m/s^2 t:s | missing:none | free fall with no air resistance, upward positive, before impact | fit:high",
+     "gen": "<tool> eval<arg> (23.24)-(9.81)*(283.15)</tool><res> -2754.4615</res><a> v = -2754 m/s. v=v_0-g*t gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>The values are Estimate the intensity. Given F = 2030, d = 900..</q><r>W=F*d | W:J F:N d:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (2030.0)*(900.0)</tool><res> 1827000</res><a> That gives 1827000 J. Using W=F*d.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Determine L. Given m = 0.24, v = 37.45..</q><r>p=m*v | p:kg*m/s m:kg v:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (0.24)*(37.45)</tool><res> 8.988</res><a> 8.988 kg*m/s. From p=m*v.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Determine f_obs. Given V = 0.76, I = 1.08..</q><r>P=V*I | P:W V:V I:A | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes P from V and I, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Using what is intensity of sound? Given F = 177.5, v = 7.79.</q><r>P=F*v | P:W F:N v:m/s | missing:none | force along the direction of motion; otherwise only the component along v does work | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes P from F and v, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Given find the total mechanical energy. Given R_1 = 0.639, R_2 = 619.</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:none | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<tool> eval<arg> (0.639)+(619.0)</tool><res> 619.639</res><a> The total mechanical energy is 619.6 ohm. From R_eqv=R_1+R_2.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with estimate the tangential speed. Given K = 0.406, U = 4660.</q><r>E=K+U | E:J K:J U:J | missing:none | conservative forces only; friction makes E fall rather than hold | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes E from K and U, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What was frequency of a mass-spring system in shm? Starting. Given d = 6., R = 8.314.</q><r>C_V=((d)/(2))*R | C_V:J/(mol*K) d:1 R:J/(mol*K) | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((6.0))/(2))*(8.314)</tool><res> 24.942</res><a> That gives 24.94 J/(mol*K). C_V=((d)/(2))*R gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What is the equivalent resistance? Assume. Given Delta_p = 58.08, Delta_t = 33.9..</q><r>F_net=((Delta_p)/(Delta_t)) | F_net:N Delta_p:kg*m/s Delta_t:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((58.08))/((33.9)))</tool><res> 1.713274336</res><a> That gives 1.713 N. Using F_net=((Delta_p)/(Delta_t)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Consider a case where Calculate F_c. Given p_g = 7500., p_atm = 101300.</q><r>p_abs=p_g+p_atm | p_abs:Pa p_g:Pa p_atm:Pa | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (7500.0)+(101300.0)</tool><res> 108800</res><a> That gives 108800 Pa. From p_abs=p_g+p_atm.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Determine the input work. Given L = 0.244, T = 3500..</q><r>g=((4*(pi)^(2)*L)/((T)^(2))) | g:m/s^2 L:m T:s | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> ((4*(pi)^(2)*(0.244))/(((3500.0))^(2)))</tool><res> 7.863456241e-07</res><a> That gives 7.863456241e-07 m/s^2. g=((4*(pi)^(2)*L)/((T)^(2))) gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>With determine power. Given E = 2.64e-15, h = 6.626e-34.</q><r>Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:none | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
+     "gen": "<tool> eval<arg> (((6.626e-34))/((2.64e-15)))</tool><res> 2.509848485e-19</res><a> That gives 2.509848485e-19 s. Substituting into Delta_t=((h)/(E)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with what was density from mass and volume? Given B = 77, l = 8.5, v = 0.34.</q><r>epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes epsilon from B, l and v, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Compute energy quantum. Given omega_0 = 16.043, alpha = 22.33, t = 0.017..</q><r>omega_f=omega_0+alpha*t | omega_f:1/s omega_0:1/s alpha:1/s^2 t:s | missing:none | constant angular acceleration | fit:high",
+     "gen": "<tool> eval<arg> (16.043)+(22.33)*(0.017)</tool><res> 16.42261</res><a> That gives 16.42 1/s. From omega_f=omega_0+alpha*t.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>The values are Calculate P. Given theta_image = 1.55, theta_object = 1.481..</q><r>M=((theta_image)/(theta_object)) | M:1 theta_image:1 theta_object:1 | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((1.55e-06))/((1.481)))</tool><res> 1.046590142e-06</res><a> 1.046590142e-06 m. Using M=((theta_image)/(theta_object)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Where compute m. Given F = 5.625, d = 0.04.</q><r>W=F*d | W:J F:N d:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (5.625)*(0.04)</tool><res> 0.225</res><a> 0.225 J. Using W=F*d.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Compute the wavelength in a medium of refractive index n. Given omega_0 = 140.8, alpha = 49.4, t = 538..</q><r>omega_f=omega_0+alpha*t | omega_f:1/s omega_0:1/s alpha:1/s^2 t:s | missing:none | constant angular acceleration | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes omega_f from omega_0, alpha and t, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For determine the motionally induced emf. Given I = 0.26, R = 0.476, mu_0 = 1.257e-6.</q><r>B=((mu_0*I)/(2*pi*R)) | B:T mu_0:T*m/A I:A R:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((1.257e-06)*(0.26))/(2*pi*(0.476)))</tool><res> 1.09275249e-07</res><a> That gives 1.09275249e-07 T. B=((mu_0*I)/(2*pi*R)) gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Estimate focal length for a spherical mirror. Starting. Given Delta_f = 5710000., h = 6.626e-34.</q><r>Delta_E=h*Delta_f | Delta_E:J h:J*s Delta_f:Hz | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes Delta_E from h and Delta_f, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For estimate E. Given omega = 2026, k = 8.67.</q><r>v=((omega)/(k)) | v:m/s omega:1/s k:1/m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((2026.0))/((8.67)))</tool><res> 233.6793541</res><a> That gives 233.7 m/s. Substituting into v=((omega)/(k)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Find lambda. Given F = 7.56, d = 23, theta = 0.515..</q><r>W=F*d*cos(theta) | W:J F:N d:m theta:1 | missing:none | the scalar product: only the component of F along d does work, so a perpendicular force does none | fit:high",
+     "gen": "<tool> eval<arg> (7.56)*(23.0)*cos((0.515))</tool><res> 151.3264986</res><a> 151.3 J. Using W=F*d*cos(theta).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>A system has Find the molar heat capacity. Given Q = 1588, T = 19.2..</q><r>Delta_S=((Q)/(T)) | Delta_S:J/K Q:J T:K | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((1588.0))/((19.2)))</tool><res> 82.70833333</res><a> Delta_S = 82.71 J/K. Directly from Delta_S=((Q)/(T)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>A system has Compute the index of refraction. Given f_O = 847000000000000., h = 6.626e-34.</q><r>E_b=h*f_O | E_b:J h:J*s f_O:Hz | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (6.626e-34)*(847000000000000.0)</tool><res> 5.612222e-19</res><a> E_b = 5.612222e-19 J. Using E_b=h*f_O.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Take Compute the angular acceleration from tangential acceleration. Given x_f = 21.43, x_i = 8.54..</q><r>Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (21.43)-(8.54)</tool><res> 12.89</res><a> That gives 12.89 m. From Delta_x=x_f-x_i.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Estimate angular acceleration. Given E = 270.3, B = 7.85..</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:none | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes v_d from E and B, which does not apply.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Take What is the intensity remaining after absorption through a thickness? Given omega = 52.83, k = 7.1..</q><r>v=((omega)/(k)) | v:m/s omega:1/s k:1/m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((52.83))/((7.1)))</tool><res> 7.44084507</res><a> That gives 7.441 m/s. Using v=((omega)/(k)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>In a setup with compute E. Given lambda = 4, N = 0.15.</q><r>A_act=lambda*N | A_act:1/s lambda:1/s N:1 | missing:none | activity is decays per second, so it falls as the sample does | fit:high",
+     "gen": "<tool> eval<arg> (4.0)*(0.15)</tool><res> 0.6</res><a> 0.6 1/s. Using A_act=lambda*N.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What was angular acceleration from tangential acceleration? Given Delta_s = 27.6, r = 0.291..</q><r>Delta_theta=((Delta_s)/(r)) | Delta_theta:1 Delta_s:m r:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (((27.6))/((0.291)))</tool><res> 94.84536082</res><a> That gives 94.85 1/s^2. From Delta_theta=((Delta_s)/(r)).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Assume Determine E. Given f = 3.83, lambda = 830..</q><r>v=f*lambda | v:m/s f:Hz lambda:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (3.83)*(830.0)</tool><res> 3178.9</res><a> 3178 m/s. v=f*lambda gives it.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Consider a case where What is Delta_S? Given R_1 = 31, R_2 = 101.325..</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:none | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<tool> eval<arg> (31.0)+(101.325)</tool><res> 132.325</res><a> 132.3 ohm. From R_eqv=R_1+R_2.<end>",
+     "ok": false
+    }
+   ]
+  },
+  "fit_ho": {
+   "k": 0,
+   "n": 0,
+   "unreachable": 120
+  },
+  "explain": {
+   "k": 81,
+   "n": 87,
+   "unreachable": 0,
+   "pct": 93.10344827586206,
+   "rows": [
+    {
+     "prompt": "<q>How is I related to the other quantities?</q><r>I=I_0*exp(-mu*x) | I:W/m^2 I_0:W/m^2 mu:1/m x:m | missing:I_0 | a uniform absorber and a narrow beam; mu is the linear attenuation coefficient | fit:high",
+     "gen": "<a> Each millimetre of absorber removes the same FRACTION of what reaches it, not the same amount, so I = I_0*exp(-mu*x). Doubling the shielding squares the reduction.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>how do you find theta?</q><r>theta=((s)/(r)) | theta:1 s:m r:m | missing:s | theta in radians, which is what makes arc length equal r times the angle | fit:high",
+     "gen": "<a> Walk along a curve of radius r and cover arc length s. The angle you swept is theta = s/r. That is what a radian is, and since it is a length over a length, theta has no units at all.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does entropy change of a system in a reversible isothermal process say?</q><r>Delta_S=((Q)/(T)) | Delta_S:J/K Q:J T:K | missing:Q | standard conditions | fit:high",
+     "gen": "<a> Pour heat into something and its disorder rises by Delta_S = Q/T. The same joule buys more of it in a cold body than a hot one, which is why heat drifts from hot to cold. T is in kelvin.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>define v_d.</q><r>v_d=E/B | v_d:m/s E:V/m B:T | missing:E | standard conditions | fit:high",
+     "gen": "<a> Cross an electric field with a magnetic one and a charge gets two opposite shoves. They cancel at exactly one speed, v_d = E/B. Go faster or slower and you get bent out of the beam.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>if how do you find fermi temperature? Given k_B = 1.381e-23.</q><r>T_F=((E_F)/(k_B)) | T_F:K E_F:J k_B:J/K | missing:E_F | standard conditions | fit:high",
+     "gen": "<a> Divide the Fermi energy by Boltzmann's constant and an energy becomes a temperature: T_F = E_F/k_B. It is how hot you would have to get an ordinary particle to make it move as fast as those electrons do.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>The values are explain how molar heat capacity at constant volume for an ideal gas with d degrees of freedom is calculated. Given R = 8.314..</q><r>C_V=((d)/(2))*R | C_V:J/(mol*K) d:1 R:J/(mol*K) | missing:d | standard conditions | fit:high",
+     "gen": "<a> Heat gets split evenly over every independent way a molecule can move, and d counts those ways. Each one is worth half of R, so C_V = (d/2)*R. More ways to move, more heat per degree.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what does v_CM depend on?</q><r>v_CM=R*omega | v_CM:m/s R:m omega:1/s | missing:R | standard conditions | fit:high",
+     "gen": "<a> Roll a wheel without letting it skid and the bottom of it is, for that instant, not moving at all. That pins the middle to v_CM = R*omega. Same spin, bigger wheel, more ground covered.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does photon frequency depend on? Take. Given h = 6.626e-34.</q><r>f=(Delta_E_LK)/h | f:Hz Delta_E_LK:J h:J*s | missing:Delta_E_LK | standard conditions | fit:high",
+     "gen": "<a> An electron drops from the L level to the K level and the leftover energy leaves as one photon. f = Delta_E_LK / h fixes its frequency: a wider gap buys a higher f, never a faster photon. h is Planck's constant.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>How do you find s?</q><r>s=r*theta | s:m r:m theta:1 | missing:r | standard conditions | fit:high",
+     "gen": "<a> Two dots on a spinning CD sweep the same angle, but the outer one covers far more ground. The distance it actually travels is s = r*theta. Double the radius and you double the arc.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>how do you find intensity for a spherical wave?</q><r>I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+     "gen": "<a> Walk away from a speaker and it gets quieter, but no sound went missing. The same power P is smeared over a bigger sphere, and a sphere has area 4*pi*r^2. So I = P/(4*pi*r^2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>what is rotational power?</q><r>P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
+     "gen": "<a> It is the straight-line power rule turned sideways: swap the push for a twist and the speed for a spin rate, and you get P = tau*omega. Hold the power fixed and you trade one for the other.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how omega is calculated.</q><r>omega=((theta)/(t)) | omega:1/s theta:1 t:s | missing:theta | standard conditions | fit:high",
+     "gen": "<a> Angular speed asks one thing: how fast is the angle changing. Sweep an angle theta in time t and omega = theta/t. Every point on a spinning disk shares that omega, even the rim that travels furthest.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>take what is molar heat capacity at constant pressure? Given R = 8.314..</q><r>C_p=C_V+R | C_p:J/(mol*K) C_V:J/(mol*K) R:J/(mol*K) | missing:C_V | standard conditions | fit:high",
+     "gen": "<a> Heat a gas in a sealed box and every joule goes into the gas. Let it expand at steady pressure and some of it goes into shoving the atmosphere out of the way, so you need more: C_p = C_V + R.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does period depend on?</q><r>T=((1)/(f)) | T:s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> Period and frequency are one fact said two ways, T = 1/f. Paid twice a month? That is the frequency. The half month of waiting between checks is the period. Count the events, or count the wait.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what does the work done by a constant force depend on?</q><r>W=F*d | W:J F:N d:m | missing:F | standard conditions | fit:high",
+     "gen": "<a> Carry a heavy bag across a room and you do no work on it. Work is W = F*d, force times the distance moved along that force. You pull up, the bag goes sideways, so none of it counts.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has what is the normal force? Given g = 9.81..</q><r>N=m*g | N:N m:kg g:m/s^2 | missing:m | standard conditions | fit:high",
+     "gen": "<a> The table pushes back. Sit still on a flat surface and your weight pulls down while the surface holds you up just as hard, so N = m*g. Tilt that surface and it stops being true.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what does I depend on?</q><r>I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+     "gen": "<a> Walk away from a speaker and it gets quieter, but no sound went missing. The same power P is smeared over a bigger sphere, and a sphere has area 4*pi*r^2. So I = P/(4*pi*r^2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>define A_act.</q><r>A_act=lambda*N | A_act:1/s lambda:1/s N:1 | missing:lambda | activity is decays per second, so it falls as the sample does | fit:high",
+     "gen": "<a> Activity counts decays per second: A_act = lambda*N. It depends on how many nuclei are left, so it falls as the sample does, on exactly the same curve.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>define t_half.</q><r>t_half=ln(2)/lambda | t_half:s lambda:1/s | missing:lambda | exponential decay only; the half-life does not depend on how much you started with | fit:high",
+     "gen": "<a> Half-life is the time to lose half of whatever you have: t_half = ln(2)/lambda. The ln(2) is there because halving is what we chose to measure; the physics is all in lambda.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what does motionally induced emf depend on?</q><r>epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:B | standard conditions | fit:high",
+     "gen": "<a> Slide a wire sideways through a magnetic field and a voltage shows up across its ends. That is epsilon = B*l*v: move faster, use a longer wire, or find a stronger field and you get more of it.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how wavelength in a medium of refractive index n is calculated.</q><r>lambda_n=((lambda)/(n)) | lambda_n:m lambda:m n:1 | missing:lambda | standard conditions | fit:high",
+     "gen": "<a> Light entering glass slows down but still arrives just as often, so the waves have to bunch up. lambda_n = lambda/n is that squeezed wavelength inside, where lambda is the vacuum value.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>How do you find heat transferred?</q><r>Q=m*c*dT | Q:J m:kg c:J/(kg*K) dT:K | missing:m | no phase change over the interval; at the melting point dT stays flat | fit:high",
+     "gen": "<a> Heat something and the energy it soaks up is Q = m*c*dT: more mass or a bigger temperature swing costs more joules. It quits at the melting point, where heat pours in and dT stays flat.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>State law of refraction (snell's law).</q><r>theta_2=asin(((n_1*sin(theta_1))/(n_2))) | theta_2:1 n_1:1 theta_1:1 n_2:1 | missing:n_1 | standard conditions | fit:high",
+     "gen": "<a> Stand a pencil in a glass of water and it looks snapped in two. Light kinks when it changes speed, and theta_2 = asin((n_1*sin(theta_1))/n_2) says by how much. Raise n_2 and the ray tips toward the perpendicular.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has how do you find normal force on an object on a horizontal surface? Given g = 9.81..</q><r>N=m*g | N:N m:kg g:m/s^2 | missing:m | standard conditions | fit:high",
+     "gen": "<a> The table pushes back. Sit still on a flat surface and your weight pulls down while the surface holds you up just as hard, so N = m*g. Tilt that surface and it stops being true.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>where how is energy quantum related to the other quantities? Given h = 6.626e-34.</q><r>Delta_E=h*f | Delta_E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> Light does not arrive in a smooth stream. It comes in packets, and Delta_E = h*f says a packet's energy is set by its frequency alone. Planck guessed it for hot glowing objects; Einstein saw what it meant.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what does the angular velocity depend on?</q><r>omega_f=omega_0+alpha*t | omega_f:1/s omega_0:1/s alpha:1/s^2 t:s | missing:omega_0 | constant angular acceleration | fit:high",
+     "gen": "<a> Push a merry-go-round at a steady rate and its spin climbs at a steady rate. omega_f = omega_0 + alpha*t. Take the spin it already had, then add alpha for every second you keep pushing.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Explain what F_D is.</q><r>F_D=((1)/(2))*C*rho*A*(v)^(2) | F_D:N C:1 rho:kg/m^3 A:m^2 v:m/s | missing:C | standard conditions | fit:high",
+     "gen": "<a> Move through air or water and it pushes back, harder the faster you go. Drag is F_D = (1/2)*C*rho*A*v^2, so doubling your speed quadruples the push. That is why a cyclist tucks.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>How do you find I_rms?</q><r>I_rms=((I_0)/(sqrt(2))) | I_rms:A I_0:A | missing:I_0 | standard conditions | fit:high",
+     "gen": "<a> AC current swings both ways, so its plain average is zero and tells you nothing. Square it, average that, take the root: I_rms = I_0/sqrt(2). It is the steady DC current that would heat the same.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is centripetal acceleration?</q><r>a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
+     "gen": "<a> Round a curve at steady speed and you are still accelerating, because your direction keeps changing. a = v^2/r points straight at the center. Centripetal is Latin for center seeking.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>How is N related to the other quantities?</q><r>N=N_0*exp(-lambda*t) | N:1 N_0:1 lambda:1/s t:s | missing:N_0 | a large sample, so the average is smooth; lambda is the decay constant, not a wavelength | fit:high",
+     "gen": "<a> Radioactive nuclei do not age. Each one has the same chance of going in the next second, so the population falls by the same FRACTION each second: N = N_0*exp(-lambda*t).<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Explain how torque is calculated.</q><r>tau=r*F | tau:N*m r:m F:N | missing:r | standard conditions | fit:high",
+     "gen": "<a> Push a merry-go-round near the middle and little happens. Push at the rim and it spins. Same force, bigger r. tau = r*F is twisting effort, and distance from the pivot counts as much as push.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what is angular position?</q><r>theta=((s)/(r)) | theta:1 s:m r:m | missing:s | theta in radians, which is what makes arc length equal r times the angle | fit:high",
+     "gen": "<a> Walk along a curve of radius r and cover arc length s. The angle you swept is theta = s/r. That is what a radian is, and since it is a length over a length, theta has no units at all.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does C depend on?</q><r>C=((Q)/(V)) | C:F Q:C V:V | missing:Q | standard conditions | fit:high",
+     "gen": "<a> Push charge onto a capacitor and the voltage climbs to match, so the ratio C = Q/V never budges. It tells you how much charge one volt buys, and that holds right up to the voltage where the gap arcs over.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>In one sentence, what is hooke's law?</q><r>F=-k*x | F:N k:N/m x:m | missing:k | restoring force, signed: negative means opposite to the displacement | fit:high",
+     "gen": "<a> Stretch a spring and it pulls back. Go twice as far and it pulls twice as hard: F = -k*x. The minus sign means the pull always aims back toward the relaxed position. A big k is a stiff spring.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Define velocity of a wave.</q><r>v=f*lambda | v:m/s f:Hz lambda:m | missing:f | standard conditions | fit:high",
+     "gen": "<a> A wave travels one whole wavelength in one cycle, so v = f*lambda is really just how far over how long. Count f crests going past you each second, and they arrive lambda apart.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>how is x related to the other quantities?</q><r>x=l-l_0 | x:m l:m l_0:m | missing:l | standard conditions | fit:high",
+     "gen": "<a> A spring does not care how long it is, only how much longer than it likes to be. x = l - l_0 is that difference: length now, minus its natural resting length. Squash it instead and x goes negative.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>in one sentence, what is lens/mirror equation (solved version)?</q><r>f=((d_i*d_o)/(d_o+d_i)) | f:m d_i:m d_o:m | missing:d_i | paraxial rays, close to the axis | fit:high",
+     "gen": "<a> Set an object at d_o, find where its image lands at d_i, and the optics tell you their own focal length: f = (d_i*d_o)/(d_o+d_i). It is the lens/mirror equation rearranged to hand you f.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Explain what total entropy change is.</q><r>Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:Delta_S_h | standard conditions | fit:high",
+     "gen": "<a> Entropy is not conserved, it piles up. Take the change at the hot end, add the change at the cold end: Delta_S_tot = Delta_S_h + Delta_S_c. For anything that really happens the total is positive.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain what the displacement is.</q><r>Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_f | standard conditions | fit:high",
+     "gen": "<a> Walk to the fridge and back and your displacement is zero, whatever your legs think. Delta_x = x_f - x_i only looks at the two endpoints, and the path you took between them appears nowhere in it.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>how is apparent depth related to the other quantities?</q><r>s_i=(((n_2)/(n_1)))*s_o | s_i:m n_2:1 n_1:1 s_o:m | missing:n_2 | flat refracting surface; s_i and s_o are AXIAL depths below the surface. Transverse magnification at a plane interface is exactly +1, so this relation must never be read as an image HEIGHT. | fit:high",
+     "gen": "<a> A coin on the pool floor looks nearer the surface than it is. s_i = (n_2/n_1)*s_o, with n_2 the stuff the coin sits in and n_2 the stuff your eye is in. Water under air, and it rises.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>The values are what does E depend on? Given c = 299800000..</q><r>E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:Delta_m | standard conditions | fit:high",
+     "gen": "<a> Weigh a nucleus, then weigh its protons and neutrons separately, and the loose parts come out heavier. That missing mass is Delta_m, and E = Delta_m*c^2 is the energy holding the thing together.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>Take . explain what binding energy is. Given h = 6.626e-34.</q><r>E_b=h*f_O | E_b:J h:J*s f_O:Hz | missing:f_O | standard conditions | fit:high",
+     "gen": "<a> Shine dim blue light on sodium and electrons jump off. Shine bright red light and nothing comes out at all. There is a threshold frequency f_O, and E_b = h*f_O is how tightly that electron was held.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>where explain what time of flight is. Given g = 9.81.</q><r>T_tof=((2(v_0*sin(theta_0)))/(g)) | T_tof:s v_0:m/s theta_0:1 g:m/s^2 | missing:v_0 | projectile returning to its launch height, no air resistance | fit:high",
+     "gen": "<a> Only the upward part of the launch matters. v_0*sin(theta_0) is the kick straight up, and gravity takes it away then hands it back, so T_tof = ((2(v_0*sin(theta_0)))/g): rise equals fall.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>define the angle of rotation.</q><r>Delta_theta=((Delta_s)/(r)) | Delta_theta:1 Delta_s:m r:m | missing:Delta_s | standard conditions | fit:high",
+     "gen": "<a> Take how far you moved along the curve and divide by how far out you were: Delta_theta = (Delta_s/r). Both are meters, so they cancel and the angle is a bare number. That is what a radian is.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does vertical position depend on?</q><r>y=y_0+((1)/(2))(v_0y+v_y)t | y:m y_0:m v_0y:m/s v_y:m/s t:s | missing:y_0 | constant acceleration, so the average velocity is half the sum of the ends | fit:high",
+     "gen": "<a> Speed up steadily and your average is just the halfway point between the start and the end. That is all this is: y = y_0+(1/2)(v_0y+v_y)t, halfway speed times t, on top of where you began.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>starting from define the magnetic field due to a long straight wire. Given mu_0 = 1.257e-06.</q><r>B=((mu_0*I)/(2*pi*R)) | B:T mu_0:T*m/A I:A R:m | missing:I | standard conditions | fit:high",
+     "gen": "<a> Push current down a wire and the space around it starts shoving on magnets. The field wraps the wire in circles, B = ((mu_0*I)/(2*pi*R)). Right thumb along the current, fingers curl the way B points.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>How is the angular frequency related to the other quantities?</q><r>omega=sqrt(((k)/(m))) | omega:1/s k:N/m m:kg | missing:k | standard conditions | fit:high",
+     "gen": "<a> Two things set the wobble rate and nothing else gets a vote. Stiffness speeds it up, mass drags it down, and omega = sqrt(k/m) is that tug of war. The root means mass has to grow a lot to slow it much.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Define the intensity.</q><r>I=((P)/(A)) | I:W/m^2 P:W A:m^2 | missing:P | standard conditions | fit:high",
+     "gen": "<a> Same power, spread thinner. I = P/A is watts divided by the area they land on, which is why a lens can scorch paper without adding any energy at all. It only shrinks A, and I climbs.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>how is extension related to the other quantities?</q><r>x=l-l_0 | x:m l:m l_0:m | missing:l | standard conditions | fit:high",
+     "gen": "<a> A spring does not care how long it is, only how much longer than it likes to be. x = l - l_0 is that difference: length now, minus its natural resting length. Squash it instead and x goes negative.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how intensity is calculated.</q><r>I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+     "gen": "<a> Walk away from a speaker and it gets quieter, but no sound went missing. The same power P is smeared over a bigger sphere, and a sphere has area 4*pi*r^2. So I = P/(4*pi*r^2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>explain how the capacitance is calculated. Starting from. Given epsilon_0 = 8.854e-12.</q><r>C=epsilon_0*((A)/(d)) | C:F epsilon_0:C^2/(N*m^2) A:m^2 d:m | missing:A | standard conditions | fit:high",
+     "gen": "<a> Capacitance is how much charge two plates hold per volt. Wide plates give charge room to spread out, close plates tug harder on each other, so C = epsilon_0*(A/d). Nothing else gets a say.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does common expression of ohm's law say?</q><r>V=I*R | V:V I:A R:ohm | missing:I | ohmic material at constant temperature; a diode does not obey it | fit:high",
+     "gen": "<a> Voltage is the push, current is the flow, resistance is how much the wire fights back. V = I*R ties the three together: same push against more resistance, and less current gets through.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>suppose what does time of flight depend on? Given g = 9.81..</q><r>T_tof=((2(v_0*sin(theta_0)))/(g)) | T_tof:s v_0:m/s theta_0:1 g:m/s^2 | missing:v_0 | projectile returning to its launch height, no air resistance | fit:high",
+     "gen": "<a> Only the upward part of the launch matters. v_0*sin(theta_0) is the kick straight up, and gravity takes it away then hands it back, so T_tof = ((2(v_0*sin(theta_0)))/g): rise equals fall.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does E depend on? The values. Given c = 299800000..</q><r>E=(Delta_m)(c)^(2) | E:J Delta_m:kg c:m/s | missing:Delta_m | standard conditions | fit:high",
+     "gen": "<a> Weigh a nucleus, then weigh its protons and neutrons separately, and the loose parts come out heavier. That missing mass is Delta_m, and E = Delta_m*c^2 is the energy holding the thing together.<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What is definition of electric potential?</q><r>V=((U_E)/(q)) | V:V U_E:J q:C | missing:U_E | standard conditions | fit:high",
+     "gen": "<a> Voltage is energy per unit charge, not energy. V = (U_E)/(q) divides out how much charge you brought, so what is left describes the spot itself, and any charge dropped there gets that much per coulomb.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how P is calculated.</q><r>P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
+     "gen": "<a> It is the straight-line power rule turned sideways: swap the push for a twist and the speed for a spin rate, and you get P = tau*omega. Hold the power fixed and you trade one for the other.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>define photon wavelength from energy. For. Given c = 299800000, h = 6.626e-34.</q><r>lambda=((h*c)/(E)) | lambda:m h:J*s c:m/s E:J | missing:E | standard conditions | fit:high",
+     "gen": "<a> Ask a photon how much energy it carries and you have asked its wavelength too: lambda = (h*c)/E locks the two together. Violet carries more energy per photon than red, so violet's wave is the shorter one.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What does relationship between frequency and period say?</q><r>f=((1)/(T)) | f:Hz T:s | missing:T | standard conditions | fit:high",
+     "gen": "<a> Count how many waves go past each second and you have f. Time one single wave and you have T. Same fact, flipped over: f = 1/T. Double how often it repeats and the period is cut in half.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Explain how centripetal force is calculated.</q><r>F_c=m*a_c | F_c:N m:kg a_c:m/s^2 | missing:m | standard conditions | fit:high",
+     "gen": "<a> Centripetal force is not a new kind of force. It is the name for whatever is already pulling you inward: rope tension, road friction, Earth's pull on the Moon. Whatever does the job, F_c = m*a_c.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is newton's law of universal gravitation? If. Given G = 6.674e-11.</q><r>F=G*m1*m2/(r)^(2) | F:N G:N*m^2/kg^2 m1:kg m2:kg r:m | missing:m1 | standard conditions | fit:high",
+     "gen": "<a> You and this calculator are pulling on each other right now. F = G*m1*m2/r^2 says every pair of masses does, and the pull dies fast: back off to twice the distance, get a quarter the force.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>You are told . what is the approximate time? Given h = 6.626e-34.</q><r>Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:E | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
+     "gen": "<a> Quantum rules let a particle flicker into being with energy E so long as it disappears fast enough. Delta_t = h/E is that deadline, with h Planck's constant. Borrow more energy, get less time to repay it.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has . what does the magnetic field due to a long straight wire depend on? Given mu_0 = 1.257e-06.</q><r>B=((mu_0*I)/(2*pi*R)) | B:T mu_0:T*m/A I:A R:m | missing:I | standard conditions | fit:high",
+     "gen": "<a> Push current down a wire and the space around it starts shoving on magnets. The field wraps the wire in circles, B = ((mu_0*I)/(2*pi*R)). Right thumb along the current, fingers curl the way B points.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>define the horizontal position under constant velocity.</q><r>x=x_0+v_x*t | x:m x_0:m v_x:m/s t:s | missing:x_0 | standard conditions | fit:high",
+     "gen": "<a> Nothing pushes it sideways, so it just keeps going. Start at x_0, add v_x for every second that passes: x = x_0 + v_x*t. This is the horizontal half of a projectile, coasting the whole flight.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>What is the arc length?</q><r>s=r*theta | s:m r:m theta:1 | missing:r | standard conditions | fit:high",
+     "gen": "<a> Two dots on a spinning CD sweep the same angle, but the outer one covers far more ground. The distance it actually travels is s = r*theta. Double the radius and you double the arc.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has . what does beta depend on? Given I_0 = 1e-12.</q><r>beta=10*log(((I)/(I_0))) | beta:1 I:W/m^2 I_0:W/m^2 | missing:I | I_0 is the threshold of hearing, 1e-12 W/m^2, which is what makes 0 dB mean 'just audible' | fit:high",
+     "gen": "<a> Hearing is logarithmic, so the decibel scale is too: beta = 10*log(I/I_0). Ten times the intensity is only 10 dB more, which is why a rock concert is not a thousand times louder than speech.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how intensity for a spherical wave is calculated.</q><r>I=((P)/(4*pi*(r)^(2))) | I:W/m^2 P:W r:m | missing:P | isotropic source, nothing absorbing the wave | fit:high",
+     "gen": "<a> Walk away from a speaker and it gets quieter, but no sound went missing. The same power P is smeared over a bigger sphere, and a sphere has area 4*pi*r^2. So I = P/(4*pi*r^2).<end>",
+     "ok": false
+    },
+    {
+     "prompt": "<q>What does the electrical power depend on?</q><r>P=(((V)^(2))/(R)) | P:W V:V R:ohm | missing:V | standard conditions | fit:high",
+     "gen": "<a> At a wall outlet the voltage is fixed, so the only thing setting how bright a bulb burns is its own resistance: P = V^2/R. Lower R, more power, hotter filament. That is the whole difference between bulbs.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Take . define energy difference from a frequency difference. Given h = 6.626e-34.</q><r>Delta_E=h*Delta_f | Delta_E:J h:J*s Delta_f:Hz | missing:Delta_f | standard conditions | fit:high",
+     "gen": "<a> Energy in light comes in lumps, not a smooth stream. Step up in frequency by Delta_f and the energy step is Delta_E = h*Delta_f. Planck got h from glowing hot objects and did not believe it himself.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Explain what the force is.</q><r>F=((m*Delta_v)/(Delta_t)) | F:N m:kg Delta_v:m/s Delta_t:s | missing:m | constant mass, and Delta_t is the interval over which the force acts | fit:high",
+     "gen": "<a> Force is about how fast momentum changes: F = (m*Delta_v)/(Delta_t). Same mass, same change in speed, but spread over a longer Delta_t and F drops. That is the entire job of an airbag.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what does v depend on?</q><r>v=sqrt(((v_x))^(2)+((v_y))^(2)) | v:m/s v_x:m/s v_y:m/s | missing:v_x | two perpendicular components; the magnitude is never negative | fit:high",
+     "gen": "<a> Two perpendicular components make a right triangle, so the vector itself is the hypotenuse: v = sqrt(v_x^2 + v_y^2). Three sideways and four up is five, not seven.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>define kinetic energy.</q><r>K=0.5*m*(v)^(2) | K:J m:kg v:m/s | missing:m | standard conditions | fit:high",
+     "gen": "<a> Double your speed and you carry four times the energy, not twice. That squared v in K = 0.5*m*v^2 is the whole story. Mass counts too, but speed is the one that punishes you for it.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how sound intensity level is calculated. A system has. Given I_0 = 1e-12.</q><r>beta=10*log(((I)/(I_0))) | beta:1 I:W/m^2 I_0:W/m^2 | missing:I | I_0 is the threshold of hearing, 1e-12 W/m^2, which is what makes 0 dB mean 'just audible' | fit:high",
+     "gen": "<a> Hearing is logarithmic, so the decibel scale is too: beta = 10*log(I/I_0). Ten times the intensity is only 10 dB more, which is why a rock concert is not a thousand times louder than speech.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how the displacement is calculated.</q><r>Delta_x=x_f-x_i | Delta_x:m x_f:m x_i:m | missing:x_f | standard conditions | fit:high",
+     "gen": "<a> Walk to the fridge and back and your displacement is zero, whatever your legs think. Delta_x = x_f - x_i only looks at the two endpoints, and the path you took between them appears nowhere in it.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>For explain how absolute pressure is calculated. Given p_atm = 101300.</q><r>p_abs=p_g+p_atm | p_abs:Pa p_g:Pa p_atm:Pa | missing:p_g | standard conditions | fit:high",
+     "gen": "<a> A flat tire still has air in it. The gauge reads zero because it only counts what is above the air around it, and p_abs = p_g + p_atm adds that air back to give the real pressure.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Explain how wave speed from wavelength and period is calculated.</q><r>v=((lambda)/(T)) | v:m/s lambda:m T:s | missing:lambda | standard conditions | fit:high",
+     "gen": "<a> A wave moves forward exactly one wavelength every period. That is all v = lambda/T says. Watch a gull on the swell: it bobs once while the crest under it slides to where the next crest was.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>How do you find the rotational power?</q><r>P=tau*omega | P:W tau:N*m omega:1/s | missing:tau | standard conditions | fit:high",
+     "gen": "<a> It is the straight-line power rule turned sideways: swap the push for a twist and the speed for a spin rate, and you get P = tau*omega. Hold the power fixed and you trade one for the other.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>how do you find tangential speed?</q><r>v_t=r*omega | v_t:m/s r:m omega:1/s | missing:r | standard conditions | fit:high",
+     "gen": "<a> Stand on the equator and Earth's spin carries you along quickly; stand near a pole and it hardly moves you, though the whole planet turns together. v_t = r*omega, and r is your distance from the axis.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>how is uniform acceleration related to the other quantities?</q><r>a=(vf-vi)/t | a:m/s^2 vf:m/s vi:m/s t:s | missing:vf | constant acceleration; otherwise this is the average over t | fit:high",
+     "gen": "<a> Acceleration is how fast your speed is changing. a = (vf-vi)/t: the speed you ended with, minus the one you started with, over the time it took. Slow down instead and a comes out negative.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>with explain what E is. Given h = 6.626e-34.</q><r>E=h*f | E:J h:J*s f:Hz | missing:f | standard conditions | fit:high",
+     "gen": "<a> Light does not arrive in a smooth stream. It comes in packets, and E = h*f says a packet's energy is set by its frequency alone. Planck guessed it for hot glowing objects; Einstein saw what it meant.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what does kirchhoff junction rule say?</q><r>I_1=I_2+I_3 | I_1:A I_2:A I_3:A | missing:I_2 | standard conditions | fit:high",
+     "gen": "<a> Charge does not pile up at a wire joint, any more than water piles up in a pipe tee. What flows in flows out: I_1 = I_2 + I_3. That is conservation of charge, written for one junction.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>explain how equivalent resistance of two resistors in series is calculated.</q><r>R_eqv=R_1+R_2 | R_eqv:ohm R_1:ohm R_2:ohm | missing:R_1 | resistors in series, with nothing branching off between them | fit:high",
+     "gen": "<a> In series there is one path only, so the same current goes through both and their voltage drops add. Hence R_eqv = R_1+R_2. Add more bulbs to a series string and every one of them dims.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>How is the centripetal acceleration related to the other quantities?</q><r>a=(v)^(2)/r | a:m/s^2 v:m/s r:m | missing:v | standard conditions | fit:high",
+     "gen": "<a> Round a curve at steady speed and you are still accelerating, because your direction keeps changing. a = v^2/r points straight at the center. Centripetal is Latin for center seeking.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>what is magnitude of magnetic force?</q><r>F=q*v*B*sin(theta) | F:N q:C v:m/s B:T theta:1 | missing:q | standard conditions | fit:high",
+     "gen": "<a> A charge sitting still feels nothing from a magnet. Get it moving across the field and it does: F = q*v*B*sin(theta), where theta is the angle between v and B. Line v up with B and it dies.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Suppose explain relativistic doppler effect for frequency. Given c = 299800000..</q><r>f_obs=f_s*sqrt(((1-((v)/(c)))/(1+((v)/(c))))) | f_obs:Hz f_s:Hz v:m/s c:m/s | missing:f_s | standard conditions | fit:high",
+     "gen": "<a> Light from something running away arrives lower in frequency. f_obs = f_s*sqrt((1-v/c)/(1+v/c)), and v counts positive for receding, so the bracquet drops under one and the color slides red.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>A system has explain how the pressure is calculated. Given g = 9.81, p_0 = 101300..</q><r>p=p_0+rho*g*h | p:Pa p_0:Pa rho:kg/m^3 g:m/s^2 h:m | missing:rho | standard conditions | fit:high",
+     "gen": "<a> Your ears hurt at the deep end because a column of water is sitting on you. p = p_0 + rho*g*h adds that weight to the air already pressing down. Only the depth h matters, not the pool shape.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>Define the frequency of a mass-spring system in shm.</q><r>f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:k | standard conditions | fit:high",
+     "gen": "<a> Pluck a guitar string gently or hard and the note does not change. Amplitude is nowhere in f = (1/(2*pi))*sqrt(k/m). Only the stiffness k and the mass m are, and nothing else gets a say.<end>",
+     "ok": true
+    },
+    {
+     "prompt": "<q>With what does approximate time depend on? Given h = 6.626e-34.</q><r>Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:E | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
+     "gen": "<a> Quantum rules let a particle flicker into being with energy E so long as it disappears fast enough. Delta_t = h/E is that deadline, with h Planck's constant. Borrow more energy, get less time to repay it.<end>",
+     "ok": true
+    }
+   ]
+  },
+  "explain_ho": {
+   "k": 0,
+   "n": 0,
+   "unreachable": 82
+  }
+ }
+}

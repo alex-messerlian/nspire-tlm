@@ -40,3 +40,6 @@ paper/latex/*.blg
 paper/latex/*.log
 paper/latex/*.out
 paper/figures/*.png
+
+# int8 exports for host scoring on the device decoder (regenerable)
+build/int8/

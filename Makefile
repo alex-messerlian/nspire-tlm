@@ -66,7 +66,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck $(BUILD)/devprompt
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck $(BUILD)/devprompt $(BUILD)/devasm
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -207,6 +207,8 @@ $(BUILD)/rankcli:        tools/eval/rankcli.c      src/store/askparse.c src/stor
 # for the pane (they were removed once for exactly that) and not found by the shortlist.
 $(BUILD)/devprompt:      tools/eval/devprompt.c    src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
+$(BUILD)/devasm:         tools/eval/devasm.c       src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c -lm
 $(BUILD)/promptcheck:    tools/eval/promptcheck.c  src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c src/store/gfx.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c src/store/gfx.c -lm
 $(BUILD)/keycost:        tools/eval/keycost.c      src/store/pickui.c src/store/picker.c src/store/askparse.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
@@ -256,6 +258,16 @@ $(BUILD)/test_ckpt: tools/eval/test_ckpt.c src/runq_nspire.c | $(BUILD)
 # moved the device to another group size, and the two would disagree while both looked correct.
 # The golden's whole job is to catch exactly that kind of silent divergence.
 GS_SRC := $(shell grep -oE '^\#define FIXED_GS [0-9]+' src/runq_nspire.c | grep -oE '[0-9]+$$')
+
+# The calculator's generation loop on the host -- int8 engine, tool injection, the shipped
+# answer_states_result -- so a quality number can be attached to what the device decodes.
+$(BUILD)/int8gen: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -I $(BUILD) -DFIXED_GS=$(GS_SRC) -o $@ $< src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) -lm
+
+# The same loop at group 16, which divides every row length at widths 176 and 352 -- the control
+# for the row-alignment defect, and the decoder the width ladder is scored on.
+$(BUILD)/int8gen_g16: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -I $(BUILD) -DFIXED_GS=16 -o $@ $< src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) -lm
 
 $(BUILD)/golden_forward: tools/eval/golden_forward.c src/runq_nspire.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -DFIXED_GS=$(GS_SRC) -o $@ $< -lm
