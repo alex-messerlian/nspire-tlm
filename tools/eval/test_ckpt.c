@@ -129,6 +129,27 @@ int main(void) {
         T("wrong group size is REJECTED", rc != 0, why);
     }
 
+    /* 8b. A143. AN ODD HEAD SIZE. n_heads is Config field 4, at offset 8 + 3*4 = 20. With 32 heads
+     *     the shipped dim 352 gives head_size 11. The forward pass would run and pair dimensions
+     *     ACROSS heads in RoPE; the probe must refuse it.
+     *
+     *     The reason is asserted, not just the exit code. Changing n_heads also changes the
+     *     expected file size, so the size check would reject this file too -- a test that only
+     *     looked at rc would pass with the head-size check deleted, which is exactly the
+     *     survived-control shape this repo keeps finding. */
+    {   const char *p = forge("oddhead", real, 20, 32, 1);
+        why[0] = 0;
+        int rc = p ? rq_probe(p, why, sizeof why) : -1;
+        T("odd head size is REJECTED, for that reason", rc != 0 && strstr(why, "odd") != NULL, why);
+    }
+    /*     And a head count that does not divide dim at all (352 / 5). */
+    {   const char *p = forge("baddiv", real, 20, 5, 1);
+        why[0] = 0;
+        int rc = p ? rq_probe(p, why, sizeof why) : -1;
+        T("heads not dividing dim is REJECTED, for that reason",
+          rc != 0 && strstr(why, "divisible") != NULL, why);
+    }
+
     /* 9. A missing file must report, not crash. */
     T("absent file is REJECTED", rq_probe("/tmp/definitely_not_here.bin", why, sizeof why) != 0, why);
 

@@ -434,6 +434,24 @@ int rq_probe(const char *path, char *why, int cap) {
     if (c.dim <= 0 || c.n_heads <= 0 || c.n_layers <= 0 || c.vocab_size <= 0 || c.hidden_dim <= 0) {
         snprintf(why, cap, "config has a non-positive dimension"); return 1;
     }
+    /* A143. THE HEAD SIZE MUST BE EVEN, AND NOTHING CHECKED IT.
+     *
+     * The RoPE loop in forward() walks `i` over the whole of `dim` in steps of 2 and rotates the
+     * pair (i, i+1). When head_size is odd those pairs STRADDLE HEADS: at head_size 33, the pair
+     * (32, 33) rotates the last dimension of head 0 together with the first dimension of head 1.
+     * The engine computes a position encoding that belongs to no trainable model, and says
+     * nothing. PyTorch refuses the same shape outright (RoPE reshapes to (..., -1, 2)).
+     *
+     * Found because a d264, 8-head sweep checkpoint (head_size 33) timed without complaint while
+     * training the same shape in PyTorch failed in 36 seconds. Every shipped and trained model has
+     * an even head size (22, 44), so no shipped output was ever affected -- this closes the door. */
+    if (c.dim % c.n_heads) {
+        snprintf(why, cap, "dim %d is not divisible by %d heads", c.dim, c.n_heads); return 1;
+    }
+    if ((c.dim / c.n_heads) % 2) {
+        snprintf(why, cap, "head size %d is odd; RoPE rotates dimension pairs", c.dim / c.n_heads);
+        return 1;
+    }
     long long want = rq_expected_size(&c, shared, gs);
     /* EXACT, not a lower bound. A file LARGER than the layout is as wrong as a short one: it means
      * the Config and the payload disagree, and the weights would be read at the wrong offsets. */

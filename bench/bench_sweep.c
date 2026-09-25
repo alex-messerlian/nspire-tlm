@@ -55,7 +55,8 @@ FILE *g_nspire_log = 0;
 static const char *SHAPES[] = {
     "m352.bin.tns",   /* control A: same shape, seed 1 */
     "m176.bin.tns",
-    "m264.bin.tns",
+    "m264.bin.tns",   /* 8 heads, head_size 33: the engine must now REFUSE it (A143) */
+    "m264h6.bin.tns", /* 6 heads, head_size 44: the trainable d264 -- replaces the row above */
     "m440.bin.tns",
     "m352b.bin.tns",  /* control B: same shape, seed 99 */
 };
