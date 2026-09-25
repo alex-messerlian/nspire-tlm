@@ -92,3 +92,20 @@ explicitly so that a good d264 result cannot quietly become a shipping decision 
     RUN=w352 SEED=1 DIM=352 LAYERS=6 HEADS=8 SEQ=512 BS=24 STEPS=8000 .venv-tok/bin/python train/select_run.py
 
 Then `score_arms` against each, with `TOK=` pinned to the tokenizer they were trained with.
+
+
+## Amendment 2 (2026-09-24, before the runs): a second training seed
+
+Seed 1 found `d1` -2.5 pp and `explain` -69.3 pp from d352 to d176. That headline rests on ONE
+training run per width, and the first question a reviewer will ask is whether it is seed noise.
+
+**Added:** `SEED=2` at both widths. Everything else identical to seed 1, and verified before launch:
+`corpus_sha acdc7b70cef192b7`, `tok_sha c60e1250c64df27e`.
+
+**What would change the conclusion, stated now:** the dissociation stands if, at seed 2, d176's
+`d1` drop stays under 10 pp AND its `explain` drop stays over 40 pp. If either fails, the paper
+reports the two seeds side by side and says the effect is seed-sensitive -- it does not average
+them into a result that neither seed showed.
+
+    RUN=w176s2 SEED=2 DIM=176 LAYERS=6 HEADS=8 SEQ=512 BS=24 STEPS=8000 .venv-tok/bin/python train/select_run.py
+    RUN=w352s2 SEED=2 DIM=352 LAYERS=6 HEADS=8 SEQ=512 BS=24 STEPS=8000 .venv-tok/bin/python train/select_run.py
