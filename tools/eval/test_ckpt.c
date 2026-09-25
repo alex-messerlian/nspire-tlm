@@ -150,6 +150,17 @@ int main(void) {
           rc != 0 && strstr(why, "divisible") != NULL, why);
     }
 
+    /*     A151. A row length the group does not divide (hidden_dim 1000 at the file's group): the
+     *     engine would skip the remainder of every row. Asserted on the REASON, not only the refusal,
+     *     because a changed hidden_dim also breaks the size check -- a test that looked only at rc
+     *     would pass with the row check deleted. hidden_dim is the second config int, offset 12. */
+    {   const char *p = forge("rowalign", real, 12, 1000, 1);
+        why[0] = 0;
+        int rc = p ? rq_probe(p, why, sizeof why) : -1;
+        T("a row length the group does not divide is REJECTED, for that reason",
+          rc != 0 && strstr(why, "row length") != NULL, why);
+    }
+
     /* 9. A missing file must report, not crash. */
     T("absent file is REJECTED", rq_probe("/tmp/definitely_not_here.bin", why, sizeof why) != 0, why);
 

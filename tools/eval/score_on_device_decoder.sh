@@ -4,15 +4,21 @@
 #
 #   tools/eval/score_on_device_decoder.sh <group> <checkpoint.pt>...
 #
-# group 88 is what ships; group 16 divides every row length at widths 176 and 352 and is the
-# control for the row-alignment defect (docs/RESULT_CORRECTNESS.md). Exports go to build/int8/
+# The engine's own group (FIXED_GS, 32 since A151) is what ships; group 16 divides every row length
+# at widths 176 and 352 and scores the width ladder. Group 88, the defective layout, is no longer
+# buildable: rq_probe refuses it (docs/RESULT_CORRECTNESS.md s4). Exports go to build/int8/
 # (gitignored); results to results/{correct,arms}_int8_g<group>_<name>.json.
 set -euo pipefail
 G="${1:?usage: score_on_device_decoder.sh <group> <checkpoint.pt>...}"; shift
 PY=.venv-tok/bin/python
 make -s build/devasm build/int8gen build/int8gen_g16
-BIN=build/int8gen; [ "$G" = 16 ] && BIN=build/int8gen_g16
-[ "$G" = 88 ] || [ "$G" = 16 ] || { echo "no decoder built for group $G"; exit 2; }
+# build/int8gen is compiled at the ENGINE's group (FIXED_GS in src/runq_nspire.c, what ships);
+# build/int8gen_g16 at CONTROL_GS. Any other group has no decoder, and is refused rather than run on
+# a binary whose compiled group does not match the file.
+SHIP_GS=$(grep -oE '^#define FIXED_GS [0-9]+' src/runq_nspire.c | grep -oE '[0-9]+$')
+if [ "$G" = "$SHIP_GS" ]; then BIN=build/int8gen
+elif [ "$G" = 16 ]; then BIN=build/int8gen_g16
+else echo "no decoder built for group $G (engine is $SHIP_GS, control is 16)"; exit 2; fi
 mkdir -p build/int8
 for CK in "$@"; do
   NAME=$(basename "$CK" .pt); OUT=build/int8/${NAME}_g${G}.bin

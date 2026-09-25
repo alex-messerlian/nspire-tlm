@@ -48,7 +48,7 @@
  * and tools/nspire-cli/push-all.sh compares the two before sending. Changing this means
  * re-exporting the checkpoint.
  */
-#define FIXED_GS 88
+#define FIXED_GS 32
 #endif
 #define GS FIXED_GS   /* compile-time: removes two __divsi3 per group */
 #else
@@ -450,6 +450,22 @@ int rq_probe(const char *path, char *why, int cap) {
     }
     if ((c.dim / c.n_heads) % 2) {
         snprintf(why, cap, "head size %d is odd; RoPE rotates dimension pairs", c.dim / c.n_heads);
+        return 1;
+    }
+    /* A151. EVERY ROW LENGTH MUST BE A MULTIPLE OF THE GROUP, AND NOTHING CHECKED IT.
+     *
+     * quantize() and matmul() walk each row in steps of GS and IGNORE the remainder, and matmul
+     * reads each chunk's scale as w->s[(i*n + j) / GS]. That is correct only when GS divides the row
+     * length n. The row lengths are dim (every matrix but w2) and hidden_dim (w2). The exporter chose
+     * group 88 because it divides every TENSOR length, and at dim 352 / hidden 1024 it does not divide
+     * 1024: every layer ignored 56 of 1,024 hidden inputs and applied a neighbouring group's scale to
+     * part of each chunk. The shipped model lost 9.2 points of strict accuracy to it
+     * (docs/RESULT_CORRECTNESS.md s4), and host/device parity could not see it because both sides run
+     * this code. Refused here, before the size check, so the reason names the real defect. */
+    if (gs <= 0 || c.dim % gs || c.hidden_dim % gs) {
+        int bad = (gs > 0 && c.dim % gs) ? c.dim : c.hidden_dim;
+        snprintf(why, cap, "group %d does not divide row length %d; the engine would ignore %d "
+                 "inputs per row", gs, bad, gs > 0 ? bad % gs : bad);
         return 1;
     }
     long long want = rq_expected_size(&c, shared, gs);

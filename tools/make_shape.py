@@ -16,11 +16,22 @@ and bench_sweep times both. If weights mattered the two would differ.
 Written directly in V2 rather than via legacy fp32 + tools/legacy_to_q80.py, because that path
 quantises in pure Python over millions of values and the values here are arbitrary anyway.
 """
-import argparse, math, random, struct
+import argparse
+import re, math, random, struct
 from pathlib import Path
 
 MAGIC = 0x616b3432
 GROUP_MAX, GROUP_FLOOR = 96, 32
+
+
+def engine_group() -> int:
+    """FIXED_GS as the engine source declares it -- one source of truth, never a typed default. A
+    hardcoded 88 here would keep producing group-88 shapes after the engine moved (A151)."""
+    src = (Path(__file__).resolve().parents[1] / "src/runq_nspire.c").read_text()
+    m = re.search(r"^#define FIXED_GS (\d+)", src, re.M)
+    if not m:
+        raise SystemExit("ABORT: no '#define FIXED_GS' in src/runq_nspire.c")
+    return int(m.group(1))
 
 
 def hidden_for(dim: int) -> int:
@@ -36,16 +47,16 @@ def pick_group(lengths, force: int | None = None) -> int:
     any other group is refused at load with "GS n, built for 88" -- measured: a first sweep
     shipped d192/d256/d416 at groups 96/64/64 and three of five shapes were unloadable.
 
-    So the shape ladder is not free. dim*dim must divide 88 = 2^3 * 11, which needs dim divisible
-    by 44, and the head count needs dim divisible by 8: dim must be a multiple of 88.
+    So the shape ladder is not free: every tensor length AND every row length (dim and hidden, A151)
+    must be a multiple of the group. At the row-aligned group 32, with eight heads, dim may be any
+    multiple of 32 whose 8/3-rounded hidden width is also one: 192, 224, 256, ..., 448.
     """
     if force is not None:
         bad = sorted(L for L in lengths if L % force)
         if bad:
             raise SystemExit(
                 f"ABORT: group {force} does not divide tensor lengths {bad}. The engine is built "
-                f"for FIXED_GS {force} and would refuse this checkpoint at load. For heads=8, "
-                f"dim must be a multiple of 88.")
+                f"for FIXED_GS {force} and would refuse this checkpoint at load.")
         return force
     return _largest_group(lengths)
 
@@ -76,7 +87,9 @@ def build(dim, layers, heads, vocab, seq, seed, out: Path, group_force=None):
     quant_lens = ([vocab * dim]
                   + [dim * dim] * (4 * layers)          # wq wk wv wo
                   + [dim * hidden] * (3 * layers))      # w1 w2 w3
-    group = pick_group(set(quant_lens), group_force)
+    # A151: the ROW lengths (dim, hidden) must be multiples of the group too -- the engine groups
+    # each row from its start and ignores any remainder. rq_probe refuses a file that violates it.
+    group = pick_group(set(quant_lens) | {dim, hidden}, group_force)
 
     with out.open("wb") as o:
         o.write(struct.pack("I", MAGIC))
@@ -117,8 +130,9 @@ if __name__ == "__main__":
     p.add_argument("--vocab", type=int, default=4096)
     p.add_argument("--seq", type=int, default=512)
     p.add_argument("--seed", type=int, default=1)
-    p.add_argument("--group", type=int, default=88,
-                   help="demand this group size; 88 is what the engine is built for. "
+    p.add_argument("--group", type=int, default=engine_group(),
+                   help="demand this group size; the default is FIXED_GS read from "
+                        "src/runq_nspire.c, what the engine is built for. "
                         "Pass 0 to let the largest valid group be chosen instead.")
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args()

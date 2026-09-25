@@ -41,27 +41,28 @@ FILE *g_nspire_log = 0;
 
 /* Smallest first, so a shape that cannot load does not cost the rows after it. The repeated
  * shape is deliberate -- see the header. */
-/* EVERY DIM HERE IS A MULTIPLE OF 88, and that is a constraint, not a preference.
+/* EVERY DIM HERE IS A MULTIPLE OF 32, AND SO IS EVERY HIDDEN WIDTH (A151).
  *
- * FIXED_GS is 88 in src/runq_nspire.c, compile-time, so the hot loop loses two __divsi3 per
- * group. A checkpoint quantised at any other group is refused at load. The first version of this
- * sweep used d192/d256/d416, whose tensor lengths take groups 96/64/64, and THREE OF FIVE SHAPES
- * WERE UNLOADABLE -- "GS 96, built for 88". dim*dim must divide 88 = 2^3 * 11 (so dim divisible
- * by 44) and heads need dim divisible by 8, which leaves multiples of 88.
+ * FIXED_GS is compile-time in src/runq_nspire.c, and since A151 rq_probe refuses any checkpoint
+ * whose ROW lengths (dim and hidden) the group does not divide: quantize() and matmul() ignore a
+ * row's remainder. The old group 88 divided every tensor but not the 1,024-wide rows of the shipped
+ * model, which ignored 56 of 1,024 hidden inputs per layer. Group 32 admits, at eight heads, every
+ * width whose 8/3-rounded hidden width is a multiple of 32: 192, 224, 256, ..., 448.
  *
- * No shape above the ceiling is listed. heap_ceiling() measures that directly and to the
- * kilobyte; shipping a 24 MB checkpoint to watch it fail was both indirect and, as it turned out,
- * untransferable -- the push stalled at 7.5 minutes having used 0.11 s of CPU. */
+ * The trained model is read from the app's own folder rather than kept as a second 11.7 MB copy in
+ * /sweep: a name starting with '/' is used as given.
+ *
+ * m384 is the memory test. Its checkpoint (13.1 MiB) and its KV cache (9.0 MiB) each fit under the
+ * largest single block (21.53 MiB) and together exceed it, so whether it loads measures the two-block
+ * limit that has only been bracketed (between 21.53 and 26.87 MiB). LAST, because if it passes the
+ * memory test it is loaded for real. */
 static const char *SHAPES[] = {
-    "m352.bin.tns",   /* control A: same shape, seed 1 */
-    "m176.bin.tns",
-    "m264.bin.tns",   /* 8 heads, head_size 33: the engine must now REFUSE it (A143) */
-    "m264h6.bin.tns", /* 6 heads, head_size 44: the trainable d264 -- replaces the row above */
-    "m352b.bin.tns",  /* control B: same shape, seed 99 */
-    "m440h10.bin.tns", /* 10 heads, head size 44: the TRAINABLE d440. LAST: if it passes the
-                          memory test the bench loads it for real, and a failed load exits the process. The 8-head m440 had head size
-                          55 and is refused by rq_probe (A144 session), so its memory result was
-                          measured on a shape no one could train. */
+    "/documents/tlm/model4096.bin.tns", /* control A: the TRAINED shipped d352, group 32 */
+    "m192.bin.tns",
+    "m256.bin.tns",
+    "m320.bin.tns",
+    "m352b.bin.tns",  /* control B: same shape as A, random weights, seed 99 */
+    "m384.bin.tns",   /* the two-block memory test -- see above */
 };
 #define NSHAPES ((int)(sizeof SHAPES / sizeof SHAPES[0]))
 
@@ -125,7 +126,8 @@ int main(void) {
                                  "us_per_pos");
 
     for (int i = 0; i < NSHAPES; i++) {
-        snprintf(PATHBUF, sizeof PATHBUF, "/documents/sweep/%s", SHAPES[i]);
+        if (SHAPES[i][0] == '/') snprintf(PATHBUF, sizeof PATHBUF, "%s", SHAPES[i]);
+        else snprintf(PATHBUF, sizeof PATHBUF, "/documents/sweep/%s", SHAPES[i]);
 
         /* --- does the file exist, and how big is it --- */
         long fsz = 0;

@@ -20,6 +20,7 @@
 #include "../../tools/eval/eval.h"
 #include "toolrun.h"
 #include "shapecheck.h"
+#include "gencore.h"
 
 /* ---- elapsed time -------------------------------------------------------------------------------
  * The status line reports how long a turn took, and this project does not put unmeasured numbers on
@@ -346,7 +347,6 @@ static int answer_states_result(const char *ans, const char *res) {
     return 0;
 }
 
-static int argmax(const float *v, int n) { int b = 0; for (int i = 1; i < n; i++) if (v[i] > v[b]) b = i; return b; }
 
 /* Tool execution lives in toolrun.c so the shipping code can be verified on the host against
  * evalcli, instead of only by a device round-trip. See src/store/toolrun.h. */
@@ -411,6 +411,93 @@ static int resolve_data_dir(ns_store2 *st, char *why, int wcap) {
 }
 
 const ns_store2 *app_store(void) { return ST.n ? &ST : 0; }
+
+/* ---- generation hooks: presentation around src/store/gencore.c ------------------------------ */
+typedef struct {
+    int wrote;                  /* "<a>" seen: the status line says the answer is being written */
+    const char *prompt;         /* for the structural call check, which reads prompt + document */
+    char *tool_call;            /* the call's display label, reported in the final status line */
+    int *shape_bad;
+    char *shape_reason;
+} app_gen_ctx;
+
+static void gen_on_prefill(void *ctx, int done, int total) {
+    (void)ctx;
+    /* THE PREFILL REPAINTS, and it has to: reading a 51-token prompt is 51 forward passes at the
+     * measured 1.753 tok/s, so the app sat with a frozen screen for ~29 seconds before the first
+     * generated token. A draw costs a fraction of one forward pass, so this is progress for free. */
+    char pr[40];
+    snprintf(pr, sizeof pr, "%d%%", (100 * done) / (total > 0 ? total : 1));
+    app_status("Reading", pr);
+    app_draw();
+    if (done == total) { app_status("Thinking", 0); app_draw(); }
+}
+
+static void gen_on_token(void *ctx, int tok) {
+    app_gen_ctx *c = ctx;
+    char piece[64];
+    ns_tok_decode(&TK, &tok, 1, piece, sizeof piece);
+    app_stream_token(piece);
+    if (!c->wrote && strstr(piece, "<a>")) { c->wrote = 1; app_status("Writing the answer", 0); }
+    app_draw();                          /* stream: one repaint per token */
+}
+
+static void gen_on_tool_begin(void *ctx, const char *span) {
+    app_gen_ctx *c = ctx;
+    /* Say what is being run BEFORE running it: a frozen screen with no explanation is the failure
+     * mode this whole line exists to prevent. */
+    tlm_call_label(span, c->tool_call, 64);
+    app_status("Running", c->tool_call);
+    app_draw();
+}
+
+static void gen_on_tool_end(void *ctx, int ok, const char *res, const char *span, const char *doc) {
+    app_gen_ctx *c = ctx;
+    (void)span;
+    app_status(ok ? "Got" : "Tool refused", res);
+    app_draw();
+    /* ---- STRUCTURAL CALL VALIDATION -- docs/ARCHITECTURE.md s6 ------------------------------
+     * Provenance checks that the ARGUMENTS trace to supplied values, not that the OPERATION is the
+     * specified one, so `v=d/t` answered as eval((49.0)/(150.0)) is perfectly clean and perfectly
+     * inverted. The document handed in is prompt + everything emitted so far, the same string the
+     * two host graders pass. A CATEGORY, NEVER A REPAIR: the reader is told the call does not match
+     * the relation; the model is told nothing. */
+    static char fulldoc[2048], shape_why[192];
+    int fl = snprintf(fulldoc, sizeof fulldoc, "%s%s", c->prompt, doc);
+    if (fl > 0) {
+        *c->shape_bad = tlm_shape_check_doc(fulldoc, shape_why, sizeof shape_why);
+        if (*c->shape_bad == TLM_SHAPE_MISMATCH) {
+            app_status("Call does not match the relation", c->tool_call);
+            app_draw();
+        }
+        snprintf(c->shape_reason, 192, "%s", shape_why);
+    }
+}
+
+static void gen_on_inject(void *ctx, int tok) {
+    (void)ctx;
+    char piece[64];
+    ns_tok_decode(&TK, &tok, 1, piece, sizeof piece);
+    app_stream_token(piece);
+}
+
+static void gen_on_injected(void *ctx) { (void)ctx; app_draw(); }
+
+static int gen_should_stop(void *ctx, int in_prefill) {
+    (void)ctx;
+    /* ESC is honoured during prefill too: an interrupt during the longest phase of a turn used to be
+     * ignored entirely. Between generated tokens, a tap on Stop counts the same as the key; this
+     * asks where the CURSOR is, not where the finger is, since pointing is relative. */
+    if (in_prefill) return app_take_abort();
+    int s = 0;
+    if (isKeyPressed(KEY_NSPIRE_ESC)) s = 1;
+    else {
+        touchpad_report_t r;
+        if (touchpad_scan(&r) == 0 && r.contact && app_hit_stop(CX, CY)) s = 1;
+    }
+    if (app_take_abort()) s = 1;
+    return s;
+}
 
 void app_request(const char *question, const char *rid) {
     app_begin_turn(question);
@@ -512,156 +599,33 @@ void app_request(const char *question, const char *rid) {
         app_stream_token(msg); app_stream_end(); return;
     }
     if (!MODEL_READY) { rq_build(dpath("model4096.bin.tns")); MODEL_READY = 1; }
-    int V = rq_vocab();
-
     static int ids[NS_MAX_TOKENS];
     int n = ns_tok_encode(&TK, prompt, ids, NS_MAX_TOKENS);
     if (n <= 0) { app_stream_token("<a> encode failed<end>"); app_stream_end(); return; }
 
-    /* Token ids the runtime steers on. Looked up by TEXT, so the device and the host steer on the
-     * same tokens rather than on numbers hardcoded twice. */
-    const int ID_RES   = ns_tok_special_id(&TK, "<res>");
-    const int ID_TOOLC = ns_tok_special_id(&TK, "</tool>");
-    const int ID_END   = ns_tok_special_id(&TK, "<end>");
-
-    /* THE PREFILL REPAINTS, and it has to: reading a 51-token prompt is 51 forward passes at the
-     * measured 1.753 tok/s, so the app sat with a frozen screen for ~29 seconds before the first
-     * generated token. Nothing was wrong and nothing said so -- which on a device with no other
-     * feedback is indistinguishable from a hang, and was reported as one.
-     *
-     * A draw costs a fraction of one forward pass, so this is progress for free. ESC is honoured
-     * here too: an interrupt during the longest phase of a turn used to be ignored entirely. */
-    int tok = ids[0], pos = 0;
-    while (pos < n - 1) {
-        rq_forward(tok, pos); pos++; tok = ids[pos];
-        if ((pos & 7) == 0 || pos == n - 1) {
-            char pr[40];
-            snprintf(pr, sizeof pr, "%d%%", (100 * pos) / (n > 1 ? n - 1 : 1));
-            app_status("Reading", pr);
-            app_draw();
-            if (app_take_abort()) { app_stream_token("<a> stopped<end>"); app_stream_end(); return; }
-        }
-    }
-
-    static int emitted[300];                 /* what the model has produced, for span extraction */
-    int nemit = 0;
-
-    /* POLL. This loop used to run to completion with nothing checking for input: 60 tokens at the
-     * measured 2.683 tok/s is 22.4 seconds during which the calculator answered no key and no tap.
-     * In front of a judge that is not "slow", it is indistinguishable from a crash -- and it is the
-     * one code path where the device is guaranteed to look broken while working perfectly.
-     *
-     * Polling between tokens, not inside rq_forward, so the cost is one keypad scan per ~370 ms of
-     * compute rather than anything measurable against the forward pass. */
-    int stopped = 0;
-    static char tool_call[64], tool_res[48];
-    int tool_ok = 0; tool_call[0] = 0; tool_res[0] = 0;
+    /* THE LOOP ITSELF IS src/store/gencore.c, shared with the device benchmark and the host harness
+     * (tools/eval/int8gen.c), so a device/host comparison of a full tool-using turn compares ONE
+     * implementation on two machines. What stays here is presentation, as hooks: streaming, the
+     * status line, the stop button, and the structural call check. Behaviour is unchanged. */
+    static char tool_call[64];
+    static char shape_reason[192];
+    tool_call[0] = 0; shape_reason[0] = 0;
     /* Structural call validation state -- docs/ARCHITECTURE.md s6. Initialised to UNCHECKED, not to
      * OK: a document that never reaches the check must not read as one that passed it. */
-    static char shape_reason[192];
-    int shape_bad = TLM_SHAPE_UNCHECKED; shape_reason[0] = 0;
-    app_status("Thinking", 0);
-    app_draw();
-
-    int wrote = 0;
-    for (int s = 0; s < 90 && pos < 250; s++) {
-        float *lg = rq_forward(tok, pos); pos++;
-
-        /* The model may not SUPPLY its own result. <res> is the runtime's to emit, and suppressing
-         * the logit is what makes that structural rather than a convention the model may break.
-         * The host has done this since it was written (server.py: lg[0, RES] = -1e30); the device
-         * did not, which is half of why its result chip held a number nobody had checked. */
-        if (ID_RES >= 0) lg[ID_RES] = -1e30f;
-
-        tok = argmax(lg, V);
-        if (nemit < (int)(sizeof emitted / sizeof emitted[0])) emitted[nemit++] = tok;
-
-        char piece[64];
-        ns_tok_decode(&TK, &tok, 1, piece, sizeof piece);
-        app_stream_token(piece);
-        if (!wrote && strstr(piece, "<a>")) { wrote = 1; app_status("Writing the answer", 0); }
-        app_draw();                          /* stream: one repaint per token */
-        if (tok == ID_END || tok == 10) break;
-
-        /* ---- a call just closed: EXECUTE IT ------------------------------------------------
-         * This is the whole architecture. The model emitted a call; the runtime runs it and feeds
-         * the real answer back in, so everything the model writes afterwards is composed around a
-         * number it did not choose. */
-        if (tok == ID_TOOLC) {
-            static char doc[1024], span[320], inj[MAX_RESULT + 16];
-            ns_tok_decode(&TK, emitted, nemit, doc, sizeof doc);
-            if (tlm_extract_call(doc, span, sizeof span)) {
-                /* Say what is being run BEFORE running it: on a 396 MHz core the evaluator is fast
-                 * but not instant, and a frozen screen with no explanation is the failure mode this
-                 * whole line exists to prevent. */
-                tlm_call_label(span, tool_call, sizeof tool_call);
-                app_status("Running", tool_call);
-                app_draw();
-                tool_ok = tlm_result_span(span, inj, sizeof inj);
-                {   const char *o = strstr(inj, "<res>");
-                    const char *c = o ? strstr(o, "</res>") : 0;
-                    if (o && c) {
-                        int L = (int)(c - o) - 5;
-                        if (L >= (int)sizeof tool_res) L = (int)sizeof tool_res - 1;
-                        if (L > 0) { memcpy(tool_res, o + 5, (size_t)L); tool_res[L] = 0; }
-                    } }
-                app_status(tool_ok ? "Got" : "Tool refused", tool_res);
-                app_draw();
-
-                /* ---- STRUCTURAL CALL VALIDATION -- docs/ARCHITECTURE.md s6 ------------------
-                 * The runtime is holding the relation and the call it just ran, and until now
-                 * nothing compared them. Provenance checks that the ARGUMENTS trace to supplied
-                 * values, not that the OPERATION is the specified one, so `v=d/t` answered as
-                 * eval((49.0)/(150.0)) is perfectly clean and perfectly inverted.
-                 *
-                 * The document handed in is prompt + everything emitted so far, which is the same
-                 * string the two host graders pass. Note this runs AFTER execution: the result is
-                 * already on screen, and what a mismatch changes is whether the answer composed
-                 * around it is allowed to stand. */
-                {   static char fulldoc[2048], shape_why[192];
-                    int fl = snprintf(fulldoc, sizeof fulldoc, "%s%s", prompt, doc);
-                    if (fl > 0) {
-                        shape_bad = tlm_shape_check_doc(fulldoc, shape_why, sizeof shape_why);
-                        if (shape_bad == TLM_SHAPE_MISMATCH) {
-                            /* A CATEGORY, NEVER A REPAIR. A signal that says "you dropped g" is a
-                             * supplier with extra steps, and that is the incremental drift
-                             * MODEL_RUNTIME_LINE.md exists to prevent. The reader is told the call
-                             * does not match the relation; the model is told nothing. */
-                            app_status("Call does not match the relation", tool_call);
-                            app_draw();
-                        }
-                        snprintf(shape_reason, sizeof shape_reason, "%s", shape_why);
-                    } }
-            } else
-                /* Malformed span. Report the evaluator's own no-call code rather than skipping, so
-                 * a broken call is visible instead of looking like a clean answer. */
-                snprintf(inj, sizeof inj, "<res>!give</res>");
-
-            int iids[64];
-            int ni = ns_tok_encode(&TK, inj, iids, 64);
-            for (int k = 0; k < ni && pos < 250; k++) {
-                rq_forward(tok, pos); pos++;         /* consume the token just produced */
-                tok = iids[k];
-                if (nemit < (int)(sizeof emitted / sizeof emitted[0])) emitted[nemit++] = tok;
-                ns_tok_decode(&TK, &tok, 1, piece, sizeof piece);
-                app_stream_token(piece);
-            }
-            app_draw();
-        }
-
-        if (isKeyPressed(KEY_NSPIRE_ESC)) { stopped = 1; }
-        else {
-            /* A tap on Stop counts the same as the key. This asks where the CURSOR is, not where
-             * the finger is: pointing is relative now, so pad coordinates no longer name a screen
-             * position at all. Mapping them as if they did would have made Stop respond to a touch
-             * in the corresponding corner of the pad while ignoring a tap with the cursor sitting
-             * on the button -- the exact inversion of what the user sees. */
-            touchpad_report_t r;
-            if (touchpad_scan(&r) == 0 && r.contact && app_hit_stop(CX, CY)) stopped = 1;
-        }
-        if (app_take_abort()) stopped = 1;
-        if (stopped) break;
-    }
+    int shape_bad = TLM_SHAPE_UNCHECKED;
+    app_gen_ctx G = { 0, prompt, tool_call, &shape_bad, shape_reason };
+    const tlm_gen_hooks hooks = { &G, gen_on_prefill, gen_on_token, gen_on_tool_begin,
+                                  gen_on_tool_end, gen_on_inject, gen_on_injected, gen_should_stop };
+    if (n <= 1) { app_status("Thinking", 0); app_draw(); }
+    static tlm_gen_result R;
+    tlm_generate(&TK, ids, n, &hooks, &R);
+    if (R.stopped_in_prefill) { app_stream_token("<a> stopped<end>"); app_stream_end(); return; }
+    const int *emitted = R.emitted;
+    const int nemit = R.nemit;
+    const int tool_ok = R.tool_ok;
+    const char *tool_res = R.tool_res;
+    const int stopped = R.stopped;
+    (void)shape_bad;
     /* THE RUNTIME OWNS THE ARITHMETIC, INCLUDING IN THE PROSE.
      *
      * Measured on device and reproduced on host, fp32 and int8 alike:
@@ -691,7 +655,8 @@ void app_request(const char *question, const char *rid) {
              * physics answer and a bare number is not one. The prose is still left standing: the
              * model said what it said, and hiding that would misrepresent what the model does. */
             const char *unit = 0;
-            for (int k = 0; k < ST.rec[idx].nvars; k++)
+            /* idx < 0 is Form C, no record: there is no unit to name, and ST.rec[-1] is not one. */
+            if (idx >= 0) for (int k = 0; k < ST.rec[idx].nvars; k++)
                 if (ST.rec[idx].lhs && !strcmp(ST.rec[idx].var[k], ST.rec[idx].lhs)) {
                     unit = ST.rec[idx].unit[k]; break;
                 }

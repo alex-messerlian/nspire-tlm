@@ -19,6 +19,8 @@
 #include "loader.h"
 #include "assemble.h"
 #include "tokenizer.h"
+#include "askparse.h"
+#include "gencore.h"
 
 typedef struct { int dim, hidden_dim, n_layers, n_heads, n_kv_heads, vocab_size, seq_len; } CfgV;
 /* from runq_nspire.c */
@@ -41,6 +43,16 @@ static int argmax(const float *v, int n) {
     for (int i = 1; i < n; i++) if (v[i] > bv) { bv = v[i]; bi = i; }
     return bi;
 }
+
+/* ---- A152: timing hooks for the whole-turn parity phase ---------------------------------------
+ * The 32 kHz timer counts DOWN; main() configures it before any turn runs. */
+static volatile uint32_t TURN_T0, TURN_TFIRST;
+static volatile int TURN_FIRST;
+static void turn_on_token(void *ctx, int tok) {
+    (void)ctx; (void)tok;
+    if (!TURN_FIRST) { TURN_FIRST = 1; TURN_TFIRST = *(volatile uint32_t *)(uintptr_t)0x900D0004u; }
+}
+static const tlm_gen_hooks TURN_HOOKS = { 0, 0, turn_on_token, 0, 0, 0, 0, 0 };
 
 int main(void) {
     screen_init();
@@ -175,40 +187,58 @@ static char GDIR[32] = "/documents/tlm/";
     { static char txt[4096];
       ns_tok_decode(&tk, out, produced, txt, sizeof txt);
       say("TEXT: %s", txt); }
-    /* A146. PARITY OVER MORE THAN ONE PROMPT. Every parity result so far is one prompt, and the
-     * model stops itself at 33 tokens there, so raising the token cap could not widen the sample.
-     * More prompts can. Each prompt is logged VERBATIM so the host (tools/eval/golden_decode.c)
-     * replays exactly the string the calculator tokenised -- the host never re-assembles it, so a
-     * prompt-assembly difference cannot hide inside a decoding comparison. Untimed. */
+    /* A152. PARITY OF THE WHOLE TURN, NOT OF FREE-RUNNING DECODE.
+     *
+     * The A146 phase decoded five prompts with no tool execution, so it checked the engine and not
+     * the loop the answers come from: tool calls executed, results injected, refusals and
+     * explanations written. Each turn below is assembled
+     * as app_request assembles it (ask_build, then ns_assemble on the chosen record) and run through
+     * tlm_generate -- src/store/gencore.c, the SAME function the app and the host harness call -- so
+     * tools/eval/parity_toolloop.py compares one implementation on two machines, id for id. The
+     * turns cover each path: four answerable, one with an irrelevant value, a withheld value, no
+     * values, and an explanation. Timed: time to the first generated token (prefill plus one step)
+     * and to the end of the turn, the latency a student actually waits. */
     {
-        static const struct { const char *f, *q; const char *nm[3], *vl[3]; int nv; } PP[] = {
-            { "F=m*a",  "A 3 kg cart accelerates at 4 m/s^2. Find the net force.",        {"m","a"}, {"3","4"},    2 },
-            { "W=F*d",  "A 20 N force pushes a box 5 m. How much work is done?",          {"F","d"}, {"20","5"},   2 },
-            { "p=m*v",  "A 0.5 kg ball moves at 12 m/s. Find its momentum.",              {"m","v"}, {"0.5","12"}, 2 },
-            { "V=I*R",  "A current of 2 A flows through a 6 ohm resistor. Find the voltage.", {"I","R"}, {"2","6"}, 2 },
-            { "F=-k*x", "A spring with k = 50 N/m is stretched 0.2 m. Find the force.",   {"k","x"}, {"50","0.2"}, 2 },
+        static const struct { const char *kind, *f, *q; } TT[] = {
+            { "answer", "I_S=((N_P)/(N_S))*I_P", "Using I_P = 8.54, N_P = 780, N_S = 2430, find I_S." },
+            { "answer", "epsilon=B*l*v", "Take l = 0.057, v = 1.35, B = 0.196. What was the motionally induced emf?" },
+            { "answer", "V=I*R", "Take R = 223.61, I = 74.54. Estimate V." },
+            { "answer", "alpha=((Delta_omega)/(Delta_t))", "Where Delta_omega = 56.533, Delta_t = 689, compute angular acceleration." },
+            { "extra value", "I=((P)/(A))", "Given m = 31.89, P = 559, A = 0.202, determine I." },
+            { "value withheld", "f=((d_i*d_o)/(d_o+d_i))", "A system has v = 9700000, d_i = 39.6. Estimate f." },
+            { "no values", "p=((F)/(A))", "determine pressure." },
+            { "explain", "I=I_0*exp(-mu*x)", "How is I related to the other quantities?" },
         };
-        for (unsigned pi = 0; pi < sizeof PP / sizeof PP[0]; pi++) {
+        for (unsigned ti = 0; ti < sizeof TT / sizeof TT[0]; ti++) {
             int ri = -1;
-            for (int i = 0; i < st.n; i++) if (!strcmp(st.rec[i].formula, PP[pi].f)) { ri = i; break; }
-            if (ri < 0) { say("parity %u: record %s NOT IN STORE -- skipped", pi, PP[pi].f); continue; }
-            ns_input pin; memset(&pin, 0, sizeof pin);
-            for (int k = 0; k < PP[pi].nv; k++) { pin.var[k] = PP[pi].nm[k]; pin.val[k] = PP[pi].vl[k]; }
-            pin.nvals = PP[pi].nv;
-            ns_assemble(prompt, sizeof prompt, &st.rec[ri], PP[pi].q, &pin);
-            say("parity %u prompt: %s", pi, prompt);
-            int pn = ns_tok_encode(&tk, prompt, ids, NS_MAX_TOKENS);
-            if (pn <= 0) { say("parity %u: encode failed", pi); continue; }
-            int pt = ids[0], pp = 0, pc = 0;
-            while (pp < pn - 1) { rq_forward(pt, pp); pp++; pt = ids[pp]; }
-            for (int s3 = 0; s3 < GEN_MAX; s3++) {
-                float *lg = rq_forward(pt, pp); pp++;
-                pt = argmax(lg, V); out[pc++] = pt;
-                if (pt == 10) break;
-            }
-            static char pl[GEN_MAX * 7]; int q2 = 0;
-            for (int i = 0; i < pc && q2 < (int)sizeof pl - 8; i++) q2 += snprintf(pl + q2, sizeof pl - q2, "%d ", out[i]);
-            say("parity %u ids: %s", pi, pl);
+            for (int i = 0; i < st.n; i++)
+                if (st.rec[i].formula && !strcmp(st.rec[i].formula, TT[ti].f)) { ri = i; break; }
+            if (ri < 0) { say("turn %u: record %s NOT IN STORE -- skipped", ti, TT[ti].f); continue; }
+            static ns_ask ask;
+            ask_build(&st, TT[ti].q, &ask);
+            if (ns_assemble(prompt, sizeof prompt, &st.rec[ri], ask.question, &ask.in) < 0) {
+                say("turn %u: assemble overflow", ti); continue; }
+            say("turn %u kind: %s", ti, TT[ti].kind);
+            say("turn %u prompt: %s", ti, prompt);
+            int tn = ns_tok_encode(&tk, prompt, ids, NS_MAX_TOKENS);
+            if (tn <= 0) { say("turn %u: encode failed", ti); continue; }
+            static tlm_gen_result R;
+            TURN_FIRST = 0;
+            uint32_t ta = MMIO32(T32 + T_VAL);
+            TURN_T0 = ta;
+            tlm_generate(&tk, ids, tn, &TURN_HOOKS, &R);
+            uint32_t tb = MMIO32(T32 + T_VAL);
+            static char tl[TLM_GEN_MAXEMIT * 7]; int q3 = 0;
+            for (int i = 0; i < R.nemit && q3 < (int)sizeof tl - 8; i++)
+                q3 += snprintf(tl + q3, sizeof tl - q3, "%d ", R.emitted[i]);
+            say("turn %u ids: %s", ti, tl);
+            static char tt[2048];
+            ns_tok_decode(&tk, R.emitted, R.nemit, tt, sizeof tt);
+            say("turn %u text: %s", ti, tt);
+            uint32_t tf = TURN_FIRST ? (ta - TURN_TFIRST) : 0, tall = ta - tb;
+            say("turn %u timing: prompt %d tokens, first output %u ticks = %u.%03u s, turn %u ticks = "
+                "%u.%03u s, %d ids, %d calls", ti, tn, tf, tf / 32768u, (tf % 32768u) * 1000u / 32768u,
+                tall, tall / 32768u, (tall % 32768u) * 1000u / 32768u, R.nemit, R.ncalls);
         }
     }
 restore:

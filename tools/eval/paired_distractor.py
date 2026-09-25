@@ -60,7 +60,7 @@ def run(binary, model, items):
     rows = [l.split("\t") for l in p.stdout.splitlines() if l.startswith("GEN\t")]
     assert len(rows) == len(items), (len(rows), len(items))
     out = []
-    for it, (_, t, _res, st) in zip(items, rows):
+    for it, (_, t, _res, st) in zip(items, [r[:4] for r in rows]):
         g = t.replace("\\n", "\n").replace("\\t", "\t").replace("\\\\", "\\")
         ref = S.reference(it)
         ok = (grade.well_formed(g) and not grade.is_refusal(g) and S.call_right(g, ref)

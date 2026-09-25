@@ -94,7 +94,13 @@ def main(src, dst):
     _lens = {len(t) for t in [tok_emb] + wq + wk + wv + wo + w1 + w2 + w3}
     if not shared:
         _lens.add(len(out_w))
-    group = max((g for g in range(1, GROUP + 1) if all(L % g == 0 for L in _lens)), default=1)
+    # AND EVERY ROW LENGTH (A151). The engine groups each ROW from its start and ignores any
+    # remainder, so a group must divide dim and hidden_dim, not only each tensor's total length --
+    # 88 divided every tensor of the d352 model and not its 1,024-wide rows. rq_probe now refuses
+    # such a file; choosing the group here from the right property means it is never produced.
+    _rows = {dim, hidden_dim}
+    group = max((g for g in range(1, GROUP + 1)
+                 if all(L % g == 0 for L in _lens) and all(r % g == 0 for r in _rows)), default=1)
     GROUP_FLOOR = min(32, GROUP)
     if group < GROUP_FLOOR:
         raise SystemExit(
@@ -115,10 +121,9 @@ def main(src, dst):
     # hidden units in every layer, and it cost the shipped model 9.2 points of strict answer
     # accuracy (docs/RESULT_CORRECTNESS.md). Reported here, loudly, until the engine is fixed.
     bad_rows = sorted({n for n in (dim, hidden_dim) if n % group})
-    if bad_rows:
-        print(f"WARNING: group {group} does not divide row length(s) {bad_rows}. The engine will "
-              f"skip {', '.join(f'{n % group} of every {n}' for n in bad_rows)} inputs per row and "
-              f"misalign scales. See docs/RESULT_CORRECTNESS.md.")
+    if bad_rows:     # unreachable by construction above; kept so a future edit cannot reintroduce it
+        raise SystemExit(f"ABORT: group {group} does not divide row length(s) {bad_rows}; the engine "
+                         "would ignore the remainder of every row (A151, docs/RESULT_CORRECTNESS.md)")
 
     o = open(dst, 'wb')
     o.write(struct.pack('I', 0x616b3432))               # magic "ak42"

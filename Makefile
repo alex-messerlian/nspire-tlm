@@ -38,7 +38,7 @@ APP_SRC   := src/store/app.c src/store/gfx.c src/store/loader.c src/store/assemb
 
 APP_HDR   := $(wildcard src/store/*.h)
 
-DEV_SRC   := src/store/device_app.c $(APP_SRC) src/runq_nspire.c src/nspire.c include/nspire_screen.c
+DEV_SRC   := src/store/device_app.c $(APP_SRC) src/store/gencore.c src/runq_nspire.c src/nspire.c include/nspire_screen.c
 
 # app.c is #included by the suites that exercise its statics, so it is NOT linked separately there.
 # app.c now draws the relation picker, so its state machine and the given parser link here
@@ -247,7 +247,7 @@ $(BUILD)/tlmui: src/store/tlm_demo.c src/store/ui_host.c src/store/host_stubs.c 
 # Compiles runq_nspire.c on the HOST, which is the point: the loader that runs on the calculator is
 # the one under test, not a reimplementation of its rules.
 $(BUILD)/test_ckpt: tools/eval/test_ckpt.c src/runq_nspire.c | $(BUILD)
-	$(CC) $(HOSTFLAGS) -DFIXED_GS=88 -o $@ $< -lm
+	$(CC) $(HOSTFLAGS) -DFIXED_GS=32 -o $@ $< -lm
 
 # THE FORWARD-PASS GOLDEN. Compiles the same runq_nspire.c the calculator runs, so a claim that a
 # hot-loop change is bit-exact is checkable on the host without a device round-trip. Phase 1 of the
@@ -261,13 +261,16 @@ GS_SRC := $(shell grep -oE '^\#define FIXED_GS [0-9]+' src/runq_nspire.c | grep 
 
 # The calculator's generation loop on the host -- int8 engine, tool injection, the shipped
 # answer_states_result -- so a quality number can be attached to what the device decodes.
-$(BUILD)/int8gen: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h $(APP_HDR) | $(BUILD)
-	$(CC) $(HOSTFLAGS) -I $(BUILD) -DFIXED_GS=$(GS_SRC) -o $@ $< src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) -lm
+$(BUILD)/int8gen: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c src/store/gencore.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -I $(BUILD) -DFIXED_GS=$(GS_SRC) -o $@ $< src/store/tokenizer.c src/store/toolrun.c src/store/gencore.c $(EVAL_CORE) -lm
 
 # The same loop at group 16, which divides every row length at widths 176 and 352 -- the control
 # for the row-alignment defect, and the decoder the width ladder is scored on.
-$(BUILD)/int8gen_g16: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h $(APP_HDR) | $(BUILD)
-	$(CC) $(HOSTFLAGS) -I $(BUILD) -DFIXED_GS=16 -o $@ $< src/store/tokenizer.c src/store/toolrun.c $(EVAL_CORE) -lm
+# A VARIABLE, NOT A LITERAL: tools/export_device.sh rewrites every `-DFIXED_GS=<digits>` in this file
+# to the shipping group, and it turned this control decoder into a copy of the shipped one once.
+CONTROL_GS := 16
+$(BUILD)/int8gen_g16: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c src/store/gencore.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h $(APP_HDR) | $(BUILD)
+	$(CC) $(HOSTFLAGS) -I $(BUILD) -DFIXED_GS=$(CONTROL_GS) -o $@ $< src/store/tokenizer.c src/store/toolrun.c src/store/gencore.c $(EVAL_CORE) -lm
 
 $(BUILD)/golden_forward: tools/eval/golden_forward.c src/runq_nspire.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -DFIXED_GS=$(GS_SRC) -o $@ $< -lm
@@ -315,6 +318,7 @@ device: $(BUILD)/chattlm.tns
 # producing a quietly wrong number.
 GEN_SRC := src/store/device_generate.c src/store/loader.c src/store/assemble.c \
            src/store/tokenizer.c src/store/picker.c src/store/shapecheck.c \
+           src/store/gencore.c src/store/toolrun.c src/store/askparse.c \
            src/runq_nspire.c src/nspire.c include/nspire_screen.c
 
 bench/bench_generate.tns: $(GEN_SRC) $(EVAL_CORE) $(APP_HDR)

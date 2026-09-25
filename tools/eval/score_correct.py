@@ -241,7 +241,7 @@ def score_int8(tables, model=None, label="train/ship.pt"):
             raise SystemExit(f"ABORT: int8gen returned {len(lines)} lines for {len(sc)} items")
         rows, k, shown, dev = [], 0, 0, 0
         for (it, ref), line in zip(sc, lines):
-            _, text, res, states = line.split("\t")
+            _, text, res, states = line.split("\t")[:4]
             gn = text.replace("\\n", "\n").replace("\\t", "\t").replace("\\\\", "\\")
             ok = correct(gn, ref)
             vis = call_right(gn, ref) and "<a>" in gn          # prose right, or corrected
