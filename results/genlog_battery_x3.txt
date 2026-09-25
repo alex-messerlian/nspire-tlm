@@ -154,3 +154,66 @@ DECODE THROUGHPUT: 1.923 tok/s
 ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 198 24 449 229 39 78 25 94 24 10 
 TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 s. Using v=d/t.<end>
 == done ==
+
+== generate ==
+printf works from this TU
+store 1619 records, vocab 4085
+prompt: <q>A car goes 150 m in 12 s. Find the speed. Given d = 150, t = 12.</q><r>v=d/t | v:m/s d:m t:s | missing:none | standard conditions | fit:high
+prompt tokens: 54
+loading model...
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+model loaded, vocab 4096
+timer: RUNNING (181 ticks over a busy loop)
+AHB 198 MHz -> CPU ~396 MHz (battery, VALID)
+prefill 53 tokens: 788863 ticks = 24.074 s
+decode  33 tokens: 568666 ticks = 17.354 s
+DECODE THROUGHPUT: 1.901 tok/s
+decode split: in rq_forward 567692 ticks = 17324 ms, in argmax 973 ticks = 29 ms, other 1 ticks
+ids: 5 1969 6 364 3292 24 26 261 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 198 24 449 229 39 78 25 94 24 10 
+TEXT: <tool> eval<arg> (150.0)/(12.0)</tool> <unk>4<tool> 3<unk><a> That gives 1 s. Using v=d/t.<end>
+parity 0 prompt: <q>A 3 kg cart accelerates at 4 m/s^2. Find the net force. Given m = 3, a = 4.</q><r>F=m*a | F:N m:kg a:m/s^2 | missing:none | constant mass in an inertial frame; it fails on a rocket burning its own fuel | fit:high
+parity 0 ids: 5 1969 6 364 29 24 26 312 30 24 26 19 7 150 0 30 5 302 0 4 280 189 225 24 504 291 280 39 87 20 75 24 10 
+parity 1 prompt: <q>A 20 N force pushes a box 5 m. How much work is done? Given F = 20, d = 5.</q><r>W=F*d | W:J F:N d:m | missing:none | standard conditions | fit:high
+parity 1 ids: 5 1969 6 364 31 24 26 312 31 24 26 19 7 150 0 30 5 302 0 4 300 189 225 444 24 300 39 48 20 78 316 350 24 10 
+parity 2 prompt: <q>A 0.5 kg ball moves at 12 m/s. Find its momentum. Given m = 0.5, v = 12.</q><r>p=m*v | p:kg*m/s m:kg v:m/s | missing:none | standard conditions | fit:high
+parity 2 ids: 5 1969 6 364 26 24 31 312 376 24 26 19 7 150 0 30 5 302 0 4 3765 316 225 794 20 87 25 93 24 449 226 39 87 20 96 24 10 
+parity 3 prompt: <q>A current of 2 A flows through a 6 ohm resistor. Find the voltage. Given I = 2, R = 6.</q><r>V=I*R | V:V I:A R:ohm | missing:none | ohmic material at constant temperature; a diode does not obey it | fit:high
+parity 3 ids: 5 1969 6 364 28 24 26 312 32 24 26 19 7 150 0 30 5 302 0 4 339 189 225 24 34 339 24 449 339 39 51 20 60 24 10 
+parity 4 prompt: <q>A spring with k = 50 N/m is stretched 0.2 m. Find the force. Given k = 50, x = 0.2.</q><r>F=-k*x | F:N k:N/m x:m | missing:none | restoring force, signed: negative means opposite to the displacement | fit:high
+parity 4 ids: 5 1969 6 596 18 1174 24 26 312 26 24 28 19 7 150 0 30 5 302 0 4 280 189 225 24 34 400 24 449 280 1297 85 20 98 24 10 
+== done ==

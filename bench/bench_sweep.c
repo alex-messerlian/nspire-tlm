@@ -197,12 +197,26 @@ int main(void) {
         bench_timer_t tm;
         timer_acquire(&tm, TIMER_32K_BASE);
         uint32_t us[NPOS];
-        for (int pi = 0; pi < NPOS; pi++) {
-            for (int w = 0; w < WARM; w++) rq_forward(1, POS[pi] + w);
-            uint32_t t0 = timer_raw(TIMER_32K_BASE);
-            for (int r = 0; r < REPS; r++) rq_forward(1, POS[pi] + WARM + r);
-            uint32_t ticks = timer_delta(t0, timer_raw(TIMER_32K_BASE)) / REPS;
-            us[pi] = (uint32_t)((uint64_t)ticks * 1000000u / 32768u);
+        /* A147. EVERY POSITION IS WRITTEN BEFORE IT IS READ -- the KV cache is filled by a sequential
+         * walk from 0, as in real decode.
+         *
+         * This used to jump straight to POS[pi], so at position 256 attention ran over ~250 KV rows
+         * that were never written: all zero. Measured on d352 (docs/RESULT_KV_FILL.md), a filled cache
+         * makes per-position cost 40% higher (1,650 vs 1,178 us/pos) with the fixed cost unchanged --
+         * the soft-float arithmetic takes fast paths on zero operands. Every pos-256 number from the
+         * jump version was therefore optimistic, and the frontier's long-context curves with it. */
+        {
+            int last = POS[NPOS - 1] + WARM + REPS, pi = 0;
+            uint32_t t0 = 0;
+            for (int p = 0; p < last && pi < NPOS; p++) {
+                if (p == POS[pi] + WARM) t0 = timer_raw(TIMER_32K_BASE);
+                rq_forward(1, p);
+                if (p == POS[pi] + WARM + REPS - 1) {
+                    uint32_t ticks = timer_delta(t0, timer_raw(TIMER_32K_BASE)) / REPS;
+                    us[pi] = (uint32_t)((uint64_t)ticks * 1000000u / 32768u);
+                    pi++;
+                }
+            }
         }
         timer_release(&tm);
 
