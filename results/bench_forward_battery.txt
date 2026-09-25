@@ -944,3 +944,174 @@ FIXED_stages_us=46264 -- embedding + final norm + final quant + classifier
 PERLAYER_stages_us=371551 total over 6 layers = 61925 us/layer
 CROSS_CHECK_1=FIXED_stages_us should equal INTERCEPT_us. A disagreement means the model of the forward pass is wrong, and that is the finding.
 CROSS_CHECK_2=PERLAYER_stages_us/layer should equal per_layer_us from the regression. A disagreement means per-layer cost is NOT uniform in L, which is the table's load-bearing assumption.
+
+=== bench_sweep ===
+cpu_hz=396000000 ahb_hz=198000000 apb_hz=99000000 power=BATTERY(396) -- valid
+heap_ceiling_fresh=22576128 B = 21.53 MiB (largest single malloc, before any model is loaded)
+note=random weights: TIMING ONLY. These say nothing about quality and must never be scored.
+header=shape bytes params dim hidden L us_at_pos8 us_at_pos256 us_per_pos
+need=m352.bin.tns dim=352 hidden=1024 L=6 seq=512 file=11417728 B kv=8650752 B total=20068480 B FITS
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+shape=m352.bin.tns 11417728 B  pos8=427581 us  pos256=834136 us  per_pos=1639 us
+tok_s_x1000=m352.bin.tns pos8=2338 pos256=1198
+heap_after=m352.bin.tns -> 22576128 B = 21.53 MiB
+need=m176.bin.tns dim=176 hidden=512 L=6 seq=512 file=3236032 B kv=4325376 B total=7561408 B FITS
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=2
+load_pct=6
+load_pct=10
+load_pct=16
+load_pct=20
+load_pct=26
+load_pct=30
+load_pct=36
+load_pct=40
+load_pct=46
+load_pct=50
+load_pct=56
+load_pct=60
+load_pct=66
+load_pct=70
+load_pct=76
+load_pct=81
+load_pct=85
+load_pct=91
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+shape=m176.bin.tns 3236032 B  pos8=141448 us  pos256=358703 us  per_pos=876 us
+tok_s_x1000=m176.bin.tns pos8=7069 pos256=2787
+heap_after=m176.bin.tns -> 22576128 B = 21.53 MiB
+shape=m264.bin.tns UNLOADABLE (6708640 B): head size 33 is odd; RoPE rotates dimension pairs
+need=m264h6.bin.tns dim=264 hidden=768 L=6 seq=512 file=6708640 B kv=6488064 B total=13196704 B FITS
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+shape=m264h6.bin.tns 6708640 B  pos8=266876 us  pos256=538757 us  per_pos=1096 us
+tok_s_x1000=m264h6.bin.tns pos8=3747 pos256=1856
+heap_after=m264h6.bin.tns -> 22576128 B = 21.53 MiB
+need=m352b.bin.tns dim=352 hidden=1024 L=6 seq=512 file=11417728 B kv=8650752 B total=20068480 B FITS
+step=read_checkpoint: entry
+step=mmap:entry
+step=mmap:malloc-returned
+step=mmap:before-fopen
+step=mmap:fopen-returned
+step=mmap:before-first-read
+step=mmap:first-read-returned
+load_pct=0
+load_pct=5
+load_pct=10
+load_pct=15
+load_pct=20
+load_pct=25
+load_pct=30
+load_pct=35
+load_pct=40
+load_pct=45
+load_pct=50
+load_pct=55
+load_pct=60
+load_pct=65
+load_pct=70
+load_pct=75
+load_pct=80
+load_pct=85
+load_pct=90
+load_pct=95
+load_pct=100
+step=mmap:read-loop-done
+step=mmap:fclose-done
+step=mmap returned
+step=memory_map_weights
+step=memory_map_weights done
+step=read_checkpoint: returned
+step=malloc_run_state (needs ~3.7MB)
+step=malloc_run_state done
+shape=m352b.bin.tns 11417728 B  pos8=431823 us  pos256=797241 us  per_pos=1473 us
+tok_s_x1000=m352b.bin.tns pos8=2315 pos256=1254
+heap_after=m352b.bin.tns -> 22576128 B = 21.53 MiB
+need=m440h10.bin.tns dim=440 hidden=1280 L=6 seq=512 file=17363296 B kv=10813440 B total=28176736 B DOES NOT FIT
+shape=m440h10.bin.tns SKIPPED -- file + KV cache do not fit in situ. THIS IS THE CEILING, and it is the SUM, not the file.
+heap_ceiling_after=22576128 B = 21.53 MiB (largest single malloc AFTER the sweep; compare with heap_ceiling_fresh)
+controls=m352 and m352b are the SAME shape with different weights. If their rows differ, decode cost is not weight-independent and every other row in this table is suspect.
