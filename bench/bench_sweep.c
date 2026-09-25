@@ -57,8 +57,11 @@ static const char *SHAPES[] = {
     "m176.bin.tns",
     "m264.bin.tns",   /* 8 heads, head_size 33: the engine must now REFUSE it (A143) */
     "m264h6.bin.tns", /* 6 heads, head_size 44: the trainable d264 -- replaces the row above */
-    "m440.bin.tns",
     "m352b.bin.tns",  /* control B: same shape, seed 99 */
+    "m440h10.bin.tns", /* 10 heads, head size 44: the TRAINABLE d440. LAST: if it passes the
+                          memory test the bench loads it for real, and a failed load exits the process. The 8-head m440 had head size
+                          55 and is refused by rq_probe (A144 session), so its memory result was
+                          measured on a shape no one could train. */
 };
 #define NSHAPES ((int)(sizeof SHAPES / sizeof SHAPES[0]))
 
@@ -169,10 +172,15 @@ int main(void) {
             size_t kv_dim = (size_t)dim * nkv / nh;
             size_t kv_bytes = 2u * (size_t)nl * (size_t)seq * kv_dim * sizeof(float);
 
+            /* A146. ALLOCATE WHAT THE ENGINE ALLOCATES. malloc_run_state takes the KV cache as TWO
+             * blocks (key_cache, value_cache), not one. Asking for it as a single kv_bytes block was
+             * stricter than the engine, so a "does not fit" could have been a false negative for the
+             * real program. Three blocks now: checkpoint, keys, values. */
             void *a = malloc((size_t)fsz);
-            void *b = a ? malloc(kv_bytes) : NULL;
-            int fits = a && b;
-            free(b); free(a);
+            void *b = a ? malloc(kv_bytes / 2) : NULL;
+            void *c = b ? malloc(kv_bytes / 2) : NULL;
+            int fits = a && b && c;
+            free(c); free(b); free(a);
             bench_result("need", "%s dim=%d hidden=%d L=%d seq=%d file=%ld B kv=%lu B total=%lu B %s",
                          SHAPES[i], dim, hid, nl, seq, fsz, (unsigned long)kv_bytes,
                          (unsigned long)((size_t)fsz + kv_bytes), fits ? "FITS" : "DOES NOT FIT");

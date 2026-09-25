@@ -134,10 +134,20 @@ static char GDIR[32] = "/documents/tlm/";
      * draws cannot see a tail that thin. 120 costs about a minute more of decode and is
      * the same run. The tok/s figure is unaffected -- it is a rate, computed over whatever
      * number of tokens were produced. */
+    /* A146. WHERE DOES THE DECODE TIME GO? The cost model built from bench_forward under-predicts
+     * this loop by a consistent 4.3-4.5% (~22-23 ms per token) on two unseen runs. Two candidate
+     * causes, and this separates them: time spent INSIDE rq_forward, and time spent in the argmax
+     * over the logits (soft-float comparisons, outside rq_forward). If the forward alone accounts for
+     * the gap, the model under-predicts the forward pass itself; if the argmax does, it does not. */
+    uint32_t fwd_ticks = 0, am_ticks = 0;
     for (int s2 = 0; s2 < GEN_MAX; s2++) {
+        uint32_t a0 = MMIO32(T32 + T_VAL);
         float *lg = rq_forward(tok, pos);
+        uint32_t a1 = MMIO32(T32 + T_VAL);
         pos++;
         tok = argmax(lg, V);
+        uint32_t a2 = MMIO32(T32 + T_VAL);
+        fwd_ticks += a0 - a1; am_ticks += a1 - a2;       /* down-counter */
         out[produced++] = tok;
         if (tok == 10) break;
     }
@@ -152,6 +162,10 @@ static char GDIR[32] = "/documents/tlm/";
         uint32_t milli = (uint32_t)((unsigned long long)produced * 32768ull * 1000ull / ddec);
         say("DECODE THROUGHPUT: %u.%03u tok/s", milli / 1000u, milli % 1000u);
     }
+    say("decode split: in rq_forward %u ticks = %u ms, in argmax %u ticks = %u ms, other %d ticks",
+        fwd_ticks, (unsigned)((unsigned long long)fwd_ticks * 1000u / 32768u),
+        am_ticks, (unsigned)((unsigned long long)am_ticks * 1000u / 32768u),
+        (int)ddec - (int)fwd_ticks - (int)am_ticks);
     /* Room for GEN_MAX ids. At 300 bytes with a 270-byte guard this silently truncated the id
      * list, which is the one artefact the host comparison needs verbatim. */
     { static char line[GEN_MAX * 7]; int p2 = 0;
@@ -161,6 +175,42 @@ static char GDIR[32] = "/documents/tlm/";
     { static char txt[4096];
       ns_tok_decode(&tk, out, produced, txt, sizeof txt);
       say("TEXT: %s", txt); }
+    /* A146. PARITY OVER MORE THAN ONE PROMPT. Every parity result so far is one prompt, and the
+     * model stops itself at 33 tokens there, so raising the token cap could not widen the sample.
+     * More prompts can. Each prompt is logged VERBATIM so the host (tools/eval/golden_decode.c)
+     * replays exactly the string the calculator tokenised -- the host never re-assembles it, so a
+     * prompt-assembly difference cannot hide inside a decoding comparison. Untimed. */
+    {
+        static const struct { const char *f, *q; const char *nm[3], *vl[3]; int nv; } PP[] = {
+            { "F=m*a",  "A 3 kg cart accelerates at 4 m/s^2. Find the net force.",        {"m","a"}, {"3","4"},    2 },
+            { "W=F*d",  "A 20 N force pushes a box 5 m. How much work is done?",          {"F","d"}, {"20","5"},   2 },
+            { "p=m*v",  "A 0.5 kg ball moves at 12 m/s. Find its momentum.",              {"m","v"}, {"0.5","12"}, 2 },
+            { "V=I*R",  "A current of 2 A flows through a 6 ohm resistor. Find the voltage.", {"I","R"}, {"2","6"}, 2 },
+            { "F=-k*x", "A spring with k = 50 N/m is stretched 0.2 m. Find the force.",   {"k","x"}, {"50","0.2"}, 2 },
+        };
+        for (unsigned pi = 0; pi < sizeof PP / sizeof PP[0]; pi++) {
+            int ri = -1;
+            for (int i = 0; i < st.n; i++) if (!strcmp(st.rec[i].formula, PP[pi].f)) { ri = i; break; }
+            if (ri < 0) { say("parity %u: record %s NOT IN STORE -- skipped", pi, PP[pi].f); continue; }
+            ns_input pin; memset(&pin, 0, sizeof pin);
+            for (int k = 0; k < PP[pi].nv; k++) { pin.var[k] = PP[pi].nm[k]; pin.val[k] = PP[pi].vl[k]; }
+            pin.nvals = PP[pi].nv;
+            ns_assemble(prompt, sizeof prompt, &st.rec[ri], PP[pi].q, &pin);
+            say("parity %u prompt: %s", pi, prompt);
+            int pn = ns_tok_encode(&tk, prompt, ids, NS_MAX_TOKENS);
+            if (pn <= 0) { say("parity %u: encode failed", pi); continue; }
+            int pt = ids[0], pp = 0, pc = 0;
+            while (pp < pn - 1) { rq_forward(pt, pp); pp++; pt = ids[pp]; }
+            for (int s3 = 0; s3 < GEN_MAX; s3++) {
+                float *lg = rq_forward(pt, pp); pp++;
+                pt = argmax(lg, V); out[pc++] = pt;
+                if (pt == 10) break;
+            }
+            static char pl[GEN_MAX * 7]; int q2 = 0;
+            for (int i = 0; i < pc && q2 < (int)sizeof pl - 8; i++) q2 += snprintf(pl + q2, sizeof pl - q2, "%d ", out[i]);
+            say("parity %u ids: %s", pi, pl);
+        }
+    }
 restore:
     MMIO32(T32 + T_CTRL) = 0;
     MMIO32(T32 + T_LOAD) = saved_load;

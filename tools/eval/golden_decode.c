@@ -53,7 +53,10 @@ int main(int argc, char **argv) {
     int V = rq_vocab();
 
     static int ids[1024];
-    int n = ns_tok_encode(&tk, PROMPT, ids, 1024);
+    /* A146: an optional 3rd argument replaces the built-in prompt, so tools/eval/parity_prompts.py can
+     * replay every prompt the device LOGGED, verbatim. With it, only host ids are printed. */
+    const char *prompt_text = argc > 3 ? argv[3] : PROMPT;
+    int n = ns_tok_encode(&tk, prompt_text, ids, 1024);
     printf("prompt tokens: %d   vocab %d\n", n, V);
 
     /* Prefill exactly as src/store/device_generate.c does: forward every prompt token but the
@@ -74,6 +77,10 @@ int main(int argc, char **argv) {
         if (tok == 10) break;          /* the device's stop condition */
     }
 
+    if (argc > 3) {                      /* replay mode: ids only, compared by the caller */
+        printf("host ids  :"); for (int i = 0; i < produced; i++) printf(" %d", out[i]); printf("\n");
+        return 0;
+    }
     printf("host ids  :");
     for (int i = 0; i < produced; i++) printf(" %d", out[i]);
     printf("\ndevice ids:");

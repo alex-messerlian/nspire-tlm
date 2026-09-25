@@ -219,6 +219,34 @@ int main(void) {
             "fit a line to these: the SLOPE is the per-position cost (attention + KV traffic) and "
             "the INTERCEPT is the position-independent cost. Extrapolate to C/2 for a mean-position "
             "tok/s, or to C for worst case, and say which you used.");
+
+        /* A146. THE SAME SWEEP WITH A FILLED KV CACHE -- one variable changed.
+         *
+         * part1b jumps straight to each base, so at pos 250 the KV rows below it were never written:
+         * attention runs over rows that are all zero. The cost model fitted to part1b under-predicts
+         * real decode by a consistent 4.3-4.5% (~22-23 ms/token) on two unseen runs. Hypothesis:
+         * soft-float multiply and expf take fast paths on zero operands, so empty rows are cheaper
+         * than real ones.
+         *
+         * This walks EVERY position from 0 in order, so every row is written before it is read, and
+         * times the same windows. It keeps part1b's repeated token 1, so the cache contents are the
+         * ONLY difference -- if the slope rises enough to close the gap, the hypothesis holds; if not,
+         * it is ruled out. About 500 forwards, a few minutes. */
+        bench_result("part1c", "%s", "same windows, KV cache FILLED by a sequential walk from 0 (token 1 held)");
+        int last = bases[nb - 1] + REPS;
+        int wi = 0;
+        uint32_t tw = 0;
+        for (int p = 0; p < last && wi < nb; p++) {
+            if (p == bases[wi]) tw = timer_raw(TIMER_32K_BASE);
+            rq_forward(1, p);
+            if (p == bases[wi] + REPS - 1) {
+                uint32_t ticks = timer_delta(tw, timer_raw(TIMER_32K_BASE)) / REPS;
+                bench_result("t_per_token_pos_filled", "pos %d = %lu ticks = %lu us",
+                             bases[wi], (unsigned long)ticks,
+                             (unsigned long)((uint64_t)ticks * 1000000u / 32768u));
+                wi++;
+            }
+        }
     }
 
     /* ---- 2. the decomposition of one full pass --------------------------------------------- */
