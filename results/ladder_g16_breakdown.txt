@@ -1,20 +1,20 @@
 w176.pt (int8, w176_g16  dim 176  corpus -  prompts: device  decoding: greedy-int8
-  answer_0 n=120x1  correct  48.3%  restated_wrong  19.2%  call_wrong  32.5%  refused   0.0%  malformed   0.0%  answered  78.3%
-  answer_s n=120x1  correct  57.5%  restated_wrong  15.0%  call_wrong  27.5%  refused   0.0%  malformed   0.0%  answered  78.3%
+  answer_0 n=120x1  correct  50.8%  restated_wrong  16.7%  call_wrong  32.5%  refused   0.0%  malformed   0.0%  answered  81.7%
+  answer_s n=120x1  correct  58.3%  restated_wrong  14.2%  call_wrong  27.5%  refused   0.0%  malformed   0.0%  answered  80.0%
   answer_w n=120x1  correct  59.2%  restated_wrong  15.8%  call_wrong  25.0%  refused   0.0%  malformed   0.0%  answered  80.0%
-  answer_x n=120x1  correct  35.0%  restated_wrong   7.5%  call_wrong  57.5%  refused   0.0%  malformed   0.0%  answered  77.5%
+  answer_x n=120x1  correct  35.0%  restated_wrong   7.5%  call_wrong  57.5%  refused   0.0%  malformed   0.0%  answered  78.3%
 w176s2.pt (int8, w176s2_g16  dim 176  corpus -  prompts: device  decoding: greedy-int8
-  answer_0 n=120x1  correct  66.7%  restated_wrong  20.0%  call_wrong  13.3%  refused   0.0%  malformed   0.0%  answered  77.5%
-  answer_s n=120x1  correct  65.0%  restated_wrong  12.5%  call_wrong  21.7%  refused   0.0%  malformed   0.8%  answered  80.8%
-  answer_w n=120x1  correct  62.5%  restated_wrong  20.8%  call_wrong  16.7%  refused   0.0%  malformed   0.0%  answered  73.3%
-  answer_x n=120x1  correct  41.7%  restated_wrong  15.0%  call_wrong  43.3%  refused   0.0%  malformed   0.0%  answered  75.0%
+  answer_0 n=120x1  correct  68.3%  restated_wrong  18.3%  call_wrong  13.3%  refused   0.0%  malformed   0.0%  answered  79.2%
+  answer_s n=120x1  correct  68.3%  restated_wrong   9.2%  call_wrong  21.7%  refused   0.0%  malformed   0.8%  answered  84.2%
+  answer_w n=120x1  correct  63.3%  restated_wrong  20.0%  call_wrong  16.7%  refused   0.0%  malformed   0.0%  answered  74.2%
+  answer_x n=120x1  correct  43.3%  restated_wrong  13.3%  call_wrong  43.3%  refused   0.0%  malformed   0.0%  answered  78.3%
 w352.pt (int8, w352_g16  dim 352  corpus -  prompts: device  decoding: greedy-int8
-  answer_0 n=120x1  correct  77.5%  restated_wrong  20.8%  call_wrong   1.7%  refused   0.0%  malformed   0.0%  answered  78.3%
-  answer_s n=120x1  correct  83.3%  restated_wrong  15.8%  call_wrong   0.8%  refused   0.0%  malformed   0.0%  answered  84.2%
-  answer_w n=120x1  correct  80.8%  restated_wrong  15.8%  call_wrong   3.3%  refused   0.0%  malformed   0.0%  answered  83.3%
-  answer_x n=120x1  correct  54.2%  restated_wrong  10.0%  call_wrong  35.8%  refused   0.0%  malformed   0.0%  answered  87.5%
+  answer_0 n=120x1  correct  82.5%  restated_wrong  15.8%  call_wrong   1.7%  refused   0.0%  malformed   0.0%  answered  83.3%
+  answer_s n=120x1  correct  87.5%  restated_wrong  11.7%  call_wrong   0.8%  refused   0.0%  malformed   0.0%  answered  88.3%
+  answer_w n=120x1  correct  82.5%  restated_wrong  14.2%  call_wrong   3.3%  refused   0.0%  malformed   0.0%  answered  85.0%
+  answer_x n=120x1  correct  56.7%  restated_wrong   7.5%  call_wrong  35.8%  refused   0.0%  malformed   0.0%  answered  90.0%
 w352s2.pt (int8, w352s2_g16  dim 352  corpus -  prompts: device  decoding: greedy-int8
-  answer_0 n=120x1  correct  82.5%  restated_wrong  12.5%  call_wrong   5.0%  refused   0.0%  malformed   0.0%  answered  86.7%
-  answer_s n=120x1  correct  85.0%  restated_wrong  14.2%  call_wrong   0.8%  refused   0.0%  malformed   0.0%  answered  85.8%
-  answer_w n=120x1  correct  84.2%  restated_wrong  11.7%  call_wrong   4.2%  refused   0.0%  malformed   0.0%  answered  88.3%
-  answer_x n=120x1  correct  45.0%  restated_wrong   7.5%  call_wrong  32.5%  refused  15.0%  malformed   0.0%  answered  74.2%
+  answer_0 n=120x1  correct  86.7%  restated_wrong   8.3%  call_wrong   5.0%  refused   0.0%  malformed   0.0%  answered  90.8%
+  answer_s n=120x1  correct  88.3%  restated_wrong  10.8%  call_wrong   0.8%  refused   0.0%  malformed   0.0%  answered  89.2%
+  answer_w n=120x1  correct  86.7%  restated_wrong   9.2%  call_wrong   4.2%  refused   0.0%  malformed   0.0%  answered  90.8%
+  answer_x n=120x1  correct  47.5%  restated_wrong   5.0%  call_wrong  32.5%  refused  15.0%  malformed   0.0%  answered  77.5%

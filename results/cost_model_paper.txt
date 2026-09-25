@@ -1,0 +1,26 @@
+block: 6 depth points, 5 empty + 5 filled positions, 12 stages; windows placed at mean positions
+depth   (positions 3-14): 46,116 + 62,144 L us   R^2 = 0.999999
+position, EMPTY cache:  410,469 + 1,177.7 p us   R^2 = 0.999986
+position, FILLED cache: 404,009 + 1,649.8 p us   R^2 = 0.999992   (intercept is an extrapolation to p = 0)
+filled / empty slope: 1.401  (+40.1% relative to empty; empty is 28.6% below filled)
+stages (positions 3-14): token 419,036 us; attributed 417,810 us, unattributed 0.29%
+   ffn matmul    55.6%
+   qkv matmul    16.9%
+   classifier    10.9%
+   attention      9.2%
+   RoPE           5.1%
+   matrix products 83.5%
+consistency, same block, same positions:
+   fixed stages 46,263 vs depth intercept 46,116: 0.32%
+   per-layer stages 61,924 vs depth slope 62,144: 0.35%
+   attributed stages 417,810 vs filled fit at p = 8.5 (418,033): 0.05%
+throughput, filled model:
+   position     0: 2.475 tok/s  extrapolated
+   position   128: 1.626 tok/s  
+   position   256: 1.210 tok/s  
+   position 497.5: 0.816 tok/s  last measured window
+   position   511: 0.802 tok/s  extrapolated
+   drop 0 -> 511: 68%
+decode prediction (positions 53..53+n-1), filled model, uninstrumented runs:
+   24 tokens: predicted 12.250 s, measured 12.332 s (n = 1, range 12.332-12.332) -> -0.7%; empty-cache model -5.3%; measured rate 1.946 tok/s (range 1.946-1.946)
+   33 tokens: predicted 17.089 s, measured 17.175 s (n = 3, range 17.158-17.190) -> -0.5%; empty-cache model -5.5%; measured rate 1.921 tok/s (range 1.920-1.923)

@@ -77,7 +77,17 @@ def answer_matches_result(generation):
         # result span were then byte-identical and no rounding had to be tolerated. A20 made <res>
         # verbatim (it must match src/store/toolrun.c) and this bug became visible on 145 of 1,199
         # documents. A latent grader defect uncovered by fixing the corpus, not caused by it.
-        d = sum(1 for ch in tok.split("e")[0].lstrip("-+0.").replace(".", "") if ch.isdigit())
+        #
+        # AND AN INTEGER'S TRAILING ZEROS ARE PLACEHOLDERS TOO. Counting them read "16670" as five
+        # significant figures and rejected it as a restatement of 16667.8894, although it is the
+        # correct 4-sf rounding (docs/RESULT_CORRECTNESS.md s5). Without a
+        # decimal point the precision is ambiguous, so the zeros are not counted; "4737" for 4737.6
+        # is still a truncation and still fails.
+        mant = tok.split("e")[0].split("E")[0]
+        digits = mant.lstrip("-+0.").replace(".", "")
+        if "." not in mant:
+            digits = digits.rstrip("0") or digits[:1]
+        d = sum(1 for ch in digits if ch.isdigit())
         try: vals.append((float(tok), max(1, d)))
         except ValueError: pass
     refs = []

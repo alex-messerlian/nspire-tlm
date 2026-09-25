@@ -285,7 +285,9 @@ def breakdown(paths):
                 g, ref = row["gen"], row["ref"]
                 b["answered"] += (row["well_formed"] and not row["refused"]
                                   and grade.answer_matches_result(g))
-                if row["correct"]:
+                # RECOMPUTED from the saved generation, never read from the stored flag, so a grader
+                # fix (e.g. the trailing-zero repair) reaches every saved run without regenerating.
+                if correct(g, ref):
                     b["correct"] += 1
                 elif row["refused"]:
                     b["refused"] += 1

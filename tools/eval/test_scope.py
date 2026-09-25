@@ -58,12 +58,15 @@ _AMR = [
     ("states no number at all",               "<tool>e<arg>84/7</tool><res>12</res><a> It is fast.<end>",       False),
     ("no result span to match against",       "<a> 12 m/s.<end>",                                              False),
     ("result present, answer echoes the ARG", "<tool>e<arg>84/7</tool><res>12</res><a> 84 m.<end>",             False),
+    ("integer trailing zero is a placeholder", "<tool>e<arg>x</tool><res>16667.8894</res><a> 16670 V.<end>",      True),
+    ("truncation is not rounding",            "<tool>e<arg>x</tool><res>4737.6</res><a> 4737 N.<end>",           False),
+    ("wrong 3-sf rounding still fails",       "<tool>e<arg>x</tool><res>16667.9</res><a> 16600 V.<end>",         False),
 ]
 for _lbl, _g, _want in _AMR:
     _got = grade.answer_matches_result(_g)
     if _got != _want:
         print(f"FAIL answer_matches_result: {_lbl} -> {_got}, want {_want}"); fail += 1
-print(f"  ok  answer_matches_result: {len(_AMR)} cases, including 4 that must be REJECTED")
+print(f"  ok  answer_matches_result: {len(_AMR)} cases, including 6 that must be REJECTED")
 
 print(f"{'FAILED' if fail else 'PASS'}: {len(CASES)} answer/refusal cases + 4 scope assertions "
       f"+ {len(_AMR)} result-match cases, {fail} failure(s)")

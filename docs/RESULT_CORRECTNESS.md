@@ -175,3 +175,53 @@ scored by the replaced harness. The ladder is therefore NOT reported as a test o
     tools/eval/score_on_device_decoder.sh 88 train/ship.pt train/w352.pt train/w352s2.pt train/w176.pt train/w176s2.pt
     tools/eval/score_on_device_decoder.sh 16 train/ship.pt train/w352.pt train/w352s2.pt train/w176.pt train/w176s2.pt
     .venv-tok/bin/python tools/eval/int8_calls.py results/correct_devg_ship.json
+
+
+## 7. Checks added after the first draft, and what they measured
+
+The measurements:
+
+**Strict grader: an integer's trailing zeros are placeholders.** `grade.answer_matches_result` read
+"16670" as five significant figures and rejected a correct 4-sf restatement of 16667.8894. Fixed in
+`tools/eval/grade.py`; `tools/eval/test_scope.py` pins it with three cases (16670 passes, 4737 for
+4737.6 still fails as truncation, 16600 for 16667.9 still fails). The report now RECOMPUTES
+correctness from saved generations, so every saved run picks the fix up. Strict `answer_0`, shipped:
+group 88 **79.2%** (was 75.0), group 16 **88.3%** (was 84.2), fp32 greedy 88.3%. At group 16 int8 and
+fp32 reach the same verdict on **120/120** items and identical text on 114/120.
+Harness steps under the fixed grader: split text 55.0 -> device prompts 76.1 -> greedy 88.3 -> int8
+group 88 79.2.
+
+**Independent references** (`tools/eval/independent_refs.py`): all 480 answer-arm references
+recomputed in Python `math` from the same substituted expression agree with evalcli to 1e-8 (max
+4.9e-10, evalcli's 10-sf printing). Scope: arithmetic only; a wrong stored formula would pass both.
+
+**Paired distractor** (`tools/eval/paired_distractor.py`): the 120 `answer_0` items, each with one
+spare assignment (drawn from `answer_x`'s own spares, never a symbol in the item) inserted before
+the first given or after the last, nothing else changed. Device-check right:
+
+| decoder | base | spare LAST | spare FIRST | lost (last / first) | wrong with spare in call (first) |
+|---|---|---|---|---|---|
+| int8 group 88 (shipped) | 110 | 104 | **55** | 8 / **59** | 43 of 65 |
+| int8 group 16 | 116 | 113 | **61** | 4 / 56 | 43 of 59 |
+
+Reversing the relevant givens, no spare: 83/91 -> 83/91 at group 88 (3 lost, 3 gained) -- the model
+binds by NAME. **Cause, measured in the ladder corpus (`acdc7b70`): of 75,618 compute documents with
+a spare given, 100.00% place every spare after every relevant given.** The model learned where
+irrelevant values sit. The `answer_x` split places its spare first -- a shape the generator never
+emits -- which is why that set scores 57.5%.
+
+**Deterministic baseline** (`tools/eval/score_deterministic.py`): the runtime's own parse/bind via the
+device prompt, evalcli, no model; the same graders. answer_0/s/w 120/120 each, answer_x 119/120,
+d1 120/120, d1_zero 102/102, fit 0/120, explain format 68/87 (78.2%; 13 of 19 misses are its
+keyword intent rule). On every set that asks for a number or a refusal it matches or beats the model.
+
+**Device parser defect found by the baseline:** `ask_build` matches symbols case-insensitively, so a
+stated `Q = 1.29e-05` (the answer_x spare) was bound to `q`, overriding the electron-charge constant.
+One item; the model saw the same wrong prompt. Not fixed here.
+
+**Cost model regenerated from ONE block with windows at their mean positions**
+(`paper/cost_model.py` -> `results/cost_model_paper.txt`): depth 46,116 + 62,144 L (R^2 0.999999);
+filled position 404,009 + 1,649.8 p (R^2 0.999992; intercept extrapolated), empty 1,177.7 p (+40.1%
+filled vs empty); consistency 0.32 / 0.35 / 0.05%; decode prediction -0.5% (33 tokens, 3 runs) and
+-0.7% (24 tokens, 1 run), empty-cache model -5.5 / -5.3%. The width sweep's "@8" and "@256" are
+positions 11-18 and 259-266.
