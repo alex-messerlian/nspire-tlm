@@ -45,9 +45,12 @@ static int argmax(const float *v, int n) {
 int main(void) {
     screen_init();
 static char GDIR[32] = "/documents/tlm/";
-    LOG = fopen("/documents/tlm/genlog.txt.tns", "w");
+    /* A144. APPEND, NOT OVERWRITE. The timing needs three battery runs for a spread, and "w" kept only
+     * the last -- two runs' results would have existed only as photographs. Each run is marked so
+     * the host can split them; the file stays a few KB, far below the size that has failed to pull. */
+    LOG = fopen("/documents/tlm/genlog.txt.tns", "a");
     g_nspire_log = LOG;
-    say("== generate ==");
+    say("\n== generate ==");
     say("printf works from this TU");
 
     ns_store2 st; ns_tok tk;

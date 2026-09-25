@@ -62,8 +62,11 @@ int main(int argc, char **argv) {
     int tok = ids[0], pos = 0;
     while (pos < n - 1) { rq_forward(tok, pos); pos++; tok = ids[pos]; }
 
-    int out[64], produced = 0;
-    for (int s = 0; s < NDEV; s++) {
+    int out[128], produced = 0;
+    /* Decode to the device's own stop condition or 120 tokens, whichever comes first -- the same
+     * rule as device_generate.c at GEN_MAX 120 -- so the host sequence is compared in full rather
+     * than truncated to the 24-token device log that DEVICE_IDS preserves. */
+    for (int s = 0; s < 120; s++) {
         float *lg = rq_forward(tok, pos);
         pos++;
         tok = argmax_of(lg, V);

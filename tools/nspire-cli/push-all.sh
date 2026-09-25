@@ -141,7 +141,17 @@ newer_than bench/bench_rtc.tns      bench/bench_rtc.c bench/common.h
 newer_than tools/eval/eval_device.tns tools/eval/device_main.c tools/eval/eval.h
 newer_than src/llama2.tns             src/nspire_main.c src/runq_nspire.c src/nspire.c
 fi
-newer_than build/chattlm.tns        $(echo src/store/*.c src/store/*.h src/runq_nspire.c src/nspire.c)
+# A144. THE APP'S INPUTS COME FROM THE MAKEFILE, NOT FROM A GLOB.
+#
+# This was `src/store/*.c src/store/*.h ...`, which includes every program in src/store -- among them
+# device_generate.c, the throughput benchmark, which has its own main() and is NOT linked into
+# chattlm.tns. Editing that benchmark made this gate declare the app stale and REFUSE the whole
+# transfer, while `make -q build/chattlm.tns` correctly said the app was current. A check wider than
+# the property it names is a false alarm, and a gate that cries wolf teaches people to bypass it.
+# The Makefile's DEV_SRC / EVAL_CORE / APP_HDR ARE the app's inputs, so ask for them.
+APP_INPUTS=$(printf 'show: ; @echo $(DEV_SRC) $(EVAL_CORE) $(APP_HDR)\n' | make -s --no-print-directory -f Makefile -f - show)
+[ -n "$APP_INPUTS" ] || { echo "  FATAL: could not read the app's inputs from the Makefile"; exit 1; }
+newer_than build/chattlm.tns        $APP_INPUTS
 # These two have their own Makefiles (tools/eval/, src/) and are NOT built by the repo-root `make`.
 # They were absent from a fresh worktree while push-all.sh sent them unconditionally under `set -e`,
 # so the transfer would have aborted mid-run after the device had already been half-written. Named
