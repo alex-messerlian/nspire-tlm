@@ -66,12 +66,22 @@ CONTROLS = {
     # record so it cannot conflict, and q is on the DELIBERATE list. A control must name the thing
     # the gate asserts about, not merely a string the gate's file contains.
     # A156, one control per clause, each aimed at the test_autopick case only that clause decides.
-    "test_autopick":   ("src/store/askparse.c",     # the rule itself: I_S question must go through
-                        "    if (givens_bind_uniquely(st, out[0], in, question)) return 1;",
+    "test_autopick":   ("src/store/askparse.c",     # A156 itself: "What is output work?" (no
+                        "    if (givens_bind_uniquely(st, out[0], in, question)) return 1;",  # symbol, 66%)
                         "    if (0) return 1;"),
-    "autopick_unique": ("src/store/askparse.c",     # m, v bind K AND p: must stay ambiguous
+    "autopick_unique": ("src/store/askparse.c",     # series and parallel R_eqv: must stay ambiguous
                         "            && givens_bind(&st->rec[r], in)) return 0;",
                         "            && 0) return 0;"),
+    # A157, one per clause: the tie-break itself, its ambiguity refusal, and a/A/I closing a clause.
+    "autopick_tiebreak":("src/store/askparse.c",    # "Given m = 2, a = 3, find F" must pick F=m*a
+                        "    if (asked_symbol_pick(st, in, question, &pick)) {",
+                        "    if (0) {"),
+    "autopick_ambig":  ("src/store/askparse.c",     # "find R and P" must be refused
+                        "        if (named && strcmp(named, rec->formula)) return 0;",
+                        "        if (0) return 0;"),
+    "autopick_clause": ("src/store/askparse.c",     # "V, R, find I" must not pick P = V^2/R
+                        "        return !(*f == 0 || *f == '?' || *f == '.' || *f == ',' || *f == ';' || *f == '!' || *f == ':');",
+                        "        return 1;"),
     "autopick_other":  ("src/store/askparse.c",     # binds I = P/A, asks for v_d
                         "    return !names_other_variable(st, t, in, question);",
                         "    return 1;"),
@@ -347,6 +357,8 @@ ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_sc
          "given_range_kind": "given_range",
          "autopick_unique": "test_autopick", "autopick_other": "test_autopick",
          "autopick_letter": "test_autopick", "autopick_units": "test_autopick",
+         "autopick_tiebreak": "test_autopick", "autopick_ambig": "test_autopick",
+         "autopick_clause": "test_autopick",
          }   # one control per FIELD the parity gate checks
 
 

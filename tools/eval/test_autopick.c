@@ -13,6 +13,10 @@
  * ran this binary (A156 found it built by `make tests` and listed nowhere in the gate loop, with
  * test_askparse and test_ansmatch). The host stub for app_request records the rid it was sent: a
  * record id is an answer path, the empty string is Form C.
+ *
+ * A157 changed one expectation here, on purpose: "Take m = 497, v = 71.7. What is K?" was a
+ * DECLINE case (m and v bind K and p alike) and is now answered, because it names K. The ambiguity
+ * it stood for is held by "find R and P" and by the series/parallel R_eqv case below.
  */
 #include <stdio.h>
 #include <string.h>
@@ -80,6 +84,16 @@ int main(void) {
     answers("Given d = 150, t = 12, find the speed", "v=d/t");
     answers("Given d = 150 m, t = 12 s, find v", "v=d/t");              /* units are not symbols */
     answers("Using I_P = 8.54, N_P = 780, N_S = 2430, find I_S.", "I_S=((N_P)/(N_S))*I_P");
+    /* decided by A156 alone: no symbol named, coverage 66% under the bar of 75 */
+    answers("What is output work? Take d_o = 82.5, F_o = 75.6.", "W_o=F_o*d_o");
+
+    printf("\n-- A157: the asked symbol breaks a tie between bound relations --------------\n");
+    answers("Given m = 2, a = 3, find F", "F=m*a");                     /* not F_net=m*a */
+    answers("Given V = 12, I = 2, find R", "R=V/I");                    /* not P=V*I     */
+    answers("Given V = 12, I = 2, find P", "P=V*I");                    /* not R=V/I     */
+    answers("Take m = 497, v = 71.7. What is K?", "K=0.5*m*(v)^(2)");   /* not p=m*v     */
+    answers("A cart has m = 2 and a = 3. Find F.", "F=m*a");            /* "A" is an article */
+    answers("Given F = 10, m = 2, find a", "a=((F)/(m))");              /* "a" closes the clause */
 
     /* ---- THE OTHER DIRECTION, which is the half that can silently rot --------------------- */
     printf("\n-- these must be declined ------------------------------------------------\n");
@@ -87,7 +101,9 @@ int main(void) {
     declines("Find the gradient of f(x,y,z) = xy + yz + xz at point P(1,2,3).");  /* out of scope */
     declines("Suppose P = 464, A = 3.39e-05. Compute v_d.");     /* binds I = P/A, asks for v_d  */
     declines("Take m = 497, v = 71.7, h = 3. What is K?");       /* binds lambda, asks for K     */
-    declines("Take m = 497, v = 71.7. What is K?");              /* binds K AND p: ambiguous     */
+    declines("Given V = 12, R = 6, find I");       /* binds only P = V^2/R, and asks for I     */
+    declines("Given V = 12, I = 2, find R and P"); /* two named relations: ambiguous          */
+    declines("Find R_eqv. Suppose R_2 = 64.56, R_1 = 2.56.");    /* series AND parallel R_eqv    */
 
     printf("\n-- neither path may leave the question in the compose buffer ---------------\n");
     sent_for("what is hookes law");

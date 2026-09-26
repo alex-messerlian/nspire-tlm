@@ -710,10 +710,12 @@ static int question_carries_relation(const ns_store2 *st, int r, const char *que
  *   for v_d. A token that is a variable somewhere in the store, is not given and is not this
  *   record's LHS means the question asks for something else. Caught both such cases in the
  *   withheld-value arms and removed no correct pick. SINGLE LETTERS count too, except where they
- *   are not symbols: "a", "A" and "I" (English words), unit notation ("150 m", "m/s", "s^2") and a
- *   possessive ("newton's"). Measured three ways: ignoring single letters let "m = 497, v = 71.7,
- *   h = 3. What is K?" pick lambda = h/(m*v); counting every single letter blocked "find v in m/s"
- *   and "d = 150 m, t = 12 s"; the exemptions pass both and change no count in the table below.
+ *   are not symbols: unit notation ("150 m", "m/s", "s^2"), a possessive ("newton's"), and "a",
+ *   "A" and "I" wherever a word follows them (English: "I have...", "a car"). Measured: ignoring
+ *   single letters let "m = 497, v = 71.7, h = 3. What is K?" pick lambda = h/(m*v); counting every
+ *   single letter blocked "find v in m/s" and "d = 150 m, t = 12 s". A157 found the third: with
+ *   a/A/I exempt everywhere, "Given V = 12, R = 6, find I" picked P = V^2/R -- I closing the clause
+ *   is a symbol. None of the three changes a count in the table below.
  *
  * Measured against the shipped rule (right pick / wrong pick, 120 items each):
  *
@@ -751,13 +753,17 @@ static int givens_bind(const ns_rec2 *r, const ns_input *in) {
 }
 
 static int single_letter_exempt(const char *q, const char *s, const char *e) {
-    if (*s == 'a' || *s == 'A' || *s == 'I') return 1;          /* English words */
     const char *b = s;
     while (b > q && b[-1] == ' ') b--;
     if (b > q && ((b[-1] >= '0' && b[-1] <= '9') || b[-1] == '/' || b[-1] == '^' || b[-1] == '*'))
         return 1;                                               /* a unit: "150 m", "m/s" */
     if (*e == '/' || *e == '^' || *e == '*') return 1;          /* a unit: "m/s", "s^2"   */
     if (b > q && b[-1] == '\'') return 1;                      /* possessive: newton's   */
+    if (*s == 'a' || *s == 'A' || *s == 'I') {                  /* a word unless it closes */
+        const char *f = e;                                      /* the clause: "find I"    */
+        while (*f == ' ') f++;
+        return !(*f == 0 || *f == '?' || *f == '.' || *f == ',' || *f == ';' || *f == '!' || *f == ':');
+    }
     return 0;
 }
 
@@ -787,6 +793,63 @@ static int givens_bind_uniquely(const ns_store2 *st, int top, const ns_input *in
     return !names_other_variable(st, t, in, question);
 }
 
+/* A157. THE ASKED SYMBOL BREAKS A TIE BETWEEN BOUND RELATIONS.
+ *
+ * A156 stays silent when the givens bind two relations, which is right for "R_1, R_2, what was
+ * equivalent resistance?" and wrong for the questions a student types most: "Given m = 2, a = 3,
+ * find F" binds F = m*a AND F_net = m*a; "Given V = 12, I = 2, find R" binds R = V/I AND P = V*I.
+ * The question already says which: it names F, or R. Reported from the device after A156.
+ *
+ * So: among the relations the givens bind (givens_bind, A156's test), take those whose LHS the
+ * question names as a token -- single letters under the same exemptions as names_other_variable --
+ * and if they are one relation, choose it, whatever the ranking put first. Duplicates of that
+ * relation (same formula, another chapter) are resolved by the ranking's own score. Two named
+ * relations ("find R and P", or series and parallel both written R_eqv) is ambiguous and this rule
+ * says nothing; A156's guard still applies to the choice.
+ *
+ * Measured against A156 (right pick / wrong pick, 120 items each):
+ *
+ *     values given, symbol asked      62 / 6   ->   96 / 3    fewer wrong: the named symbol now
+ *     symbol only ("What was F?")     28 / 6   ->  118 / 0    overrides a wrong word-based guess
+ *     quantity named in words         93 / 2   ->   93 / 2    no symbol to name
+ *     spare value, withheld value, explain, 16,989 out-of-scope (1.96%), 200 textbook: unchanged
+ *
+ * SCOPE, as for A156 and more so: the evaluation's questions name the record's own LHS by
+ * construction, so 118/120 is what symbol-only questions score WHEN the student's symbol is the
+ * store's. A student who asks for "Fnet" or "v" where the store says F_net or v_f gets A156 or
+ * coverage instead, which is where they were before. */
+static int lhs_named(const ns_rec2 *rec, const char *q) {
+    for (const char *c = q; *c; ) {
+        if (!alpha(*c) || (c > q && (idch(c[-1]) || c[-1] == '.'))) { c++; continue; }
+        const char *from = c;
+        char sym[32]; int k = 0;
+        while (idch(*c)) { if (k < 31) sym[k++] = *c; c++; }
+        sym[k] = 0;
+        if (k == 31 || strcmp(sym, rec->lhs)) continue;
+        if (k == 1 && single_letter_exempt(q, from, c)) continue;
+        return 1;
+    }
+    return 0;
+}
+
+static int asked_symbol_pick(const ns_store2 *st, const ns_input *in, const char *question,
+                             int *pick) {
+    if (!in || in->nvals < 1) return 0;
+    const char *named = 0;
+    int best = -1, best_sc = -1;
+    for (int r = 0; r < st->n; r++) {
+        const ns_rec2 *rec = &st->rec[r];
+        if (!givens_bind(rec, in) || !lhs_named(rec, question)) continue;
+        if (named && strcmp(named, rec->formula)) return 0;   /* two named relations: ambiguous */
+        named = rec->formula;
+        int sc = score_record(st, r, question, in, 1, ASK_NOUN);
+        if (sc > best_sc) { best_sc = sc; best = r; }
+    }
+    if (best < 0 || names_other_variable(st, &st->rec[best], in, question)) return 0;
+    *pick = best;
+    return 1;
+}
+
 int ask_confident(const ns_store2 *st, const char *question, const ns_input *in, int *idx_out) {
     if (idx_out) *idx_out = -1;
     if (!st || !question) return 0;
@@ -795,6 +858,11 @@ int ask_confident(const ns_store2 *st, const char *question, const ns_input *in,
     if (n < 1) return 0;
     if (idx_out) *idx_out = out[0];
     if (question_carries_relation(st, out[0], question)) return 1;
+    int pick;
+    if (asked_symbol_pick(st, in, question, &pick)) {                   /* A157, above */
+        if (idx_out) *idx_out = pick;
+        return 1;
+    }
     if (givens_bind_uniquely(st, out[0], in, question)) return 1;       /* A156, above */
     /* A VERBATIM RECORD NAME WAS TRIED AS A THIRD CERTAINTY RULE AND MEASURED OUT. It would have
      * caught the one worded calculus question that still falls through ("derivative of kinetic
