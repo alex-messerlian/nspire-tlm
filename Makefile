@@ -66,7 +66,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck $(BUILD)/devprompt $(BUILD)/devasm
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck $(BUILD)/devprompt $(BUILD)/devasm $(BUILD)/autoasm
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -111,6 +111,10 @@ $(BUILD)/hoststub.o: $(BUILD)/hoststub.c
 # prerequisites. Without them a palette-only edit left build/test_theme "up to date" and the gate
 # passed on a stale binary -- a suite that cannot see your change is worse than no suite.
 $(addprefix $(BUILD)/,$(TESTS_APP)): $(BUILD)/%: tools/eval/%.c $(APP_SRC) src/store/app.h src/store/font_data.h $(BUILD)/hoststub.o | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< $(HOST_LINK) -lm
+
+# autoasm #includes app.c to call open_picker(), the shipped selection, rather than a copy of it.
+$(BUILD)/autoasm: tools/eval/autoasm.c $(APP_SRC) src/store/app.h src/store/font_data.h $(BUILD)/hoststub.o | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< $(HOST_LINK) -lm
 
 $(BUILD)/render_app: tools/eval/render_app.c $(APP_SRC) $(APP_HDR) $(BUILD)/hoststub.o | $(BUILD)
@@ -188,7 +192,11 @@ $(BUILD)/test_tokenizer: src/store/test_tokenizer.c src/store/tokenizer.c | $(BU
 $(BUILD)/ansmatch_impl.h: src/store/device_app.c | $(BUILD)
 	@sed -n '/^static int answer_states_result/,/^}/p' $< > $@
 	@test -s $@ || { echo "  FATAL: answer_states_result not found in device_app.c"; exit 1; }
-$(BUILD)/test_ansmatch: tools/eval/test_ansmatch.c $(BUILD)/ansmatch_impl.h | $(BUILD)
+# device_app.c DIRECTLY as well as through the generated header (A156). A control restore stamps the
+# source two seconds ahead so make rebuilds; the header it regenerates gets the CURRENT time, which
+# on 1-second make timestamps can tie the stale binary built during the mutation, and then the
+# binary was never rebuilt: test_ansmatch kept the mutated 20% tolerance after a clean restore.
+$(BUILD)/test_ansmatch: tools/eval/test_ansmatch.c $(BUILD)/ansmatch_impl.h src/store/device_app.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -I $(BUILD) -o $@ $< -lm
 
 $(BUILD)/test_askparse:  tools/eval/test_askparse.c src/store/askparse.c src/store/picker.c src/store/assemble.c src/store/loader.c $(APP_HDR) | $(BUILD)
@@ -261,7 +269,7 @@ GS_SRC := $(shell grep -oE '^\#define FIXED_GS [0-9]+' src/runq_nspire.c | grep 
 
 # The calculator's generation loop on the host -- int8 engine, tool injection, the shipped
 # answer_states_result -- so a quality number can be attached to what the device decodes.
-$(BUILD)/int8gen: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c src/store/gencore.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h $(APP_HDR) | $(BUILD)
+$(BUILD)/int8gen: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer.c src/store/toolrun.c src/store/gencore.c $(EVAL_CORE) $(BUILD)/ansmatch_impl.h src/store/device_app.c $(APP_HDR) | $(BUILD)
 	$(CC) $(HOSTFLAGS) -I $(BUILD) -DFIXED_GS=$(GS_SRC) -o $@ $< src/store/tokenizer.c src/store/toolrun.c src/store/gencore.c $(EVAL_CORE) -lm
 
 # The same loop at group 16, which divides every row length at widths 176 and 352 -- the control

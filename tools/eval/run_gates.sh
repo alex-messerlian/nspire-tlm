@@ -254,6 +254,15 @@ if ! _skip test_lossmask; then $PY train/test_lossmask.py >/dev/null 2>&1 && pri
 if ! _skip test_loader; then ./build/test_loader build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_loader" || { printf "  %-20s FAIL\n" "test_loader"; fail=1; }; fi
 if ! _skip test_picker; then ./build/test_picker build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_picker" || { printf "  %-20s FAIL\n" "test_picker"; fail=1; }; fi
 if ! _skip test_pickui; then ./build/test_pickui build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_pickui" || { printf "  %-20s FAIL\n" "test_pickui"; fail=1; }; fi
+# A156. BUILT BY `make tests` AND RUN BY NOTHING: test_askparse, test_autopick and test_ansmatch were
+# in the Makefile's test lists and in no line of this file, so every assertion in them was coverage
+# that never executed. test_autopick had been FAILING since A125 (it asserted a picker the app no
+# longer shows) and its "answered directly" half passed whatever the app did. Wired here with a
+# gate that proves the Makefile lists nothing this file skips (tools/eval/gate_tests_wired.py).
+if ! _skip test_askparse; then ./build/test_askparse build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_askparse" || { printf "  %-20s FAIL\n" "test_askparse"; fail=1; }; fi
+if ! _skip test_autopick; then ./build/test_autopick >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_autopick" || { printf "  %-20s FAIL\n" "test_autopick"; fail=1; }; fi
+if ! _skip test_ansmatch; then ./build/test_ansmatch >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_ansmatch" || { printf "  %-20s FAIL\n" "test_ansmatch"; fail=1; }; fi
+if ! _skip tests_wired; then $PY tools/eval/gate_tests_wired.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "tests_wired" || { printf "  %-20s FAIL\n" "tests_wired"; fail=1; }; fi
 if ! _skip test_context; then ./build/test_context >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_context" || { printf "  %-20s FAIL\n" "test_context"; fail=1; }; fi
 if ! _skip test_assemble; then ./build/test_assemble build/store.tns >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_assemble" || { printf "  %-20s FAIL\n" "test_assemble"; fail=1; }; fi
 if ! _skip test_tokenizer; then ./build/test_tokenizer build/tok4096.tok build/tok_reference.json >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_tokenizer" || { printf "  %-20s FAIL\n" "test_tokenizer"; fail=1; }; fi

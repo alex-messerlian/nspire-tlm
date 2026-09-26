@@ -686,6 +686,107 @@ static int question_carries_relation(const ns_store2 *st, int r, const char *que
     return has_op && strlen(rhs) >= 3 && strstr(nq, rhs) != 0;
 }
 
+/* A156. THE GIVENS BIND THE RECORD: a third certainty, for questions that come with values.
+ *
+ * Scored end to end on the calculator's decoder (tools/eval/score_endtoend.py), the shipped app
+ * answered 17.5% of the values-given evaluation questions correctly, and almost all of the rest it
+ * DECLINED -- "no matching relation". The model was not the bottleneck and neither was the
+ * ranking. On questions naming the quantity in words the top-ranked record was RIGHT 88.3% of the
+ * time; coverage let 28.3% through. Coverage was tuned on lookups, word problems and out-of-scope
+ * questions, never on a question carrying values, and every framing word ("Take", "Estimate",
+ * "In a setup with") counts against it.
+ *
+ * Values are evidence the words are not. If the question supplies exactly the inputs of the
+ * top-ranked record -- every given is one of its variables, every other variable but its LHS is
+ * given or a stored constant, and the LHS itself is not given -- the record computes a single
+ * unknown from exactly what the student typed. Two refinements, each earning its place by
+ * measurement:
+ *
+ *   UNIQUE. If another relation (a different formula) is bound by the same givens, the question is
+ *   ambiguous -- R_1 and R_2 bind series AND parallel resistance -- and this rule stays silent.
+ *   Without it, symbol-only questions picked 14 wrong records instead of 6.
+ *
+ *   NAMES NO OTHER VARIABLE. "P = 464, A = 3.39e-05. Compute v_d." binds I = P/A exactly, and asks
+ *   for v_d. A token that is a variable somewhere in the store, is not given and is not this
+ *   record's LHS means the question asks for something else. Caught both such cases in the
+ *   withheld-value arms and removed no correct pick. SINGLE LETTERS count too, except where they
+ *   are not symbols: "a", "A" and "I" (English words), unit notation ("150 m", "m/s", "s^2") and a
+ *   possessive ("newton's"). Measured three ways: ignoring single letters let "m = 497, v = 71.7,
+ *   h = 3. What is K?" pick lambda = h/(m*v); counting every single letter blocked "find v in m/s"
+ *   and "d = 150 m, t = 12 s"; the exemptions pass both and change no count in the table below.
+ *
+ * Measured against the shipped rule (right pick / wrong pick, 120 items each):
+ *
+ *     values given, symbol asked      22 / 6   ->   62 / 6
+ *     quantity named in words         34 / 2   ->   93 / 2
+ *     symbol only ("What was F?")      0 / 6   ->   28 / 6
+ *     a value withheld (d1)           24 / 5   ->   24 / 6   the one new pick is I = P/(4*pi*r^2)
+ *                                                            for "r = 30, P = 5.33, what is I?",
+ *                                                            which that record does answer
+ *     2,000 + 14,989 out-of-scope     1.60% / 2.01% confident, unchanged: stems carry no givens
+ *     200 textbook questions (DEV)    never fires: textbooks state values in prose
+ *
+ * SCOPE, stated because it limits the claim: the evaluation questions use the store's own symbols
+ * by construction, so the gain on a student who writes "vi" for v_0 will be smaller. The rule can
+ * only fire when the student's symbols ARE the store's; otherwise it falls through to coverage. */
+static int rec_has_var(const ns_rec2 *r, const char *v) {
+    for (int i = 0; i < r->nvars; i++) if (r->var[i] && !strcmp(r->var[i], v)) return 1;
+    return 0;
+}
+
+static int input_has(const ns_input *in, const char *v) {
+    for (int i = 0; i < in->nvals; i++) if (in->var[i] && !strcmp(in->var[i], v)) return 1;
+    return 0;
+}
+
+static int givens_bind(const ns_rec2 *r, const ns_input *in) {
+    if (!r->formula || !r->lhs || !strchr(r->formula, '=') || !in || in->nvals < 1) return 0;
+    for (int i = 0; i < in->nvals; i++) if (!in->var[i] || !rec_has_var(r, in->var[i])) return 0;
+    if (input_has(in, r->lhs)) return 0;
+    for (int i = 0; i < r->nvars; i++) {
+        if (!r->var[i] || !strcmp(r->var[i], r->lhs)) continue;
+        if (!input_has(in, r->var[i]) && !(r->cval[i] && r->cval[i][0])) return 0;
+    }
+    return 1;
+}
+
+static int single_letter_exempt(const char *q, const char *s, const char *e) {
+    if (*s == 'a' || *s == 'A' || *s == 'I') return 1;          /* English words */
+    const char *b = s;
+    while (b > q && b[-1] == ' ') b--;
+    if (b > q && ((b[-1] >= '0' && b[-1] <= '9') || b[-1] == '/' || b[-1] == '^' || b[-1] == '*'))
+        return 1;                                               /* a unit: "150 m", "m/s" */
+    if (*e == '/' || *e == '^' || *e == '*') return 1;          /* a unit: "m/s", "s^2"   */
+    if (b > q && b[-1] == '\'') return 1;                      /* possessive: newton's   */
+    return 0;
+}
+
+static int names_other_variable(const ns_store2 *st, const ns_rec2 *rec, const ns_input *in,
+                                 const char *q) {
+    for (const char *p = q; *p; ) {
+        /* a token starts at a letter that does not continue an identifier or a number (3.05e-07) */
+        if (!alpha(*p) || (p > q && (idch(p[-1]) || p[-1] == '.'))) { p++; continue; }
+        const char *start = p;
+        char tok[32]; int n = 0;
+        while (idch(*p)) { if (n < 31) tok[n++] = *p; p++; }
+        tok[n] = 0;
+        if (n == 31 || input_has(in, tok) || !strcmp(tok, rec->lhs)) continue;
+        if (n == 1 && single_letter_exempt(q, start, p)) continue;
+        for (int r = 0; r < st->n; r++) if (rec_has_var(&st->rec[r], tok)) return 1;
+    }
+    return 0;
+}
+
+static int givens_bind_uniquely(const ns_store2 *st, int top, const ns_input *in,
+                                const char *question) {
+    const ns_rec2 *t = &st->rec[top];
+    if (!givens_bind(t, in)) return 0;
+    for (int r = 0; r < st->n; r++)
+        if (r != top && st->rec[r].formula && strcmp(st->rec[r].formula, t->formula)
+            && givens_bind(&st->rec[r], in)) return 0;
+    return !names_other_variable(st, t, in, question);
+}
+
 int ask_confident(const ns_store2 *st, const char *question, const ns_input *in, int *idx_out) {
     if (idx_out) *idx_out = -1;
     if (!st || !question) return 0;
@@ -694,6 +795,7 @@ int ask_confident(const ns_store2 *st, const char *question, const ns_input *in,
     if (n < 1) return 0;
     if (idx_out) *idx_out = out[0];
     if (question_carries_relation(st, out[0], question)) return 1;
+    if (givens_bind_uniquely(st, out[0], in, question)) return 1;       /* A156, above */
     /* A VERBATIM RECORD NAME WAS TRIED AS A THIRD CERTAINTY RULE AND MEASURED OUT. It would have
      * caught the one worded calculus question that still falls through ("derivative of kinetic
      * energy with respect to v", which ranks this record first and scores 0 on coverage). Measured

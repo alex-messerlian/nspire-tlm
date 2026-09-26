@@ -65,6 +65,32 @@ CONTROLS = {
     # Two earlier attempts survived because they named the wrong subject -- dT appears in a single
     # record so it cannot conflict, and q is on the DELIBERATE list. A control must name the thing
     # the gate asserts about, not merely a string the gate's file contains.
+    # A156, one control per clause, each aimed at the test_autopick case only that clause decides.
+    "test_autopick":   ("src/store/askparse.c",     # the rule itself: I_S question must go through
+                        "    if (givens_bind_uniquely(st, out[0], in, question)) return 1;",
+                        "    if (0) return 1;"),
+    "autopick_unique": ("src/store/askparse.c",     # m, v bind K AND p: must stay ambiguous
+                        "            && givens_bind(&st->rec[r], in)) return 0;",
+                        "            && 0) return 0;"),
+    "autopick_other":  ("src/store/askparse.c",     # binds I = P/A, asks for v_d
+                        "    return !names_other_variable(st, t, in, question);",
+                        "    return 1;"),
+    "autopick_letter": ("src/store/askparse.c",     # binds lambda, asks for K
+                        "        if (n == 1 && single_letter_exempt(q, start, p)) continue;",
+                        "        if (n == 1) continue;"),
+    "autopick_units":  ("src/store/askparse.c",     # "d = 150 m, t = 12 s" must still bind v = d/t
+                        "        return 1;                                               /* a unit: \"150 m\", \"m/s\" */",
+                        "        return 0;"),
+    # The two suites A156 found unrun, each given the control a wired suite owes.
+    "test_askparse":   ("src/store/askparse.h",     # a bar of 0: the word problem and the
+                        "#define ASK_CONFIDENT_MIN 75",  # out-of-scope question go confident
+                        "#define ASK_CONFIDENT_MIN 0"),
+    "test_ansmatch":   ("src/store/device_app.c",   # 2% -> 20%: "one zero short" would pass
+                        "double tol = (want < 0 ? -want : want) * 0.02;",
+                        "double tol = (want < 0 ? -want : want) * 2.0;"),
+    # The wiring gate: drop a suite from the gate loop and it must notice.
+    "tests_wired":     ("tools/eval/run_gates.sh",  # the suite's line stops running it
+                        'then ./build/test_ansmatch >/dev/null', 'then : >/dev/null'),
     "decl_siblings":   ("corpus/generate.py",
                         '("F_net=m*a", "a"):', '("F_net=m*a", "a"): (7.0, 9.0, "x"),  #'),
     # D3: put back a document that declines an answerable question.
@@ -319,6 +345,8 @@ ALIAS = {"test_scope_wf": "test_scope", "test_scope_ref": "test_scope", "test_sc
          "test_score_unit": "test_score",
          "fit_cue_units": "fit_cue",
          "given_range_kind": "given_range",
+         "autopick_unique": "test_autopick", "autopick_other": "test_autopick",
+         "autopick_letter": "test_autopick", "autopick_units": "test_autopick",
          }   # one control per FIELD the parity gate checks
 
 

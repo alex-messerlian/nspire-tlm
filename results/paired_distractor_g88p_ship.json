@@ -1,0 +1,24 @@
+{
+ "model": "build/transfer/model4096.bin.tns",
+ "decoder": "build/int8gen",
+ "n": 120,
+ "conditions": {
+  "first": {
+   "right": 61,
+   "both": 60,
+   "lost": 56,
+   "gained": 1,
+   "neither": 3,
+   "wrong_with_distractor_value_in_call": 43
+  },
+  "last": {
+   "right": 113,
+   "both": 112,
+   "lost": 4,
+   "gained": 1,
+   "neither": 3,
+   "wrong_with_distractor_value_in_call": 3
+  }
+ },
+ "base_right": 116
+}
