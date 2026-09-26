@@ -33,12 +33,13 @@ d2_*.txt
 paper/.venv-fig/
 
 # paper build outputs (regenerable)
-paper/latex/main.pdf
-paper/latex/*.aux
-paper/latex/*.bbl
-paper/latex/*.blg
-paper/latex/*.log
-paper/latex/*.out
+paper/tmlr/*.pdf
+paper/tmlr/*.aux
+paper/tmlr/*.bbl
+paper/tmlr/*.blg
+paper/tmlr/*.log
+paper/tmlr/*.out
+paper/tmlr/main_preprint.tex
 paper/figures/*.png
 
 # int8 exports for host scoring on the device decoder (regenerable)
