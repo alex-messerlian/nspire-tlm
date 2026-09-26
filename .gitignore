@@ -33,14 +33,32 @@ d2_*.txt
 paper/.venv-fig/
 
 # paper build outputs (regenerable)
-paper/tmlr/*.pdf
-paper/tmlr/*.aux
-paper/tmlr/*.bbl
-paper/tmlr/*.blg
-paper/tmlr/*.log
-paper/tmlr/*.out
-paper/tmlr/main_preprint.tex
-paper/figures/*.png
+# paper/manuscript/paper.pdf and paper-arxiv.pdf ARE tracked: the folder is the deliverable.
+paper/manuscript/*.aux
+paper/manuscript/*.bbl
+paper/manuscript/*.blg
+paper/manuscript/*.log
+paper/manuscript/*.out
+paper/manuscript/paper-arxiv.tex
+paper/manuscript/figures/*.png
+paper/__pycache__/
 
 # int8 exports for host scoring on the device decoder (regenerable)
 build/int8/
+
+# ---- 2026-09-26 tidy-up ------------------------------------------------------------------------
+# build/ holds what `make` produces. The few DATA files there stay tracked (model4096*.bin,
+# tok4096.tok, tok_reference.json, transfer/README.txt): an ignore rule never untracks a tracked
+# file, and a new data file needs `git add -f`.
+build/*
+# host tools compiled by `make` next to their sources
+tools/eval/evalcli
+tools/eval/provcli
+tools/eval/shapecli
+tools/eval/test_eval
+# local leftovers, kept rather than deleted (attic/README.txt)
+attic/
+# model checkpoints are too large for git; train/README.md lists the ones that matter and must be
+# backed up. Checkpoints tracked before this rule stay tracked.
+train/*.pt
+train/archive_*/
