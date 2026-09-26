@@ -163,6 +163,18 @@ static int is_stopword(const char *w) {
          * anything -- so two questions the device answers correctly looked like poor matches. */
         "explain", "find", "calculate", "define", "compute", "determine", "describe",
         "give", "tell", "show", "how", "why", "does", "did", "much", "many",
+        /* A155. "given" IS A REQUEST WORD, and it was missing. "Given d = 150, t = 12, find the
+         * speed" covered 1 of 2 words (50%), so the device declined with "no matching relation" --
+         * reported from the device. It occurs in 0 of 3,361 store names and glossary terms. Measured
+         * on the evaluation's own questions (ask_confident, confident AND the right relation):
+         * values-given 21 -> 22 of 120, named-in-words 30 -> 34, wrong selections 5 -> 6 and 2 -> 2,
+         * out-of-scope false positives unchanged at 32 of 2,000 (1.60%).
+         *
+         * SIXTEEN MORE framing words ("estimate", "take", "using", "assume", ...) also occur in zero
+         * names and were measured and LEFT OUT: they raised correct selections on values-given
+         * questions to 36 but wrong ones to 14 (precision 81% -> 72%). A confidently wrong relation
+         * is the worst outcome this system has, so the minimal change ships. */
+        "given",
     };
     for (unsigned i = 0; i < sizeof STOP / sizeof STOP[0]; i++)
         if (!strcmp(STOP[i], w)) return 1;
