@@ -1,0 +1,174 @@
+{
+ "selector": "A157 (build/autoasm)",
+ "rows": {
+  "answer_0": {
+   "n": 120,
+   "model": {
+    "correct": 93,
+    "wrong": 4,
+    "declined": 23
+   },
+   "no_model": {
+    "correct": 96,
+    "wrong": 1,
+    "declined": 23
+   }
+  },
+  "answer_s": {
+   "n": 120,
+   "model": {
+    "correct": 115,
+    "wrong": 3,
+    "declined": 2
+   },
+   "no_model": {
+    "correct": 118,
+    "wrong": 0,
+    "declined": 2
+   }
+  },
+  "answer_w": {
+   "n": 120,
+   "model": {
+    "correct": 89,
+    "wrong": 4,
+    "declined": 27
+   },
+   "no_model": {
+    "correct": 93,
+    "wrong": 2,
+    "declined": 25
+   }
+  },
+  "answer_x": {
+   "n": 120,
+   "model": {
+    "correct": 9,
+    "wrong": 4,
+    "declined": 107
+   },
+   "no_model": {
+    "correct": 13,
+    "wrong": 2,
+    "declined": 105
+   }
+  },
+  "d1": {
+   "n": 120,
+   "model": {
+    "correct": 119,
+    "wrong": 1,
+    "declined": 0
+   },
+   "no_model": {
+    "correct": 116,
+    "wrong": 4,
+    "declined": 0
+   }
+  },
+  "d1_zero": {
+   "n": 102,
+   "model": {
+    "correct": 102,
+    "wrong": 0,
+    "declined": 0
+   },
+   "no_model": {
+    "correct": 93,
+    "wrong": 9,
+    "declined": 0
+   }
+  },
+  "fit": {
+   "n": 120,
+   "model": {
+    "correct": 119,
+    "wrong": 1,
+    "declined": 0
+   },
+   "no_model": {
+    "correct": 118,
+    "wrong": 2,
+    "declined": 0
+   }
+  },
+  "explain": {
+   "n": 87,
+   "model": {
+    "correct": 37,
+    "wrong": 3,
+    "declined": 47
+   },
+   "no_model": {
+    "correct": 26,
+    "wrong": 3,
+    "declined": 58
+   }
+  },
+  "out_of_scope": {
+   "n": 2000,
+   "model": {
+    "correct": 1982,
+    "wrong": 18,
+    "declined": 0
+   },
+   "no_model": {
+    "correct": 1981,
+    "wrong": 19,
+    "declined": 0
+   }
+  },
+  "fresh: values given, symbol asked": {
+   "n": 300,
+   "model": {
+    "correct": 248,
+    "wrong": 5,
+    "declined": 47
+   },
+   "no_model": {
+    "correct": 253,
+    "wrong": 2,
+    "declined": 45
+   }
+  },
+  "fresh: named in words": {
+   "n": 300,
+   "model": {
+    "correct": 200,
+    "wrong": 9,
+    "declined": 91
+   },
+   "no_model": {
+    "correct": 209,
+    "wrong": 2,
+    "declined": 89
+   }
+  },
+  "fresh: symbol only": {
+   "n": 300,
+   "model": {
+    "correct": 285,
+    "wrong": 10,
+    "declined": 5
+   },
+   "no_model": {
+    "correct": 295,
+    "wrong": 0,
+    "declined": 5
+   }
+  },
+  "fresh: one irrelevant value": {
+   "n": 300,
+   "model": {
+    "correct": 23,
+    "wrong": 18,
+    "declined": 259
+   },
+   "no_model": {
+    "correct": 40,
+    "wrong": 8,
+    "declined": 252
+   }
+  }
+ }
+}

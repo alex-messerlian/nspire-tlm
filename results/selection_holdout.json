@@ -11,6 +11,10 @@
   "symbol only": [
    "symbol",
    2017
+  ],
+  "one irrelevant value": [
+   "spare",
+   1013
   ]
  },
  "revisions": {
@@ -72,29 +76,119 @@
     "wrong": 0,
     "none": 5
    }
+  },
+  "one irrelevant value": {
+   "n": 300,
+   "A155": {
+    "right": 41,
+    "wrong": 15,
+    "none": 244
+   },
+   "A156": {
+    "right": 41,
+    "wrong": 15,
+    "none": 244
+   },
+   "A157": {
+    "right": 41,
+    "wrong": 15,
+    "none": 244
+   }
   }
  },
  "end_to_end": {
   "values given, symbol asked": {
    "n": 300,
-   "unscoreable": 0,
-   "correct": 248,
-   "declined": 47,
-   "wrong": 5
+   "A155": {
+    "correct": 48,
+    "wrong": 2,
+    "declined": 250
+   },
+   "A156": {
+    "correct": 153,
+    "wrong": 5,
+    "declined": 142
+   },
+   "A157": {
+    "correct": 248,
+    "wrong": 5,
+    "declined": 47
+   }
   },
   "named in words": {
    "n": 300,
-   "unscoreable": 0,
-   "correct": 200,
-   "declined": 91,
-   "wrong": 9
+   "A155": {
+    "correct": 63,
+    "wrong": 4,
+    "declined": 233
+   },
+   "A156": {
+    "correct": 200,
+    "wrong": 9,
+    "declined": 91
+   },
+   "A157": {
+    "correct": 200,
+    "wrong": 9,
+    "declined": 91
+   }
   },
   "symbol only": {
    "n": 300,
-   "unscoreable": 0,
-   "correct": 285,
-   "declined": 5,
-   "wrong": 10
+   "A155": {
+    "correct": 2,
+    "wrong": 3,
+    "declined": 295
+   },
+   "A156": {
+    "correct": 79,
+    "wrong": 6,
+    "declined": 215
+   },
+   "A157": {
+    "correct": 285,
+    "wrong": 10,
+    "declined": 5
+   }
+  },
+  "one irrelevant value": {
+   "n": 300,
+   "A155": {
+    "correct": 23,
+    "wrong": 18,
+    "declined": 259
+   },
+   "A156": {
+    "correct": 23,
+    "wrong": 18,
+    "declined": 259
+   },
+   "A157": {
+    "correct": 23,
+    "wrong": 18,
+    "declined": 259
+   }
+  },
+  "fit (negative, development set)": {
+   "n": 120,
+   "A155": {
+    "correct": 120,
+    "wrong": 0,
+    "declined": 0,
+    "chose_inapplicable": 0
+   },
+   "A156": {
+    "correct": 120,
+    "wrong": 0,
+    "declined": 0,
+    "chose_inapplicable": 0
+   },
+   "A157": {
+    "correct": 119,
+    "wrong": 1,
+    "declined": 0,
+    "chose_inapplicable": 0
+   }
   }
  }
 }

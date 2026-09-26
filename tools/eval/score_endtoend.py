@@ -28,6 +28,10 @@ PER ITEM, TWO OUTCOMES, printed separately so neither hides inside the other:
     out_of_scope correct = declined. 2,000 certified out-of-scope stems (corpus/d3_stems.json, the
                  first 2,000). NOTE: the D3 training class draws its questions from this same pool,
                  so the MODEL's refusal here is in-distribution; the SELECTION is not trained.
+    fit          correct = declined. The VALUE-CONTAINING NEGATIVE SET (A158): each question's values
+                 bind a relation exactly (the item's `record`) but it asks for another quantity.
+                 That is the input on which A156/A157 could pick a relation confidently and
+                 wrongly, so "selection right" is reported for it as `chose_inapplicable`.
 
 CONTROLS, before any model output is graded: the answer grader is score_correct's, whose positive
 and negative controls run first (score_correct.controls); and the selection grader must mark every
@@ -47,9 +51,10 @@ MODEL = ROOT / "build/transfer/model4096.bin.tns"
 OOS_N = 2000
 
 
-def autoasm(questions):
-    """[(rid or None, prompt)] -- the app's own choice and the prompt it would send."""
-    p = subprocess.run([str(ROOT / "build/autoasm")], cwd=ROOT,
+def autoasm(questions, binary=None):
+    """[(rid or None, prompt)] -- the app's own choice and the prompt it would send. `binary` is an
+    autoasm linked against another revision's askparse.c (selection_holdout.py); default: current."""
+    p = subprocess.run([binary or str(ROOT / "build/autoasm")], cwd=ROOT,
                        input="".join(q.replace("\n", " ") + "\n" for q in questions),
                        capture_output=True, text=True, check=True)
     out = p.stdout.splitlines()
@@ -112,9 +117,9 @@ def tally(rows, key):
     return t
 
 
-def run_arm(arm, items, refs=None):
+def run_arm(arm, items, refs=None, binary=None):
     fs = [it["record"].split(" | ", 1)[0] if it.get("record") else None for it in items]
-    chosen = autoasm([it["q"] for it in items])
+    chosen = autoasm([it["q"] for it in items], binary)
     gens = int8gen([pr for _, pr in chosen])
     rows = []
     for i, (it, (rid, pr), (gen, states)) in enumerate(zip(items, chosen, gens)):
@@ -144,19 +149,22 @@ def main(dest=None):
           f"{'result correct':>14s} {'declined':>9s} {'wrong':>6s}")
     arms = [(a, [it for it, _ in tables[a][0]], [r for _, r in tables[a][0]]) for a in ANSWER]
     arms += [(a, json.loads((ROOT / f"corpus/split_{a}.json").read_text()), None)
-             for a in DECLINE + ("explain",)]
+             for a in DECLINE + ("explain", "fit")]
     stems = json.loads((ROOT / "corpus/d3_stems.json").read_text())["stems"][:OOS_N]
     arms.append(("out_of_scope", [{"q": q, "record": None} for q in stems], None))
     for arm, items, refs in arms:
         skipped = len(tables[arm][1]) if arm in tables else 0
         rows = run_arm(arm, items, refs)
         s, r, n = tally(rows, "selection"), tally(rows, "result"), len(rows)
+        if arm == "fit":          # "right" here is the bound but INAPPLICABLE relation
+            s = {"chose_inapplicable": s.get("right", 0), "wrong": s.get("wrong", 0),
+                 "none": s.get("none", 0)}
         lucky = sum(x["selection"] != "right" and x["result"] == "correct" for x in rows
                     if arm in ANSWER)
         out["arms"][arm] = {"n": n, "unscoreable": skipped, "selection": s, "result": r,
                             "correct_without_right_choice": lucky, "rows": rows}
         pct = lambda d, k: f"{d.get(k, 0):4d} {100 * d.get(k, 0) / n:5.1f}%"
-        print(f"  {arm:12s} {n:5d}  {pct(s, 'right')} {s.get('wrong', 0):6d} {s.get('none', 0):6d}   "
+        print(f"  {arm:12s} {n:5d}  {pct(s, 'chose_inapplicable' if arm == 'fit' else 'right')} {s.get('wrong', 0):6d} {s.get('none', 0):6d}   "
               f"{pct(r, 'correct')} {r.get('declined', 0):9d} {r.get('wrong', 0):6d}"
               + (f"   (correct with another record: {lucky})" if lucky else "")
               + (f"   (unscoreable, excluded and counted: {skipped})" if skipped else ""),

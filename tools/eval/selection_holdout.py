@@ -31,7 +31,7 @@ import score_correct as S                                     # noqa: E402
 import score_endtoend as E                                    # noqa: E402
 
 SEEDS = {"values given, symbol asked": ("answer", 1011), "named in words": ("worded", 1017),
-         "symbol only": ("symbol", 2017)}
+         "symbol only": ("symbol", 2017), "one irrelevant value": ("spare", 1013)}
 REVS = {"A155": "793a551", "A156": "60b3607", "A157": None}
 N = 300
 HOST_LINK = ["src/store/gfx.c", "src/store/chatstore.c", "src/store/pickui.c", "src/store/picker.c",
@@ -43,7 +43,8 @@ def fresh():
             for it in json.loads((ROOT / f"corpus/split_{arm}.json").read_text())}
     sets = {}
     for label, (kind, seed) in SEEDS.items():
-        items = (answer_control.build(n=N, seed=seed, spare=False) if kind == "answer"
+        items = (answer_control.build(n=N, seed=seed, spare=(kind == "spare"))
+                 if kind in ("answer", "spare")
                  else worded_control.build(n=N, seed=seed, worded=(kind == "worded")))
         dup = [it for it in items if it["q"] in seen]
         gone = [it for it in items if it["q"] not in seen
@@ -90,16 +91,30 @@ def main(dest=None):
             out["selection"][label] = {"n": len(items), **cells}
             print(f"  {label:27s} n={len(items):3d}  " + "   ".join(
                 f"{c['right']:3d}/{c['wrong']:2d}/{c['none']:3d}" for c in cells.values()))
-    print("\n  end to end, current app (A157), calculator's decoder:")
-    for label, items in sets.items():
-        refs = [S.reference(it) for it in items]
-        ok = [(it, r) for it, r in zip(items, refs) if r is not None]
-        rows = E.run_arm("answer_0", [it for it, _ in ok], [r for _, r in ok])
-        res = {k: sum(x["result"] == k for x in rows) for k in ("correct", "declined", "wrong")}
-        out["end_to_end"][label] = {"n": len(rows), "unscoreable": len(items) - len(ok), **res}
-        print(f"  {label:27s} n={len(rows):3d}  right {res['correct']:3d} "
-              f"({100 * res['correct'] / len(rows):5.1f}%)  declined {res['declined']:3d}  "
-              f"wrong {res['wrong']:2d}   (unscoreable, excluded and counted: {len(items) - len(ok)})")
+        # END TO END UNDER EVERY REVISION (A158): correct / wrong / declined for
+        # each selector, not only the current one, because a selector that reaches more questions
+        # also sends more of them to the model, and wrong ANSWERS can rise while wrong CHOICES do not.
+        print("\n  end to end on the calculator's decoder, right / wrong / declined:")
+        fit = json.loads((ROOT / "corpus/split_fit.json").read_text())
+        for label, items in list(sets.items()) + [("fit (negative, development set)", fit)]:
+            refs = None
+            if not label.startswith("fit"):
+                refs = [S.reference(it) for it in items]
+                ok = [(it, r) for it, r in zip(items, refs) if r is not None]
+                items, refs = [it for it, _ in ok], [r for _, r in ok]
+            arm = "fit" if label.startswith("fit") else "answer_0"
+            cells = {}
+            for name, b in bins.items():
+                rows = E.run_arm(arm, items, refs, binary=b)
+                res = {k: sum(x["result"] == k for x in rows) for k in ("correct", "wrong", "declined")}
+                if arm == "fit":
+                    res["chose_inapplicable"] = sum(x["selection"] == "right" for x in rows)
+                cells[name] = res
+            out["end_to_end"][label] = {"n": len(items), **cells}
+            print(f"  {label:31s} n={len(items):3d}  " + "   ".join(
+                f"{n}: {c['correct']:3d}/{c['wrong']:2d}/{c['declined']:3d}" for n, c in cells.items())
+                + (f"   (chose the inapplicable relation: " + ", ".join(
+                    f"{n} {c['chose_inapplicable']}" for n, c in cells.items()) + ")" if arm == "fit" else ""))
     if dest:
         pathlib.Path(dest).write_text(json.dumps(out, indent=1))
         print(f"  -> {dest}")

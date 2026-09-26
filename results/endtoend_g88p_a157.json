@@ -7219,6 +7219,1102 @@
     }
    ]
   },
+  "fit": {
+   "n": 120,
+   "unscoreable": 0,
+   "selection": {
+    "chose_inapplicable": 0,
+    "wrong": 27,
+    "none": 93
+   },
+   "result": {
+    "correct": 119,
+    "wrong": 1
+   },
+   "correct_without_right_choice": 0,
+   "rows": [
+    {
+     "q": "If m_2 = 71.8, m_1 = 944, what is theta_r?",
+     "rid": null,
+     "prompt": "<q>If what is theta_r?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Determine the average ac power from rms current and voltage. If Delta_S_h = -12, Delta_S_c = 234.6.",
+     "rid": null,
+     "prompt": "<q>Determine the average ac power from rms current and voltage.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "With E_F = 2.1e-19, estimate x component.",
+     "rid": null,
+     "prompt": "<q>With estimate x component.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For Delta_E_LK = 2.7e-17, what was spring constant from force and extension?",
+     "rid": "f4a620c2",
+     "prompt": "<q>For what was spring constant from force and extension? Given Delta_E_LK = 2.7e-17.</q><r>k=((F)/(x)) | k:N/m F:N x:m | missing:F | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For Delta_E = 8.01e-15, calculate v.",
+     "rid": null,
+     "prompt": "<q>For calculate v.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with v_y = 1, v_x = 4, compute motionally induced emf.",
+     "rid": "b213e3a5",
+     "prompt": "<q>In a setup with compute motionally induced emf. Given v_y = 1, v_x = 4.</q><r>epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:B | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: B is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute the fringe spacing in double-slit interference. A system has lambda = 0.045.",
+     "rid": null,
+     "prompt": "<q>Compute the fringe spacing in double-slit interference. A system</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For q = 9.35e-07, r = 3.89, what is v?",
+     "rid": null,
+     "prompt": "<q>For what is v?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "If B = 0.667, estimate C_V.",
+     "rid": null,
+     "prompt": "<q>If estimate C_V.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "If x_0 = 37.5, v_x = 43.54, t = 530.93, what is magnitude of torque from a force at an angle?",
+     "rid": "faa3d71d",
+     "prompt": "<q>If what is magnitude of torque from a force at an angle? Given x_0 = 37.5, v_x = 43.54, t = 530.93.</q><r>tau=r*F*sin(theta) | tau:N*m r:m F:N theta:1 | missing:r | the vector product magnitude: only the component of F perpendicular to r turns anything | fit:high",
+     "gen": "<a> I cannot answer that: r is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What was P? Starting from R_1 = 0.733, R_2 = 0.675.",
+     "rid": "cb854c8b",
+     "prompt": "<q>What was P? Starting. Given R_1 = 0.733, R_2 = 0.675..</q><r>v=a*t | v:m/s a:m/s^2 t:s | missing:a | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes v from a and t, which does not apply.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For v = 42.08, r = 0.156, what was v_toty?",
+     "rid": null,
+     "prompt": "<q>For what was v_toty?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Determine acceleration. If R = 0.244, theta = 1.72.",
+     "rid": null,
+     "prompt": "<q>Determine acceleration.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "The values are f = 21.6, lambda = 2.186. Calculate I_rms.",
+     "rid": null,
+     "prompt": "<q>The values are Calculate I_rms.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Given U_E = 6.15e-05, q = 8.04e-09, find the mass from energy equivalence.",
+     "rid": "e04377e1",
+     "prompt": "<q>Given find the mass from energy equivalence. Given U_E = 6.15e-05, q = 8.04e-09, c = 2.998e8.</q><r>m=Delta_E/(c)^(2) | m:kg Delta_E:J c:m/s | missing:Delta_E | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes m from Delta_E and c, which does not apply.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with Delta_m = 1.12e-29, calculate charge remaining on a discharging capacitor.",
+     "rid": null,
+     "prompt": "<q>In a setup with calculate charge remaining on a discharging capacitor.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "You are told E = 138, B = 8.2. Compute energy quantum.",
+     "rid": null,
+     "prompt": "<q>You are told Compute energy quantum.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Find the energy change associated. Starting from v = 778, L = 3.71.",
+     "rid": "5b69e739",
+     "prompt": "<q>Find the energy change associated. Starting. Given v = 778, L = 3.71..</q><r>U_form=E_transfer+U_coul+U_ex | U_form:J E_transfer:J U_coul:J U_ex:J | missing:E_transfer | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: E_transfer is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Measurements give lambda = 1, N = 2. What is the period of a particle's motion in a magnetic field?",
+     "rid": "b19adaa8",
+     "prompt": "<q>Measurements give What is the period of a particle's motion in a magnetic field? Given lambda = 1, N = 2., m = 9.109e-31, q = 1.602e-19.</q><r>T=((2*pi*m)/(q*B)) | T:s m:kg q:C B:T | missing:B | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: B is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Measurements give v_0 = 656, a = 63.55, t = 2.62. What was angular frequency?",
+     "rid": null,
+     "prompt": "<q>Measurements give What was angular frequency?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with m = 149.07, v = 178.7, what is the beat frequency?",
+     "rid": null,
+     "prompt": "<q>In a setup with what is the beat frequency?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Consider a case where V = 7.557, R = 340. What is pressure?",
+     "rid": null,
+     "prompt": "<q>Consider a case where What is pressure?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with d_i = 12.4, d_o = 4.66, find V_rms.",
+     "rid": null,
+     "prompt": "<q>In a setup with find V_rms.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Using Delta_p_max = 78, rho = 35.73, v = 772, what was C?",
+     "rid": null,
+     "prompt": "<q>Using what was C?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Measurements give f = 65200000000000. Determine de broglie wavelength.",
+     "rid": null,
+     "prompt": "<q>Measurements give Determine de broglie wavelength.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Using k = 28.8, m = 1.07, find the total entropy change of system and surroundings.",
+     "rid": "e63ae0f6",
+     "prompt": "<q>Using find the total entropy change of system and surroundings. Given k = 28.8, m = 1.07.</q><r>Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:Delta_S_h | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_S_c is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For k = 456, x = 0.737, compute capacitance.",
+     "rid": "96e237b0",
+     "prompt": "<q>For compute capacitance. Given k = 456, x = 0.737.</q><r>C=((Q)/(V)) | C:F Q:C V:V | missing:Q | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Q is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "You are told d = 4.286, t = 101.3. Compute a_t.",
+     "rid": null,
+     "prompt": "<q>You are told Compute a_t.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Where r = 0.826, theta = 0.515, determine capacitance.",
+     "rid": null,
+     "prompt": "<q>Where determine capacitance.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Given W = 1040, t = 42.87, what is intensity remaining after absorption through a thickness?",
+     "rid": "917047f2",
+     "prompt": "<q>Given what is intensity remaining after absorption through a thickness? Given W = 1040, t = 42.87.</q><r>I=I_0*exp(-mu*x) | I:W/m^2 I_0:W/m^2 mu:1/m x:m | missing:I_0 | a uniform absorber and a narrow beam; mu is the linear attenuation coefficient | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes I from I_0, mu and x, which does not apply.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Take v = 886.29, L = 5.48. Compute B.",
+     "rid": null,
+     "prompt": "<q>Take Compute B.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What was the angular velocity? In a setup with E = 5.79e-18.",
+     "rid": null,
+     "prompt": "<q>What was the angular velocity? In a setup with .</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "The values are F_net = 0.68, a = 50.71. Compute F_c.",
+     "rid": null,
+     "prompt": "<q>The values are Compute F_c.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute V. Where r = 0.06, F = 132.8.",
+     "rid": null,
+     "prompt": "<q>Compute V.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Using omega = 2.18, k = 375, what was power?",
+     "rid": null,
+     "prompt": "<q>Using what was power?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Starting from v_x = 1, v_y = 6, what is the angular magnification m of a simple magnifier?",
+     "rid": "c246907d",
+     "prompt": "<q>Starting from what is the angular magnification m of a simple magnifier? Given v_x = 1, v_y = 6.</q><r>M=((theta_image)/(theta_object)) | M:1 theta_image:1 theta_object:1 | missing:theta_image | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: theta_object is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Assume theta = 3.35, t = 625. Find motionally induced emf.",
+     "rid": null,
+     "prompt": "<q>Assume Find motionally induced emf.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Assume d = 235, t = 9.79. Estimate F.",
+     "rid": null,
+     "prompt": "<q>Assume Estimate F.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "A system has l = 0.616, l_0 = 6.37. What is tangential acceleration?",
+     "rid": null,
+     "prompt": "<q>A system has What is tangential acceleration?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Estimate omega. Measurements give v = 24.7, r = 1.74.",
+     "rid": "2e627e65",
+     "prompt": "<q>Estimate omega. Measurements give. Given v = 24.7, r = 1.74..</q><r>omega=v/r | omega:1/s v:m/s r:m | missing:none | standard conditions | fit:high",
+     "gen": "<tool> eval<arg> (24.7)/(1.74)</tool><res> 14.1954023</res><a> 14.2 1/s. omega=v/r gives it.<end>",
+     "selection": "wrong",
+     "result": "wrong",
+     "ref": null
+    },
+    {
+     "q": "Determine F_net. Using I = 1.274, R = 1.3.",
+     "rid": null,
+     "prompt": "<q>Determine F_net.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Take n = 3, E_1 = 1.32e-19. Determine R_eqv.",
+     "rid": null,
+     "prompt": "<q>Take . Determine R_eqv.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with Delta_S_h = -0.00137, Delta_S_c = 368, determine rms voltage.",
+     "rid": null,
+     "prompt": "<q>In a setup with determine rms voltage.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What is P? If E = 145.5, B = 0.44.",
+     "rid": null,
+     "prompt": "<q>What is P?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Assume Delta_m = 1.21e-29. Estimate displacement.",
+     "rid": null,
+     "prompt": "<q>Assume . Estimate displacement.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Suppose E = 5780, B = 9.7. What is the heat transferred?",
+     "rid": null,
+     "prompt": "<q>Suppose What is the heat transferred?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute omega. A system has m = 0.101, Delta_v = 800, Delta_t = 0.843.",
+     "rid": null,
+     "prompt": "<q>Compute omega. A system</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What was absolute pressure? Where x = 0.121, lambda = 2.27e-08, d = 0.01.",
+     "rid": null,
+     "prompt": "<q>What was absolute pressure?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute the length. Take Delta_m = 6.41e-30.",
+     "rid": null,
+     "prompt": "<q>Compute the length. Take .</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Calculate the centripetal acceleration. With v_0 = 2.75, theta_0 = 0.238.",
+     "rid": null,
+     "prompt": "<q>Calculate the centripetal acceleration.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "The values are v = 3.7, theta = 0.524. What is electrical power?",
+     "rid": null,
+     "prompt": "<q>The values are What is electrical power?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Where E_transfer = 7.47e-19, U_coul = -5.25e-19, U_ex = 5.5e-20, estimate the displacement under uniform acceleration.",
+     "rid": null,
+     "prompt": "<q>Where estimate the displacement under uniform acceleration.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Calculate area of a sector. The values are T_c = 270.3, T_h = 407.",
+     "rid": null,
+     "prompt": "<q>Calculate area of a sector. The values</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Find C. Consider a case where R_1 = 74, R_2 = 272.",
+     "rid": null,
+     "prompt": "<q>Find C. Consider a case</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Calculate the angle of rotation. In a setup with r = 2.165, theta = 7.7.",
+     "rid": null,
+     "prompt": "<q>Calculate the angle of rotation. In a setup</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Assume Delta_v = 46.85, Delta_t = 4.5. Determine the path length difference for waves from two slits to a common point on a screen.",
+     "rid": null,
+     "prompt": "<q>Assume Determine the path length difference for waves from two slits to a common point on a screen.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Where F_o = 270, d_o = 66.8, what is the tangential acceleration?",
+     "rid": null,
+     "prompt": "<q>Where what is the tangential acceleration?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Where E_transfer = 8.43e-20, U_coul = -5.22e-19, U_ex = 5.78e-20, compute displacement.",
+     "rid": null,
+     "prompt": "<q>Where compute displacement.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Estimate I. Where F = 38.6, m = 6300.",
+     "rid": null,
+     "prompt": "<q>Estimate I.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Given V = 2.98, I = 12.5, compute I_1.",
+     "rid": null,
+     "prompt": "<q>Given compute I_1.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Where Delta_E = 6.03e-11, what is the half-life?",
+     "rid": null,
+     "prompt": "<q>Where what is the half-life?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "A system has Delta_p = 129.1, Delta_t = 379. What was the fundamental frequency of a closed tube?",
+     "rid": null,
+     "prompt": "<q>A system has What was the fundamental frequency of a closed tube?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "If x = 6.88, lambda = 1.91e-09, d = 0.01, what was F?",
+     "rid": null,
+     "prompt": "<q>If what was F?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute the motionally induced emf. Take W = 10.6, t = 0.654.",
+     "rid": "b213e3a5",
+     "prompt": "<q>Compute the motionally induced emf. Given W = 10.6, t = 0.654..</q><r>epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:B | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: B is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Consider a case where lambda = 9.2e-10. Estimate magnetic field.",
+     "rid": null,
+     "prompt": "<q>Consider a case where . Estimate magnetic field.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Consider a case where I_0 = 0.28. Estimate the angular speed.",
+     "rid": null,
+     "prompt": "<q>Consider a case where Estimate the angular speed.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For R = 1.7, alpha = 14.14, estimate F.",
+     "rid": null,
+     "prompt": "<q>For estimate F.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For m = 20.5, h = 4250, determine time.",
+     "rid": "e596c35a",
+     "prompt": "<q>For determine time. Given m = 20.5, h = 4250.</q><r>Delta_t=((h)/(E)) | Delta_t:s h:J*s E:J | missing:E | order-of-magnitude estimate from the uncertainty principle, not an exact lifetime | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes Delta_t from h and E, which does not apply.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "If r = 3.1, alpha = 0.801, determine v.",
+     "rid": "k22852f2",
+     "prompt": "<q>If determine v. Given r = 3.1, alpha = 0.801.</q><r>alpha (alpha) rays | term:text | missing:none | one of the types of rays emitted from the nucleus of an atom as alpha particles | fit:high",
+     "gen": "<a> I cannot answer that: the record defines alpha (alpha) rays. Nothing in it can be evaluated.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What is I_S? If m = 64.1, Delta_v = 6.56, Delta_t = 6.44.",
+     "rid": null,
+     "prompt": "<q>What is I_S?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Assume R = 4.6. What was electric potential of a point charge?",
+     "rid": "f0c8cb87",
+     "prompt": "<q>Assume What was electric potential of a point charge? Given r = 4.6., k_e = 8.988e9.</q><r>V=((k_e*q)/(r)) | V:V k_e:V*m/C q:C r:m | missing:q | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: q is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Starting from F = 255, v = 188, determine the total entropy change of system and surroundings.",
+     "rid": "e63ae0f6",
+     "prompt": "<q>Starting from determine the total entropy change of system and surroundings. Given F = 255, v = 188.</q><r>Delta_S_tot=Delta_S_h+Delta_S_c | Delta_S_tot:J/K Delta_S_h:J/K Delta_S_c:J/K | missing:Delta_S_h | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: Delta_S_c is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with K = 39.95, U = 58.8, what is tangential speed?",
+     "rid": null,
+     "prompt": "<q>In a setup with what is tangential speed?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "If rho = 11.7, V = 0.065, calculate d.",
+     "rid": null,
+     "prompt": "<q>If calculate d.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Calculate q. For R = 135.87, C = 2.53e-05.",
+     "rid": null,
+     "prompt": "<q>Calculate q. For .</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Take R = 0.282, theta = 1.75. Calculate E.",
+     "rid": null,
+     "prompt": "<q>Take Calculate E.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "You are told E = 4.83e-14. Estimate I_1.",
+     "rid": null,
+     "prompt": "<q>You are told . Estimate I_1.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Where k = 2.56, m = 83.4, determine p.",
+     "rid": null,
+     "prompt": "<q>Where determine p.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Calculate displacement of center of mass of rolling object. Consider a case where m = 0.368, v = 357.8.",
+     "rid": null,
+     "prompt": "<q>Calculate displacement of center of mass of rolling object. Consider a case</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Estimate binding energy of an electron. You are told d_i = 6, d_o = 33.3.",
+     "rid": null,
+     "prompt": "<q>Estimate binding energy of an electron. You are told</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Starting from v_0 = 222, a = 233.43, t = 351.58, compute time constant.",
+     "rid": null,
+     "prompt": "<q>Starting from compute time constant.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Take v = 1.6, theta = 0.285. What was the period of a particle's motion in a magnetic field?",
+     "rid": "b19adaa8",
+     "prompt": "<q>Take What was the period of a particle's motion in a magnetic field? Given v = 1.6, theta = 0.285., m = 9.109e-31, q = 1.602e-19.</q><r>T=((2*pi*m)/(q*B)) | T:s m:kg q:C B:T | missing:B | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: B is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "With v_wy = 7.71, v_p = 158.89, calculate lambda.",
+     "rid": null,
+     "prompt": "<q>With calculate lambda.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute R_x. Take lambda = 0.018.",
+     "rid": null,
+     "prompt": "<q>Compute R_x.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute output work. Given v_wy = 6.91, v_p = 91.1.",
+     "rid": "db63654a",
+     "prompt": "<q>Compute output work. Given v_wy = 6.91, v_p = 91.1..</q><r>W_o=F_o*d_o | W_o:J F_o:N d_o:m | missing:F_o | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: F_o is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Starting from W = 505.4, t = 191.2, compute the fermi temperature.",
+     "rid": null,
+     "prompt": "<q>Starting from compute the fermi temperature.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What is output work? Starting from theta_image = 0.433, theta_object = 0.28.",
+     "rid": null,
+     "prompt": "<q>What is output work? Starting</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Consider a case where k = 7.71, x = 0.193. Estimate the displacement.",
+     "rid": null,
+     "prompt": "<q>Consider a case where Estimate the displacement.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What is drift velocity? If m_R = 288, m_g = 800.",
+     "rid": "56f0223d",
+     "prompt": "<q>What is drift velocity? Given m_R = 288, m_g = 800., n = 8.5e+28, q = 1.602e-19.</q><r>v_d=((I)/(n*q*A)) | v_d:m/s I:A n:1/m^3 q:C A:m^2 | missing:I | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes v_d from I, n, q and A, which does not apply.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Consider a case where Delta_p_max = 5.26, rho = 46.85, v = 338. What was t_half?",
+     "rid": null,
+     "prompt": "<q>Consider a case where What was t_half?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Determine the height of free fall. Consider a case where v_0 = 23.24, t = 283.15.",
+     "rid": null,
+     "prompt": "<q>Determine the height of free fall. Consider a case</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "The values are F = 2030, d = 900. Estimate the intensity.",
+     "rid": null,
+     "prompt": "<q>The values are Estimate the intensity.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Determine L. Take m = 0.24, v = 37.45.",
+     "rid": null,
+     "prompt": "<q>Determine L.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Determine f_obs. Take V = 0.76, I = 1.08.",
+     "rid": null,
+     "prompt": "<q>Determine f_obs.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Using F = 177.5, v = 7.79, what is intensity of sound?",
+     "rid": null,
+     "prompt": "<q>Using what is intensity of sound?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Given R_1 = 0.639, R_2 = 619, find the total mechanical energy.",
+     "rid": "da1e3585",
+     "prompt": "<q>Given find the total mechanical energy. Given R_1 = 0.639, R_2 = 619.</q><r>E=K+U | E:J K:J U:J | missing:K | conservative forces only; friction makes E fall rather than hold | fit:high",
+     "gen": "<a> I cannot answer that: K is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with K = 0.406, U = 4660, estimate the tangential speed.",
+     "rid": null,
+     "prompt": "<q>In a setup with estimate the tangential speed.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What was frequency of a mass-spring system in shm? Starting from d = 6.",
+     "rid": "22347cbf",
+     "prompt": "<q>What was frequency of a mass-spring system in shm? Starting. Given d = 6..</q><r>f=((1)/(2*pi))*sqrt(((k)/(m))) | f:Hz k:N/m m:kg | missing:k | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: k is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What is the equivalent resistance? Assume Delta_p = 58.08, Delta_t = 33.9.",
+     "rid": null,
+     "prompt": "<q>What is the equivalent resistance? Assume</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Consider a case where p_g = 7500. Calculate F_c.",
+     "rid": null,
+     "prompt": "<q>Consider a case where Calculate F_c.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Determine the input work. Take L = 0.244, T = 3500.",
+     "rid": null,
+     "prompt": "<q>Determine the input work.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "With E = 2.64e-15, determine power.",
+     "rid": "9813f994",
+     "prompt": "<q>With determine power. Given E = 2.64e-15.</q><r>P=((W)/(t)) | P:W W:J t:s | missing:W | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: W is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with B = 77, l = 8.5, v = 0.34, what was density from mass and volume?",
+     "rid": "d005aec3",
+     "prompt": "<q>In a setup with what was density from mass and volume? Given B = 77, l = 8.5, V = 0.34.</q><r>m=rho*V | m:kg rho:kg/m^3 V:m^3 | missing:rho | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: the record shown computes m from rho and V, which does not apply.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute energy quantum. If omega_0 = 16.043, alpha = 22.33, t = 0.017.",
+     "rid": null,
+     "prompt": "<q>Compute energy quantum.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "The values are theta_image = 1.55, theta_object = 1.481. Calculate P.",
+     "rid": null,
+     "prompt": "<q>The values are Calculate P.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Where F = 5.625, d = 0.04, compute m.",
+     "rid": null,
+     "prompt": "<q>Where compute m.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Compute the wavelength in a medium of refractive index n. Suppose omega_0 = 140.8, alpha = 49.4, t = 538.",
+     "rid": null,
+     "prompt": "<q>Compute the wavelength in a medium of refractive index n.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For I = 0.26, R = 0.476, determine the motionally induced emf.",
+     "rid": "b213e3a5",
+     "prompt": "<q>For determine the motionally induced emf. Given I = 0.26, R = 0.476.</q><r>epsilon=B*l*v | epsilon:V B:T l:m v:m/s | missing:B | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: B is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Estimate focal length for a spherical mirror. Starting from Delta_f = 5710000.",
+     "rid": null,
+     "prompt": "<q>Estimate focal length for a spherical mirror. Starting</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "For omega = 2026, k = 8.67, estimate E.",
+     "rid": null,
+     "prompt": "<q>For estimate E.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Find lambda. Suppose F = 7.56, d = 23, theta = 0.515.",
+     "rid": null,
+     "prompt": "<q>Find lambda.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "A system has Q = 1588, T = 19.2. Find the molar heat capacity.",
+     "rid": null,
+     "prompt": "<q>A system has Find the molar heat capacity.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "A system has f_O = 847000000000000. Compute the index of refraction.",
+     "rid": null,
+     "prompt": "<q>A system has Compute the index of refraction.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Take x_f = 21.43, x_i = 8.54. Compute the angular acceleration from tangential acceleration.",
+     "rid": "a5633cc7",
+     "prompt": "<q>Take Compute the angular acceleration from tangential acceleration. Given x_f = 21.43, x_i = 8.54..</q><r>alpha=((a_t)/(r)) | alpha:1/s^2 a_t:m/s^2 r:m | missing:a_t | standard conditions | fit:high",
+     "gen": "<a> I cannot answer that: a_t is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Estimate angular acceleration. Given E = 270.3, B = 7.85.",
+     "rid": null,
+     "prompt": "<q>Estimate angular acceleration.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Take omega = 52.83, k = 7.1. What is the intensity remaining after absorption through a thickness?",
+     "rid": "917047f2",
+     "prompt": "<q>Take What is the intensity remaining after absorption through a thickness? Given omega = 52.83, k = 7.1..</q><r>I=I_0*exp(-mu*x) | I:W/m^2 I_0:W/m^2 mu:1/m x:m | missing:I_0 | a uniform absorber and a narrow beam; mu is the linear attenuation coefficient | fit:high",
+     "gen": "<a> I cannot answer that: I_0 is not given.<end>",
+     "selection": "wrong",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "In a setup with lambda = 4, N = 0.15, compute E.",
+     "rid": null,
+     "prompt": "<q>In a setup with compute E.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "What was angular acceleration from tangential acceleration? Using Delta_s = 27.6, r = 0.291.",
+     "rid": null,
+     "prompt": "<q>What was angular acceleration from tangential acceleration?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Assume f = 3.83, lambda = 830. Determine E.",
+     "rid": null,
+     "prompt": "<q>Assume Determine E.</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    },
+    {
+     "q": "Consider a case where R_1 = 31, R_2 = 101.325. What is Delta_S?",
+     "rid": null,
+     "prompt": "<q>Consider a case where What is Delta_S?</q><r>none | missing:none | no matching relation | fit:low<a>",
+     "gen": " I cannot answer that: no record matches this question.<end>",
+     "selection": "none",
+     "result": "correct",
+     "ref": null
+    }
+   ]
+  },
   "out_of_scope": {
    "n": 2000,
    "unscoreable": 0,

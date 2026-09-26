@@ -108,6 +108,44 @@ declined:
 Same direction and similar size; wrong choices never rise. This controls for tuning to the items,
 not for the generator's template family or its use of the store's symbols, which the arms share.
 
+## Outcome accounting (A158): right / wrong / declined, not accuracy alone
+
+A selector that answers more questions also sends more of them to the model, so wrong ANSWERS can
+rise while wrong CHOICES do not. Development arms, end to end on the calculator's decoder:
+
+| item set | A155 right / wrong / declined | A156 | A157 |
+|---|---|---|---|
+| values given | 21 / 2 / 97 | 59 / 4 / 57 | 93 / 4 / 23 |
+| symbol only | 0 / 0 / 120 | 27 / 1 / 92 | 115 / 3 / 2 |
+| named in words | 32 / 2 / 86 | 89 / 4 / 27 | 89 / 4 / 27 |
+| one irrelevant value | 9 / 4 / 107 | 9 / 4 / 107 | 9 / 4 / 107 |
+
+Wrong answers rose from 8 to 15 across the four sets while right answers rose from 62 to 306 and
+declines fell from 410 to 159. At A157 the four sets hold 8 wrong CHOICES (3, 0, 2, 3): 7 of them
+then decline, and 1 produces a wrong answer (the ambiguous "equivalent resistance" item). Every
+other wrong answer follows a right choice and is a copying error.
+
+The earlier sentence "the one wrong choice among the answerable items is ..." was WRONG: it counted
+wrong answers that followed a wrong choice, not wrong choices. Corrected here and in the paper.
+
+## The negative set and the no-model path behind the selector (A158)
+
+**Values that fit an inapplicable relation.** The `fit` arm (each question's values bind a relation
+exactly while it asks for a different quantity) is the input on which A156/A157 could choose
+confidently and wrongly. Under all three selectors it chose the inapplicable relation 0 of 120 times;
+declines 120, 120, 119. A157's one answer, "Estimate omega. Measurements give v = 24.7, r = 1.74",
+used omega = v/r, which those values do answer (`results/selection_holdout.json`).
+
+**The no-model path behind the A157 selector** (`tools/eval/score_deterministic_e2e.py`,
+`results/deterministic_e2e.json`): right more often and wrong less often on every answerable set,
+development and fresh (fresh symbol-only 295 right / 0 wrong, against the model's 285 / 10); but it
+declines less reliably (withheld value 116 vs 119, no values 93 vs 102) and passes the explanation
+format check on 26 of 87 against the model's 37. The 13 non-declines are selector misfires to
+GLOSSARY TERMS -- "null measurements" for "Measurements give ...", the glossary entry for "compute the
+equivalent resistance" -- where the no-model path shows the definition and the model declines. That
+is also a selector finding in its own right: the coverage rule accepts a glossary term whose name
+the question happens to contain, for a question that asks to compute something.
+
 ## What the errors are
 
 - **Wrong answers after the right choice are copying errors**, the failure s7 of
