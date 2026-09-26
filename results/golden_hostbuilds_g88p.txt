@@ -1,0 +1,38 @@
+# Golden probe on the SHIPPED padded group-88 engine: host builds vs the calculator
+# host: tools/eval/golden_forward.c, -O2, three -ffp-contract settings (default = clang's 'on')
+# device: results/device_g88p/golden_dev.txt. Compared on the three logits each step prints (l0, l1, lN).
+# produced 2026-09-25 by the commands in this commit message
+== host default
+step=0 tok=1 pos=0 logit_hash=d7edb3466811d813 argmax=526 l0=-4.52789736 l1=0.357524037 lN=-2.8233974
+step=1 tok=2 pos=31 logit_hash=ff85340677a68cea argmax=3 l0=-2.61835527 l1=-0.747854471 lN=2.0093658
+step=2 tok=100 pos=62 logit_hash=93381406e51b03e6 argmax=79 l0=-5.19124269 l1=-2.17323256 lN=-1.17215133
+step=3 tok=7 pos=93 logit_hash=35c641dfe8322624 argmax=150 l0=-1.46467245 l1=-0.0815437734 lN=-3.05323625
+step=4 tok=4095 pos=124 logit_hash=d6d2422461c193a3 argmax=581 l0=-3.30993032 l1=0.828572929 lN=0.987952352
+step=5 tok=42 pos=155 logit_hash=d7ae9a1ca4b3463a argmax=24 l0=-2.83081222 l1=0.118509293 lN=-0.228902698
+step=6 tok=3 pos=186 logit_hash=112a98f006ecb7f9 argmax=229 l0=-3.3866961 l1=-1.85914254 lN=-0.178193554
+step=7 tok=900 pos=217 logit_hash=cfa0a32ffc3dfaff argmax=196 l0=-2.65690613 l1=0.100442871 lN=-0.338706434
+== host nofma
+step=0 tok=1 pos=0 logit_hash=4abca849552bf4fe argmax=526 l0=-4.52789736 l1=0.357524037 lN=-2.8233974
+step=1 tok=2 pos=31 logit_hash=67a0598a7debaf9d argmax=3 l0=-2.5982337 l1=-0.740024567 lN=2.02169204
+step=2 tok=100 pos=62 logit_hash=7c452edb5d2a80b5 argmax=79 l0=-5.24211264 l1=-2.11809111 lN=-1.19430113
+step=3 tok=7 pos=93 logit_hash=231aa55cd12adc93 argmax=150 l0=-1.50569665 l1=-0.0315582752 lN=-3.0703373
+step=4 tok=4095 pos=124 logit_hash=581d295ad818cadf argmax=581 l0=-3.35042787 l1=0.844109476 lN=0.980551481
+step=5 tok=42 pos=155 logit_hash=4ade615f1e615aa5 argmax=24 l0=-2.81974936 l1=0.104026079 lN=-0.220190555
+step=6 tok=3 pos=186 logit_hash=ec6f62253955ee8a argmax=280 l0=-3.35421109 l1=-1.85544789 lN=-0.198938668
+step=7 tok=900 pos=217 logit_hash=06bf5fd29c2b2809 argmax=196 l0=-2.61493945 l1=0.164925456 lN=-0.319575012
+== host fma
+step=0 tok=1 pos=0 logit_hash=d7edb3466811d813 argmax=526 l0=-4.52789736 l1=0.357524037 lN=-2.8233974
+step=1 tok=2 pos=31 logit_hash=1ae9d9b4af058b36 argmax=3 l0=-2.61835504 l1=-0.747854233 lN=2.00936556
+step=2 tok=100 pos=62 logit_hash=1300124b99a70867 argmax=79 l0=-5.16965914 l1=-2.16477203 lN=-1.16225755
+step=3 tok=7 pos=93 logit_hash=bd76327c53e0d6ac argmax=150 l0=-1.49378741 l1=-0.0909680426 lN=-3.0787878
+step=4 tok=4095 pos=124 logit_hash=e7d3292cc1c341c7 argmax=581 l0=-3.34369683 l1=0.837416589 lN=0.949086368
+step=5 tok=42 pos=155 logit_hash=c972b2eefddfbc12 argmax=24 l0=-2.81726766 l1=0.122136779 lN=-0.238392875
+step=6 tok=3 pos=186 logit_hash=b6fcf0df27d83d6c argmax=280 l0=-3.35599923 l1=-1.84539127 lN=-0.176253378
+step=7 tok=900 pos=217 logit_hash=5756a613d68170c8 argmax=196 l0=-2.65417194 l1=0.141609281 lN=-0.288336694
+== comparisons (max |logit diff| over l0,l1,lN; argmax agreement; disagreeing steps)
+host default  vs device    0.0613  7/8  [6]
+host nofma    vs device    0.0807  8/8  []
+host fma      vs device    0.0800  8/8  []
+host nofma    vs host fma    0.0725  8/8  []
+host default  vs host nofma  0.0645  7/8  [6]
+host default  vs host fma    0.0504  7/8  [6]

@@ -1,0 +1,4 @@
+correct_int8_g88p_ship.json: answer_x by position of the irrelevant value (device check)
+  first  right  24/47  =  51.1%
+  middle right  13/32  =  40.6%
+  last   right  41/41  = 100.0%

@@ -207,8 +207,11 @@ the first given or after the last, nothing else changed. Device-check right:
 Reversing the relevant givens, no spare: 83/91 -> 83/91 at group 88 (3 lost, 3 gained) -- the model
 binds by NAME. **Cause, measured in the ladder corpus (`acdc7b70`): of 75,618 compute documents with
 a spare given, 100.00% place every spare after every relevant given.** The model learned where
-irrelevant values sit. The `answer_x` split places its spare first -- a shape the generator never
-emits -- which is why that set scores 57.5%.
+irrelevant values sit. CORRECTED (A158): this said the `answer_x` split "places its spare first". It
+does not -- answer_control.py shuffles the order, so the spare is first in 47 of 120 items, middle
+in 32, last in 41, and 79 of 120 (not last) are a shape the generator never emits. Split by position
+(`tools/eval/spare_position.py`), the shipped engine is right on 41/41 with the spare last, 24/47 first
+and 13/32 in the middle: the positional finding again, on items the paired experiment did not touch.
 
 **Deterministic baseline** (`tools/eval/score_deterministic.py`): the runtime's own parse/bind via the
 device prompt, evalcli, no model; the same graders. answer_0/s/w 120/120 each, answer_x 119/120,
