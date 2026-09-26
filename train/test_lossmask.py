@@ -92,15 +92,22 @@ else:
 # ---- NO NINTH COPY. The defect recurred eight times because there was no importable mask, so
 # every trainer that needed one wrote it. tools/eval/genloop.py's guard, applied here: any file
 # reimplementing the loop is a failure, and the allowlist is this module and its own test.
-import re as _re
+import re as _re, subprocess as _sp
 ALLOW = {"train/lossmask.py", "train/test_lossmask.py"}
 LOOP = _re.compile(r"elif\s+(ins|inside)\s*:\s*\w+\[")
 _root = pathlib.Path(__file__).resolve().parent.parent
+# THIS CHECKOUT'S files: tracked, plus new ones git would offer to add. Not an rglob over the folder:
+# run from the main checkout, that also walked nested worktrees -- other checkouts of this same
+# repository, each with its own train/lossmask.py -- and reported them as reimplementations.
+_ls = _sp.run(["git", "-C", str(_root), "ls-files", "-z", "--cached", "--others",
+               "--exclude-standard", "--", "*.py"], capture_output=True, text=True)
+if _ls.returncode != 0:
+    fails += 1
+    print(f"  FAIL  could not list this checkout's files, so the scan did not run: {_ls.stderr.strip()}")
 offenders = []
-for f in sorted(_root.rglob("*.py")):
-    rel = f.relative_to(_root).as_posix()
-    if rel in ALLOW or "/.git/" in rel or rel.endswith(".bak") or "scratchpad" in rel: continue
-    try: txt = f.read_text()
+for rel in sorted(filter(None, _ls.stdout.split("\0"))):
+    if rel in ALLOW or rel.endswith(".bak") or "scratchpad" in rel: continue
+    try: txt = (_root / rel).read_text()
     except Exception: continue
     if LOOP.search(txt) and "RES_O" in txt:
         offenders.append(rel)
