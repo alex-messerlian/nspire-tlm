@@ -157,5 +157,10 @@ int main(int argc, char **argv) {
         }
         fclose(o);
     }
+    /* FREE WHAT WAS BUILT. On the calculator this program runs under Ndless, which does not reclaim
+     * the heap from a program that exits holding it: golden_dev left ~20 MB allocated, and ChatTLM,
+     * opened next, reported "Not enough free RAM" for its 11.6 MB model block. Every other device
+     * benchmark already called rq_free(); this was the one that did not. */
+    rq_free();
     return 0;
 }

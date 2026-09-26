@@ -1,0 +1,18 @@
+prompt assembly: host (build/devasm) equals the device's logged prompt on 8/8 turns
+  turn 0 [answer        ] device  56 ids, host  56: IDENTICAL
+      prompt 80 tokens, first output 1259520 ticks = 38.437 s, turn 2325770 ticks = 70.976 s, 56 ids, 1 calls
+  turn 1 [answer        ] device  41 ids, host  41: IDENTICAL
+      prompt 64 tokens, first output 980125 ticks = 29.911 s, turn 1705401 ticks = 52.044 s, 41 ids, 1 calls
+  turn 2 [answer        ] device  35 ids, host  35: IDENTICAL
+      prompt 62 tokens, first output 946155 ticks = 28.874 s, turn 1553532 ticks = 47.410 s, 35 ids, 1 calls
+  turn 3 [answer        ] device  52 ids, host  52: IDENTICAL
+      prompt 66 tokens, first output 1014297 ticks = 30.953 s, turn 1959552 ticks = 59.800 s, 52 ids, 1 calls
+  turn 4 [extra value   ] device  46 ids, host  46: IDENTICAL
+      prompt 58 tokens, first output 878873 ticks = 26.821 s, turn 1686348 ticks = 51.463 s, 46 ids, 1 calls
+  turn 5 [value withheld] device  14 ids, host  14: IDENTICAL
+      prompt 76 tokens, first output 1188412 ticks = 36.267 s, turn 1423059 ticks = 43.428 s, 14 ids, 0 calls
+  turn 6 [no values     ] device  22 ids, host  22: IDENTICAL
+      prompt 35 tokens, first output 508598 ticks = 15.521 s, turn 846070 ticks = 25.820 s, 22 ids, 0 calls
+  turn 7 [explain       ] device  59 ids, host  59: IDENTICAL
+      prompt 83 tokens, first output 1313469 ticks = 40.083 s, turn 2451655 ticks = 74.818 s, 59 ids, 0 calls
+whole turns identical: 8/8; device ids compared: 325
