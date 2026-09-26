@@ -1,0 +1,100 @@
+{
+ "seeds": {
+  "values given, symbol asked": [
+   "answer",
+   1011
+  ],
+  "named in words": [
+   "worded",
+   1017
+  ],
+  "symbol only": [
+   "symbol",
+   2017
+  ]
+ },
+ "revisions": {
+  "A155": "793a551",
+  "A156": "60b3607",
+  "A157": null
+ },
+ "selection": {
+  "values given, symbol asked": {
+   "n": 300,
+   "A155": {
+    "right": 49,
+    "wrong": 14,
+    "none": 237
+   },
+   "A156": {
+    "right": 157,
+    "wrong": 14,
+    "none": 129
+   },
+   "A157": {
+    "right": 253,
+    "wrong": 5,
+    "none": 42
+   }
+  },
+  "named in words": {
+   "n": 300,
+   "A155": {
+    "right": 66,
+    "wrong": 10,
+    "none": 224
+   },
+   "A156": {
+    "right": 208,
+    "wrong": 10,
+    "none": 82
+   },
+   "A157": {
+    "right": 208,
+    "wrong": 10,
+    "none": 82
+   }
+  },
+  "symbol only": {
+   "n": 300,
+   "A155": {
+    "right": 2,
+    "wrong": 26,
+    "none": 272
+   },
+   "A156": {
+    "right": 82,
+    "wrong": 26,
+    "none": 192
+   },
+   "A157": {
+    "right": 295,
+    "wrong": 0,
+    "none": 5
+   }
+  }
+ },
+ "end_to_end": {
+  "values given, symbol asked": {
+   "n": 300,
+   "unscoreable": 0,
+   "correct": 248,
+   "declined": 47,
+   "wrong": 5
+  },
+  "named in words": {
+   "n": 300,
+   "unscoreable": 0,
+   "correct": 200,
+   "declined": 91,
+   "wrong": 9
+  },
+  "symbol only": {
+   "n": 300,
+   "unscoreable": 0,
+   "correct": 285,
+   "declined": 5,
+   "wrong": 10
+  }
+ }
+}

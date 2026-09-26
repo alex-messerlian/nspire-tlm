@@ -91,6 +91,23 @@ the A156 controls re-aimed where A157 now decides their old case (the rule itsel
 work? Take d_o = 82.5, F_o = 75.6.", which names no symbol and covers 66%; uniqueness at series and
 parallel R_eqv).
 
+## Held out: the rules on 900 items they were not designed on
+
+A156 and A157 were written while reading the arms' items, so their gains there are not held-out
+estimates. `tools/eval/selection_holdout.py` draws 900 fresh items from the arms' own producers
+(`answer_control.py`, `worded_control.py`) with seeds no arm uses, and runs the same app code linked
+against each revision's askparse.c (`results/selection_holdout.json`). Selection right / wrong /
+declined:
+
+| fresh item set (300 each) | A155 | A156 | A157 | A157 right end to end |
+|---|---|---|---|---|
+| values given, symbol asked | 49 / 14 / 237 | 157 / 14 / 129 | 253 / 5 / 42 | 82.7% |
+| named in words | 66 / 10 / 224 | 208 / 10 / 82 | 208 / 10 / 82 | 66.7% |
+| symbol only | 2 / 26 / 272 | 82 / 26 / 192 | 295 / 0 / 5 | 95.0% |
+
+Same direction and similar size; wrong choices never rise. This controls for tuning to the items,
+not for the generator's template family or its use of the store's symbols, which the arms share.
+
 ## What the errors are
 
 - **Wrong answers after the right choice are copying errors**, the failure s7 of

@@ -1,0 +1,13 @@
+{
+ "model": "build/transfer/model4096.bin.tns",
+ "decoder": "build/int8gen",
+ "n": 91,
+ "original_right": 87,
+ "reversed_right": 87,
+ "lost": 2,
+ "gained": 2,
+ "example": {
+  "original": "Using I_P = 8.54, N_P = 780, N_S = 2430, find I_S.",
+  "reversed": "Using N_S = 2430, N_P = 780, I_P = 8.54, find I_S."
+ }
+}
