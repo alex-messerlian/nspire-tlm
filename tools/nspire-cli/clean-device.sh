@@ -1,98 +1,112 @@
 #!/bin/sh
-# clean-device.sh -- leave ONLY the files a ChatTLM demo needs on the calculator.
+# clean-device.sh -- leave ONLY the folder a student gets: /chattlm.
 #
-# WHY. push-all.sh used to send 12 benchmark programs, two engines and 33 MB of legacy checkpoints
-# on every run. The document root reached 22 entries and chattlm could not be found among them --
-# reported from the device as "I can't find it". A132 made those opt-in; this removes what earlier
-# runs already left behind.
+# WHAT SURVIVES (2026-09-27: one folder, the layout the public release ships):
+#   /chattlm/ChatTLM_Setup.tns     the document a student opens. It installs the loader, which then
+#                                  starts ChatTLM by itself.
+#   /chattlm/chattlm_support.tns   the loader. The exploit reads this exact path (installer/stage0.S,
+#                                  respath), so it cannot move.
+#   /chattlm/startup/chattlm.tns   ChatTLM. The loader runs every document in this folder
+#                                  (ploaderhook.c:484, file_each on "./chattlm/startup").
+#   /chattlm/data/                 the model, tokenizer and record store, and the student's saved
+#                                  chats and feedback (device_app.c looks here first).
+#   /themes.csv                    the calculator's own file, not ours. Ndless only reads it in an SDK
+#                                  sample (samples/newlib-c++/test_newlib.cpp); the loader never does.
 #
-# WHAT SURVIVES, and why each one:
-#   /chattlm.tns                     the app, opened from My Documents
-#   /chattlm/startup/chattlm.tns     the copy the loader runs at power-on (ploaderhook.c:484)
-#   /chattlm/ChatTLM_Setup.tns       our setup document, for a calculator with no loader yet
-#   /chattlm/chattlm_support.tns     the loader itself. A134: the exploit reads this exact path
-#                                    (installer/stage0.S respath) and the file was NEVER pushed,
-#                                    so setup only worked where Ndless was already installed.
-#   /ndless/ndless_installer_*.tns   THEIR installer and the file it needs. The condition for
-#   /ndless/ndless_resources.tns     removing these -- "once our setup has installed from scratch
-#                                    once" -- WAS MET on 2026-09-21: the loader was removed via
-#                                    our own uninstall dialog and ChatTLM Setup reinstalled it
-#                                    from nothing. They are now removed by this script.
-#                                    Keep a copy on the HOST (ndless/ in the main checkout); the
-#                                    reason to hold them was recovery, and the host has that
-#                                    covered without putting two installers in front of a student.
-#   /tlm/{store,tok4096,model4096}   the model data; device_app needs all three in one directory
-#   /tlm/chats.tns.tns               the student's saved sessions -- user data, not ours to delete
-#   /tlm/feedback.tns.tns            same
-#   /themes.csv                      read by Ndless from the documents root
+# WHAT GOES: the top-level copy of the app; /tlm, after its saved chats move to /chattlm/data; the
+# benchmark programs and their /sweep shapes; the upstream Ndless installer pair (ChatTLM Setup has
+# installed from nothing since 2026-09-21, and the host keeps a copy in ndless/); the OS's
+# NspireLogs.zip. Every file removed is first pulled to attic/calculator-removed-<date>/ on the host,
+# and the benchmarks come back with tools/nspire-cli/push-bench.sh.
 #
-# Everything else is a benchmark, a log, or a superseded model. Nothing here is unrecoverable:
-# PUSH_BENCH=1 sh tools/nspire-cli/push-all.sh restores the measurement tools in about two minutes.
+# Run tools/nspire-cli/push-all.sh FIRST, so /chattlm/data is complete. This script refuses to empty
+# /tlm otherwise. DRY_RUN=1 lists what it would do and changes nothing.
 set -u
 cd "$(dirname "$0")/../.."
 DYLD_LIBRARY_PATH="$PWD/vendor/libnspire/_install/lib:${DYLD_LIBRARY_PATH:-}"
 export DYLD_LIBRARY_PATH
 NSP=tools/nspire-cli/nsp
 DRY="${DRY_RUN:-0}"
+KEEP="attic/calculator-removed-$(date +%Y-%m-%d)"
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
 
-gone=0; kept=0; failed=0
+gone=0
+# Pull to the host, then remove. A file that cannot be pulled is left where it is.
 drop() {
     if [ "$DRY" = "1" ]; then echo "  would remove $1"; gone=$((gone+1)); return; fi
+    $NSP ls "$(dirname "$1")" 2>/dev/null | awk '{print $3}' | grep -Fqx "$(basename "$1")" \
+        || { echo "  (absent)  $1"; return; }
+    mkdir -p "$KEEP$(dirname "$1")"
+    if ! $NSP pull "$1" "$KEEP$1" >/dev/null 2>&1; then echo "  KEPT (could not back up) $1"; return; fi
     if $NSP rm "$1" >/dev/null 2>&1; then echo "  removed $1"; gone=$((gone+1))
-    else echo "  (absent)  $1"; fi
+    else echo "  could not remove $1"; fi
 }
-# EMPTY ROOT-LEVEL DIRECTORIES CANNOT BE REMOVED OVER USB, and that is a device quirk rather than
-# a bug here. nspire_dir_delete answers "Path does not exist" for /bench, /documents/bench, bench
-# and /bench/ alike, while ns ls on the same path works and the root listing still shows it. Same
-# family as this tool's own note that mkdir fails at the documents root (0xFF0F).
-#
-# The FILES inside are gone, which is what made chattlm unfindable. The empty folder is cosmetic
-# and the calculator deletes it in two keypresses from its own file browser. Reported, not retried.
+# Move one file to a new path on the device: pull, push, read back, compare, then remove the old one.
+move() {
+    if [ "$DRY" = "1" ]; then echo "  would move $1 -> $2"; return; fi
+    $NSP pull "$1" "$TMP/f" >/dev/null 2>&1 || { echo "  (absent)  $1"; return; }
+    $NSP push "$TMP/f" "$2" >/dev/null 2>&1 && $NSP pull "$2" "$TMP/g" >/dev/null 2>&1 \
+        && cmp -s "$TMP/f" "$TMP/g" || { echo "  COULD NOT MOVE $1 (left in place)"; return; }
+    mkdir -p "$KEEP$(dirname "$1")"; cp "$TMP/f" "$KEEP$1"
+    $NSP rm "$1" >/dev/null 2>&1 && echo "  moved $1 -> $2" || echo "  copied $1 -> $2 (old copy not removed)"
+}
+# EMPTY TOP-LEVEL FOLDERS CANNOT BE REMOVED OVER USB: nspire_dir_delete answers "Path does not exist"
+# for them while ls on the same path works. The files inside are gone; the empty folder is deleted on
+# the calculator in two keypresses. Reported, not retried.
 dropdir() {
     if [ "$DRY" = "1" ]; then echo "  would rmdir $1"; return; fi
     $NSP rmdir "$1" >/dev/null 2>&1 && echo "  rmdir   $1" \
-        || echo "  (left empty -- root dirs cannot be removed over USB; delete on the device) $1"
+        || echo "  (empty, delete it on the calculator) $1"
 }
 
-echo "--- benchmark and engine programs (restore with PUSH_BENCH=1) ---"
-for b in platform mem mac flash rtc cas forward memceiling byte word ask; do
+echo "--- /chattlm/data must be complete before anything in /tlm is touched ---"
+for f in store.tns.tns tok4096.tok.tns model4096.bin.tns; do
+    $NSP ls /chattlm/data 2>/dev/null | awk '{print $3}' | grep -Fqx "$f" \
+        || { echo "  FATAL: /chattlm/data/$f is missing. Run tools/nspire-cli/push-all.sh first."; exit 1; }
+done
+echo "  ok: store, tokenizer and model are in /chattlm/data"
+
+echo "--- the student's saved chats and feedback follow the data ---"
+for f in chats.tns.tns feedback.tns.tns; do
+    if $NSP ls /chattlm/data 2>/dev/null | awk '{print $3}' | grep -Fqx "$f"; then
+        drop "/tlm/$f"          # /chattlm/data already has one; the /tlm copy is backed up to the host
+    else
+        move "/tlm/$f" "/chattlm/data/$f"
+    fi
+done
+
+echo "--- the top-level copy of the app, and /tlm ---"
+drop /chattlm.tns
+for f in store.tns.tns tok4096.tok.tns model4096.bin.tns genlog.txt.tns bench_results.txt.tns \
+         golden_dev.txt.tns logits0.bin.tns tlmlog.txt.tns caslog.txt.tns casnext.txt.tns casnext3.txt.tns; do
+    drop "/tlm/$f"
+done
+dropdir /tlm
+
+echo "--- benchmark programs and their shapes (restore with push-bench.sh) ---"
+for b in platform mem mac flash rtc cas forward generate sweep memceiling byte word ask; do
     drop "/bench_${b}.tns"
 done
 drop /eval_device.tns
 drop /llama2.tns
 drop /golden_dev.tns
-
-echo "--- benchmark output logs ---"
-for f in results filetest llama2_device golden argtest slmlog fsprobe memceiling; do
-    drop "/bench/${f}.txt.tns"
+for s in m176 m192 m256 m264 m264h6 m320 m352 m352b m384 m440 m440h10; do
+    drop "/sweep/$s.bin.tns"
 done
-drop /bench/logits0.bin.tns
-dropdir /bench
+dropdir /sweep
 
-echo "--- superseded checkpoints (33 MB) ---"
-drop /models/stories15M_q80.bin.tns
-drop /models/stories15M_q96.bin.tns
-drop /models/tokenizer.bin.tns
-dropdir /models
-dropdir /slm
-
-echo "--- stray logs ---"
-drop /tlm/caslog.txt.tns
-drop /tlm/casnext.txt.tns
-drop /tlm/casnext3.txt.tns
-drop /ndless/slmlog.txt.tns
-# A136. The upstream installer pair, now that our own setup has installed from nothing (see the
-# header). Two setup documents on one calculator is the confusion this script exists to remove,
-# and the host keeps a copy for recovery.
+echo "--- the upstream Ndless installer pair, and the OS's log bundle ---"
 drop /ndless/ndless_installer_4.5.5-6.2.0-6.4.0.tns
 drop /ndless/ndless_resources.tns
+dropdir /ndless
 drop /NspireLogs.zip
 
 echo
 echo "--- what is left ---"
-for d in / /chattlm /chattlm/startup /ndless /ndless/startup /tlm; do
+for d in / /chattlm /chattlm/startup /chattlm/data; do
     echo "  $d"
     $NSP ls "$d" 2>/dev/null | sed 's/^/      /'
 done
 echo
-echo "removed $gone item(s)."
+echo "removed $gone item(s); each is backed up in $KEEP/."

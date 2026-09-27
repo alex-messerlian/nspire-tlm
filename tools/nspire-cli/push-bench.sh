@@ -47,12 +47,20 @@ for f in m176 m192 m256 m264 m264h6 m320 m352 m352b m384 m440 m440h10; do
 done
 $NSP mkdir /sweep/.mk >/dev/null 2>&1 || true
 $NSP rmdir /sweep/.mk >/dev/null 2>&1 || true
+# THE BENCHMARKS READ THE SHIPPED MODEL FROM /tlm (bench_forward.c, bench_sweep.c, golden_forward.c),
+# and a student's calculator no longer has /tlm: its data live in /chattlm/data (push-all.sh). So a
+# benchmark push brings its own copy. clean-device.sh removes it again after measuring.
+$NSP mkdir /tlm/.mk >/dev/null 2>&1 || true
+$NSP rmdir /tlm/.mk >/dev/null 2>&1 || true
 
 echo "--- benchmarks ---"
 send bench/bench_forward.tns  /bench_forward.tns
 send bench/bench_sweep.tns    /bench_sweep.tns
 send bench/bench_generate.tns /bench_generate.tns
 send build/golden_dev.tns     /golden_dev.tns
+send build/transfer/store.tns.tns    /tlm/store.tns.tns
+send build/transfer/tok4096.tok.tns  /tlm/tok4096.tok.tns
+send build/transfer/model4096.bin.tns /tlm/model4096.bin.tns
 echo "--- sweep shapes ---"
 for f in build/sweep/*.bin.tns; do send "$f" "/sweep/$(basename "$f")"; done
 $NSP ls /sweep || true

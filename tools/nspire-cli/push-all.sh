@@ -74,7 +74,7 @@ echo "--- directories ---"
 # with "Path does not exist" -- AFTER writing /chattlm.tns; and /bench and /models were recreated
 # on every run even with PUSH_BENCH unset, which is the root clutter clean-device.sh exists to
 # remove. A directory is made here only if a file is going into it.
-DIRS="/chattlm/startup /tlm"
+DIRS="/chattlm/startup /chattlm/data"
 [ "${PUSH_BENCH:-0}" = "1" ]  && DIRS="$DIRS /bench"
 [ "${PUSH_LEGACY:-0}" = "1" ] && DIRS="$DIRS /models"
 for d in $DIRS; do
@@ -234,8 +234,12 @@ fi
 # never touched build/transfer/, so a fresh device had no /tlm at all and the app exited at boot.
 # All three data files must land, and all three must land in the SAME directory: device_app.c
 # accepts a prefix only when store, tokenizer AND model all open under it.
+#
+# ONE FOLDER (2026-09-27). A student's calculator holds /chattlm only: ChatTLM_Setup.tns,
+# chattlm_support.tns, startup/chattlm.tns and data/. That folder is what the public release
+# ships. The top-level /chattlm.tns and /tlm are no longer written; tools/nspire-cli/clean-device.sh
+# removes them from a calculator that has them, after moving the student's saved chats.
 echo "--- ChatTLM (8.2 MB: ~40 s to push, ~40 s to verify) ---"
-send build/chattlm.tns             /chattlm.tns
 # A130. THE STARTUP COPY IS PUSHED TOO, AND IT IS THE ONE THE CALCULATOR ACTUALLY RUNS.
 #
 # The loader runs every document in /chattlm/startup at boot (ploaderhook.c:484, file_each on
@@ -263,9 +267,9 @@ send build/chattlm.tns             /chattlm/startup/chattlm.tns
 # not work at all, and the failure looks like a flaky exploit rather than a missing file.
 send build/ChatTLM_Setup.tns       /chattlm/ChatTLM_Setup.tns
 send build/chattlm_support.tns     /chattlm/chattlm_support.tns
-send build/transfer/store.tns.tns  /tlm/store.tns.tns
-send build/transfer/tok4096.tok.tns /tlm/tok4096.tok.tns
-send build/transfer/model4096.bin.tns /tlm/model4096.bin.tns
+send build/transfer/store.tns.tns  /chattlm/data/store.tns.tns
+send build/transfer/tok4096.tok.tns /chattlm/data/tok4096.tok.tns
+send build/transfer/model4096.bin.tns /chattlm/data/model4096.bin.tns
 
 if [ "${PUSH_LEGACY:-0}" = "1" ]; then
 echo "--- legacy stories15M model (17 MB: ~60 s to push, ~60 s to verify) ---"

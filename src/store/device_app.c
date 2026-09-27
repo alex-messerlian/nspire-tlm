@@ -358,11 +358,16 @@ static int answer_states_result(const char *ans, const char *res) {
  * the app exit 1 on launch with no message -- the exact silent-failure shape that cost five device
  * cycles during Phase 2 bring-up.
  *
- * So resolve at runtime instead: try each candidate directory and keep the first where the STORE
- * opens. Probing the store rather than the directory means a half-populated directory does not win.
- * The chosen prefix is reported into the log so a wrong pick is visible without a round-trip. */
-static const char *DATA_DIRS[] = { "/documents/chattlm/", "/documents/tlm/", "/documents/slm/", "/documents/ndless/",
-                                   "/documents/bench/", "/documents/" };
+ * So resolve at runtime instead: try each candidate directory and keep the first where the store,
+ * the tokenizer AND the model all open (resolve_data_dir), so a half-populated directory does not win.
+ *
+ * A STUDENT'S CALCULATOR HOLDS ONE FOLDER, /documents/chattlm/, and the data sit in its data/
+ * subfolder (2026-09-27): the setup document, the support file, startup/ and data/ are all a reader
+ * sees. The older locations stay as fallbacks, so a calculator from an earlier install keeps working
+ * and the benchmark push (tools/nspire-cli/push-bench.sh) can keep its own copy in /tlm. */
+static const char *DATA_DIRS[] = { "/documents/chattlm/data/", "/documents/chattlm/", "/documents/tlm/",
+                                   "/documents/slm/", "/documents/ndless/", "/documents/bench/",
+                                   "/documents/" };
 static char DATA_DIR[32];
 static int  MODEL_OK = 0;          /* set by rq_probe at startup; gates the send path */
 static char MODEL_WHY[160];        /* why not, in words the reader can act on */
