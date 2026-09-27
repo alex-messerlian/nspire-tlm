@@ -1,339 +1,101 @@
-# nspire-tlm — a language model on a TI-Nspire CX II CAS
+# A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds
 
-Mission, phases, and rules of engagement live in the project log.
+**Alexander Messerlian** · Independent Researcher, Palo Alto, CA, USA ·
+ORCID [0009-0003-4933-6832](https://orcid.org/0009-0003-4933-6832)
 
-## Architecture
+**Paper:** [`paper/paper.pdf`](paper/paper.pdf), the anonymous copy under review at TMLR, and
+[`paper/paper-arxiv.pdf`](paper/paper-arxiv.pdf), the named copy for arXiv.
 
-**Tool-augmented, not knowledge-augmented.** The model never computes. It emits a structured call,
-the runtime executes it, the result is injected, and the model composes prose around it. The model
-learns *format*, which is reachable at 45M parameters; it does not learn calculus, which is not.
+## Abstract
 
-One base model (language + math register + call format), then continued training per domain —
-algebra, calculus, physics, statistics. N finetuned packs ship to flash, one loads into RAM at a
-time. Training N models from scratch would pay the English tax N times, and at 45M most of the
-capacity is language.
+We built a physics assistant that runs entirely on a TI-Nspire CX II CAS graphing calculator, which has one ARM926EJ-S
+core at 396 MHz, no floating-point unit, about 21.5 MiB of memory for an application and no network. We use it to
+study how the conclusions of a small-model evaluation depend on what the evaluation runs. The 10.9M-parameter model
+never computes: the runtime picks a relation from a store, puts it in the prompt with the question's values and the
+variables still missing, and runs the calculation the model writes. Given the right relation, the model is right on
+96.7% of problems that give every value. Its errors are digits copied wrongly, and placing an irrelevant value before
+the relevant ones lowers its score from 116 to 61 of 120, which matches the training generator's habit of adding
+irrelevant values last. In the full system, picking the relation was at first the main limit: the calculator answered
+21 of 120 of the same problems correctly and declined most of the rest. Two selection rules that use the values in the
+question raise this to 93 (and to 248 of 300 new problems from the same generators), while wrong answers rise from 2
+to 4. A simple path through the same runtime with no model is right more often and wrong less often on every problem
+that asks for a number, both with the relation supplied and behind the same selector; the model declines more
+reliably. Differences between our harness and the calculator moved measured accuracy by 9 to 21 points, and scoring
+on the calculator's integer engine revealed a weight-layout defect that a host–calculator comparison could not
+detect. A per-token cost model fitted on battery predicts a decode run within 0.4%, and a filled KV cache costs 40%
+more per position than an empty one.
 
-| Doc | What it is |
+## Contents
+
+| Folder | What is in it |
 |---|---|
-| [`docs/TOOL_SPEC.md`](docs/TOOL_SPEC.md) | **FROZEN v1.1.0.** The call format. Everything downstream depends on it. |
-| [`docs/HARDWARE.md`](docs/HARDWARE.md) | Measured device properties. Populated on hardware. |
-| [`docs/RESULT_D416.md`](docs/RESULT_D416.md) | The size question, closed: capability is flat above the threshold. |
-| [`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md) | The corpus, not the device, is the limit. |
-| [`docs/RESULT_COMPUTE_BOUND.md`](docs/RESULT_COMPUTE_BOUND.md) | The brief's bandwidth hypothesis, falsified. |
-| [`tools/eval/`](tools/eval/) | Backend 1: our own C evaluator, plus the gate suite. |
-| [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md) | What already exists. Read this before anything else. |
-| [`bench/`](bench/) | The micro-benchmarks that fill in HARDWARE.md. |
-
-## Sequencing
-
-1. ~~Tool interface spec + host evaluator~~ — **done**, no hardware needed.
-2. Data generation, **algebra only**.
-3. Train **one** model. Prove the full loop on host.
-4. Port to device.
-5. Only then add domains 2–4.
-
-Do not train four models before one runs on the calculator.
-
-**Current state: Phase 0–2 met on the physical calculator; Phase 3–4 in progress.** The device
-generates text unaided, on battery, with no computer attached. Hardware numbers below are measured
-unless tagged `[SOURCED]` or `[ESTIMATE]`.
-
-### Measured, on the physical device, battery, USB out
-
-| | |
-|---|---|
-| Shipping model | **d352 — 10,908,128 parameters**, 6 layers, int8 group-quantised, 11.4 MB |
-| Throughput | **1.70 tok/s** at context 512, 1.35 at the larger context (battery, USB out) |
-| Largest single `malloc` | 21.56 MiB bare / **4.83 MiB after ordinary use** — the gap is the finding |
-| DRAM read | 97 MB/s | 
-| Compute | 48 MMAC/s int8 — **the device is compute bound at every quantisation** |
-| I-cache / D-cache | 16 KB / **8 KB**, 32-byte line, 4-way |
-| CPU clock | **198 MHz, then 144 MHz** — not the 396 MHz the brief assumes |
-
-### The four results the project leads with
-
-1. **We measured our own measurement error, and most of our comparisons were inside it.** Three
-   training runs identical except the random seed score `fit` at **67.8 / 47.5 / 37.8** — a
-   **30-point** range, sd 15.3. Every `fit` value this project ever quoted falls inside that band,
-   including the ones that looked like clean effects. At this variance, resolving a 10-point
-   difference needs ~37 runs per arm (~48 h per side); **anything under ~20 points is unaffordable
-   on this hardware**, so the project claims 20+ point effects and no smaller ones.
-   ([`docs/RESULT_NOISE.md`](docs/RESULT_NOISE.md))
-
-   The trap is worth naming: every arm reports a tight *within-run* range, and that is **decoding**
-   noise across sampling seeds on one model. Quoted beside a number it reads exactly like an error
-   bar, and it is an error bar on the wrong quantity — training noise here is 15× larger.
-
-2. **A capability threshold.** Below ~10.3M parameters the model is healthy in every respect — it
-   answers, it refuses a withheld given 100% of the time, it does not over-refuse — and it *never*
-   declines on the grounds that the retrieved record does not apply (`fit` = **0.0%**). A 0.0% draw
-   is 3.3 sd from the mean of a converged run, so the cliff survives replication even though the
-   exact bracket does not. The transition is **not** the memory cliff the brief predicted; memory
-   never binds — compute does.
-   ([`docs/RESULT_COMPUTE_BOUND.md`](docs/RESULT_COMPUTE_BOUND.md))
-
-3. **Teaching the model to explain works, and it is the one large effect here.** The corpus
-   contained **0 of 239,832** record-bearing documents with no student-supplied value — the exact
-   prompt the device builds for *"explain Newton's second law"* — so the shipped model answered that
-   question with a self-contradiction. Adding the class takes `explain` from **0.0% to 80.0%**
-   (sd 3.9). Eighty points against an 8-point range.
-   ([`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md))
-
-4. **The model reads the record for the tool call and recalls it for prose — and the corpus explains
-   why.** Rename one variable in a record's formula *in the prompt only*, on records the model knows
-   well, and ask it to restate the relation: it gives the **original** formula 87–90% of the time and
-   the one it was shown **0 of 80 times**. Give the same corrupted record to the *tool call* and it
-   follows what it was shown ~10:1 over memory.
-   ([`docs/RESULT_RECALL_NOT_READ.md`](docs/RESULT_RECALL_NOT_READ.md))
-
-   **The corpus forces reading only where the target varies with the input.** A tool call cannot be
-   memorised — the values differ in every document — so the model learned to read the formula to
-   build one. A prose restatement of that same formula is identical in every document for a given
-   record, so recall always suffices. These probes are deterministic corruptions, not arm means, so
-   they are unaffected by result 1.
-
-**Unresolved, and stated as such:** whether d352 (10.9M) or d416 (15.4M) is better. On an identical
-corpus they differ by 2.9 points on `fit` — inside the band. The size question is open, not closed.
-
-## Sequencing
-
-1. ~~Tool interface spec + host evaluator~~ — **done**, no hardware needed.
-2. Data generation, **algebra only**.
-3. Train **one** model. Prove the full loop on host.
-4. Port to device.
-5. Only then add domains 2–4.
-
-Do not train four models before one runs on the calculator.
-
-**Current state: Phase 0–2 met on the physical calculator; Phase 3–4 in progress.** The device
-generates text unaided, on battery, with no computer attached. Hardware numbers below are measured
-unless tagged `[SOURCED]` or `[ESTIMATE]`.
-
-### Measured, on the physical device, battery, USB out
-
-| | |
-|---|---|
-| Shipping model | **d352 — 10,908,128 parameters**, 6 layers, int8 group-quantised, 11.4 MB |
-| Throughput | **1.70 tok/s** at context 512, 1.35 at the larger context (battery, USB out) |
-| Largest single `malloc` | 21.56 MiB bare / **4.83 MiB after ordinary use** — the gap is the finding |
-| DRAM read | 97 MB/s | 
-| Compute | 48 MMAC/s int8 — **the device is compute bound at every quantisation** |
-| I-cache / D-cache | 16 KB / **8 KB**, 32-byte line, 4-way |
-| CPU clock | **198 MHz, then 144 MHz** — not the 396 MHz the brief assumes |
-
-### The three results the project leads with
-
-1. **A capability threshold, bracketed to 6.1%.** Below ~10.3M parameters the model is healthy in
-   every respect — it answers, it refuses a withheld given 100% of the time, it does not
-   over-refuse — and it *never* declines on the grounds that the retrieved record does not apply
-   (`fit` = 0.0%). Above it, `fit` is 63–68%. The transition is not the memory cliff the brief
-   predicted; memory never binds.
-2. **Above the threshold, capability is flat, and the corpus is the limit.** +42% parameters buys
-   +4.7 points on the primary arm ([`docs/RESULT_D416.md`](docs/RESULT_D416.md)), while a behaviour
-   the corpus never demonstrates — explaining what a relation *is* — measured **0.0% at both sizes**
-   ([`docs/RESULT_CANNOT_EXPLAIN.md`](docs/RESULT_CANNOT_EXPLAIN.md)). Taught it, the model reaches
-   **93.1%** on the records it trains on.
-3. **The model reads the record for the tool call and recalls it for prose — and the corpus
-   explains exactly why.** Rename one variable in a record's formula *in the prompt only*, on
-   records the model knows well, and ask it to restate the relation: it states the **original**
-   formula 87–90% of the time and the one it was shown **0 of 80 times.** Give the same corrupted
-   record to the *tool call* and it follows what it was shown ~10:1 over memory, on the shipped
-   model most strongly of all.
-   ([`docs/RESULT_RECALL_NOT_READ.md`](docs/RESULT_RECALL_NOT_READ.md))
-
-   **The corpus forces reading only where the target varies with the input.** A tool call cannot be
-   memorised — the values differ in every document — so the model learned to read the formula to
-   build one. A prose restatement of that same formula is identical in every document for a given
-   record, so recall always suffices and reading is never required. The fix is a corpus property,
-   not a capacity one, and the tool call is its own positive control.
-
-## Metrics
-
-Alongside tok/s and perplexity:
-
-- **Tool call validity rate** — emitted calls that parse and execute, split by first attempt vs.
-  retry so recovery is visible separately from first-shot accuracy.
-- **Answer correctness with tools vs. without** — same checkpoint, same questions, tool layer on and
-  off. This difference is the architecture's entire justification, so it is the headline number.
-- **Result-span leak rate** — how often the model tries to emit a `<res>` token. Should be ~0. A
-  nonzero value means the training loss mask is broken, which is the most dangerous possible bug in
-  the pipeline.
-
----
-
-## Pushback on the brief — and how the predictions scored
-
-The brief asks to be attacked. Four places where I thought it was wrong, **written before any
-hardware measurement existed**. They are kept below verbatim, because a prediction is only worth
-something if it was recorded before the answer was known. Here is how they did.
-
-| # | Predicted | Measured | Verdict |
-|---|---|---|---|
-| 1 | int8 roughly balanced, int4 compute bound; *M* ≈ 150 MMAC/s | **97 MB/s DRAM, 48 MMAC/s** — compute bound at **every** quantisation, and memory is cycle-locked to the CPU so the ratio is clock-invariant | **Right, and understated.** The MAC estimate was 3× too high. int4 was dropped for throughput: it halves demand on the resource with headroom |
-| 2 | Lead with the frontier, not a parameter record | The project leads with a **capability threshold** and a **flat region above it** | **Held** |
-| 3 | Report dense params; lead with the dense number | Shipped dense; `total` and `active` are equal | **Held, and followed** |
-| 4 | Capacity binds; KV quantisation and context are first-order | **Compute binds. Memory never does** — the shipping checkpoint uses 48–58% of the ceiling at every context. int8 KV was measured and bought 0.27 tok/s | **Wrong.** Two sessions went into a 21.56 MiB ceiling that never fired |
-
-The §4 estimate — "~70M params at ≈2.1 tok/s, landing on the brief's own 2 tok/s floor" — called its
-own coincidence *"either lovely or a sign that one of my estimates is off."* It was the latter, by
-about 7×: the real answer is ~10.9M at 1.70 tok/s. The floor itself was later re-examined and
-relaxed, because it had been written before anything ran and never compared against a latency anyone
-had actually watched.
-
-**The methodology correction was adopted.** Bit-exact greedy tokens at temperature 0 became the port
-oracle (`build/golden_forward`), and perplexity is reported with a tolerance rather than claimed
-bit-exact — the brief asked for something unachievable across a fp32 host and a fixed-point device.
-
-**The timer note was earned.** The SP804 wrap warning turned out to matter: reading the counter raw,
-without the LOAD/CONTROL setup `bench/common.h` does, produced a 2^32 underflow.
-
-The four arguments as originally written follow.
-
-### 1. "Memory bandwidth bound, not compute bound" is probably wrong at int4 on *this* core
-
-The brief's reasoning — int8 gives arithmetic intensity ≈ 1.0, so the machine is bandwidth bound — is
-valid arithmetic with a hidden premise: that the core's MAC rate comfortably exceeds its DRAM
-bandwidth. That premise holds on almost every modern chip because they all have SIMD. It may not
-hold here.
-
-ARM926EJ-S is single-issue with no SIMD. `SMLABB` and friends retire **one 16×16 MAC per cycle**, and
-ARMv5TE has no `SMLAD` (dual MAC) — that is ARMv6. So the architectural ceiling is 396 MMAC/s at
-396 MHz, and realistic tuned code, once loads and loop overhead are counted, lands well below it.
-
-Let *B* = sustained DRAM read (MB/s), *M* = tuned MAC rate (MMAC/s). For a dense model:
-
-| Quantization | Bytes read per MAC | Memory-bound when |
-|---|---|---|
-| int8 | 1 | *B* < *M* |
-| int4 | 0.5 | 2*B* < *M* |
-
-`[ESTIMATE]` *M* ≈ 150 MMAC/s tuned (≈2.6 cycles/MAC at 396 MHz, allowing for loads and loop
-overhead on a core with no out-of-order recovery). *B* is completely unknown — no one has published a
-memcpy number for the NS2018 — but an ARM926 with a small D-cache and no prefetcher plausibly
-sustains 100–250 MB/s.
-
-Under those estimates **int8 is roughly balanced and int4 is compute bound**, because being
-compute-bound at int4 needs only *M* > 2*B*, and *M* > 300 MMAC/s is above the architectural ceiling.
-
-If that holds, the brief's Phase 3 priority order is inverted past the first step. Quantizing int8→int4
-is still the right first move — it halves the memory footprint, which is what actually limits model
-size — but it will **not** deliver the throughput multiplier the brief predicts, and going below int4
-will deliver none at all. Integer kernel tuning, listed third, becomes the highest-value work.
-
-`bench_mac` and `bench_mem` measure *M* and *B* directly. This is HARDWARE.md row **D6**, and it is
-the most interesting scientific question in the project — considerably more interesting than "can we
-beat 30M parameters."
-
-### 2. The headline result is already gone; the frontier is the real contribution
-
-*(Partly superseded by the tool-augmented architecture: the claim is no longer "largest model" alone
-but "largest model that answers correctly," which is a better and less crowded claim. The frontier
-argument below still holds.)*
-
-Published **2026-08-03**: a 28.9M-parameter model on an **ESP32-S3** — 240 MHz, 8 MB of slow PSRAM —
-at a measured **9.88 tok/s**. See [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md) §2.
-
-The CX II has a faster core and 64 MB of real LPDDR. Exceeding 30M parameters here is close to a
-foregone conclusion, so "we beat the Google AI Overview's 30M claim" is no longer a result worth
-building a project around — the claim was already false when it was written, and someone else
-demonstrated it on weaker hardware.
-
-What is still unclaimed, and what this project should lead with:
-- The first measured **params / tok/s / perplexity frontier** for the TI-Nspire CX II.
-- The first published **DRAM bandwidth, MAC rate, and usable-heap measurements** for the NS2018 SoC.
-  Nobody has these. They are genuinely novel and they are Phase 0 deliverables.
-- A **roofline model that predicts the frontier**, and an account of where it fails.
-
-That is a better project than a record attempt, and it is more robust: it cannot be scooped by
-someone with a bigger calculator.
-
-### 3. "max(params)" is not well defined once PLE exists
-
-The ESP32-S3 result gets 28.9M total parameters while reading ~450 bytes per token from a
-flash-resident embedding table. About 25M of its 28.9M parameters are essentially free, bandwidth-wise.
-Per-Layer Embeddings makes parameter count arbitrarily inflatable at fixed cost.
-
-So the mission's objective function needs a decision, made now rather than argued about at the poster:
-
-> **Report both `total_params` and `active_params_per_token`, always, and lead the headline claim with
-> the dense number.**
-
-Recommendation: make the primary result a **dense** model, where the two numbers are equal and the
-claim is unimpeachable. Then run PLE as a clearly-labelled secondary result — "and with a sparse
-embedding architecture, N total parameters at the same throughput." A judge who knows the field will
-respect the distinction being drawn explicitly far more than a big number that quietly depends on it.
-
-### 4. The binding constraint is probably capacity, and the "cliff" is a designed experiment
-
-The brief hopes to find the point where the model stops fitting in RAM and throughput falls off a
-cliff, calling it the most interesting data point. Two problems.
-
-First, `[ESTIMATE]` with ~35 MB usable heap: int4 weights alone could reach ~70M parameters, but the
-KV cache competes for the same RAM. For a llama2-shaped model with dim=512, 8 layers, 1024-token
-context, int8 KV is 2·8·1024·512 ≈ **8.4 MB** — a quarter of the budget. Capacity, not bandwidth, is
-what stops us, and **KV quantization and context length are therefore first-order levers on maximum
-model size**, not the fourth-priority item the brief makes them.
-
-Second, at ~70M params and *M* ≈ 150 MMAC/s, decode is ≈0.47 s/token ≈ **2.1 tok/s** — the capacity
-limit and the brief's own 2 tok/s usability floor land in nearly the same place `[ESTIMATE]`. That is
-either a lovely coincidence worth putting on the poster, or a sign that one of my estimates is off.
-Either way it is worth knowing before committing to a model size.
-
-And the cliff itself: you do not stumble into flash spill: you build it. Deliberately serving weights
-from a flash-backed path and measuring the collapse is a **controlled experiment** with a clean
-independent variable. Frame it that way rather than as a discovery, and it gets stronger, not weaker.
-
-### One thing the brief asked for that is already solved, and one it missed
-
-**Solved — the timer.** The brief lists "a timer with resolution good enough for per token
-measurement" as an open Phase 0 risk. The CX II has an SP804 at `0x90010000` running off the APB
-clock, ~99 MHz, giving ~10 ns resolution `[SOURCED]`. That is far better than needed. The real
-constraint is that a 32-bit counter at 99 MHz **wraps every ~43 s**, so long runs must handle wrap —
-`bench/common.h` does. There are two more SP804s (12 MHz, 32.768 kHz); `bench_platform` gates the
-fast one against the 32 kHz one so we never have to trust the wiki's "99 MHz".
-
-**Missed — 256 KB of internal SRAM at `0xA4000000`.** `[SOURCED]` from the Hackspire CX II memory map,
-and not mentioned in the brief. If an Ndless application can claim even 64 KB of it, that is the
-correct home for activations, RMSNorm scratch, and the hot rows of the KV cache — the data touched
-many times per token rather than streamed once. On a machine this bandwidth-constrained that could
-matter more than any kernel tuning. Completely unknown whether the OS owns all of it. `bench_mem`
-read-probes it; see the safety note in [`docs/PHASE0.md`](docs/PHASE0.md) H7.
-
-### A methodology correction
-
-The brief asks for perplexity "computed identically on host and device to prove the device port is
-numerically faithful." Bit-exact perplexity across a host fp32 reference and a device fixed-point
-engine is not achievable — the moment softmax, RMSNorm, or RoPE use fixed-point or lookup
-approximations, the values diverge by design.
-
-Split the oracle in two:
-1. **Bit-exact greedy token sequence at temperature 0.** Achievable, binary pass/fail, and the right
-   gate for "is the port correct." Atome lm demonstrates exactly this (48/48 and 16/16 tokens exact)
-   on comparable targets — cited precedent for the method.
-2. **Perplexity within a stated tolerance**, reported as a number with its tolerance, as the quality
-   metric across the quantization sweep.
-
-Conflating them produces a gate that can never be met and would stall Phase 2 indefinitely.
-
-## Getting `corpus/raw` back
-
-`corpus/raw` is 5.1 GB of OpenStax source — twelve books, 2,987 `.cnxml` modules — and it is
-**gitignored and not in the repository**. `train/prepare.py` and every miner under `corpus/` read it.
+| `paper/` | `paper.pdf` and `paper-arxiv.pdf`, their LaTeX source `paper.tex`, `references.bib`, `figures/`, TMLR's style files, and the paper's license |
+| `submission/` | [`SUBMISSION.md`](submission/SUBMISSION.md): what to upload to TMLR and arXiv, what the forms ask for, and what is left to do |
+| `src/` | The calculator application and the inference engine, in C |
+| `corpus/` | The record store and the program that generates the training documents |
+| `train/` | Training code; [`train/README.md`](train/README.md) lists the model files, which are not in git |
+| `tools/` | The evaluation harness and its checks (`tools/eval/`), and the paper's checks and figure scripts (`tools/paper/`) |
+| `results/`, `device_pull/` | Every measurement behind the paper's tables and figures, and raw logs pulled from the calculator |
+| `docs/` | A write-up per result; [`docs/paper/`](docs/paper/) holds the paper's records: every number and its source, and the citation log |
+| `bench/` | The calculator's micro-benchmarks |
+| `resources/`, `installer/` | The loader derived from Ndless, and the setup document that installs it |
+
+## Editing and rebuilding the paper
+
+Edit `paper/paper.tex`. Keep the `\label{...}` names, the `\ifdeanonymized ... \fi` blocks (they hide the author's name
+in the review copy) and `\label{endofmain}` just before the statements (the length check uses it). Every number in the
+text is listed in [`docs/paper/FACTS.md`](docs/paper/FACTS.md) with the file it comes from; check it there before
+changing it. The tables and figures come from `results/`, so edit their captions freely but their numbers only through
+FACTS.md and the scripts.
+
+To rebuild the review copy:
 
 ```bash
-tools/fetch_oer.sh
+cd paper && tectonic paper.tex
 ```
 
-That script is the inventory: title, upstream repo and on-disk directory for each of the twelve,
-including the two where the directory name deliberately differs from the repo name because code
-already refers to it. Verify with 2,987 `.cnxml` modules and `prepare.py` reproducing 29,594,922
-tokens.
+To rebuild both PDFs, write the arXiv upload `submission/arxiv-source.zip`, and run every check (anonymity, citations,
+fonts, figures, length), from the repository root:
 
-It exists because the directory was once destroyed and there was no script recording what it held —
-the inventory survived only as a prose table in `docs/CORPUS_MEASURED.md` and three hardcoded names
-in `corpus/tokenizer_study.py`, which turned a two-command restore into archaeology. **A bulk input
-with no fetch script is a single point of failure regardless of how it was obtained.**
+```bash
+.venv-fig/bin/python tools/paper/check_paper.py --final --preprint
+```
 
-Do not symlink it from a worktree: a worktree shares its object store with the main checkout, so a
-committed symlink is checked out over whatever occupies that path there. That is what destroyed it.
-`tools/eval/gate_no_repo_symlink.py` now fails any tracked symlink resolving inside the repo.
+The environment is `python3 -m venv .venv-fig && .venv-fig/bin/pip install -r tools/paper/requirements.txt`. The
+figures are drawn from `results/` by `tools/paper/make_figures.py`.
+
+## Reproducing the results
+
+`make check` builds the host tools and runs the test and check suite. The evaluation scripts are in `tools/eval/`, and
+each `docs/RESULT_*.md` describes one result and how it was produced. Timings need the calculator, running on battery,
+and the Ndless toolchain; [`build/transfer/README.txt`](build/transfer/README.txt) describes the transfer to the
+calculator. The project's working log, from the original brief to the pushback on its hypotheses, is in
+[`docs/PROJECT_NOTES.md`](docs/PROJECT_NOTES.md); some of its numbers are superseded, and the paper and FACTS.md are
+current.
+
+## Citation
+
+If you use this work, please cite:
+
+```bibtex
+@misc{messerlian2026calculator,
+  author = {Alexander Messerlian},
+  title  = {A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds},
+  year   = {2026},
+  note   = {Manuscript under review}
+}
+```
+
+[`CITATION.cff`](CITATION.cff) gives the same reference.
+
+## License
+
+- **Paper** (everything in `paper/`, including the figures): [CC BY 4.0](paper/LICENSE.md). TMLR's style files keep
+  their own licenses.
+- **Code, data and weights**: to be released with the final version of the paper, under the MIT License for the code
+  written for this work, the Mozilla Public License 1.1 for the loader derived from Ndless, and CC BY-NC-SA 4.0 for the
+  corpus, the record store and the weights, following the licenses of the OpenStax source text.
+
+## Contact
+
+Alexander Messerlian, alex.messerlian@icloud.com

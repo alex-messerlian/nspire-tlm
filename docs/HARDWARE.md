@@ -132,7 +132,7 @@ lever is clock and cycles-per-MAC.
 > D6 is the project's thesis. The brief asserts the answer is bandwidth (D2). Our pre-measurement
 > reasoning says it is probably capacity (D5) first and compute (D3) second, and that the bandwidth
 > claim may be wrong on this specific machine because ARM926EJ-S is a 1-MAC-per-cycle core with no
-> SIMD — unusually weak compute relative to its DRAM. See `README.md` §Pushback. **This is a
+> SIMD — unusually weak compute relative to its DRAM. See `PROJECT_NOTES.md` §Pushback. **This is a
 > disagreement to settle with `bench_mem` and `bench_mac`, not with argument.**
 
 ## E. Power and thermal

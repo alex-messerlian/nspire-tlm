@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds"
+type: software
+authors:
+  - family-names: Messerlian
+    given-names: Alexander
+    affiliation: "Independent Researcher, Palo Alto, CA, USA"
+    email: alex.messerlian@icloud.com
+    orcid: "https://orcid.org/0009-0003-4933-6832"
+keywords:
+  - on-device language models
+  - tool-augmented language models
+  - evaluation methodology
+  - quantization
+  - embedded inference
+  - small language models
+preferred-citation:
+  type: unpublished
+  title: "A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds"
+  authors:
+    - family-names: Messerlian
+      given-names: Alexander
+      orcid: "https://orcid.org/0009-0003-4933-6832"
+  year: 2026
+  notes: "Manuscript under review"
