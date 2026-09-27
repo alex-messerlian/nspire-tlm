@@ -29,19 +29,19 @@ overnight.log
 probe_*.txt
 d2_*.txt
 
-# figure-generation environment (paper/requirements-figures.txt)
-paper/.venv-fig/
+# figure-generation environment (tools/paper/requirements.txt)
+.venv-fig/
 
-# paper build outputs (regenerable)
-# paper/manuscript/paper.pdf and paper-arxiv.pdf ARE tracked: the folder is the deliverable.
-paper/manuscript/*.aux
-paper/manuscript/*.bbl
-paper/manuscript/*.blg
-paper/manuscript/*.log
-paper/manuscript/*.out
-paper/manuscript/paper-arxiv.tex
-paper/manuscript/figures/*.png
-paper/__pycache__/
+# paper build outputs (regenerable; tools/paper/check_paper.py removes LaTeX's working files after
+# each build). paper/paper.pdf and paper/paper-arxiv.pdf ARE tracked: the folder is the deliverable.
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/paper-arxiv.tex
+# the arXiv upload, rebuilt from paper/ by check_paper.py --preprint
+submission/arxiv-source.zip
 
 # int8 exports for host scoring on the device decoder (regenerable)
 build/int8/

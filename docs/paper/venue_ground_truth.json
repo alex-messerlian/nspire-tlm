@@ -1,0 +1,234 @@
+{
+ "2406.06576": {
+  "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/3eceb70f47690051d6769739fbf6294b-Abstract-Conference.html",
+  "title": "OccamLLM: Fast and Exact Language Model Arithmetic in a Single Step",
+  "authors": [
+   "Dugan, Owen",
+   "Jiménez-Benetó, Donato M.",
+   "Loh, Charlotte",
+   "Chen, Zhuo",
+   "Dangovski, Rumen",
+   "Soljačić, Marin"
+  ],
+  "venue": "Advances in Neural Information Processing Systems",
+  "year": "2024"
+ },
+ "2504.04718": {
+  "url": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/776a5f2c7d6dd4b0d83145fc044e2726-Abstract-Conference.html",
+  "title": "T1: Tool-integrated Verification for Test-time Compute Scaling in Small Language Models",
+  "authors": [
+   "Kang, Minki",
+   "Jeong, Jongwon",
+   "Cho, Jaewoong"
+  ],
+  "venue": "International Conference on Learning Representations",
+  "year": "2026"
+ },
+ "2007.10319": {
+  "url": "https://proceedings.neurips.cc/paper/2020/hash/86c51678350f656dcc7f490a43946ee5-Abstract.html",
+  "title": "MCUNet: Tiny Deep Learning on IoT Devices",
+  "authors": [
+   "Lin, Ji",
+   "Chen, Wei-Ming",
+   "Lin, Yujun",
+   "cohn, john",
+   "Gan, Chuang",
+   "Han, Song"
+  ],
+  "venue": "Advances in Neural Information Processing Systems",
+  "year": "2020"
+ },
+ "2211.12588": {
+  "url": "https://jmlr.org/tmlr/papers/bib/YfZ4ZPt8zd.bib",
+  "title": "Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks",
+  "authors": [
+   "Wenhu Chen",
+   "Xueguang Ma",
+   "Xinyi Wang",
+   "William W. Cohen"
+  ],
+  "venue": "Transactions on Machine Learning Research",
+  "year": "2023"
+ },
+ "2208.07339": {
+  "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/c3ba4962c05c49636d4c6206a97e9c8a-Abstract-Conference.html",
+  "title": "GPT3.int8(): 8-bit Matrix Multiplication for Transformers at Scale",
+  "authors": [
+   "Dettmers, Tim",
+   "Lewis, Mike",
+   "Belkada, Younes",
+   "Zettlemoyer, Luke"
+  ],
+  "venue": "Advances in Neural Information Processing Systems",
+  "year": "2022"
+ },
+ "1910.07467": {
+  "url": "https://proceedings.neurips.cc/paper/2019/hash/1e8a19426224ca89e83cef47f1e7f53b-Abstract.html",
+  "title": "Root Mean Square Layer Normalization",
+  "authors": [
+   "Zhang, Biao",
+   "Sennrich, Rico"
+  ],
+  "venue": "Advances in Neural Information Processing Systems",
+  "year": "2019"
+ },
+ "2203.15556": {
+  "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/c1e2faff6f588870935f114ebe04a3e5-Abstract-Conference.html",
+  "title": "An empirical analysis of compute-optimal large language model training",
+  "authors": [
+   "Hoffmann, Jordan",
+   "Borgeaud, Sebastian",
+   "Mensch, Arthur",
+   "Buchatskaya, Elena",
+   "Cai, Trevor",
+   "Rutherford, Eliza",
+   "de Las Casas, Diego",
+   "Hendricks, Lisa Anne",
+   "Welbl, Johannes",
+   "Clark, Aidan",
+   "Hennigan, Thomas",
+   "Noland, Eric",
+   "Millican, Katherine",
+   "van den Driessche, George",
+   "Damoc, Bogdan",
+   "Guy, Aurelia",
+   "Osindero, Simon",
+   "Simonyan, Karén",
+   "Elsen, Erich",
+   "Vinyals, Oriol",
+   "Rae, Jack",
+   "Sifre, Laurent"
+  ],
+  "venue": "Advances in Neural Information Processing Systems",
+  "year": "2022"
+ },
+ "2302.04761": {
+  "url": "https://proceedings.neurips.cc/paper/2023/hash/d842425e4bf79ba039352da0f658a906-Abstract-Conference.html",
+  "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+  "authors": [
+   "Schick, Timo",
+   "Dwivedi-Yu, Jane",
+   "Dessi, Roberto",
+   "Raileanu, Roberta",
+   "Lomeli, Maria",
+   "Hambro, Eric",
+   "Zettlemoyer, Luke",
+   "Cancedda, Nicola",
+   "Scialom, Thomas"
+  ],
+  "venue": "Advances in Neural Information Processing Systems",
+  "year": "2023"
+ },
+ "2305.15017": {
+  "url": "https://aclanthology.org/2023.emnlp-main.742.bib",
+  "title": "Calc-X and Calcformers: Empowering Arithmetical Chain-of-Thought through Interaction with Symbolic Systems",
+  "authors": [
+   "Kadl{\\v{c}}{\\'i}k, Marek",
+   "{\\v{S}}tef{\\'a}nik, Michal",
+   "Sotolar, Ondrej",
+   "Martinek, Vlastimil"
+  ],
+  "venue": "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing",
+  "year": "2023"
+ },
+ "1712.05877": {
+  "url": "https://openaccess.thecvf.com/content_cvpr_2018/html/Jacob_Quantization_and_Training_CVPR_2018_paper.html",
+  "title": "Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference",
+  "authors": [
+   "Jacob, Benoit",
+   "Kligys, Skirmantas",
+   "Chen, Bo",
+   "Zhu, Menglong",
+   "Tang, Matthew",
+   "Howard, Andrew",
+   "Adam, Hartwig",
+   "Kalenichenko, Dmitry"
+  ],
+  "venue": "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition",
+  "year": "2018"
+ },
+ "2005.11401": {
+  "url": "https://proceedings.neurips.cc/paper/2020/hash/6b493230-Abstract.html",
+  "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "authors": [
+   "Lewis, Patrick",
+   "Perez, Ethan",
+   "Piktus, Aleksandra",
+   "Petroni, Fabio",
+   "Karpukhin, Vladimir",
+   "Goyal, Naman",
+   "Küttler, Heinrich",
+   "Lewis, Mike",
+   "Yih, Wen-tau",
+   "Rocktäschel, Tim",
+   "Riedel, Sebastian",
+   "Kiela, Douwe"
+  ],
+  "venue": "Advances in Neural Information Processing Systems",
+  "year": "2020"
+ },
+ "2402.14905": {
+  "url": "https://proceedings.mlr.press/v235/liu24ce.html",
+  "title": "MobileLLM: Optimizing Sub-billion Parameter Language Models for On-Device Use Cases",
+  "authors": [
+   "Zechun Liu",
+   "Changsheng Zhao",
+   "Forrest Iandola",
+   "Chen Lai",
+   "Yuandong Tian",
+   "Igor Fedorov",
+   "Yunyang Xiong",
+   "Ernie Chang",
+   "Yangyang Shi",
+   "Raghuraman Krishnamoorthi",
+   "Liangzhen Lai",
+   "Vikas Chandra"
+  ],
+  "venue": "International Conference on Machine Learning",
+  "year": "2024"
+ },
+ "2211.10435": {
+  "url": "https://proceedings.mlr.press/v202/gao23f.html",
+  "title": "PAL: Program-aided Language Models",
+  "authors": [
+   "Luyu Gao",
+   "Aman Madaan",
+   "Shuyan Zhou",
+   "Uri Alon",
+   "Pengfei Liu",
+   "Yiming Yang",
+   "Jamie Callan",
+   "Graham Neubig"
+  ],
+  "venue": "International Conference on Machine Learning",
+  "year": "2023"
+ },
+ "2312.11514": {
+  "url": "https://aclanthology.org/2024.acl-long.678.bib",
+  "title": "LLM in a flash: Efficient Large Language Model Inference with Limited Memory",
+  "authors": [
+   "Alizadeh, Keivan",
+   "Mirzadeh, Seyed Iman",
+   "Belenko, Dmitry",
+   "Khatamifard, S.",
+   "Cho, Minsik",
+   "Del Mundo, Carlo C",
+   "Rastegari, Mohammad",
+   "Farajtabar, Mehrdad"
+  ],
+  "venue": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+  "year": "2024"
+ },
+ "2402.17231": {
+  "url": "https://aclanthology.org/2024.naacl-long.54.bib",
+  "title": "MATHSENSEI: A Tool-Augmented Large Language Model for Mathematical Reasoning",
+  "authors": [
+   "Das, Debrup",
+   "Banerjee, Debopriyo",
+   "Aditya, Somak",
+   "Kulkarni, Ashish"
+  ],
+  "venue": "Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)",
+  "year": "2024"
+ }
+}

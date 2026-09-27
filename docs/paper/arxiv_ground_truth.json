@@ -1,0 +1,436 @@
+{
+ "2104.09864": {
+  "version": "2104.09864v5",
+  "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+  "authors": [
+   "Jianlin Su",
+   "Yu Lu",
+   "Shengfeng Pan",
+   "Ahmed Murtadha",
+   "Bo Wen",
+   "Yunfeng Liu"
+  ],
+  "published": "2021-04-20",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2406.06576": {
+  "version": "2406.06576v4",
+  "title": "OccamLLM: Fast and Exact Language Model Arithmetic in a Single Step",
+  "authors": [
+   "Owen Dugan",
+   "Donato Manuel Jimenez Beneto",
+   "Charlotte Loh",
+   "Zhuo Chen",
+   "Rumen Dangovski",
+   "Marin Soljačić"
+  ],
+  "published": "2024-06-04",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2410.17957": {
+  "version": "2410.17957v1",
+  "title": "MCUBERT: Memory-Efficient BERT Inference on Commodity Microcontrollers",
+  "authors": [
+   "Zebin Yang",
+   "Renze Chen",
+   "Taiqiang Wu",
+   "Ngai Wong",
+   "Yun Liang",
+   "Runsheng Wang",
+   "Ru Huang",
+   "Meng Li"
+  ],
+  "published": "2024-10-23",
+  "journal_ref": null,
+  "doi": "10.1145/3676536.3676747"
+ },
+ "2408.04413": {
+  "version": "2408.04413v1",
+  "title": "Deeploy: Enabling Energy-Efficient Deployment of Small Language Models On Heterogeneous Microcontrollers",
+  "authors": [
+   "Moritz Scherer",
+   "Luka Macan",
+   "Victor Jung",
+   "Philip Wiese",
+   "Luca Bompani",
+   "Alessio Burrello",
+   "Francesco Conti",
+   "Luca Benini"
+  ],
+  "published": "2024-08-08",
+  "journal_ref": null,
+  "doi": null
+ },
+ "1801.06601": {
+  "version": "1801.06601v1",
+  "title": "CMSIS-NN: Efficient Neural Network Kernels for Arm Cortex-M CPUs",
+  "authors": [
+   "Liangzhen Lai",
+   "Naveen Suda",
+   "Vikas Chandra"
+  ],
+  "published": "2018-01-19",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2307.09288": {
+  "version": "2307.09288v2",
+  "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models",
+  "authors": [
+   "Hugo Touvron",
+   "Louis Martin",
+   "Kevin Stone",
+   "Peter Albert",
+   "Amjad Almahairi",
+   "Yasmine Babaei",
+   "Nikolay Bashlykov",
+   "Soumya Batra",
+   "Prajjwal Bhargava",
+   "Shruti Bhosale",
+   "Dan Bikel",
+   "Lukas Blecher",
+   "Cristian Canton Ferrer",
+   "Moya Chen",
+   "Guillem Cucurull",
+   "David Esiobu",
+   "Jude Fernandes",
+   "Jeremy Fu",
+   "Wenyin Fu",
+   "Brian Fuller",
+   "Cynthia Gao",
+   "Vedanuj Goswami",
+   "Naman Goyal",
+   "Anthony Hartshorn",
+   "Saghar Hosseini",
+   "Rui Hou",
+   "Hakan Inan",
+   "Marcin Kardas",
+   "Viktor Kerkez",
+   "Madian Khabsa",
+   "Isabel Kloumann",
+   "Artem Korenev",
+   "Punit Singh Koura",
+   "Marie-Anne Lachaux",
+   "Thibaut Lavril",
+   "Jenya Lee",
+   "Diana Liskovich",
+   "Yinghai Lu",
+   "Yuning Mao",
+   "Xavier Martinet",
+   "Todor Mihaylov",
+   "Pushkar Mishra",
+   "Igor Molybog",
+   "Yixin Nie",
+   "Andrew Poulton",
+   "Jeremy Reizenstein",
+   "Rashi Rungta",
+   "Kalyan Saladi",
+   "Alan Schelten",
+   "Ruan Silva",
+   "Eric Michael Smith",
+   "Ranjan Subramanian",
+   "Xiaoqing Ellen Tan",
+   "Binh Tang",
+   "Ross Taylor",
+   "Adina Williams",
+   "Jian Xiang Kuan",
+   "Puxin Xu",
+   "Zheng Yan",
+   "Iliyan Zarov",
+   "Yuchen Zhang",
+   "Angela Fan",
+   "Melanie Kambadur",
+   "Sharan Narang",
+   "Aurelien Rodriguez",
+   "Robert Stojnic",
+   "Sergey Edunov",
+   "Thomas Scialom"
+  ],
+  "published": "2023-07-18",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2504.04718": {
+  "version": "2504.04718v2",
+  "title": "T1: Tool-integrated Verification for Test-time Compute Scaling in Small Language Models",
+  "authors": [
+   "Minki Kang",
+   "Jongwon Jeong",
+   "Jaewoong Cho"
+  ],
+  "published": "2025-04-07",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2007.10319": {
+  "version": "2007.10319v2",
+  "title": "MCUNet: Tiny Deep Learning on IoT Devices",
+  "authors": [
+   "Ji Lin",
+   "Wei-Ming Chen",
+   "Yujun Lin",
+   "John Cohn",
+   "Chuang Gan",
+   "Song Han"
+  ],
+  "published": "2020-07-20",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2001.08361": {
+  "version": "2001.08361v1",
+  "title": "Scaling Laws for Neural Language Models",
+  "authors": [
+   "Jared Kaplan",
+   "Sam McCandlish",
+   "Tom Henighan",
+   "Tom B. Brown",
+   "Benjamin Chess",
+   "Rewon Child",
+   "Scott Gray",
+   "Alec Radford",
+   "Jeffrey Wu",
+   "Dario Amodei"
+  ],
+  "published": "2020-01-23",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2002.05202": {
+  "version": "2002.05202v1",
+  "title": "GLU Variants Improve Transformer",
+  "authors": [
+   "Noam Shazeer"
+  ],
+  "published": "2020-02-12",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2211.12588": {
+  "version": "2211.12588v4",
+  "title": "Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks",
+  "authors": [
+   "Wenhu Chen",
+   "Xueguang Ma",
+   "Xinyi Wang",
+   "William W. Cohen"
+  ],
+  "published": "2022-11-22",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2305.07759": {
+  "version": "2305.07759v2",
+  "title": "TinyStories: How Small Can Language Models Be and Still Speak Coherent English?",
+  "authors": [
+   "Ronen Eldan",
+   "Yuanzhi Li"
+  ],
+  "published": "2023-05-12",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2208.07339": {
+  "version": "2208.07339v2",
+  "title": "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale",
+  "authors": [
+   "Tim Dettmers",
+   "Mike Lewis",
+   "Younes Belkada",
+   "Luke Zettlemoyer"
+  ],
+  "published": "2022-08-15",
+  "journal_ref": null,
+  "doi": null
+ },
+ "1910.07467": {
+  "version": "1910.07467v1",
+  "title": "Root Mean Square Layer Normalization",
+  "authors": [
+   "Biao Zhang",
+   "Rico Sennrich"
+  ],
+  "published": "2019-10-16",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2203.15556": {
+  "version": "2203.15556v1",
+  "title": "Training Compute-Optimal Large Language Models",
+  "authors": [
+   "Jordan Hoffmann",
+   "Sebastian Borgeaud",
+   "Arthur Mensch",
+   "Elena Buchatskaya",
+   "Trevor Cai",
+   "Eliza Rutherford",
+   "Diego de Las Casas",
+   "Lisa Anne Hendricks",
+   "Johannes Welbl",
+   "Aidan Clark",
+   "Tom Hennigan",
+   "Eric Noland",
+   "Katie Millican",
+   "George van den Driessche",
+   "Bogdan Damoc",
+   "Aurelia Guy",
+   "Simon Osindero",
+   "Karen Simonyan",
+   "Erich Elsen",
+   "Jack W. Rae",
+   "Oriol Vinyals",
+   "Laurent Sifre"
+  ],
+  "published": "2022-03-29",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2302.04761": {
+  "version": "2302.04761v1",
+  "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+  "authors": [
+   "Timo Schick",
+   "Jane Dwivedi-Yu",
+   "Roberto Dessì",
+   "Roberta Raileanu",
+   "Maria Lomeli",
+   "Luke Zettlemoyer",
+   "Nicola Cancedda",
+   "Thomas Scialom"
+  ],
+  "published": "2023-02-09",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2305.15017": {
+  "version": "2305.15017v2",
+  "title": "Calc-X and Calcformers: Empowering Arithmetical Chain-of-Thought through Interaction with Symbolic Systems",
+  "authors": [
+   "Marek Kadlčík",
+   "Michal Štefánik",
+   "Ondřej Sotolář",
+   "Vlastimil Martinek"
+  ],
+  "published": "2023-05-24",
+  "journal_ref": null,
+  "doi": null
+ },
+ "1712.05877": {
+  "version": "1712.05877v1",
+  "title": "Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference",
+  "authors": [
+   "Benoit Jacob",
+   "Skirmantas Kligys",
+   "Bo Chen",
+   "Menglong Zhu",
+   "Matthew Tang",
+   "Andrew Howard",
+   "Hartwig Adam",
+   "Dmitry Kalenichenko"
+  ],
+  "published": "2017-12-15",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2005.11401": {
+  "version": "2005.11401v4",
+  "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "authors": [
+   "Patrick Lewis",
+   "Ethan Perez",
+   "Aleksandra Piktus",
+   "Fabio Petroni",
+   "Vladimir Karpukhin",
+   "Naman Goyal",
+   "Heinrich Küttler",
+   "Mike Lewis",
+   "Wen-tau Yih",
+   "Tim Rocktäschel",
+   "Sebastian Riedel",
+   "Douwe Kiela"
+  ],
+  "published": "2020-05-22",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2402.14905": {
+  "version": "2402.14905v2",
+  "title": "MobileLLM: Optimizing Sub-billion Parameter Language Models for On-Device Use Cases",
+  "authors": [
+   "Zechun Liu",
+   "Changsheng Zhao",
+   "Forrest Iandola",
+   "Chen Lai",
+   "Yuandong Tian",
+   "Igor Fedorov",
+   "Yunyang Xiong",
+   "Ernie Chang",
+   "Yangyang Shi",
+   "Raghuraman Krishnamoorthi",
+   "Liangzhen Lai",
+   "Vikas Chandra"
+  ],
+  "published": "2024-02-22",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2211.10435": {
+  "version": "2211.10435v2",
+  "title": "PAL: Program-aided Language Models",
+  "authors": [
+   "Luyu Gao",
+   "Aman Madaan",
+   "Shuyan Zhou",
+   "Uri Alon",
+   "Pengfei Liu",
+   "Yiming Yang",
+   "Jamie Callan",
+   "Graham Neubig"
+  ],
+  "published": "2022-11-18",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2312.11514": {
+  "version": "2312.11514v3",
+  "title": "LLM in a flash: Efficient Large Language Model Inference with Limited Memory",
+  "authors": [
+   "Keivan Alizadeh",
+   "Iman Mirzadeh",
+   "Dmitry Belenko",
+   "Karen Khatamifard",
+   "Minsik Cho",
+   "Carlo C Del Mundo",
+   "Mohammad Rastegari",
+   "Mehrdad Farajtabar"
+  ],
+  "published": "2023-12-12",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2402.17231": {
+  "version": "2402.17231v3",
+  "title": "MATHSENSEI: A Tool-Augmented Large Language Model for Mathematical Reasoning",
+  "authors": [
+   "Debrup Das",
+   "Debopriyo Banerjee",
+   "Somak Aditya",
+   "Ashish Kulkarni"
+  ],
+  "published": "2024-02-27",
+  "journal_ref": null,
+  "doi": null
+ },
+ "2605.26159": {
+  "version": "2605.26159v1",
+  "title": "Device Context Protocol: A Compact, Safety-First Architecture for LLM-Driven Control of Constrained Devices",
+  "authors": [
+   "Dongxu Yang"
+  ],
+  "published": "2026-05-24",
+  "journal_ref": null,
+  "doi": null
+ }
+}

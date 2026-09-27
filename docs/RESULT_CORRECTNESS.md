@@ -7,7 +7,7 @@ instrument that replaced it, and the numbers that replace the old ones.
 
 ## 1. The label: `d1` is a refusal arm, not "grounded computation"
 
-`FACTS.md` s8/s9, `paper/DRAFT.md`, `docs/RESULT_WIDTH_LADDER.md` and `docs/PREREG_WIDTH_LADDER.md`
+`FACTS.md` s8/s9, `docs/paper/history/DRAFT.md`, `docs/RESULT_WIDTH_LADDER.md` and `docs/PREREG_WIDTH_LADDER.md`
 all called `d1` "grounded computation" and the ladder's headline was "a 3.5x cut costs grounded
 computation 2.5 points". `tools/eval/score_arms.py` defines it otherwise, in its own docstring:
 
@@ -130,7 +130,7 @@ by the runtime ("The calculator computed N").
 `refuse`, `fit_ho` and `explain_ho` are UNREACHABLE on the device: none of their records is in the
 shipped store, so no student can select them. They are no longer quoted.
 
-### Width ladder (`paper/ladder_table.py`)
+### Width ladder (`tools/paper/ladder_table.py`)
 
 Scored at group 16 so the row-alignment defect does not confound width (at 88 it drops 72 of 512
 hidden inputs at d176 against 56 of 1,024 at d352):
@@ -223,7 +223,7 @@ stated `Q = 1.29e-05` (the answer_x spare) was bound to `q`, overriding the elec
 One item; the model saw the same wrong prompt. Not fixed here.
 
 **Cost model regenerated from ONE block with windows at their mean positions**
-(`paper/cost_model.py` -> `results/cost_model_paper.txt`): depth 46,116 + 62,144 L (R^2 0.999999);
+(`tools/paper/cost_model.py` -> `results/cost_model_paper.txt`): depth 46,116 + 62,144 L (R^2 0.999999);
 filled position 404,009 + 1,649.8 p (R^2 0.999992; intercept extrapolated), empty 1,177.7 p (+40.1%
 filled vs empty); consistency 0.32 / 0.35 / 0.05%; decode prediction -0.5% (33 tokens, 3 runs) and
 -0.7% (24 tokens, 1 run), empty-cache model -5.5 / -5.3%. The width sweep's "@8" and "@256" are
