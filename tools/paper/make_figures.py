@@ -31,6 +31,7 @@ RES = ROOT / "results"
 # part of the paper and go to build/, so paper/ holds only what the manuscript uses.
 OUT = ROOT / "paper" / "figures"
 PREVIEW = ROOT / "build" / "paper-figures"
+PREVIEW_ON = True   # off when drawing into another folder (check_paper.py compares against it)
 # THE SHIPPED ENGINE'S DEVICE SESSION (padded group 88, A153/A154). The device log is append-only and
 # this file holds every run the calculator ever wrote, the defective unpadded engine's included; only
 # the LAST bench_forward and the LAST valid bench_sweep block describe the shipped engine.
@@ -68,9 +69,8 @@ LADDER_RUNS = ("w176", "w176s2", "w352", "w352s2")
 
 
 def inputs() -> dict:
-    """figure -> the files it is drawn from. tools/paper/check_paper.py compares each included figure
-    against exactly these, not against every file in results/: an unrelated result written later
-    must not read as a stale figure, and a changed input must."""
+    """figure -> the files it is drawn from, as a record for readers. The freshness check no longer
+    uses it: tools/paper/check_paper.py redraws every figure and compares bytes."""
     ladder = [RES / f"{k}_int8_g16_{n}.json" for n in LADDER_RUNS for k in ("correct", "arms")]
     return {"fig_position": [SESSION], "fig_stages": [SESSION], "fig_frontier": [SESSION],
             "fig_memory": [SESSION, G32_SESSION], "fig_ladder": ladder}
@@ -181,6 +181,11 @@ def fig_position(fw: dict) -> str:
     return save(fig, "fig_position")
 
 
+# The device log's stage names, as the paper's text names them.
+STAGE_NAME = {"ffn matmul": "feed-forward", "qkv matmul": "q, k, v projections",
+              "RoPE": "rotary embeddings"}
+
+
 def fig_stages(fw: dict) -> str:
     total = fw["wall"]            # measured token time; shares are computed, never read from the log
     major = sorted([(n, us) for n, us, _ in fw["stages"] if us / total >= 0.02], key=lambda s: s[1])
@@ -189,7 +194,7 @@ def fig_stages(fw: dict) -> str:
     fig, ax = plt.subplots(figsize=(COL_W, 1.7))
     y = range(len(rows))
     ax.barh(list(y), [us / total * 100 for _, us in rows], height=0.55, color=S1, edgecolor=SURFACE, linewidth=0)
-    ax.set_yticks(list(y), [n for n, _ in rows], color=INK2)
+    ax.set_yticks(list(y), [STAGE_NAME.get(n, n) for n, _ in rows], color=INK2)
     for i, (_, us) in enumerate(rows):
         ax.text(us / total * 100 + 1, i, f"{us / total * 100:.1f}%", va="center", color=INK, fontsize=7)
     ax.set_xlabel("% of per-token time"); ax.set_xlim(0, 68)
@@ -213,7 +218,7 @@ def fig_frontier(sw: dict) -> str:
     # Positions 8 and 256 are the two MEASURED points per shape (Table 2 quotes the same two);
     # 128 is linear between them and is labelled as interpolated rather than passed off as measured.
     for (pos, col, mk, lab) in zip((14.5, 128, 262.5), (S1, S2, S3), MARKERS,
-                                   ("positions 11-18", "position 128 (interpolated)", "positions 259-266")):
+                                   ("positions 11\u201318", "position 128 (interpolated)", "positions 259\u2013266")):
         xs = [p for p, *_ in pts]; ys = [1e6 / (a + pos * s) for _, _, a, s in pts]
         ax.plot(xs, ys, color=col, lw=1.5, marker=mk, ms=4.5, mec=SURFACE, mew=1.0, label=lab,
                 linestyle="--" if pos == 128 else "-")
@@ -222,7 +227,7 @@ def fig_frontier(sw: dict) -> str:
     nf = sorted({(params_for(v["dim"]) / 1e6, v["dim"]) for v in sw["need"].values() if not v["fits"]})
     for x, d in nf:     # a TESTED failure: the engine tried to load it on hardware and could not
         ax.scatter([x], [0.35], marker="x", s=28, color=INK2, linewidth=1.2, zorder=3)
-        ax.text(x, 0.75, f"d{d}\ndid not load", ha="center", va="bottom", color=INK2, fontsize=6.5)
+        ax.text(x, 0.75, f"width {d}\ndid not load", ha="center", va="bottom", color=INK2, fontsize=6.5)
     nf = [x for x, _ in nf]
     ax.set_xlabel("parameters (millions)"); ax.set_ylabel("tokens per second")
     ax.set_xlim(0, max(nf + [pts[-1][0]]) + 1.5); ax.set_ylim(0, None)
@@ -273,8 +278,8 @@ def fig_memory(sw: dict) -> str:
             color=INK2, fontsize=6.5)
     for i, r in enumerate(uniq):
         ax.text(i, tot[i] + 0.4, f"{tot[i]:.1f}", ha="center", color=INK, fontsize=6.5)
-    ax.set_xticks(list(x), [f"d{r['dim']}{' (g32)' if r['layout'] == 'group 32' else ''}\n"
-                            f"{'loads' if r['fits'] else 'did not load'}" for r in uniq])
+    ax.set_xticks(list(x), [f"{r['dim']}\n{'loads' if r['fits'] else 'did not load'}" for r in uniq])
+    ax.set_xlabel("width (384: group-32 layout, hatched)")
     ax.set_ylabel("MiB held at once")
     ax.set_ylim(0, max(tot) * 1.38); ax.grid(axis="x", visible=False)
     ax.legend(loc="upper left", ncols=2)
@@ -309,13 +314,18 @@ def save(fig, name: str) -> str:
     p = OUT / f"{name}.pdf"
     # No CreationDate: the same data then gives the same bytes, so a rebuild shows no false change.
     fig.savefig(p, metadata={"CreationDate": None})
-    PREVIEW.mkdir(parents=True, exist_ok=True)
-    fig.savefig(PREVIEW / f"{name}.png", dpi=200)
+    if PREVIEW_ON:
+        PREVIEW.mkdir(parents=True, exist_ok=True)
+        fig.savefig(PREVIEW / f"{name}.png", dpi=200)
     plt.close(fig)
     return p.name
 
 
-def main() -> None:
+def main(out: str | None = None) -> None:
+    """Draw every figure into paper/figures/, or into `out` (then without PNG previews)."""
+    global OUT, PREVIEW_ON
+    if out:
+        OUT, PREVIEW_ON = Path(out), False
     style()
     fw, sw, ld = parse_forward(), parse_sweep(), parse_ladder()
     # fig_ladder is no longer in the paper (Table 7 carries the ladder); it is not written, so the
@@ -328,4 +338,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else None)

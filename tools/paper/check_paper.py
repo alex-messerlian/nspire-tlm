@@ -189,26 +189,29 @@ def main() -> int:
         re.findall(r"\\graphicspath\{(.*?)\}\s*$", tex, re.M)))]
     gone = [f for f in figs if not any((d / f).exists() or (d / (f + ".pdf")).exists() for d in dirs)]
     check("every \\includegraphics file exists", not gone, ", ".join(gone))
-    # FRESHNESS AGAINST EACH FIGURE'S OWN INPUTS. This compared every figure with every *.txt in
-    # results/, so writing an unrelated result (a new control, a new table) marked all five stale.
-    # make_figures.inputs() names the files each figure is drawn from; a missing input is a FAIL.
-    import importlib.util
+    # EACH FIGURE MUST BE EXACTLY WHAT make_figures.py DRAWS FROM results/ NOW. Redraw into a scratch
+    # folder and compare bytes; the figures carry no creation date, so an unchanged figure redraws
+    # to the same bytes. Comparing timestamps or commit times failed twice: a checkout reorders
+    # mtimes, and a script change that leaves a figure unchanged made it read as stale forever.
+    import contextlib, importlib.util, io, tempfile
     spec = importlib.util.spec_from_file_location("make_figures", MAKE_FIGURES)
-    mf = importlib.util.module_from_spec(spec); spec.loader.exec_module(mf)
-    need = mf.inputs()
+    mf = importlib.util.module_from_spec(spec)
     stale, absent = [], []
-    for f in figs:
-        stem = Path(f).stem
-        if stem not in need:
-            absent.append(f"{stem} (no declared inputs)"); continue
-        srcs = need[stem] + [MAKE_FIGURES]
-        gone = [str(s) for s in srcs if not Path(s).exists()]
-        if gone:
-            absent.append(f"{stem}: {', '.join(gone)}"); continue
-        out = FIG / f"{stem}.pdf"
-        if not out.exists() or changed_at(out) < max(changed_at(s) for s in srcs):
-            stale.append(stem)
-    check("every included figure is newer than the files it is drawn from", not stale and not absent,
+    try:
+        spec.loader.exec_module(mf)
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            mf.main(out=tmp)
+            for f in figs:
+                name = Path(f).stem + ".pdf"
+                drawn, used = Path(tmp) / name, FIG / name
+                if not drawn.exists():
+                    absent.append(f"{name} (make_figures.py does not draw it)")
+                elif not used.exists() or drawn.read_bytes() != used.read_bytes():
+                    stale.append(Path(f).stem)
+    except Exception as e:                      # a missing input or a broken script: cannot check
+        absent.append(f"make_figures.py failed: {e}")
+    check("every included figure is exactly what make_figures.py draws from results/",
+          not stale and not absent,
           f"regenerate: {', '.join(stale)}" if stale else f"cannot check: {'; '.join(absent)}")
 
     # 6. Compile, then read the page the end-of-main-text marker landed on.

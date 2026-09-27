@@ -42,6 +42,8 @@ paper/*.out
 paper/paper-arxiv.tex
 # the arXiv upload, rebuilt from paper/ by check_paper.py --preprint
 submission/arxiv-source.zip
+# original photographs and video of the calculator (large; see submission/PHOTOS.md)
+media/
 
 # int8 exports for host scoring on the device decoder (regenerable)
 build/int8/
