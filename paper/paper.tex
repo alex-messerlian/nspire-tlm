@@ -4,9 +4,9 @@
 \documentclass[10pt]{article}
 
 % SUBMISSION: plain \usepackage{tmlr} -> "Anonymous authors", "Under review as submission to TMLR".
-% arXiv: [preprint] (names shown, no TMLR header) -- check_paper.py --preprint builds that variant
-% from this file, so there is one source. Camera-ready: [accepted], which also needs \month, \year
-% and \openreview defined (see the TMLR template).
+% arXiv: [preprint] (names shown, no TMLR header) -- tools/paper/check_paper.py --preprint builds
+% that variant from this file, so there is one source. Camera-ready: [accepted], which also needs
+% \month, \year and \openreview defined (see the TMLR template).
 \usepackage{tmlr}
 \usepackage{microtype}
 \usepackage{graphicx}
@@ -32,8 +32,7 @@
 
 % Hidden by tmlr.sty in the submission build; printed in [preprint] and [accepted].
 \author{\name Alexander Messerlian \email alex.messerlian@icloud.com\\
-      \addr Independent Researcher, Palo Alto, CA, USA\\
-      \addr ORCID: 0009-0003-4933-6832}
+      \addr Independent Researcher, Palo Alto, CA, USA}
 
 \begin{document}
 
@@ -43,63 +42,63 @@
 We built a physics assistant that runs entirely on a TI-Nspire CX II CAS graphing
 calculator,\footnote{AI tools assisted with the software, the experiment tooling, drafting and draft
 review; their roles are described in the statement on the use of AI tools at the end of the paper.
-The author is responsible for the content.} with one ARM926EJ-S core at 396\,MHz, no floating-point
-unit, about 21.5\,MiB of memory for an application and no network, and use it as a case study in
-how the conclusions of a small-model evaluation depend on what the evaluation runs. Its
-10.9M-parameter decoder never computes: the runtime chooses a relation from a store, assembles it
-into the prompt with the question's values and the variables still missing, and executes the call
-the model writes. Handed the right relation, the model is right on 96.7\% of problems whose values
-are all given; its errors are digits copied wrongly, and an irrelevant value placed before the
-relevant ones lowers accuracy from 116 to 61 of 120, a sensitivity consistent with the training
-generator's practice of appending irrelevant values last. End to end, on generated benchmarks, the
-deployed system was first limited by choosing the relation: it answered 21 of 120 of the same
-problems correctly and declined most of the rest. Two selection rules that use the values the
-question assigns raise that to 93 (and to 248 of 300 fresh problems from the same generators),
-while wrong answers rise from 2 to 4. A deterministic path through the same runtime, with no model,
-is right more often and wrong less often on every problem that asks for a number, with the
-relation supplied and behind the same selector; the model declines more reliably. Harness
-differences from the calculator moved measured accuracy by 9 to 21 points, and scoring on its
-integer engine exposed a quantization-layout defect that host--device parity could not see. A
-per-token cost model fitted on battery predicts a decode run within 0.4\%, and a filled KV cache
-costs 40\% more per position than an empty one.
+The author is responsible for the content.} which has one ARM926EJ-S core at 396\,MHz, no
+floating-point unit, about 21.5\,MiB of memory for an application and no network. We use the
+assistant as a case study in how the conclusions of a small-model evaluation depend on what the
+evaluation runs. The 10.9M-parameter model never computes: the runtime picks a relation from a store, puts it
+in the prompt with the question's values and the variables still missing, and runs the tool call the
+model writes. Given the right relation, the model is right on 96.7\% of problems that give every
+value. Its errors are digits copied wrongly, and placing an irrelevant value before the relevant ones
+lowers its score from 116 to 61 of 120, a pattern consistent with the training generator's habit of adding irrelevant
+values last. End to end, on generated problems, the system was at first limited by
+choosing the relation: it answered 21 of 120 of the same problems correctly and declined most of
+the rest. Two selection rules that use the values the question assigns raise this to 93 (and to 248
+of 300 fresh problems from the same generators), while wrong answers rise from 2 to 4. A rule-based path through the same runtime with no model is right more often and wrong less often on every problem that asks for a
+number, both with the relation supplied and behind the same selector; the model declines more
+reliably. Differences between our harness and the calculator moved measured accuracy by 9 to 21 points,
+and scoring on the calculator's integer engine revealed a defect in how the int8 engine split rows
+into groups, which a host--calculator comparison could not detect. A per-token cost
+model fitted on battery predicts a decode run within 0.4\%, and a filled KV cache costs 40\% more per
+position than an empty one.
 \end{abstract}
 
 % ==================================================================================================
 \section{Introduction}
 \label{sec:intro}
 
-This is a case study in how the conclusions of a small-model evaluation depend on what the
-evaluation runs. The setting is a graphing calculator: the TI-Nspire CX II CAS has one ARM926EJ-S
-core at 396\,MHz, no floating-point unit and no SIMD, about 21.5\,MiB of memory that an application
-can allocate, and no network of any kind, and it is a machine that students already carry into
-classrooms. We built a physics and calculus assistant that runs on it standalone and on battery, and
-measured what it costs, where it fails, and what its language model contributes.
+This paper is a case study in how the conclusions of a small-model evaluation depend on what the
+evaluation actually runs. The setting is a graphing calculator, a machine students already bring to
+class. The TI-Nspire CX II CAS has one ARM926EJ-S core at 396\,MHz, no floating-point unit and no
+SIMD, about 21.5\,MiB of memory that an application can allocate, and no network. We
+built a physics and calculus assistant that runs on it by itself, on battery, and measured what it
+costs, where it fails, and what its model contributes.
 
-The constraints push the design one way: take out of the weights everything a small model is
-likely to get wrong. Arithmetic goes to an evaluator that runs on the calculator. The physics goes
-to a store of 177 relations, each with its units and conditions, from which the runtime chooses one
-and assembles it into the prompt, together with the question's values and the variables the
-question leaves unbound. What remains for the 10.9M-parameter model is to read that prompt, copy
-values into a call and write prose around the result, or to decline, or to explain a relation.
+These limits push the design one way: take out of the weights everything a small model is likely to get
+wrong. Arithmetic goes to an evaluator that runs on the calculator. The physics goes to a store
+of 177 relations, each with its units and conditions. The runtime picks one relation and puts it in
+the prompt, together with the question's values and the inputs the question gives no value for. The
+10.9M-parameter model then only reads the prompt, copies values into a call and writes a sentence
+around the result, or declines, or explains a relation.
 
-Each step that brought our evaluation closer to the deployed system changed its conclusion. Our
-contributions are measurements of those steps:
+Each time we brought our evaluation closer to the system that actually runs, its conclusion
+changed. Our contributions are measurements of those steps:
 \begin{itemize}
 \setlength{\itemsep}{1pt}
-\item how prompt assembly, decoding and the numerical implementation move measured accuracy (by 9 to
-  21 points each), including an engine defect that host--device parity could not see, found only by
-  scoring on the device's own decoder and fixed at a 2.3\% throughput cost (\S\ref{sec:eval});
-\item with the relation supplied, where the model's errors are: copying errors, and an
-  irrelevant-value sensitivity that depends on where the value is placed; and a no-model baseline
-  that, with the relation supplied, matches or beats the model on every number and refusal
-  (\S\ref{sec:quality});
-\item end to end, with the application's own selector: where the deployed system lost accuracy,
-  with right, wrong and declined counts, a replication on fresh problems, a negative set whose
-  values fit an inapplicable relation, and the no-model baseline behind the same selector
+\item how the prompt text, the decoding method and the calculator's integer engine each moved
+  measured accuracy,
+  by 9 to 21 points, including an engine defect that a host--calculator comparison could not
+  detect, found only by scoring on the calculator's own decoder and fixed at a 2.3\% cost in speed
+  (\S\ref{sec:eval});
+\item with the right relation supplied, what errors the model makes: copying mistakes, and a
+  sensitivity to where an irrelevant value is placed; and a baseline with no model that, with the
+  relation supplied, matches or beats the model on every number and refusal (\S\ref{sec:quality});
+\item in the full system, with the application choosing the relation: where accuracy was lost,
+  counted as right, wrong and declined, with a repeat on fresh problems, a negative set whose values
+  fit a relation that does not apply, and the no-model baseline behind the same selector
   (\S\ref{sec:e2e});
-\item a per-token cost model along depth, width and position, fitted on battery, and a
-  parameters--throughput--memory frontier; on software floating point an empty KV cache understates
-  the per-position cost by 40\% (\S\ref{sec:cost}, \S\ref{sec:frontier}).
+\item a model of the cost of one token by depth, width and position, fitted on battery, and the
+  limits that memory and speed set on model size; with floating point done in software, an empty
+  KV cache understates the cost per position by 40\% (\S\ref{sec:cost}, \S\ref{sec:frontier}).
 \end{itemize}
 The assistant itself, in which the model never computes, is the setting (\S\ref{sec:arch}); a
 width ladder with two seeds per width is in Appendix~\ref{app:ladder}.
@@ -108,20 +107,20 @@ width ladder with two seeds per width is in Appendix~\ref{app:ladder}.
 \section{Related Work}
 \label{sec:related}
 
-\textbf{Language models on graphing calculators.} Three projects precede this one, all released
-within the past three months (Table~\ref{tab:prior}): CalcGPT~3 \citep{fredbennett2026calcgpt},
-Transformer On Calc, the closest in method, which runs a 260K-parameter llama2.c model natively on
-the same calculator \citep{stepney141transformeroncalc}, and CasioLLM, which streams a quantized
-model of up to 25M parameters from flash on a Casio fx-CG50 without a third-party loader
-\citep{samilososami2026casiollm}. We describe rather than benchmark them, because none measures
-the same thing: none uses tools or retrieval, and none reports a cost model or a memory frontier. A
-TI-84 modification that relays questions over Wi-Fi to a cloud model is different in kind: no model
-runs on the calculator \citep{chromalock2024ti32}.
+\textbf{Language models on graphing calculators.} Three earlier projects exist, all released within
+the past three months (Table~\ref{tab:prior}): CalcGPT~3 \citep{fredbennett2026calcgpt}; Transformer
+On Calc, the closest in method, which runs a 260K-parameter llama2.c model natively on the same
+calculator \citep{stepney141transformeroncalc}; and CasioLLM, which streams a quantized model of up
+to 25M parameters from flash on a Casio fx-CG50 without a third-party loader
+\citep{samilososami2026casiollm}. We describe them rather than benchmark them, because none measures
+the same thing: none uses tools or retrieval, and none reports a cost model or a measured memory limit. A
+TI-84 modification that sends questions over Wi-Fi to a cloud model is different in kind, since no
+model runs on the calculator \citep{chromalock2024ti32}.
 
 \begin{table}[t]
 \caption{Language models that run on graphing calculators, as their authors describe them. Timings
-are not comparable across rows: workloads, vocabularies and timing protocols differ, and only
-this work states the power state.}
+cannot be compared across rows: the workloads, vocabularies and timing methods differ, and only this
+work states the power state.}
 \label{tab:prior}
 \centering\small
 \setlength{\tabcolsep}{4pt}
@@ -139,45 +138,44 @@ This work & TI-Nspire CX II CAS & native, Ndless-derived & in RAM & 10.9M, int8,
 \end{table}
 
 \textbf{Tool use and program-aided reasoning.} Letting a model call a tool instead of computing is
-established. Toolformer learns when to call an API \citep{schick2023toolformer}; PAL and Program of
-Thoughts write programs for an interpreter to execute \citep{gao2022program,chen2022program};
-Calc-X, ArithmeticGPT, MathSensei and OccamLLM address arithmetic specifically
-\citep{kadlcik2023calcx,liu2025arithmeticgpt,das2024mathsensei,dugan2024occamllm}; and T1 shows
-small models gaining from delegating verification to tools \citep{kang2025tool}.
-Retrieval-augmented generation supplies knowledge the weights lack \citep{lewis2020retrieval}, and
-retrieving the right tool from a large collection limits downstream success in ways a benchmark that
-supplies the tool conceals \citep{shi2025retrieval}; our selector chooses one physics relation by
-deterministic rules rather than retrieving from a large tool set, but the oracle-versus-selected
-comparison of Section~\ref{sec:e2e} is the same measurement. Tool use is therefore not our
-contribution, and neither is the observation that tool-augmented models
-fail in characteristic ways \citep{trevino2025benchmarking} or that irrelevant information in a
-problem misleads language models \citep{shi2023large}. What differs is the regime, a 10.9M-parameter
-model on hardware with no FPU and no network, and what can be measured there: with the arithmetic
-delegated, which errors remain, and what in the training data produced them.
+well established. Toolformer learns when to call an API \citep{schick2023toolformer}; PAL and
+Program of Thoughts write programs for an interpreter to run \citep{gao2022program,chen2022program};
+Calc-X, ArithmeticGPT, MathSensei and OccamLLM focus on arithmetic
+\citep{kadlcik2023calcx,liu2025arithmeticgpt,das2024mathsensei,dugan2024occamllm}; and T1 shows small
+models gaining from handing verification to tools \citep{kang2025tool}. Retrieval-augmented
+generation supplies knowledge the weights lack \citep{lewis2020retrieval}, and picking the right tool
+from a large collection limits later success in ways that a benchmark which supplies the tool hides
+\citep{shi2025retrieval}. Our selector picks one physics relation with fixed rules rather than
+retrieving from a large tool set, but comparing a supplied relation with a selected one, as
+Section~\ref{sec:e2e} does, is the same measurement. Tool use is therefore not our contribution, and
+neither is the observation that tool-augmented models fail in recognizable ways
+\citep{trevino2025benchmarking} or that irrelevant information in a problem misleads language models
+\citep{shi2023large}. What differs is the setting, a 10.9M-parameter model on hardware with no FPU
+and no network, and what can be measured there: with the arithmetic handed off, which errors remain,
+and how they relate to the training data.
 
 \textbf{Small models and scale.} TinyStories showed that models of a few million parameters can
-write fluent text in a narrow domain \citep{eldan2023tinystories}, and MobileLLM studies
-architectural choices below a billion parameters \citep{liu2024mobilellm}. Scaling laws relate loss
-to parameters and data \citep{kaplan2020scaling,hoffmann2022training}. Our width ladder asks a
-narrower question at fixed data and steps: which behaviours a 3.5$\times$ reduction removes.
+write fluent text in a narrow domain \citep{eldan2023tinystories}, and MobileLLM studies design
+choices below a billion parameters \citep{liu2024mobilellm}. Scaling laws relate loss to parameters
+and data \citep{kaplan2020scaling,hoffmann2022training}. Our width ladder asks a narrower question,
+with data and training steps held fixed: which behaviours a 3.5$\times$ reduction removes.
 
-\textbf{Inference under tight budgets.} Microcontroller work fits networks into kilobytes to
+\textbf{Inference under tight budgets.} Work on microcontrollers fits networks into kilobytes to
 megabytes \citep{lin2020mcunet,lai2018cmsis}, including small language models
 \citep{scherer2024deeploy,yang2024mcubert}, and microcontrollers have served as tool endpoints for a
-model hosted elsewhere \citep{yang2026device}. We use integer quantization with per-group scales
+model hosted elsewhere \citep{yang2026device}. We use integer quantization with a scale per group
 \citep{jacob2017quantization,dettmers2022matrix}. Streaming weights from flash
-\citep{alizadeh2023flash}, as CasioLLM does, escapes a RAM ceiling at a throughput cost; we keep
-weights resident and discuss the trade in Section~\ref{sec:frontier}. Our cost model shares the
-roofline's aim \citep{williams2009roofline}, but it is fitted to measurements on the device rather
-than derived from peak rates.
+\citep{alizadeh2023flash}, as CasioLLM does, avoids a RAM limit at a cost in speed; we keep the
+weights in memory and discuss the trade-off in Section~\ref{sec:frontier}. Our cost model has the
+same aim as the roofline model \citep{williams2009roofline}, but it is fitted to measurements on the
+device rather than derived from peak rates.
 
 \textbf{Evaluation fidelity.} That a model's evaluation path and its serving path must compute the
-same values is established production practice: the ML Test Score asks for a test that training
-and serving features are identical \citep{breck2017mltestscore}, deployed models are known to
-diverge from their reference implementations \citep{qiu2022mlexray}, and inference engines have a
-documented bug population \citep{liu2025first}. We do not claim the skew is new. We measure how far
-each difference moved one small model's evaluation, and report a defect that a host--device parity
-check cannot see, because both sides run the same code (Section~\ref{sec:defect}).
+same values is standard production practice: the ML Test Score asks for a test that training and
+serving features are identical \citep{breck2017mltestscore}, deployed models are known to differ from their reference implementations \citep{qiu2022mlexray}, and inference engines have a documented set
+of bugs \citep{liu2025first}. We do not claim this mismatch is new. We measure how far each
+difference moved the evaluation of one small model, and report a defect that a host--calculator
+comparison cannot see, because both sides run the same code (Section~\ref{sec:defect}).
 
 % ==================================================================================================
 \section{System}
@@ -190,27 +188,26 @@ A question passes through four steps (Figure~\ref{fig:exchange}).
 \textbf{Selection.} The runtime ranks the store's 177 relations, together with 1,442 glossary terms
 from the same textbooks, against the question, and acts only when it is confident. It is confident
 when the question writes out a stored relation; when the values the question assigns are exactly
-the inputs of one relation, choosing among several by the symbol the question asks for; or when the
-top-ranked record's name accounts for at least three quarters of the question's content words.
-Otherwise it chooses nothing, the prompt says that no relation matched, and the model declines.
-Section~\ref{sec:e2e} measures this stage and explains where the second rule came from.
+the inputs of one relation (if several qualify, the symbol the question asks for decides); or when
+the name of the top-ranked record covers at least three quarters of the question's content words.
+Otherwise it picks nothing, the prompt says that no relation matched, and the model declines.
+Section~\ref{sec:e2e} measures this step and explains the second rule's origin.
 
-\textbf{Assembly.} Native code parses the values the question supplies (\tok{m = 2}), removes them
-from the question and assembles the prompt: the question, then a record span holding the relation,
-the unit of each variable, the variables the question leaves unbound (\tok{missing}), the conditions
-under which the relation holds, and any physical constant it needs.
+\textbf{Assembly.} Native code reads the values the question gives (\tok{m = 2}), removes them from
+the question and builds the prompt: the question, then a record holding the relation, the unit of each variable, the inputs the question gives no value for (\tok{missing}), the conditions under
+which the relation holds, and any physical constant it needs.
 
-\textbf{Generation.} The model continues the prompt. When it closes a \tok{<tool>} span, the
-runtime executes the call and injects the result as a \tok{<res>} span; the model then writes its
-answer and ends with \tok{<end>}. The calculator decodes greedily. If the answer states a number
-more than 2\% from the result, the runtime appends the computed value beneath it.
+\textbf{Generation.} The model continues the prompt. When it closes a \tok{<tool>} span, the runtime
+runs the call and inserts the result as a \tok{<res>} span; the model then writes its answer and
+ends with \tok{<end>}. The calculator decodes greedily. If the answer states a number more than 2\%
+away from the result, the runtime adds the computed value below it.
 
 \textbf{Execution.} The evaluator supports seven tools: \tok{eval}, \tok{evalat}, \tok{solve},
-\tok{diff}, \tok{integ}, \tok{conv} and \tok{stat}. Units are resolved only inside \tok{conv};
-everywhere else every identifier is a symbol, so \tok{g} is gravity, not grams.
+\tok{diff}, \tok{integ}, \tok{conv} and \tok{stat}. Units are handled only inside \tok{conv};
+everywhere else every name is a symbol, so \tok{g} is gravity, not grams.
 
-The training loss is masked on every \tok{<res>} span, so the model learns to write calls and to
-restate what it is given, not to predict what the evaluator will return.
+During training the loss is masked on every \tok{<res>} span, so the model learns to write calls and
+to restate what it is given, not to predict what the evaluator will return.
 
 \begin{figure}[t]
 \centering
@@ -223,11 +220,11 @@ restate what it is given, not to predict what the evaluator will return.
 }}
 \caption{A generation-and-tool turn logged on the calculator, on battery, with the relation supplied
 by the test harness rather than chosen by the application's selector. From the question ``Take
-l = 0.057, v = 1.35, B = 0.196. What was the motionally induced emf?'' the runtime assembled the
-prompt (moving the values to the end, which leaves the stray ``Take'' and the doubled period),
-executed the model's call and injected the result. From the start of generation, including prefill,
-first output arrived after 29.9\,s and the turn completed after 52.0\,s; these times exclude
-prompt assembly and tokenization. The host reproduces this turn token for token
+l = 0.057, v = 1.35, B = 0.196. What was the motionally induced emf?'' the runtime built the prompt
+(moving the values to the end, which leaves the stray ``Take'' and the double period), ran the
+model's call and inserted the result. From the start of generation, including prefill, the first
+output appeared after 29.9\,s and the turn finished after 52.0\,s; these times exclude prompt
+assembly and tokenization. The host reproduces this turn token for token
 (Section~\ref{sec:parity}).}
 \label{fig:exchange}
 \end{figure}
@@ -237,66 +234,65 @@ prompt assembly and tokenization. The host reproduces this turn token for token
 The model is a Llama-2-style decoder \citep{touvron2023llama} with RMSNorm \citep{zhang2019root},
 rotary position embeddings \citep{su2021roformer} and a SwiGLU feed-forward block
 \citep{shazeer2020variants}: width 352, six layers, eight heads, feed-forward width 1,024, a context
-of 512 tokens and a vocabulary of 4,096, with the embedding shared by the classifier. That is
-10,903,552 parameters. Weights are stored at 8 bits with one fp32 scale per group of 88; in the
-file the feed-forward width is padded with zeros to 1,056 so that the group divides every row
-(Section~\ref{sec:defect}), for 11,629,696 bytes in all.
+of 512 tokens and a vocabulary of 4,096, with the embedding shared by the output layer (the
+classifier). That is 10,903,552 parameters. Weights are stored in 8 bits with one fp32 scale per
+group of 88; in the file the feed-forward width is padded with zeros to 1,056 so that the group size
+divides every row (Section~\ref{sec:defect}), for 11,629,696 bytes in total.
 
 The tokenizer is trained on our corpus and reserves 11 special tokens for the document structure.
-A 4,096-entry vocabulary is a throughput decision: the classifier reads $\mathrm{width}\times
+The 4,096-entry vocabulary is a speed decision: the classifier reads $\mathrm{width}\times
 \mathrm{vocab}$ weights for every token, and even at 4,096 it takes 10.6\% of a token's time
 (Section~\ref{sec:cost}). Scaling that measured stage linearly, a 32,000-entry vocabulary would add
 about 0.31\,s to every token, 73\% of the current total.
 
-Several dimensions are fixed by the engine rather than chosen. The group size is a compile-time
-constant, because a runtime divisor costs two software divisions per group in the inner loop, so
-the width must be a multiple of 88; rotary embeddings need an even head size. With eight heads that
-admits widths of 176, 352 and 528, and 528 does not fit in memory (Section~\ref{sec:frontier}).
+Some dimensions are set by the engine rather than chosen. The group size is fixed when the engine is
+compiled, because a group size read at run time costs two software divisions per group in the inner
+loop, so the width must be a multiple of 88; rotary embeddings need an even head size. With eight
+heads that allows widths of 176, 352 and 528, and 528 does not fit in memory
+(Section~\ref{sec:frontier}).
 
 \subsection{Engine and loader}
 
 The inference engine is derived from llama2.c \citep{karpathy2023llama2c}. Weights are int8 with a
-scale per group; activations are quantized to int8 per group before each matrix product, which
-accumulates in 32-bit integers. Normalization, rotary embeddings, attention and softmax run in
-fp32 through the compiler's software floating-point routines, and the KV cache is fp32. The
-generation loop, tool execution and the 2\% answer check are one C module, shared by the
-application and by the evaluation harness of Section~\ref{sec:eval}. The calculator's operating
-system does not run native programs, so the application is started by a loader derived from Ndless
-\citep{ndless}, installed once from a setup document; the calculator's hardware is not modified.
+scale per group; before each matrix product the activations are converted to int8 per group, and the
+product is summed in 32-bit integers. Normalization, rotary embeddings, attention and softmax run in
+fp32 using the compiler's software floating-point routines, and the KV cache is fp32. The generation
+loop, tool execution and the 2\% answer check are one C module, shared by the application and by the
+evaluation harness of Section~\ref{sec:eval}. The calculator's operating system does not run native
+programs, so the application is started by a loader derived from Ndless \citep{ndless}, installed
+once from a setup document; the hardware is not modified.
 
 % ==================================================================================================
 \section{Training Data}
 \label{sec:data}
 
-The model is trained from scratch on a mixture that is 85\% synthetic documents and 15\% raw
-textbook text. The textbook text is every module of 24 OpenStax textbooks \citep{openstax}, with
-markup removed; 22 of the books are licensed CC BY-NC-SA 4.0 and two CC BY 4.0. No other dataset
-is used.
+The model is trained from scratch on a mixture of 85\% synthetic documents and 15\% raw textbook
+text. The textbook text is every module of 24 OpenStax textbooks \citep{openstax}, with the markup
+removed; 22 of the books are licensed CC BY-NC-SA 4.0 and two CC BY 4.0. No other dataset is used.
 
-The synthetic documents are generated programmatically from the record store, whose 177 relations
-were mined from the same books and cleaned in passes that removed malformed and non-physics
-records. Each document is one exchange in the format of Figure~\ref{fig:exchange}. The generator
-draws each variable's value from a range declared for that quantity, executes the call with the
-device's evaluator, and renders the answer from a small set of templates, so the result in every
-document is the evaluator's own output. Document types cover answering, declining because a value
-is missing, declining because no relation matched or because the record does not apply, explaining
-a relation, defining a term from the books' glossaries, and symbolic calls. The current revision of
-the corpus has 316,219 documents; the shipped model was trained on an earlier revision from the
-same generator, and the width-ladder models of Appendix~\ref{app:ladder} on the current one. An
-audit of 400 documents sampled from an earlier 29,982-document revision found 12 ill-posed (3.00\%,
-95\% Wilson interval 1.72--5.17\%). The audit was performed by two AI reading passes whose flags
-were adjudicated by a further AI pass, not by a person; its false-positive and false-negative rates
-were not measured, so the interval reflects sampling uncertainty only, and the audit predates later
-fixes, so it does not estimate the current revision.
+The synthetic documents are generated by a program from the record store, whose 177 relations were
+extracted from the same books and cleaned in passes that removed malformed and non-physics records.
+Each document is one exchange in the format of Figure~\ref{fig:exchange}. The generator draws each variable's value from a range chosen for that quantity, runs the call with the calculator's evaluator,
+and writes the answer from a small set of templates, so the result in every document is the
+evaluator's own output. Document types cover answering, declining because a value is missing,
+declining because no relation matched or because the record does not apply, explaining a relation,
+defining a term from the books' glossaries, and symbolic calls. The current version of the corpus
+has 316,219 documents; the shipped model was trained on an earlier version from the same generator,
+and the width-ladder models of Appendix~\ref{app:ladder} on the current one. A check of 400 documents
+sampled from an earlier 29,982-document version found 12 ill-posed (3.00\%, 95\% Wilson interval
+1.72--5.17\%). The check was done by two AI reading passes whose flags were settled by a further AI
+pass, not by a person; its false-positive and false-negative rates were not measured, so the
+interval reflects sampling uncertainty only, and the check predates later fixes, so it does not
+describe the current version.
 
-One component was produced differently. The explanation documents, one per relation (177 in
-training), were drafted by an AI model, grounded in the relation's OpenStax section for 127 of the
-177 relations and without a source section for the other 50, and then corrected by automated
-checking passes that were themselves AI-assisted. They were not written, edited or reviewed by the
-author, and no person has measured their error rate after correction; before correction the drafts
-contained a physics error 13.4\% of the time.
+One part was produced differently. The explanation documents, one per relation (177 in training),
+were drafted by an AI model, based on the relation's OpenStax section for 127 of the 177 relations
+and with no source section for the other 50, and then corrected by automated checking passes that
+were themselves AI-assisted. They were not written, edited or reviewed by the author, and no person
+has measured their error rate after correction; before correction the drafts contained a physics
+error 13.4\% of the time.
 
-The model is trained for 8,000 steps at batch 24 and sequence 512 (98.3M tokens), with AdamW
+The model is trained for 8,000 steps at batch 24 and sequence length 512 (98.3M tokens), with AdamW
 (learning rate $3\times10^{-4}$, 3\% warm-up, cosine decay to 10\%, weight decay 0.1) on one laptop
 GPU. The final training loss is 0.796.
 
@@ -305,46 +301,46 @@ GPU. The final training loss is 0.796.
 \label{sec:eval}
 
 \textbf{Device and power.} Every timing in this paper is taken on one TI-Nspire CX II CAS running
-OS 6.4.0.74, on battery with the USB cable disconnected: when the cable is attached the core runs
-at 288\,MHz instead of 396. Each instrument reads the clock configuration from the PLL and marks a
-tethered run invalid. Time is read from the calculator's 32.768\,kHz crystal timer, which does not
-depend on the CPU clock.
+OS 6.4.0.74, on battery with the USB cable unplugged: with the cable attached the core runs at
+288\,MHz instead of 396. Each measuring program reads the clock setting from the PLL and marks a run
+with the cable attached as invalid. Time is read from a 32.768\,kHz crystal timer,
+which does not depend on the CPU clock.
 
-\textbf{Host scoring.} Quality is scored on a workstation, because one answer takes the calculator
-up to 75 seconds. Nothing in the scoring path is a reimplementation. The prompt is built by the
-calculator's own C code for parsing the question and assembling the record, and in
+\textbf{Host scoring.} Quality is scored on a workstation, because one answer takes the calculator up
+to 75 seconds. Nothing in the scoring path is rewritten for the host. The prompt is built by the
+calculator's own C code for reading the question and assembling the record, and in
 Section~\ref{sec:e2e} by its selection code too. Generation runs the calculator's int8 engine and
 generation loop compiled for the host (Apple clang 21.0 at \texttt{-O2}, arm64), decoding greedily,
-executing each call with the calculator's evaluator and applying its 2\% answer check; the
+running each call with the calculator's evaluator and applying its 2\% answer check; the
 calculator's build uses GCC 14.2 for the ARM926EJ-S with software floating point.
 
-\textbf{What is scored.} An answerable problem is \emph{right} if the output is well formed, does
-not decline, its last tool result is within 0.1\% of a reference, and its prose states that result
-to within 2\%, the check the calculator applies. A strict variant requires the stated number to be
-a correct rounding of the result at the precision it shows. The reference is the record's relation
-with the question's values and the store's constants substituted, executed by the same evaluator;
-we recomputed all 480 references in an independent implementation (Python's \texttt{math}) and
-every one agrees to within $10^{-8}$, which checks the arithmetic, not whether a stored relation is
-physically right. Two controls run before every scoring pass: the reference's own document must
+\textbf{What is scored.} An answerable problem is \emph{right} if the output is well formed, does not
+decline, its last tool result is within 0.1\% of a reference, and its text states that result to
+within 2\%, the check the calculator applies. A strict version also requires the stated number to
+be a correct rounding of the result at the precision it shows. The reference is the record's
+relation with the question's values and the store's constants substituted, run by the same
+evaluator; we recomputed all 480 references in an independent implementation (Python's \texttt{math})
+and every one agrees to within $10^{-8}$, which checks the arithmetic, not whether a stored relation
+is physically right. Two controls run before every scoring pass: the reference's own document must
 score right on every item, and the same document with one value scaled by 1.1 must score wrong,
-which it does on 116 to 119 of every 120 items. Declining is scored strictly: an output that calls
-a tool is not a refusal. Table~\ref{tab:quality} lists the item sets.
+which it does on 116 to 119 of every 120 items. Declining is scored strictly: an output that calls a
+tool is not a refusal. Table~\ref{tab:quality} lists the item sets.
 
 \subsection{How far the harness moves the result}
 \label{sec:harness}
 
 Our first harness scored the fp32 training model, sampled at the temperature used to generate the
-corpus, on the evaluation set's own prompt text. Each of those differs from the calculator, and
-each moved the result (Table~\ref{tab:harness}). The set's prompt text predated a change that put
-the asked quantity's unit into the record span, and did not move the values to the end of the
-question as the runtime does; replacing it with the calculator's own assembly added 21 points.
-Decoding greedily, as the calculator does, added 12. Moving from fp32 to the calculator's int8
-engine then took 9 points away, and that loss was a defect.
+corpus, on the evaluation set's own prompt text. Each of these choices differs from the calculator,
+and each moved the result (Table~\ref{tab:harness}). The set's prompt text was written before a
+change that put the unit of the asked quantity into the record, and it did not move the values to
+the end of the question as the runtime does; replacing it with the calculator's own assembly added
+21 points. Decoding greedily, as the calculator does, added 12. Moving from fp32 to the calculator's
+int8 engine then took 9 points away, and that loss came from a defect.
 
 \begin{table}[t]
-\caption{Strict accuracy on the values-given set as the harness moves toward the calculator. Rows
-are cumulative. The first two rows sample at temperature 0.8 and average three seeds; the rest
-decode greedily.}
+\caption{Strict accuracy on the values-given set as the harness is brought closer to the calculator.
+Each row keeps the changes above it and adds one. The first two rows sample at temperature 0.8 and average three
+seeds; the rest decode greedily.}
 \label{tab:harness}
 \centering\small
 \begin{tabular}{@{}lr@{}}
@@ -364,46 +360,47 @@ fp32 training model, evaluation set's prompt text, sampled & 55.0\% \\
 \label{sec:defect}
 
 The int8 engine's quantization and matrix-product routines walk each row in steps of the group size
-and ignore any remainder, which is correct only if the group size divides every row length. The
-feed-forward down-projection's rows are as long as the hidden width, 1,024, which 88 does not
+and skip any remainder, which is correct only if the group size divides every row length. The rows
+of the feed-forward down-projection are as long as the hidden width, 1,024, which 88 does not
 divide: every layer ignored 56 of its 1,024 hidden inputs, and because the following rows then
-began off a group boundary, parts of groups were scaled by a neighbour's factor. The exporter had
-chosen 88 because it divides every tensor's total length, which is a different property. A
-host--device parity check could not see the defect, because both sides ran the same code.
+started off a group boundary, parts of groups were scaled by a neighbouring group's factor. The
+exporter had chosen 88 because it divides the total length of every tensor, which is a different
+property. A host--calculator comparison could not see the defect, because both sides ran the same
+code.
 
-We fixed it without changing the group. The hidden width is padded with zeros to $1{,}056 = 12
-\times 88$: zero rows in the two up-projections and zero columns in the down-projection, which
-leaves the network's function unchanged (the largest logit difference in the training framework is
-$3.5\times10^{-6}$, with every argmax identical). The padding costs 2.3\% per token, 428.9 against
-419.1\,ms at the shipped shape. A group of 32, which also divides every row, cost 27.4\% (534.0\,ms),
-because the engine converts one fp32 scale per group in software. The engine now refuses any file
-whose group size does not divide a row. On the values-given set the fix raised accuracy from
-91.7\% to 96.7\%, and strict accuracy from 79.2\% to 89.2\%, within a point of the fp32 model's
-88.3\%. Subsequent quality results and all timing measurements use the corrected engine;
-comparisons with the earlier engine are labeled as such.
+We fixed it without changing the group size. The hidden width is padded with zeros to
+$1{,}056 = 12 \times 88$: zero rows in the two up-projections and zero columns in the
+down-projection, which leaves the network's function unchanged (the largest logit difference in the
+training framework is $3.5\times10^{-6}$, and every argmax is identical). The padding costs 2.3\%
+per token, 428.9 against 419.1\,ms at the shipped shape. A group size of 32, which also divides
+every row, cost 27.4\% (534.0\,ms), because the engine converts one fp32 scale per group in
+software. The engine now refuses any file whose group size does not divide a row. On the
+values-given set the fix raised accuracy from 91.7\% to 96.7\%, and strict accuracy from 79.2\% to
+89.2\%, within a point of the fp32 model's 88.3\%. All later quality results and all timings use the
+corrected engine; comparisons with the earlier engine are labeled as such.
 
 \subsection{Eight generation-and-tool turns agree between host and calculator}
 \label{sec:parity}
 
-A host evaluation is evidence about the calculator only if the two produce the same tokens. We
-logged eight turns on the calculator, on battery (Table~\ref{tab:turns}), with each relation
-supplied by the test harness: its runtime assembled each prompt, executed the model's tool calls and
-injected the results. The host assembles the same eight prompts and reproduces all eight turns, 325
-tokens, identically. This checks prompt assembly, generation and tool execution; it does not run
-the selector on the calculator, which Section~\ref{sec:e2e} measures on the host with the
-application's own code. The two
-do not compute the same numbers. On a probe that walks eight positions, the logits the host and
-calculator print differ by up to 0.061; but two host builds that differ only in whether the
-compiler fuses multiply-adds differ from each other by up to 0.073, so bit identity was never a
-well-posed target. The probe's one argmax disagreement is a near tie, the top two host logits
-0.0027 apart, that also separates host builds: the default build disagrees with the calculator
-there, and builds with fusion disabled or forced agree with it.
+A host evaluation tells us about the calculator only if the two produce the same tokens. We logged
+eight turns on the calculator, on battery (Table~\ref{tab:turns}), with each relation supplied by the
+test harness: the calculator's runtime built each prompt, ran the model's tool calls and inserted the
+results. The host builds the same eight prompts and reproduces all eight turns, 325 tokens, exactly.
+This checks prompt assembly, generation and tool execution; it does not run the selector on the
+calculator, which Section~\ref{sec:e2e} measures on the host with the application's own code.
+
+The two do not compute exactly the same numbers. On a probe that walks eight positions, the logits
+printed by the host and the calculator differ by up to 0.061; but two host builds that differ only
+in whether the compiler fuses multiply-adds differ from each other by up to 0.073, so bit-for-bit
+identity was never a sensible target. The probe's one disagreement on the top token is a near tie,
+the top two host logits 0.0027 apart, that also separates host builds: the default build disagrees
+with the calculator there, and builds with fusion turned off or forced agree with it.
 
 \begin{table}[t]
-\caption{Eight turns logged on the calculator, on battery, relations supplied by the test harness:
-prompts assembled by its runtime, tool calls executed by its evaluator. Each is identical, token for
-token, on the host. Times run from the start of generation and include prefill of the 35- to
-83-token prompt; they exclude prompt assembly and tokenization. The failures are the ones
+\caption{Eight turns logged on the calculator, on battery, with relations supplied by the test
+harness: prompts built by its runtime, tool calls run by its evaluator. The host reproduces each one
+token for token. Times run from the start of generation and include prefill of the 35- to 83-token
+prompt; they exclude prompt assembly and tokenization. The failures are the ones
 Section~\ref{sec:quality} measures at scale.}
 \label{tab:turns}
 \centering\footnotesize
@@ -427,15 +424,15 @@ explain & explained the relation & 40.1\,s & 74.8\,s \\
 \section{With the Right Relation Supplied}
 \label{sec:quality}
 
-Table~\ref{tab:quality} scores the shipped model on eight item sets, each built to isolate one
-behaviour, with the item's own relation handed to it. This is the model's contribution in
-isolation; Section~\ref{sec:e2e} puts the selection stage in front of it.
+Table~\ref{tab:quality} scores the shipped model on eight item sets, each built to test one
+behaviour, with each item's own relation given to it. This is the model's contribution on its own;
+Section~\ref{sec:e2e} adds the selection step before it.
 
 \begin{table}[t]
 \caption{The shipped model on the calculator's decoder (int8, run on the host), greedy, with each
 item's own relation supplied. $n$ items (distinct relations). ``Right'' means the evaluator's
-result is within 0.1\% of the reference and the prose states it within 2\%, the check the
-calculator applies. ``No model'' is the deterministic baseline described in the text.}
+result is within 0.1\% of the reference and the text states it within 2\%, the check the calculator
+applies. ``No model'' is the rule-based baseline described in the text.}
 \label{tab:quality}
 \centering\small
 \begin{tabular}{@{}lrrr@{}}
@@ -460,92 +457,93 @@ item set: pass requires & $n$ & model & no model \\
 \end{table}
 
 \textbf{When the prompt holds every value, the answers are mostly right.} Given a question that
-supplies each value the relation needs, the model is right on 116 of 120 items (96.7\%). Under the
+supplies every value the relation needs, the model is right on 116 of 120 items (96.7\%). Under the
 strict criterion it is 89.2\%; the nine items between the two criteria all state a number within
-2\% of the result, most of them truncated rather than rounded (1299.954 written as ``1299'').
+2\% of the result, most of them cut off rather than rounded (1299.954 written as ``1299'').
 
 \textbf{The remaining errors are copying errors.} All four wrong answers are calls built with a
-value copied incorrectly from the question: 2,430 written as 243.0, 272 as 263.0, 9.83 as 8.875
-and 390.8 as 390.0. None is a refusal and none is malformed, and the evaluator never erred. What
-failed was moving digits from the prompt into the call.
+value copied wrongly from the question: 2,430 written as 243.0, 272 as 263.0, 9.83 as 8.875 and
+390.8 as 390.0. None is a refusal and none is malformed, and the evaluator never made a mistake.
+What failed was moving digits from the prompt into the call.
 
-\textbf{Where an irrelevant value goes matters more than whether it is there.} Into each of the 120
-values-given questions we inserted one of the generator's own irrelevant assignments, after the last
-relevant value or before the first, changing nothing else. Placed after, it costs 4 of the 116 correct answers and gains one (113 of 120 right). Placed
-before, it costs 56 (61 of 120 right), and in 43 of the 59 wrong answers the irrelevant value is
-in the call. Reversing the order of the relevant values leaves aggregate accuracy at 87 of 91, with two answers
-becoming wrong and two becoming right; this argues against a simple fixed-position strategy, but
-does not establish that binding is order-invariant. The sensitivity is consistent with how the
-training data was written: the generator appends irrelevant values after the relevant ones, and has
-since before the shipped model's revision, and in the revision the width-ladder models were trained
-on, all 75,618 training questions that carry an irrelevant value list it after every relevant value.
-We did not retrain with irrelevant values in random positions, so this is an explanation consistent
-with the evidence, not an isolated cause. The separate irrelevant-value set of Table~\ref{tab:quality} confirms this on
-items the paired experiment did not touch. Its irrelevant value is shuffled among the relevant
-ones, and split by where it landed, the model is right on 41 of 41 items with it last, 24 of 47 with
-it first and 13 of 32 with it in the middle.
+\textbf{Where an irrelevant value is placed matters more than whether it is there.} Into each of the
+120 values-given questions we inserted one of the generator's own irrelevant values, after the last
+relevant value or before the first, and changed nothing else. Placed after, it costs 4 of the 116
+correct answers and gains one (113 of 120 right). Placed before, it costs 56 (61 of 120 right), and
+in 43 of the 59 wrong answers the irrelevant value is in the call. Reversing the order of the
+relevant values leaves overall accuracy at 87 of 91, with two answers turning wrong and two turning
+right; this argues against a simple fixed-position strategy, but does not show that the order
+of the values never matters. The sensitivity is consistent with how the training data was written: the generator adds
+irrelevant values after the relevant ones, and has done so since before the corpus version the
+shipped model was trained on,
+and in the version the width-ladder models were trained on, all 75,618 training questions that carry
+an irrelevant value list it after every relevant value. We did not retrain with irrelevant values in
+random positions, so this explanation fits the evidence but is not shown to be the cause. The
+separate irrelevant-value set of Table~\ref{tab:quality} confirms the pattern on items the paired
+experiment did not touch. There the irrelevant value is shuffled among the relevant ones, and split
+by where it landed, the model is right on 41 of 41 items with it last, 24 of 47 with it first and 13
+of 32 with it in the middle.
 
-\textbf{Declining works when the prompt says why.} When the question omits a value the relation
+\textbf{Declining works when the prompt says why.} When the question leaves out a value the relation
 needs, the model declines without calling a tool on all 120 items, and on all 102 when it gives no
 values at all. In both cases the runtime has already written the missing variable into the prompt,
-so declining requires reading one field. The refusal names only the variable the prompt lists as
-missing in 103 of the 120 withheld-value cases (85.8\%); most of the others name a variable the
+so declining only requires reading one field. The refusal names only the variable the prompt lists
+as missing in 103 of the 120 withheld-value cases (85.8\%); most of the others name a variable the
 question did give (Table~\ref{tab:turns}).
 
-\textbf{Judging fit does not work.} When the relation does not answer the question but every one
-of its variables is bound, nothing in the prompt says so, and the model computes anyway: it
-declines on none of 120 items. Of the four width-ladder checkpoints (Appendix~\ref{app:ladder}),
-three also decline on none and one declines on 19 of 120; none rejects an inapplicable relation
-reliably. Choosing the right relation therefore falls to the selection stage
-(Section~\ref{sec:e2e}).
+\textbf{Judging fit does not work.} When the relation does not answer the question but every one of
+its variables has a value, nothing in the prompt says so, and the model computes anyway: it declines
+on none of 120 items. Of the four width-ladder models (Appendix~\ref{app:ladder}), three also decline
+on none and one declines on 19 of 120; none reliably rejects a relation that does not apply.
+Choosing the right relation therefore falls to the selection step (Section~\ref{sec:e2e}).
 
-\textbf{Explanations pass a format check.} Asked to explain a relation, the model produces a
-well-formed answer that states the record's relation and asserts no number absent from its prompt
-on 93.1\% of items. The relation is already in the prompt, so this measures format, not knowledge
-or physical truth: a fixed sentence restating the prompt's relation passes it.
+\textbf{Explanations pass a format check.} Asked to explain a relation, the model writes a
+well-formed answer that states the record's relation and gives no number that is not in its prompt
+on 93.1\% of items. The relation is already in the prompt, so this measures format, not knowledge or
+physical truth: a fixed sentence that restates the prompt's relation would pass it.
 
-\textbf{A deterministic path does as well or better.} The runtime already parses the values, holds
-the relation and lists what is missing, so we also ran the obvious system with no model: decline
-when a value is missing, otherwise evaluate the relation with the parsed values and state the
-result, and for a question worded as a request for explanation, show the stored explanation. On
-the same prompts and graders (Table~\ref{tab:quality}) it is right on every answerable item but
-one, a parser defect that binds a stated $Q$ to the constant $q$ and gives the model the same wrong
-prompt. It declines on every item that lacks a value, declines on none of the fit set, and passes
-the explanation format check on 78.2\%. With the relation supplied, then, the runtime's own parse, bind and evaluate path matches or beats
-the model on every item set that asks for a number or a refusal. The model generates tool arguments
-and prose, and its measured failures are copying errors in the arguments and imprecise restatements
-of results. Section~\ref{sec:e2e} carries this comparison through the selector.
+\textbf{A rule-based path with no model does as well or better.} The runtime already reads the values,
+holds the relation and lists what is missing, so we also ran the obvious system with no model:
+decline when a value is missing, otherwise evaluate the relation and state the result, and for a question
+worded as a request for an explanation, show the stored one. On the same prompts and graders (Table~\ref{tab:quality}) it is right on every
+answerable item but one, where a parser defect binds a stated $Q$ to the constant $q$ and gives the
+model the same wrong prompt. It declines on every item that lacks a value, declines on none of the
+fit set, and passes the explanation format check on 78.2\%. With the relation supplied, then, the
+runtime's own path of reading, binding and evaluating matches or beats the model on every item set
+that asks for a number or a refusal. The model writes the tool arguments and the text, and its
+measured failures are copying errors in the arguments and imprecise restatements of results.
+Section~\ref{sec:e2e} repeats this comparison behind the selector.
 
-\textbf{Capability versus scale.} A 3.1M-parameter model trained exactly as the 10.9M one, two
-seeds at each width and scored the same way (Appendix~\ref{app:ladder}), declines as often when the
-prompt names a missing value (99.6\% at both widths), is right 19.6 points less often when every
-value is given, mostly through wrong values in the call, and passes the explanation format check
-34.5 points less often. Two seeds per width are not a variance estimate, and equal training steps do
-not hold convergence constant.
+\textbf{Capability versus scale.} A 3.1M-parameter model trained exactly like the 10.9M one, with
+two seeds at each width and scored the same way (Appendix~\ref{app:ladder}), declines just as often
+when the prompt names a missing value (99.6\% at both widths), is right 19.6 points less often when
+every value is given, mostly because of wrong values in the call, and passes the explanation format
+check 34.5 points less often. Two seeds per width are not a variance estimate, and equal training
+steps do not hold convergence constant.
 
 % ==================================================================================================
 \section{End to End: Choosing the Relation}
 \label{sec:e2e}
 
-Section~\ref{sec:quality} hands the model each item's own relation. The deployed application
-chooses the relation itself (Section~\ref{sec:arch}), so a student's answer depends first on that
-choice. We measure the two stages together by running the application's selection code on the host
-(the function the calculator's enter key reaches, compiled with its display stubbed out) on the same
-items, followed by the calculator's decoder as before, and report each outcome: right, wrong or
-declined. An answerable item is right under the criterion of Section~\ref{sec:eval}; an item that
-should be declined is right when the output declines; an explanation is right only if the right
-relation was chosen and the format check passes. Four sets should be declined: the two of
-Section~\ref{sec:quality}; a negative set whose questions assign values that bind one relation
-exactly while asking for a different quantity, which is where a rule that trusts values could
-choose confidently and wrongly; and 2,000 textbook questions that an automatic criterion certifies
-no stored relation answers. That last pool also supplies the questions of the training class that
-teaches declining, so it is an in-distribution check of refusal, not an unseen one.
+Section~\ref{sec:quality} gives the model each item's own relation. The deployed application chooses
+the relation itself (Section~\ref{sec:arch}), so a student's answer depends first on that choice. We
+measure both steps together by running the application's own selection code on the host (the
+function the enter key calls, with its display stubbed out), then the calculator's decoder as
+before, on the same items, and report each outcome: right, wrong or declined.
+An answerable item is right under the criterion of Section~\ref{sec:eval}; an item that should be
+declined is right when the output declines; an explanation is right only if the right relation was
+chosen and the format check passes. Four sets should be declined: the two of
+Section~\ref{sec:quality}; a negative set whose questions assign values that bind one relation exactly,
+supplying every input it needs, while asking for a different quantity, where a rule that trusts values could choose confidently and
+wrongly; and 2,000 textbook questions that an automatic criterion certifies no stored relation
+answers. That last pool also supplies the questions of the training documents that teach declining,
+so it is an in-distribution check of refusal, not an unseen one.
 
 \begin{table}[t]
-\caption{End to end on the calculator's decoder, the application choosing the relation. Answerable
-sets and explanations: right / wrong / declined. Sets that should be declined: declined / answered.
-``Model alone'' supplies each item's relation (Table~\ref{tab:quality}). The selector columns add,
-in order, the rules in the text; ``no model'' runs the deterministic path of
+\caption{The full system on the calculator's decoder, with the application choosing the relation.
+Answerable sets and explanations: right / wrong / declined. Sets that should be declined: declined /
+answered. ``Model alone'' supplies each item's relation (Table~\ref{tab:quality}). The selector
+columns add the rules in the text one at a time; ``no model'' runs the rule-based path of
 Section~\ref{sec:quality} behind the current selector. Fresh sets: 300 new problems per family from
 the same generators with unused seeds.}
 \label{tab:e2e}
@@ -577,93 +575,93 @@ item set & $n$ & model alone & coverage & + values bind & + asked symbol & no mo
 \end{tabular}
 \end{table}
 
-\textbf{Selection dominated the failures of the original system.} With the selector as first
+\textbf{Selection caused most of the original system's failures.} With the selector as first
 deployed, the application was right on 21 of the 120 values-given problems and declined 97, against
 116 right for the model alone; of the 22 questions it gave the right relation, 21 were answered
-right (Table~\ref{tab:e2e}). The ranking was mostly right: on questions naming the quantity in
+right (Table~\ref{tab:e2e}). The ranking itself was mostly right: on questions naming the quantity in
 words, its top choice was the right relation 88.3\% of the time, but only 30.0\% of those questions
-received any relation and 28.3\% the right one. The confidence test asks how much of the question
-the top record's name accounts for. It was tuned on name lookups, textbook word problems and
-out-of-scope questions, never on questions carrying values, and every framing word such as
+received any relation and 28.3\% the right one. The confidence test asks how much of the question the
+name of the top record accounts for. It had been tuned on name lookups, textbook word problems and
+out-of-scope questions, never on questions that carry values, and every framing word such as
 ``Take'' or ``Estimate'' counts against it.
 
-\textbf{Explicit value assignments provide a second selection signal.} Our second rule makes the
+\textbf{Values assigned in the question give a second selection signal.} Our second rule makes the
 selector confident when the values the question assigns are exactly the inputs of the top-ranked
-relation: every value names one of its variables, every other variable except the one it computes
-is given or a stored constant, and the computed one is not given. The rule stays silent when the
-same values bind a second relation (two resistances bind both series and parallel resistance) and
-when the question names a different variable from the store (``$P = 464$,
-$A = 3.39\times10^{-5}$, compute $v_d$'' binds $I = P/A$ but asks for a drift velocity). The letters
-$a$, $A$ and $I$ count as symbols only where they end a clause, since elsewhere they are usually
-English words.
+relation: every value names one of its variables, every other variable except the one it computes is
+given or is a stored constant, and the computed one is not given. The rule stays silent when the same
+values bind a second relation (two resistances bind both series and parallel resistance) and when the
+question names a different variable from the store (``$P = 464$, $A = 3.39\times10^{-5}$, compute $v_d$'' binds $I = P/A$ but asks for a drift velocity). The letters $a$, $A$ and $I$ count as symbols
+only at the end of a clause, since elsewhere they are usually English words.
 
-\textbf{The asked symbol breaks ties.} The second rule's caution made it silent on questions such as
-``Given $m = 2$, $a = 3$, find $F$'', whose values bind both $F = ma$ and $F_\mathrm{net} = ma$, and
-``Given $V = 12$, $I = 2$, find $R$'', which bind both $R = V/I$ and $P = VI$. Our third rule takes,
-among the relations the values bind, those whose computed variable the question names, and chooses
-that relation if there is only one; two named relations remain ambiguous.
+\textbf{The symbol the question asks for settles ties.} The second rule's caution made it silent on
+questions such as ``Given $m = 2$, $a = 3$, find $F$'', whose values bind both $F = ma$ and
+$F_\mathrm{net} = ma$, and ``Given $V = 12$, $I = 2$, find $R$'', whose values bind both $R = V/I$ and
+$P = VI$. Our third rule takes, among the relations the values bind, those whose
+computed variable the
+question names, and chooses that relation if there is only one; two named relations remain
+ambiguous.
 
 \textbf{More answers, and more wrong ones.} Across the four answerable development sets, right
-answers rose from 62 to 306 of 480 and declines fell from 410 to 159, while wrong answers rose from
-8 to 15, because more questions now reach the model and some of them meet its copying errors. Wrong
+answers rose from 62 to 306 of 480 and declines fell from 410 to 159, while wrong answers rose from 8
+to 15, because more questions now reach the model and some of them meet its copying errors. Wrong
 choices of relation did not rise on any answerable set and fell on two, from 6 to 3 and from 6 to 0,
-because a named symbol overrides a wrong word-based choice. Of the current selector's eight wrong
-choices on these sets, seven are then declined and one produces a wrong answer: a question asking
-for ``equivalent resistance'' without saying series or parallel. Every other wrong answer follows a
-right choice and is a copying error.
+because a named symbol overrides a wrong choice based on words. Of the current selector's eight wrong
+choices on these sets, seven are then declined and one produces a wrong answer: a question asking for
+``equivalent resistance'' without saying series or parallel. Every other wrong answer follows a right
+choice and is a copying error.
 
-\textbf{Values that fit an inapplicable relation.} No version of the selector chose the inapplicable
-relation on the negative set, and the rules did not change the out-of-scope pool, whose questions
-assign no values and so cannot trigger them. The current selector's one answer on the negative set
-(``Estimate omega. Measurements give $v = 24.7$, $r = 1.74$'') used $\omega = v/r$, which those
-values do answer, and so did its one answer on the withheld-value set ($I = P/(4\pi r^2)$ for
-``$r = 30$, $P = 5.33$, what is $I$?'', whose item withholds $A$ for $I = P/A$). Of the 2,000
-out-of-scope questions, 32 drew a confident choice and 18 were not declined: 10 got a glossary
-definition, 7 an explanation of a relation and one a computed answer.
+\textbf{Values that fit a relation that does not apply.} No version of the selector chose the
+inapplicable relation on the negative set, and the rules did not change the out-of-scope pool, whose
+questions assign no values and so cannot trigger them. The current selector's one answer on the
+negative set (``Estimate omega. Measurements give $v = 24.7$, $r = 1.74$'') used $\omega = v/r$,
+which those values do answer, and so did its one answer on the withheld-value set
+($I = P/(4\pi r^2)$ for ``$r = 30$, $P = 5.33$, what is $I$?'', whose item withholds $A$ for
+$I = P/A$). Of the 2,000 out-of-scope questions, 32 drew a confident choice and 18 were not
+declined: 10 got a glossary definition, 7 an explanation of a relation and one a computed answer.
 
 \textbf{On problems the rules were not designed on.} We wrote both rules while reading the failures
-on these items, so their gains on them are not held-out estimates. On 300 fresh problems per family,
-the pattern repeats (Table~\ref{tab:e2e}): right answers went from 48 to 248 when values are given,
-from 2 to 285 when the quantity is named only by symbol and from 63 to 200 when it is named in
-words, with wrong answers from 2 to 5, from 3 to 10 and from 4 to 9. An irrelevant value blocks both
-rules, since every value must belong to the relation, so that family is unchanged. This controls
-for tuning to particular items, not for the generator's templates or its use of the store's own
-symbols, which the fresh problems share.
+on these items, so their gains on them are not held-out estimates. On 300 fresh problems per family the
+pattern repeats (Table~\ref{tab:e2e}): right answers went from 48 to 248 when values are given,
+from 2 to 285 when the quantity is named only by symbol and from 63 to 200 when it is named in words,
+with wrong answers going from 2 to 5, from 3 to 10 and from 4 to 9. An irrelevant value blocks both
+rules, since every value must belong to the relation, so that family is unchanged. This controls for
+tuning to particular items, not for the generator's templates or its use of the store's own symbols, which the
+fresh problems share.
 
-\textbf{The model's marginal contribution, end to end.} Behind the current selector, the no-model
-path is right more often and wrong less often on every answerable set, development and fresh; on
-the fresh symbol-only problems it is right on 295 with none wrong, against the model's 285 and 10.
-It declines less reliably. On 13 of the 222 withheld-value and no-values items the selector chose a
-glossary term, such as ``null measurements'' for a question beginning ``Measurements give'' or the
-glossary entry for ``compute the equivalent resistance'', and the no-model path shows the definition
-where the model declines; its keyword rule for explanation requests also passes the format check on
-26 of 87 items against the model's 37. On these benchmarks the model adds no numerical accuracy; it
-declines more reliably when selection misfires, and it writes the prose, whose quality and
-educational value we did not measure.
+\textbf{What the model adds in the full system.} Behind the current selector, the no-model path is
+right more often and wrong less often on every answerable set, development and fresh; on the fresh
+symbol-only problems it is right on 295 with none wrong, against the model's 285 and 10. It declines
+less reliably. On 13 of the 222 withheld-value and no-values items the selector chose a glossary
+term, such as ``null measurements'' for a question beginning ``Measurements give'' or the glossary
+entry for ``compute the equivalent resistance'', and the no-model path shows the definition where
+the model declines; its keyword rule for explanation requests also passes the format check on 26 of
+87 items against the model's 37. On these benchmarks the model adds no numerical accuracy; it
+declines more reliably when selection goes wrong, and it writes the text, whose quality and teaching
+value we did not measure.
 
 % ==================================================================================================
 \section{What a Token Costs}
 \label{sec:cost}
 
-We measure the cost of one decoded token along depth, width and position. Depth, position and
-stages come from one battery run of one benchmark, which times windows of 12 consecutive positions
-and reports their mean, placed here at the mean position; width comes from a sweep in the same
-session.
+We measure the cost of one decoded token by depth, width and position. Depth, position and the breakdown by stage
+come from one battery run of one benchmark. It times windows of 12 consecutive positions and
+reports their mean, which we place at the window's mean position. Width comes from a sweep in the
+same session.
 
-\textbf{Depth and width.} Holding the weights fixed and varying the number of layers from one to
+\textbf{Depth and width.} Keeping the weights fixed and varying the number of layers from one to
 six, at positions 3 to 14, the cost per token is $46{,}102 + 63{,}777\,L$ microseconds ($R^2 =
-1.000000$). The intercept is the fixed per-token cost of the embedding lookup, the classifier and
-the final normalization. Across three shapes of 3.1, 6.4 and 10.9 million parameters, timed over
+1.000000$). The intercept is the fixed cost per token of the embedding lookup, the classifier and the
+final normalization. Across three shapes of 3.1, 6.4 and 10.9 million parameters, timed over
 positions 11 to 18, the cost is $32{,}338 + 37{,}474\,N$ microseconds for $N$ million parameters
 ($R^2 = 0.99983$).
 
 \textbf{Position.} At the shipped shape, with the KV cache (the stored keys and values of earlier
 positions) filled by decoding every earlier position, the cost is $413{,}753 + 1{,}651\,p$
-microseconds at position $p$ ($R^2 = 0.999992$; the intercept is an extrapolation to $p = 0$). That
-is 1.60 tokens/s at position 128, 1.20 at 256, and 0.81 over the last measured window, at a mean
-position of 497.5; the model extrapolates to 2.42 at position 0 and 0.80 at 511, a 67\% drop across
-the context (Figure~\ref{fig:position}). A throughput quoted without its position is underspecified
-by a factor of three.
+microseconds at position $p$ ($R^2 = 0.999992$; the intercept is an extrapolation to $p = 0$). That is
+1.60 tokens/s at position 128, 1.20 at 256, and 0.81 over the last measured window, at a mean
+position of 497.5; the fit extrapolates to 2.42 at position 0 and 0.80 at 511, a 67\% drop across the
+context (Figure~\ref{fig:position}). A speed quoted without its position can be off
+threefold.
 
 \begin{figure}[t]
 \centering
@@ -681,47 +679,46 @@ share grows with position.}
 \end{minipage}
 \end{figure}
 
-\textbf{Where the time goes.} Instrumenting each stage of a token at positions 3 to 14 accounts for
-all but 0.28\% of the measured 428.8\,ms (Figure~\ref{fig:stages}). Matrix products are 83.9\% of
-it: the feed-forward block 56.7\%, the query, key and value projections 16.5\% and the classifier
-10.6\%. Attention is 9.0\% and rotary embeddings 5.0\%. The pieces agree with each other within the
-same run and at the same positions: the fixed stages are within 0.15\% of the depth intercept, the
+\textbf{Where the time goes.} Timing each stage of a token at positions 3 to 14 accounts for all but
+0.28\% of the measured 428.8\,ms (Figure~\ref{fig:stages}). Matrix products take 83.9\% of it: the
+feed-forward block 56.7\%, the query, key and value projections 16.5\% and the classifier 10.6\%.
+Attention takes 9.0\% and rotary embeddings 5.0\%. The parts agree with each other within the same
+run and at the same positions: the fixed stages are within 0.15\% of the depth intercept, the
 per-layer stages within 0.31\% of the depth slope, and all stages together within 0.03\% of the
-position model evaluated at their mean position.
+position model at their mean position.
 
-\textbf{Prediction.} Summing the position model over the positions of a real decode predicts the
-decode time of a run it was not fitted to, collected by a different program: 18.53\,s predicted
-against 18.60\,s measured for 35 tokens at positions 53 to 87 ($-0.4\%$), a decode rate of 1.88
+\textbf{Prediction.} Adding up the position model over the positions of a real decode predicts the
+decode time of a run it was not fitted to, recorded by a different program: 18.53\,s predicted
+against 18.60\,s measured for 35 tokens at positions 53 to 87 ($-0.4\%$), a decode speed of 1.88
 tokens/s. This is one run of one prompt, so it checks the per-token model, not a varied workload,
 and it excludes prefill (processing the prompt before the first output token), which took 24.3\,s
-for 53 tokens. Three decode runs on the engine before the fix of Section~\ref{sec:defect} spanned
-1.920 to 1.923 tokens/s.
+for 53 tokens. Three decode runs on the engine before the fix of Section~\ref{sec:defect} ranged
+from 1.920 to 1.923 tokens/s.
 
 \textbf{An empty cache measures a cheaper computation.} Our first benchmark reached position $p$ by
-jumping there, leaving the cache rows below $p$ unwritten and therefore zero. Holding the input
-token fixed so that the cache contents are the only difference, filling the cache raised the fitted
-per-position cost by 40\%, from 1,182 to 1,651\,\textmu s, with the intercept within 1.6\%. The
-mechanism the evidence points to is that without an FPU every multiply-add and exponential in
-attention is a software routine, and those routines take shortcuts on zero operands; we have not
-verified this at the instruction level. The empty-cache model under-predicts the decode run above
-by 5.3\%.
+jumping there, leaving the cache rows below $p$ unwritten and therefore zero. Keeping the input token
+fixed, so that the cache contents are the only difference, filling the cache raised the fitted cost
+per position by 40\%, from 1,182 to 1,651\,\textmu s, with the intercept within 1.6\%. The likely
+reason is that without an FPU every multiply-add and exponential in attention is a software routine,
+and those routines take shortcuts when an operand is zero; we have not checked this at the
+instruction level. The empty-cache model under-predicts the decode run above by 5.3\%.
 
 % ==================================================================================================
-\section{The Frontier}
+\section{Memory and Speed Limits}
 \label{sec:frontier}
 
-\textbf{Memory.} A fresh boot leaves 21.53\,MiB as the largest single block an application can
-allocate. The checkpoint is one block, but it is not the constraint alone: the engine also holds an
-fp32 KV cache of $2 \cdot L \cdot \mathrm{context} \cdot \mathrm{width} \cdot 4$ bytes. At the shipped shape the cache is
-8.25\,MiB, 43\% of the 19.34\,MiB that checkpoint and cache occupy together
+\textbf{Memory.} After a fresh boot, the largest single block an application can allocate is
+21.53\,MiB. The checkpoint is one block, but it is not the only constraint: the engine also holds an
+fp32 KV cache of $2 \cdot L \cdot \mathrm{context} \cdot \mathrm{width} \cdot 4$ bytes. At the
+shipped shape the cache is 8.25\,MiB, 43\% of the 19.34\,MiB that checkpoint and cache take together
 (Figure~\ref{fig:memory}). The next width we tested, 440 with ten heads and 16.6M parameters, needs
 27.19\,MiB for the two and fails to load on the device, although its 16.87\,MiB checkpoint alone
-would fit in one block. A 12.2M-parameter model of width 384, in a group-32 layout, did load with
-22.10\,MiB in its two blocks. For six layers, a 512-token context and an fp32 cache the limit
-therefore lies between 12.2M and 16.6M parameters, and because the cache is linear in context
+would fit in one block. A 12.2M-parameter model of width 384, in a group-32 layout, did load, with
+22.10\,MiB in its two blocks. For six layers, a 512-token context and an fp32 cache, the limit
+therefore lies between 12.2M and 16.6M parameters, and because the cache grows linearly with context
 length, context and parameters trade directly against each other.
 
-The largest block also depends on the device's recent history: after a program failed inside the
+The largest block also depends on what the device did recently: after a program failed inside the
 loader it was 5.02\,MiB until a reboot, while four load-and-free cycles of the shipped model left it
 unchanged to the byte, so the loss comes from the crash, not from fragmentation.
 
@@ -729,30 +726,30 @@ unchanged to the byte, so the loss comes from the crash, not from fragmentation.
 \centering
 \begin{minipage}[t]{0.49\linewidth}\centering
 \includegraphics[width=\linewidth]{fig_memory.pdf}
-\caption{Checkpoint and fp32 KV cache per width (six layers, context 512), and whether it loaded.
-The shaded band is where the limit on the two-block total must lie; width 384 is a group-32 layout.
-The largest single block on a fresh boot was 21.53\,MiB.}
+\caption{Checkpoint and fp32 KV cache per width (six layers, context 512), and whether the model
+loaded. The shaded band is where the limit on the two-block total must lie; width 384 is a group-32
+layout. The largest single block on a fresh boot was 21.53\,MiB.}
 \label{fig:memory}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.49\linewidth}\centering
 \includegraphics[width=\linewidth]{fig_frontier.pdf}
-\caption{Throughput against parameters, battery, filled cache, feed-forward width padded to a
-multiple of 88. Solid: positions 11--18 and 259--266 (Table~\ref{tab:frontier}); dashed: position
-128, interpolated. Widths 176 and 264 use random weights.}
+\caption{Speed against parameters, battery, filled cache, feed-forward width padded to a multiple of
+88. Solid: positions 11--18 and 259--266 (Table~\ref{tab:frontier}); dashed: position 128,
+interpolated. Widths 176 and 264 use random weights.}
 \label{fig:frontier}
 \end{minipage}
 \end{figure}
 
-\textbf{Throughput.} Timing each width with a filled cache gives the frontier in
-Table~\ref{tab:frontier} and Figure~\ref{fig:frontier}. Over positions 11 to 18 the largest tested
-configuration that clears 2 tokens/s is the shipped 10.9M; at position 128, by linear interpolation between the
-two measured windows, it is the 6.4M width (about 2.5 tokens/s); over positions 259 to 266 it is
-3.1M. At short context, memory and throughput bind at the same width.
+\textbf{Speed.} Timing each width with a filled cache gives Table~\ref{tab:frontier} and
+Figure~\ref{fig:frontier}. Over positions 11 to 18 the largest tested configuration that reaches 2
+tokens/s is the shipped 10.9M; at position 128, by linear interpolation between the two measured
+windows, it is the 6.4M width (about 2.5 tokens/s); over positions 259 to 266 it is 3.1M. At short
+context, memory and speed set the same limit on width.
 
 \begin{table}[t]
-\caption{The frontier on battery, filled KV cache, context 512. Tokens/s averaged over positions
+\caption{Speed and memory by width on battery, filled KV cache, context 512. Tokens/s averaged over positions
 11--18 and 259--266. Widths 176 and 264 use random weights; the feed-forward width of every file is
-padded to a multiple of 88 as in the shipped one.}
+padded to a multiple of 88, as in the shipped one.}
 \label{tab:frontier}
 \centering\small
 \begin{tabular}{rrrrr}
@@ -767,15 +764,16 @@ width & params & file + KV & 11--18 & 259--266 \\
 \end{tabular}
 \end{table}
 
-\textbf{When random weights are valid.} Timing untrained widths with random weights is sound only
-if decode time does not depend on the weights' values. At width 352 a random-weight model and the
+\textbf{When random weights are valid.} Timing untrained widths with random weights is sound only if
+decode time does not depend on the weights' values. At width 352 a random-weight model and the
 trained one differ by 1.2\% over positions 11 to 18 and by 3.9\% over 259 to 266, because software
-floating point is data-dependent. The threshold classifications above would survive perturbations of
-that size, but the comparison does not bound weight-dependent variation at the other widths.
+floating point takes different amounts of time on different data. The threshold results above would
+survive differences of that size, but the comparison does not bound weight-dependent variation at
+the other widths.
 
 \textbf{Flash as the alternative.} Streaming weights from flash, as CasioLLM does
-\citep{samilososami2026casiollm}, escapes the RAM ceiling, but on this calculator sequential flash
-reads run at about a forty-eighth of DRAM read bandwidth, so we keep the model resident.
+\citep{samilososami2026casiollm}, avoids the RAM limit, but on this calculator sequential flash reads
+run at about a forty-eighth of the DRAM read speed, so we keep the model in memory.
 
 % ==================================================================================================
 \section{Limitations}
@@ -783,15 +781,14 @@ reads run at about a forty-eighth of DRAM read bandwidth, so we keep the model r
 
 \textbf{The evaluation is synthetic.} Every item, including the fresh ones of Section~\ref{sec:e2e},
 comes from the generator family that produced the training documents and uses the store's own
-symbols, with values the model has not seen. How often students' own phrasing and notation reach a
-confident choice is not measured, tool selection beyond \tok{eval} is tested only on relations
-seen in training, and we do not report perplexity. The model cannot judge whether a relation fits
+symbols, with values the model has not seen. How often students' own wording and notation lead to a
+confident choice is not measured, tool selection beyond \tok{eval} is tested only on relations seen
+in training, and we do not report perplexity. The model cannot judge whether a relation fits
 (Section~\ref{sec:quality}), so a question answered with the wrong relation, such as the ambiguous
 resistance question, gets a confident wrong answer.
 
-\textbf{One device, and few repeats.} All timings come from one calculator. On the shipped engine
-the decode rate was measured once; most other timing cells were also measured once. The width
-ladder has two points (Appendix~\ref{app:ladder}).
+\textbf{One device, and few repeats.} All timings come from one calculator. On the shipped engine the decode speed was measured once, as were most other timing cells. The width ladder
+has two points (Appendix~\ref{app:ladder}).
 
 \textbf{Explanations are scored for form, not truth.} Whether an explanation's physics is correct is
 not measured, and the explanation training text has not been reviewed by a person
@@ -802,59 +799,55 @@ not measured, and the explanation training text has not been reviewed by a perso
 \label{sec:conclusion}
 
 Given the right relation, a 10.9M-parameter model that never computes answers 96.7\% of fully
-specified physics problems correctly on a graphing calculator, and its failures are copying errors;
-a deterministic path through the same runtime answers all of them, and behind the application's own
-selector it is still right more often and wrong less often, while the model declines more reliably
-when selection misfires. The broader lesson is about measurement. Each step that brought our
-evaluation closer to the deployed system changed its conclusion: one exposed an engine defect that
-host--device parity could not see, and the last showed that most of the original system's accuracy
-was lost before the model ran, in a stage with no neural network. On hardware this constrained, the
-evaluation worth reporting is the one that runs the device's own code, end to end, and counts wrong
-answers and declines as well as right ones.
+specified physics problems correctly on a graphing calculator, and its failures are copying errors. A rule-based path through the same
+runtime with no model answers all of these problems correctly, and behind the application's
+own selector it is still right more often and wrong less often, while the model declines more
+reliably when selection goes wrong. The wider lesson is about measurement. Each step that brought our
+evaluation closer to the deployed system changed its conclusion: one exposed an engine defect that a
+host--calculator comparison could not see, and the last showed that most of the original
+system's accuracy was lost before the model ran, in a step with no neural network. On hardware this
+limited, the evaluation worth reporting is the one that runs the device's own code, end to end, and
+counts wrong answers and declines as well as right ones.
 
 \label{endofmain}
 
 % --------------------------------------------------------------------------------------------------
+\section*{Broader Impact Statement}
+
+A physics assistant on a device allowed in some examinations has clear implications for assessment.
+The system chooses the relation itself when it is confident and declines otherwise, so a student can
+get a confident wrong answer when a question is ambiguous or the chosen relation does not fit, which
+the model cannot detect. The store, the corpus and the weights will be released, so an institution
+can inspect exactly what the assistant knows and decide whether to allow it.
+
 \section*{Statements and Declarations}
 
-\subsubsection*{Broader Impact Statement}
-A physics assistant on a device permitted in some examinations has obvious implications for
-assessment. The system chooses the relation itself when it is confident and declines otherwise; a
-student can therefore receive a confident wrong answer when a question is ambiguous or the chosen
-relation does not fit, which the model cannot detect. Its store, corpus and weights will be
-released, so an institution can inspect exactly what it knows and decide whether to allow it.
-
+\begin{itemize}
+\setlength{\itemsep}{1pt}
+\item \textbf{Funding.} No external funding was received for this work.\ifdeanonymized{} The author
+funded the project personally.\fi
+\item \textbf{Competing interests.} The author declares no competing interests.
+\item \textbf{Data availability.} The record store, the training corpus, the trained weights, and the
+device logs and results behind every table and figure will be released with the final version of
+this paper. The corpus, the store and the weights will be released under CC BY-NC-SA~4.0, following
+the licences of the OpenStax source text.
+\item \textbf{Code availability.} The code, including the calculator application, the inference
+engine, the corpus generator and the evaluation harness, will be released with the final version of
+this paper, under the MIT License for the code written for this work and the Mozilla Public
+License~1.1 for the loader derived from Ndless.
 \ifdeanonymized
-\subsubsection*{Author Contributions}
-The author initiated and directed the project, funded it personally, oversaw all of its agentic
-workflows, checked the results, carried out the measurements on the calculator, and edited the
-manuscript. The author takes responsibility for the work.
+\item \textbf{Author contributions.} The author initiated and directed the project, oversaw all
+agentic workflows, checked the results, carried out the measurements on the calculator, edited the
+text and personally funded the project. The author takes full responsibility for the work.
 \fi
-
-\subsubsection*{Use of AI Tools}
-An AI assistant (Anthropic's Claude models, through the Claude Code command-line interface, 2026
-releases) wrote most of the software and experiment tooling, ran most of the host-side experiments
-and analyses, and drafted the text. The explanation training documents
-were drafted by an AI model, as described in Section~\ref{sec:data}. The author directed the work,
-carried out the measurements on the calculator, checked the results and selected what to report.
-
-\subsubsection*{Funding}
-No external funding was received for this work.\ifdeanonymized{} The author funded it
-personally.\fi
-
-\subsubsection*{Competing Interests}
-The author declares no competing interests.
-
-\subsubsection*{Data and Code Availability}
-The code, the record store, the corpus generator, the trained weights, and the device logs and
-results behind every table and figure will be released with the final version of this paper, under
-the MIT licence for the code written for this work, the Mozilla Public License~1.1 for the
-Ndless-derived loader, and CC BY-NC-SA~4.0 for the corpus and weights, following the licences of the
-OpenStax source text.
-
-\subsubsection*{Trademarks}
-TI-Nspire is a trademark of Texas Instruments, and Casio and fx-CG50 are trademarks of Casio Computer
-Co.; this work is not affiliated with or endorsed by either company.
+\item \textbf{Use of AI tools.} Anthropic's Claude models, mainly Claude Opus~5 and Claude Opus~5.5,
+used through the Claude Code command-line interface, wrote most of the software and experiment
+tooling, ran most of the host-side experiments and analyses, and drafted the text. The explanation documents in the training data were
+also drafted by an AI model (Section~\ref{sec:data}). The author directed the work, carried out the
+measurements on the calculator, checked the results and chose what to report.
+\item \textbf{Trademarks.} TI-Nspire is a trademark of Texas Instruments, and Casio and fx-CG50 are
+trademarks of Casio Computer Co.; this work is not affiliated with or endorsed by either company.
+\end{itemize}
 
 \bibliography{references}
 \bibliographystyle{tmlr}
@@ -865,17 +858,17 @@ Co.; this work is not affiliated with or endorsed by either company.
 \label{app:ladder}
 
 We trained a 3.1M-parameter model of width 176 exactly as we trained one of width 352: the same
-corpus revision and tokenizer, six layers, eight heads, 8,000 steps at batch 24 and the same
-learning-rate schedule, with two training seeds at each width. Width is the only difference. The
-two widths were chosen under the group-88 layout, so the ladder has two points and we fit nothing
+corpus version and tokenizer, six layers, eight heads, 8,000 steps at batch 24 and the same
+learning-rate schedule, with two training seeds at each width. Width is the only difference. The two
+widths were chosen under the group-88 layout, so the ladder has two points and we fit nothing
 through them. All four models are scored as in Section~\ref{sec:quality}, with the relation
 supplied, on the calculator's decoder with a group size of 16, which divides every row at both
 widths. The shipped layout differs from group 16 by at most 1.7 points on the shipped model.
 
 \begin{table}[t]
-\caption{Width ladder on the calculator's decoder (int8, run on the host), group 16, greedy, the
-relation supplied. Each cell is one training seed; change is between the two-seed means, in
-points. Items per set as in Table~\ref{tab:quality}. Explanation is the format check.}
+\caption{Width ladder on the calculator's decoder (int8, run on the host), group 16, greedy, relation
+supplied. Each cell is one training seed; the change is between the two-seed means, in points. Items
+per set as in Table~\ref{tab:quality}. Explanation is the format check.}
 \label{tab:ladder}
 \centering\small
 \setlength{\tabcolsep}{5pt}
@@ -897,29 +890,29 @@ judge fit & 0.0 & 0.0 & 0.0 & 15.8 & $-7.9$ \\
 \end{tabular}
 \end{table}
 
-\textbf{Declining is unchanged.} Declining when the prompt names a missing value is unaffected by
-the 3.5$\times$ cut: 99.6\% at both widths, and 100\% when no values are given at all
+\textbf{Declining is unchanged.} Declining when the prompt names a missing value is not affected by
+the 3.5$\times$ reduction: 99.6\% at both widths, and 100\% when no values are given at all
 (Table~\ref{tab:ladder}).
 
-\textbf{Numeric answers degrade, in the call.} Being right falls by 18 to 25 points on the three
+\textbf{Numeric answers get worse, in the call.} Being right falls by 18 to 25 points on the three
 answerable sets, from 93.8\% to 74.2\% when every value is given. The loss is in the call. Calls
 built with a wrong value are 1.7\% and 5.0\% of items at width 352 and 32.5\% and 13.3\% at width
-176, while strict restatement failures stay between 8\% and 18\% at both widths. With an extra
-value present both widths do poorly and the gap narrows to 9 points.
+176, while strict restatement failures stay between 8\% and 18\% at both widths. With an extra value
+present both widths do poorly and the gap narrows to 9 points.
 
-\textbf{Explanation format degrades most, and fit fails at both widths.} Passing the explanation
-format check falls from 93.1\% to 58.6\%, the largest drop in the table. Fit is at or near zero
-throughout; the one exception, 15.8\% for the second seed at width 352, is the same seed that scored
-highest on this set under earlier scoring, and we read it as seed variation rather than a
-capability.
+\textbf{Explanation format drops the most, and fit fails at both widths.} Passing the
+explanation format check falls from 93.1\% to 58.6\%, the largest drop in the table. Fit is at or
+near zero throughout; the one exception, 15.8\% for the second seed at width 352, is the same seed
+that scored highest on this set under earlier scoring, and we read it as seed variation rather than
+a capability.
 
 One description consistent with these numbers is that the loss grows with how much the model must
 produce beyond what the prompt already contains: a one-line refusal, a call that copies several
-values, a paragraph of prose. We did not vary that quantity with the task held fixed, so it is a
-description, not a mechanism. The width-176 seeds differ by up to 18 points, and two seeds are not
-a variance estimate; equal optimizer steps do not hold convergence constant either (final losses
-0.963 and 0.952 at width 176, 0.799 and 0.787 at 352). Predictions we registered before training
-named an item set we later found measures declining, scored by a harness we later replaced
+values, a paragraph of text. We did not vary that amount with the task held fixed, so it is a
+description, not a mechanism. The width-176 seeds differ by up to 18 points, and two seeds are not a
+variance estimate; equal optimizer steps do not hold convergence constant either (final losses 0.963
+and 0.952 at width 176, 0.799 and 0.787 at 352). Predictions we registered before training named an
+item set we later found measures declining, scored by a harness we later replaced
 (Section~\ref{sec:harness}), so this experiment is not a test of them.
 
 \end{document}
