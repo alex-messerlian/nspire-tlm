@@ -114,6 +114,7 @@ static unsigned clock_ms_since(uint32_t start) {
 FILE *g_nspire_log = 0;
 extern void  rq_build(const char *path);
 extern int   rq_probe(const char *path, char *why, int cap);
+extern int   rq_fits(const char *path, long *need);
 extern float *rq_forward(int token, int pos);
 extern int   rq_vocab(void);
 extern void  rq_free(void);
@@ -371,6 +372,18 @@ static const char *dpath(const char *leaf) {
     snprintf(buf, sizeof buf, "%s%s", DATA_DIR, leaf);
     return buf;
 }
+
+/* CAN THE MODEL LOAD NOW? rq_fits holds the checkpoint and both KV-cache blocks at once, which is
+ * what build_transformer will ask for. If not, say so in words a student can act on. Turning the
+ * calculator off and on keeps the heap as it is; only the reset button clears what earlier runs
+ * left behind, and Ndless then has to be installed again, which is what ChatTLM Setup does. */
+static int model_room(char *why, int cap) {
+    long need = 0;
+    if (rq_fits(dpath("model4096.bin.tns"), &need)) return 1;
+    snprintf(why, cap, "Not enough free memory: the model needs %ld.%ld MB. Press the reset button "
+             "on the back of the calculator, then open ChatTLM Setup.", need / 1000000, (need / 100000) % 10);
+    return 0;
+}
 /* Returns 1 when a directory holding ALL THREE data files was found.
  *
  * The first version of this probed the STORE ONLY and its comment claimed that probing a file
@@ -598,7 +611,16 @@ void app_request(const char *question, const char *rid) {
         snprintf(msg, sizeof msg, "<a> The model could not be loaded: %s<end>", MODEL_WHY);
         app_stream_token(msg); app_stream_end(); return;
     }
-    if (!MODEL_READY) { rq_build(dpath("model4096.bin.tns")); MODEL_READY = 1; }
+    /* AGAIN AT THE MOMENT OF LOADING, not only at startup: the session's own allocations since then
+     * can have taken the room, and a failure inside rq_build exits without freeing the checkpoint. */
+    if (!MODEL_READY) {
+        if (!model_room(MODEL_WHY, sizeof MODEL_WHY)) {
+            char msg[320];
+            snprintf(msg, sizeof msg, "<a> The model could not be loaded: %s<end>", MODEL_WHY);
+            app_stream_token(msg); app_stream_end(); return;
+        }
+        rq_build(dpath("model4096.bin.tns")); MODEL_READY = 1;
+    }
     static int ids[NS_MAX_TOKENS];
     int n = ns_tok_encode(&TK, prompt, ids, NS_MAX_TOKENS);
     if (n <= 0) { app_stream_token("<a> encode failed<end>"); app_stream_end(); return; }
@@ -745,25 +767,7 @@ int main(void) {
      * A TRIAL ALLOCATION IS THE ONLY HONEST PREDICTOR. Free RAM as reported is not the same
      * question as "can one contiguous block of this size be had", which is what read_checkpoint
      * needs. So ask for exactly what it will ask for, then give it straight back. */
-    if (MODEL_OK) {
-        FILE *mf = fopen(dpath("model4096.bin.tns"), "rb");
-        if (mf) {
-            long msz = 0;
-            if (fseek(mf, 0, SEEK_END) == 0) msz = ftell(mf);
-            fclose(mf);
-            if (msz > 0) {
-                void *trial = malloc((size_t)msz);
-                if (!trial) {
-                    MODEL_OK = 0;
-                    snprintf(MODEL_WHY, sizeof MODEL_WHY,
-                             "Not enough free RAM: the model needs %ld bytes in one block. "
-                             "Restart the calculator and open ChatTLM first.", msz);
-                } else {
-                    free(trial);
-                }
-            }
-        }
-    }
+    if (MODEL_OK && !model_room(MODEL_WHY, sizeof MODEL_WHY)) MODEL_OK = 0;
 
     if (ns_tok_load(&TK, dpath("tok4096.tok.tns")) != NST_OK) {
         die("Tokenizer failed to load.", dpath("tok4096.tok.tns"));

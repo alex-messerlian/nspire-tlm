@@ -410,6 +410,40 @@ long long rq_expected_size(const Config *p, int shared_classifier, int gs) {
  * the Phase 2 bring-up cost five device cycles to silence. Callers that can draw on a screen should
  * probe first and say what is wrong; nothing here allocates, so probing is cheap enough to run at
  * startup rather than on the first send. */
+/* CAN THE HEAP HOLD WHAT build_transformer WILL ASK FOR, RIGHT NOW? The checkpoint in one block,
+ * then malloc_run_state's KV cache as its two blocks (keys, values), all held at once and then given
+ * back. A trial of the checkpoint alone passes on a heap that then fails in malloc_run_state, whose
+ * failure path exit()s WITHOUT freeing the checkpoint -- and Ndless never reclaims the heap of a
+ * program that exits, so one such failure leaks ~11.6 MB and every later launch fails too.
+ * bench_sweep.c found that the SUM binds (A146); the app kept the single-block trial until a
+ * reader hit the cascade on the calculator (2026-09-27). Returns 1 if it fits; *need, when given,
+ * gets the bytes asked for. The smaller run-state buffers (~50 KB) are not included. */
+int rq_fits(const char *path, long *need) {
+    FILE *f = fopen(path, "rb");
+    if (!f) return 0;
+    uint32_t magic = 0; int version = 0; Config c;
+    int ok = fread(&magic, sizeof magic, 1, f) == 1
+          && fread(&version, sizeof version, 1, f) == 1
+          && fread(&c, sizeof c, 1, f) == 1;
+    fseek(f, 0, SEEK_END);
+    long fsz = ftell(f);
+    fclose(f);
+    if (!ok || fsz <= 0 || c.n_heads <= 0 || c.n_layers <= 0 || c.seq_len <= 0) return 0;
+    size_t kv_dim = (size_t)c.dim * c.n_kv_heads / c.n_heads;
+#ifdef KV_INT8
+    size_t half = (size_t)c.n_layers * c.seq_len * kv_dim;                /* int8 keys, or values */
+#else
+    size_t half = (size_t)c.n_layers * c.seq_len * kv_dim * sizeof(float);
+#endif
+    if (need) *need = fsz + 2 * (long)half;
+    void *a = malloc((size_t)fsz);
+    void *b = a ? malloc(half) : NULL;
+    void *d = b ? malloc(half) : NULL;
+    int fits = a && b && d;
+    free(d); free(b); free(a);
+    return fits;
+}
+
 int rq_probe(const char *path, char *why, int cap) {
     FILE *f = fopen(path, "rb");
     if (!f) { snprintf(why, cap, "cannot open %s", path); return 1; }

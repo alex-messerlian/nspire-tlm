@@ -55,7 +55,7 @@ TESTS_EVAL := test_toolrun test_prov
 # legitimate' case -- and was referenced by NO Makefile and NO gate. Its binary sat committed
 # under tools/eval/ with nothing that rebuilt it. WIRING_AUDIT records provenance.c going from
 # 'exists but is never called' to 'called but never verified'; this is the second half.
-TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck test_ansmatch test_pointer
+TESTS_PLAIN:= test_chatstore test_ckpt test_shapecheck test_ansmatch test_pointer test_rqfits
 # STORE SUITES. These four ran as COMMITTED BINARIES that no rule rebuilt, so they could not see a
 # source change: re-adding the pre-opened `<a>` bug to assemble.c and running `make check` gave ALL
 # GATES PASS. run_gates.sh's own header claims `make check` 'BUILDS the host binaries first'; for
@@ -256,6 +256,10 @@ $(BUILD)/tlmui: src/store/tlm_demo.c src/store/ui_host.c src/store/host_stubs.c 
 # the one under test, not a reimplementation of its rules.
 $(BUILD)/test_ckpt: tools/eval/test_ckpt.c src/runq_nspire.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -DFIXED_GS=88 -o $@ $< -lm
+
+# rq_fits holds the checkpoint and both KV-cache blocks at once; tested at its exact boundary.
+$(BUILD)/test_rqfits: tools/eval/test_rqfits.c src/runq_nspire.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -DFIXED_GS=$(GS_SRC) -o $@ $< -lm
 
 # THE FORWARD-PASS GOLDEN. Compiles the same runq_nspire.c the calculator runs, so a claim that a
 # hot-loop change is bit-exact is checkable on the host without a device round-trip. Phase 1 of the

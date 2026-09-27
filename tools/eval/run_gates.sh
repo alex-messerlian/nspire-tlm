@@ -275,7 +275,7 @@ if ! _skip test_ui_errs; then $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && 
 # not TESTS, is what decides whether the suite passed -- a roster kept in two places drifts, and
 # the half nobody reads is the half that silently stops running.
 # test_ckpt exits 2 for CANNOT CHECK, which the loop below already renders distinctly from FAIL.
-for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_shapecheck test_prov test_select test_persist test_palette test_pointer; do
+for b in test_search test_span test_exit test_toolrun test_chatstore test_bubble test_notation test_theme test_ckpt test_rqfits test_shapecheck test_prov test_select test_persist test_palette test_pointer; do
     if [ ! -x "build/$b" ]; then
         # A MISSING binary is a failure, not a skip. "cannot check" and "checked and clean" must
         # never share an exit status.
