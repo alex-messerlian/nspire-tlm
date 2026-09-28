@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
-title: "A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds"
+title: "Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator"
 type: software
 authors:
   - family-names: Messerlian
@@ -17,7 +17,7 @@ keywords:
   - small language models
 preferred-citation:
   type: unpublished
-  title: "A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds"
+  title: "Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator"
   authors:
     - family-names: Messerlian
       given-names: Alexander

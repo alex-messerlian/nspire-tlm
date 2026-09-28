@@ -1,4 +1,4 @@
-% A Tool-Augmented Language Model on a Graphing Calculator -- submission to TMLR.
+% Letting the Tools Do the Math -- submission to TMLR.
 % Build in this folder: tectonic paper.tex
 
 \documentclass[10pt]{article}
@@ -17,6 +17,8 @@
 \usepackage{xurl}
 \usepackage{etoolbox}
 \graphicspath{{figures/}}
+% The preprint prints no running head; drop the rule that would sit empty above it.
+\makeatletter\if@preprint\renewcommand{\headrulewidth}{0pt}\fi\makeatother
 
 % Links as blue text without boxes, as in the author's other paper.
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
@@ -38,7 +40,7 @@
 \newcommand{\Theauthor}{\ifdeanonymized The author\else The authors\fi}
 
 % Explicit breaks: tmlr.sty sets the title justified in \LARGE sans, which hyphenated "Calcula-tor".
-\title{A Tool-Augmented Language Model\\on a Graphing Calculator:\\What It Costs, Where It Fails, and What It Adds}
+\title{Letting the Tools Do the Math:\\A 10.9M-Parameter Language Model\\on a Graphing Calculator}
 
 % Hidden by tmlr.sty in the submission build; printed in [preprint] and [accepted].
 \author{\name Alexander Messerlian \email alex.messerlian@icloud.com\\

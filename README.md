@@ -1,4 +1,4 @@
-# A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds
+# Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator
 
 **Alexander Messerlian** · Independent Researcher, Palo Alto, CA, USA ·
 ORCID [0009-0003-4933-6832](https://orcid.org/0009-0003-4933-6832)
@@ -90,7 +90,7 @@ If you use this work, please cite:
 ```bibtex
 @misc{messerlian2026calculator,
   author = {Alexander Messerlian},
-  title  = {A Tool-Augmented Language Model on a Graphing Calculator: What It Costs, Where It Fails, and What It Adds},
+  title  = {Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator},
   year   = {2026},
   note   = {Manuscript under review}
 }
