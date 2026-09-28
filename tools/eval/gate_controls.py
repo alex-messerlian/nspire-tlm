@@ -360,7 +360,7 @@ def run_gate(name):
     # it refuses everyone else, which is the point. See the guard at the top of that script.
     # RUN ONLY THE GATE UNDER TEST. This ran the WHOLE suite once per control -- 56 times -- and
     # the meta-gate took 26 minutes. I cut the wait short twice, and the second time a mutation was
-    # still live when I committed: 0585c95 shipped the A6 revert with ALL GATES PASS printed just
+    # still live when I committed: 7d9e88c shipped the A6 revert with ALL GATES PASS printed just
     # above it, truthfully, about a different version of the file. The cost caused the defect.
     _env = dict(os.environ, TLM_CONTROLS_OWNER=str(os.getpid()),
                 GATE_ONLY=ALIAS.get(name, name))

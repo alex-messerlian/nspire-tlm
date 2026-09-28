@@ -4,7 +4,7 @@
 THE INVARIANT, from gen_items.py's own docstring: "every call is executed through evalcli and the
 reference answer is whatever the evaluator returns. No expected answer is typed by hand, so none can
 be wrong." That guarantee held only while the file was GENERATED. It stopped holding the moment
-anyone edited items.json by hand -- and commit 25393cc did exactly that, rewriting `q`, `record` and
+anyone edited items.json by hand -- and commit 70bb3bf did exactly that, rewriting `q`, `record` and
 `calls` on 16 items to settle three spelling decisions, without re-executing. `ref` is a DERIVED
 field, so it went stale silently.
 

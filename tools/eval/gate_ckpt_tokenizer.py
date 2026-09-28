@@ -19,7 +19,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 QUARANTINE = {
     "baseline_retrain1_55a58d4d.pt": "train/tok4096_retrain1.json",
     "baseline_run2_eca039cd.pt":     "UNKNOWN -- pre-A42 run; recover from git if it is ever re-scored",
-    **{f"{p}.pt": "UNKNOWN -- the 2026-08-26 batch; git 713827e's tokenizer decodes sel_s2 correctly"
+    **{f"{p}.pt": "UNKNOWN -- the 2026-08-26 batch; git 27749e5's tokenizer decodes sel_s2 correctly"
        for p in ("sel_s2", "sel_s3", "sel_s4", "sel_s5", "sel_s6", "sel_s7", "sel_s8", "sel_s99",
                  "ship_s1", "ship_s2", "ship_s3", "pop_s1", "pop_s2", "pop_s3", "refusal_s1", "l0")},
     **{f"cap_{n}.pt": "UNKNOWN -- the 2026-08-26 capability curve; internally consistent, do not mix"

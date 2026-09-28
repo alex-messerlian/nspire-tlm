@@ -9,8 +9,8 @@ from the same producers the evaluation arms come from -- tools/eval/answer_contr
 given, symbol asked) and tools/eval/worded_control.py (named in words; symbol only) -- with seeds
 no arm uses, and scores three versions of the app's selection on them:
 
-    A155  word coverage only                   src/store/askparse.c at b1f4603
-    A156  + the givens bind one relation       src/store/askparse.c at e9fbd64
+    A155  word coverage only                   src/store/askparse.c at c241530
+    A156  + the givens bind one relation       src/store/askparse.c at dbeda44
     A157  + the asked symbol breaks a tie      the working tree
 
 Each version is the SAME tools/eval/autoasm.c (app.c's open_picker, not a copy) linked against that
@@ -32,7 +32,7 @@ import score_endtoend as E                                    # noqa: E402
 
 SEEDS = {"values given, symbol asked": ("answer", 1011), "named in words": ("worded", 1017),
          "symbol only": ("symbol", 2017), "one irrelevant value": ("spare", 1013)}
-REVS = {"A155": "b1f4603", "A156": "e9fbd64", "A157": None}
+REVS = {"A155": "c241530", "A156": "dbeda44", "A157": None}
 N = 300
 HOST_LINK = ["src/store/gfx.c", "src/store/chatstore.c", "src/store/pickui.c", "src/store/picker.c",
              "src/store/assemble.c", "src/store/loader.c", "build/hoststub.o"]

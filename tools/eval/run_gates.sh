@@ -36,7 +36,7 @@ set -u
 # RUN ONE GATE. gate_controls.py runs this suite ONCE PER CONTROL -- 56 of them -- so the whole
 # suite ran 56 times and the meta-gate passed 26 minutes. That is not a performance note: I twice
 # cut the wait short, and on the second occasion a control's mutation was still live when I
-# committed, so commit 0585c95 shipped the A6 revert with ALL GATES PASS printed just above it.
+# committed, so commit 7d9e88c shipped the A6 revert with ALL GATES PASS printed just above it.
 # Cost is a correctness property (the project log); this makes the meta-gate affordable enough to wait for.
 #
 # GATE_ONLY names one gate; everything else is skipped. Unset, the suite behaves exactly as before.
@@ -149,7 +149,7 @@ if ! _skip event_producers; then $PY tools/eval/gate_event_producers.py >/dev/nu
 # Found by reading one generated question; every other gate passed those documents.
 # A3+A4: a derived figure must still match the artefact it came from. chars/token was written
 # as 3.5, corrected to 2.69 in prose in another document, and both were stale at 2.901.
-# items.json ref is DERIVED by executing calls. Commit 25393cc edited q/record/calls by hand
+# items.json ref is DERIVED by executing calls. Commit 70bb3bf edited q/record/calls by hand
 # to settle three spelling decisions and ref went stale on 7 items -- two of which a correct
 # model could then not pass.
 if ! _skip items_refs; then $PY tools/eval/gate_items_refs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "items_refs" || { printf "  %-20s FAIL\n" "items_refs"; fail=1; }; fi

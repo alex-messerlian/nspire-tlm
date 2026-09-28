@@ -2,7 +2,7 @@
 """PERMANENT GATE: no negative-control mutation may be present in the tree.
 
 TWICE NOW A MUTATED FILE HAS BEEN COMMITTED. First `tools/eval/genloop.py` with the <res> ban
-deleted; then `corpus/generate.py` in commit 0585c95 with A6 reverted -- `rng.choice(ASK_ALL)`,
+deleted; then `corpus/generate.py` in commit 7d9e88c with A6 reverted -- `rng.choice(ASK_ALL)`,
 which restores all 44 mined ASK frames including the 36 sentence fragments, and with them the 22.5%
 wrong-quantity defect and a 63% ill-posed rate.
 

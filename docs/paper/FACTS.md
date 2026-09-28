@@ -194,7 +194,7 @@ and one correct rounding (16667.89 as "16670", trailing zero counted as signific
 `answer_0` errors on the shipped engine (4 of 120): all 4 are calls with a value mis-copied (2430 ->
 243.0, 272 -> 263.0). `answer_x`: 42 of 120 not right, 35.0% of items a wrong call.
 
-**The group-88 defect is fixed** (A153, commit `56826db`): `quantize`/`matmul` skipped the remainder
+**The group-88 defect is fixed** (A153, commit `bca7c56`): `quantize`/`matmul` skipped the remainder
 of every row whose length the group did not divide -- the FFN down-projection, hidden 1024, 56 inputs
 ignored per layer. The hidden width is padded with zeros to 1,056 = 12 x 88. Held by `rq_probe`'s
 row check (A151, refuses a file whose group does not divide a row) and `test_ckpt`'s rowalign case.
@@ -410,7 +410,7 @@ The app's theme follows the clock (dark 18:00-06:00), which is why the video, fi
 
 ## 12. Open before submission
 
-0. ~~Fix the row-alignment defect?~~ DONE: A153 (commit `56826db`), hidden padded to 1,056; test_ckpt
+0. ~~Fix the row-alignment defect?~~ DONE: A153 (commit `bca7c56`), hidden padded to 1,056; test_ckpt
    rowalign + rq_probe's row check.
 1. ~~Photographs (4 shots planned).~~ DONE 2026-09-27: one video, three frames of it in Appendix B (section 11b).
 2. arXiv endorsement -- required since 21 Jan 2026 even with institutional email.
