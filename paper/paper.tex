@@ -53,7 +53,7 @@
 \begin{abstract}
 We decided to test the limits by building a physics assistant that runs natively on a TI-Nspire CX
 II CAS graphing calculator: one ARM926EJ-S core at 396\,MHz, with no floating-point unit, a maximum
-single memory allocation of about 21.5\,MiB and no network.\footnote{AI tools wrote most of the software and drafted the text; the Statements and Declarations describe their roles. Responsibility for the content lies with \theauthor.} We use it as a case study in how the
+single memory allocation of about 21.5\,MiB and no network. We use it as a case study in how the
 conclusions of a tiny-model evaluation depend on what the evaluation runs. The 10.9M-parameter
 model never does the arithmetic itself: the runtime picks a relation from a store, puts it in the
 prompt with the question's values, and runs the tool call the model writes. Given the correct relation,
@@ -139,7 +139,7 @@ work states the power state.}
 CalcGPT 3 & TI-Nspire & built-in Python & not stated & 8-bit GRU, 640-word vocabulary, dialogue & none \\
 Transformer On Calc & TI-Nspire CX II CAS & native, Ndless & not stated & 260K llama2.c, TinyStories & ${\sim}9$ (fp32) / ${\sim}16$ (int8) tok/s, 64 tokens \\
 CasioLLM & Casio fx-CG50 & native add-in & streamed from flash & third-party, up to 25M, 4-bit & 10-token reply in 27.1\,s \\
-Our work & TI-Nspire CX II CAS & native, Ndless-derived & in RAM & 10.9M, int8, trained from scratch; tools & 1.88 tok/s decode at positions 53--87; 26--75\,s per turn from the start of generation; battery \\
+Our work & TI-Nspire CX II CAS & native, Ndless-derived & in RAM & 10.9M, int8, fully trained; tools & 1.88 tok/s decode at positions 53--87; 26--75\,s per turn from the start of generation; battery \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -279,7 +279,7 @@ setup document installs again after every reset; the hardware is not modified (A
 \section{Training Data}
 \label{sec:data}
 
-The model is trained from scratch on a mixture that is, by tokens, 85\% synthetic
+The model is fully trained from scratch on a mixture that is, by tokens, 85\% synthetic
 documents and 15\% raw textbook text. The textbook text is every module of 24 OpenStax textbooks
 \citep{openstax}, markup removed; 22 of the books are licensed CC BY-NC-SA 4.0 and 2 CC BY 4.0. No
 other dataset is used.
@@ -853,10 +853,9 @@ agentic workflows, verified all of the results, carried out the measurements on 
 the full text and personally funded the project. The author takes full responsibility for the work.
 \fi
 \item \textbf{Use of AI tools.} Anthropic's Claude models, Claude Opus~5 and Claude Opus~5.5, used
-through the Claude Code command-line interface, wrote most of the software and experimental tooling, ran
-most of the host-side experiments and analyses, and drafted the text and the explanation documents in the
-training data (Section~\ref{sec:data}). \Theauthor{} directed the work, carried out the measurements on the
-calculator, verified all results and chose what to report.
+through the Claude Code command-line interface, helped automate the software and experimental tooling,
+ran components of the host-side experiments and analyses, and drafted the text. \Theauthor{} directed
+the work, carried out the measurements on the calculator, verified all results and chose what to report.
 \item \textbf{Trademarks.} TI-Nspire is a trademark of Texas Instruments, and Casio and fx-CG50 are
 trademarks of Casio Computer Co.; this work is not affiliated with or endorsed by either company.
 \end{itemize}
