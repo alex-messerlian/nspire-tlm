@@ -221,7 +221,7 @@ def main() -> int:
 
     # 5b. EACH PHOTOGRAPH IS A FRAME OF THE AUTHOR'S RECORDING, UNRETOUCHED: the JPEG in figures/ must
     # be the one make_media.py records, and when the recording is here (it is not in git), cutting it
-    # again must give the same bytes. The AI-regenerated stills in media/ can never pass this.
+    # again must give the same bytes. An AI-regenerated still can never pass this.
     spec = importlib.util.spec_from_file_location("make_media", MAKE_MEDIA)
     mm = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mm)

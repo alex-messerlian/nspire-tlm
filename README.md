@@ -8,20 +8,21 @@ ORCID [0009-0003-4933-6832](https://orcid.org/0009-0003-4933-6832)
 
 ## Abstract
 
-We built a physics assistant that runs entirely on a TI-Nspire CX II CAS graphing calculator: one ARM926EJ-S core at
-396 MHz, no floating-point unit, a largest single memory allocation of about 21.5 MiB and no network. We use it as a
-case study in how the conclusions of a small-model evaluation depend on what the evaluation runs. The 10.9M-parameter
-model never computes: the runtime picks a relation from a store, puts it in the prompt with the question's values, and
-runs the tool call the model writes. Given the right relation, the model is right on 96.7% of problems that give every
-value; its errors are digits copied wrongly, and an irrelevant value placed before the relevant ones lowers its score
-from 116 to 61 of 120, a pattern consistent with the training generator's habit of adding irrelevant values last. End
-to end, on generated problems, choosing the relation was at first the main limit: the system answered 21 of the same
-120 problems correctly and declined most of the rest. Two selection rules that use the values the question assigns
-raise this to 93 (and to 248 of 300 fresh problems from the same generators), while wrong answers rise from 2 to 4. A
-rule-based path through the same runtime with no model is right more often and wrong less often on every set that asks
-for a number; the model declines more reliably. Differences between our harness and the calculator moved strict
-accuracy by 9 to 21 points and exposed an engine defect that a host–calculator comparison could not detect. A per-
-token cost model fitted on battery predicts a decode run within 0.4%.
+We decided to test the limits by building a physics assistant that runs natively on a TI-Nspire CX II CAS graphing
+calculator: one ARM926EJ-S core at 396 MHz, with no floating-point unit, a maximum single memory allocation of about
+21.5 MiB and no network. We use it as a case study in how the conclusions of a tiny-model evaluation depend on what
+the evaluation runs. The 10.9M-parameter model never does the arithmetic itself: the runtime picks a relation from a
+store, puts it in the prompt with the question's values, and runs the tool call the model writes. Given the correct
+relation, the model is correct on 96.7% of problems that provide every value; its errors stem from incorrectly copied
+digits, and an irrelevant value placed before the relevant ones lowers its score from 116 to 61 of 120, a pattern
+consistent with the training generator's habit of adding irrelevant values last. End to end, on generated problems,
+choosing the relation was initially the main limit: the system answered 21 of the same 120 problems correctly and
+declined most of the rest. Two selection rules that use the values the question assigns raise this to 93 (and to 248
+of 300 fresh problems from the same generators), while incorrect answers rise from 2 to 4. A rule-based path through
+the same runtime with no model is correct more often and incorrect less often on every set that asks for a number; the
+model declines more reliably. Differences between our harness and the calculator moved strict accuracy by 9 to 21
+points and exposed an engine defect that a host–calculator comparison could not detect. A per-token cost model fitted
+on battery predicts a decode run within 0.4%.
 
 ## On the calculator
 

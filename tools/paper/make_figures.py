@@ -287,7 +287,7 @@ def fig_memory(sw: dict) -> str:
 
 
 def fig_ladder(ld: dict) -> str:
-    arms = [("d1", "decline:\nvalue missing"), ("compute", "numeric\nanswer right"),
+    arms = [("d1", "decline:\nvalue missing"), ("compute", "numeric\nanswer correct"),
             ("explain", "explanation\nformat"), ("fit", "judge\nfit")]
     widths = sorted(ld)
     fig, ax = plt.subplots(figsize=(COL_W, 2.0))

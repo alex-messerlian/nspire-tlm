@@ -16,7 +16,7 @@ Compiled 2026-09-22.
 | hidden_dim | 1024 (8/3 rule, rounded to multiple of 256) |
 | context | 512 |
 | vocabulary | 4,096 |
-| **parameters** | **10,903,552** |
+| **parameters** | **10,903,552** in the weight matrices (embedding shared with the classifier, counted once); **10,908,128** including the 4,576 RMSNorm weights (13 norms x 352). Both are 10.9M. Counted from `train/ship.pt` on 2026-09-28 |
 | quantisation | int8 Q8_0, **group 88**, shared classifier; hidden **padded 1,024 -> 1,056 with zeros** in the file (A153) so 88 divides every row |
 | **checkpoint size** | **11,629,696 B = 11.09 MiB** (the defective unpadded file was 11,417,728 B) |
 | training | 8,000 steps, seed 1, BS 24, LR 3e-4, seq 512 |
@@ -286,6 +286,8 @@ Readings, each checked on the items:
   only when the student's symbols are the store's -- A157's 95.8% on symbol-only questions is what a
   student gets who types the store's symbol for the thing asked. On 200 textbook questions (DEV)
   neither fires, because textbooks state values in prose.
+
+**No-model path on the two decline sets (paper s7):** behind the A157 selector, `build/autoasm` chose a glossary term on **12 of the 222** items (3 of 120 value-withheld, 9 of 102 no-values) and a relation on 66; the no-model path's 13 answers there are those 12 definitions plus the I = P/(4 pi r^2) item both paths answer. Recounted 2026-09-28 from `corpus/split_d1.json` and `corpus/split_d1_zero.json`; the paper had said 13.
 
 ## 9. Width ladder -- corrected 2026-09-25, on the calculator's decoder at group 16
 
