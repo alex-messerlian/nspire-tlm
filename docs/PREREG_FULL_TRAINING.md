@@ -48,3 +48,10 @@ both totals ships, and one fewer decline blocks it.
 - *Better on answer accuracy*: correct answers summed over the four answerable sets, strictly more
   in both totals, with the relation supplied (480 items) and end to end with the shipped selector
   (480 development plus 1,200 fresh items).
+
+**Correction (2026-09-28).** The training file holds **41,578,062** tokens, not the 41,361,954 given
+under Configuration, which has no source in the repository: `train/mix4096_train.bin` is 83,156,124
+bytes of uint16, and replaying `train/prepare.py`'s selection on this corpus reproduces it exactly
+(35,694,988 synthetic tokens from 316,220 documents, plus 6,303,055 textbook tokens from 1,850 of
+the 2,987 modules, 15.0% of the mixture; 1% held out, 419,981 tokens). The budget is therefore about
+**5.2** passes over the training tokens, not 5.3. Nothing else in the run depends on the figure.
