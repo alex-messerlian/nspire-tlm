@@ -55,3 +55,42 @@ bytes of uint16, and replaying `train/prepare.py`'s selection on this corpus rep
 (35,694,988 synthetic tokens from 316,220 documents, plus 6,303,055 textbook tokens from 1,850 of
 the 2,987 modules, 15.0% of the mixture; 1% held out, 419,981 tokens). The budget is therefore about
 **5.2** passes over the training tokens, not 5.3. Nothing else in the run depends on the figure.
+
+## Outcome (2026-09-28, 02:45 PDT): the rule is NOT met
+
+The run finished normally: 17,750 steps in 156 minutes, `train/full_d352.pt` (`corpus_sha
+acdc7b70cef192b7`, `tok_sha c60e1250c64df27e`, 10,908,128 parameters). Mean training loss over the
+last full 500-step window **0.6969**; held-out loss (all 820 windows of `train/mix4096_val.bin`)
+**0.7129** at the end, 0.7218 / 0.7183 / 0.7150 / 0.7141 / 0.7120 at steps 13,000 to 17,000.
+
+**The curve rule (informational).** Held-out loss fell from 0.7218 at step 13,000 to 0.7120 at
+17,000, 0.0098, more than any change between consecutive measurements (0.0009 to 0.0035), so by
+rule 1 a longer run is justified. It was flat over the final 750 steps (+0.0009), where the cosine
+schedule ends.
+
+**The ship rule**, applied by `tools/eval/compare_full_training.py` (full output in
+`results/compare_full_training.txt`):
+
+| | 8,000 steps (shipped) | 17,750 steps |
+|---|---|---|
+| declines, relation supplied: value withheld / no values / does not apply | 120 / 102 / 0 | **118 / 98** / 4 |
+| declines, end to end: value withheld / no values / does not apply / out of scope | 119 / 102 / 119 / 1,982 | **118** / 102 / **118** / **1,980** |
+| correct answers, relation supplied (480 items) | 426 | **436** |
+| correct answers, end to end (1,680 items) | 1,062 | **1,074** |
+
+Five of the seven decline measures are worse, by one to four items, so **by the rule fixed above the
+8,000-step model stays**. The answer side passes both totals; strict accuracy rises from 385 to 427 of
+the 480 answerable items, and incorrect answers end to end fall from 15 to 12 (development) and from
+42 to 34 (fresh).
+
+**What the six new failures are** (relation supplied; the 8,000-step model declined all six): three
+tool calls that should not exist (an `integ` of a made-up expression using `d_i = 2.3` as the spring
+constant; an `integ` and a `solve` over Planck's constant) and three explanations of the relation in
+place of a refusal. The four from the no-values set each give only a physical constant (Planck's
+`h` three times, `R` once). Its four new declines on the relation-does-not-apply set are correct
+refusals.
+
+**The decision is the author's.** The author asked for a fully trained model and wrote "fully
+trained" into the paper before this result existed. Keeping the rule's outcome means that wording
+changes; shipping the 17,750-step model means overriding the rule stated here, which must then be
+reported with this table.

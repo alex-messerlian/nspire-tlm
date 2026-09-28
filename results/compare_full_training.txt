@@ -1,0 +1,70 @@
+shipped (train/ship.pt, 8,000 steps)  vs  full_d352
+
+RELATION SUPPLIED (Table 4): items passed
+  values given                        116 ->  115 / 120   strict 107 -> 113
+  named by symbol                     117 ->  117 / 120   strict 108 -> 115
+  named in words                      115 ->  119 / 120   strict 101 -> 116
+  irrelevant value added               78 ->   85 / 120   strict  69 ->  83
+  decline: value withheld             120 ->  118 / 120
+  decline: no values                  102 ->   98 / 102
+  decline: relation does not apply      0 ->    4 / 120
+  explain (format)                     81 ->   81 / 87
+
+END TO END, correct / incorrect / declined (decline sets: declined / answered)
+  selector A155
+    values given                       21 /   2 /  97  ->    20 /   3 /  97   (n=120)
+    named by symbol                     0 /   0 / 120  ->     0 /   0 / 120   (n=120)
+    named in words                     32 /   2 /  86  ->    34 /   0 /  86   (n=120)
+    irrelevant value added              9 /   4 / 107  ->    11 /   2 / 107   (n=120)
+    decline: value withheld           120 /   0  ->   119 /   1   (n=120)
+    decline: no values                102 /   0  ->   102 /   0   (n=102)
+    explain (format)                   37 /   3 /  47  ->    37 /   3 /  47   (n=87)
+    decline: out of scope            1982 /  18  ->  1980 /  20   (n=2000)
+  selector A156
+    values given                       59 /   4 /  57  ->    58 /   5 /  57   (n=120)
+    named by symbol                    27 /   1 /  92  ->    27 /   1 /  92   (n=120)
+    named in words                     89 /   4 /  27  ->    92 /   1 /  27   (n=120)
+    irrelevant value added              9 /   4 / 107  ->    11 /   2 / 107   (n=120)
+    decline: value withheld           119 /   1  ->   118 /   2   (n=120)
+    decline: no values                102 /   0  ->   102 /   0   (n=102)
+    explain (format)                   37 /   3 /  47  ->    37 /   3 /  47   (n=87)
+    decline: out of scope            1982 /  18  ->  1980 /  20   (n=2000)
+  selector A157
+    values given                       93 /   4 /  23  ->    91 /   6 /  23   (n=120)
+    named by symbol                   115 /   3 /   2  ->   115 /   3 /   2   (n=120)
+    named in words                     89 /   4 /  27  ->    92 /   1 /  27   (n=120)
+    irrelevant value added              9 /   4 / 107  ->    11 /   2 / 107   (n=120)
+    decline: value withheld           119 /   1  ->   118 /   2   (n=120)
+    decline: no values                102 /   0  ->   102 /   0   (n=102)
+    explain (format)                   37 /   3 /  47  ->    37 /   3 /  47   (n=87)
+    decline: relation does not apply  119 /   1  ->   118 /   2   (n=120)
+    decline: out of scope            1982 /  18  ->  1980 /  20   (n=2000)
+  fresh sets (300 each)
+    values given, symbol asked   A155   48/ 2/250  ->   48/ 2/250
+    values given, symbol asked   A156  153/ 5/142  ->  155/ 3/142
+    values given, symbol asked   A157  248/ 5/ 47  ->  251/ 3/ 46
+    named in words               A155   63/ 4/233  ->   64/ 3/233
+    named in words               A156  200/ 9/ 91  ->  204/ 5/ 91
+    named in words               A157  200/ 9/ 91  ->  204/ 5/ 91
+    symbol only                  A155    2/ 3/295  ->    2/ 5/293
+    symbol only                  A156   79/ 6/215  ->   81/ 6/213
+    symbol only                  A157  285/10/  5  ->  286/ 9/  5
+    one irrelevant value         A155   23/18/259  ->   24/17/259
+    one irrelevant value         A156   23/18/259  ->   24/17/259
+    one irrelevant value         A157   23/18/259  ->   24/17/259
+    fit (negative, development set) A155  chose the inapplicable relation 0 -> 0
+    fit (negative, development set) A156  chose the inapplicable relation 0 -> 0
+    fit (negative, development set) A157  chose the inapplicable relation 0 -> 0
+
+DECISION (docs/PREREG_FULL_TRAINING.md)
+  FAIL  supplied  decline: value withheld            120 -> 118
+  FAIL  supplied  decline: no values                 102 -> 98
+  pass  supplied  decline: relation does not apply   0 -> 4
+  FAIL  end to end decline: value withheld           119 -> 118
+  pass  end to end decline: no values                102 -> 102
+  FAIL  end to end decline: relation does not apply  119 -> 118
+  FAIL  end to end decline: out of scope             1982 -> 1980
+  pass  supplied, correct answers over 480 items: 426 -> 436
+  pass  end to end, correct answers over 1,680 items: 1062 -> 1074
+
+  => DOES NOT SHIP: the shipped model stays

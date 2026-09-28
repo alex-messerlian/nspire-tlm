@@ -51,7 +51,7 @@ checkpoint paired with the wrong one scores ~0 rather than erroring. Between two
 
 | | |
 |---|---|
-| documents | 316,219 |
+| documents | **316,220** (`wc -l` says 316,219: the file's last line has no newline; `train/corpus_check.py` parses 316,220) |
 | compute documents | 239,750 (bands are checked against this, not the total) |
 | store records (shipped) | **177** after cleaning |
 | retrieval candidates incl. knowledge tier | 1,619 |
@@ -288,6 +288,55 @@ Readings, each checked on the items:
   neither fires, because textbooks state values in prose.
 
 **No-model path on the two decline sets (paper s7):** behind the A157 selector, `build/autoasm` chose a glossary term on **12 of the 222** items (3 of 120 value-withheld, 9 of 102 no-values) and a relation on 66; the no-model path's 13 answers there are those 12 definitions plus the I = P/(4 pi r^2) item both paths answer. Recounted 2026-09-28 from `corpus/split_d1.json` and `corpus/split_d1_zero.json`; the paper had said 13.
+
+## 8c. The full-length run (17,750 steps) -- scored, and NOT shipped by the pre-registered rule
+
+`docs/PREREG_FULL_TRAINING.md` (fixed before the run) and its Outcome section. `train/full_d352.pt`:
+the shipped configuration and seed on the current corpus (`corpus_sha acdc7b70cef192b7`, `tok_sha
+c60e1250c64df27e`), 17,750 steps at batch 24 x 512 = **218.1M tokens, 20.0 per parameter**, about
+5.2 passes over the 41,578,062 training tokens; 156 min on the laptop GPU. Training loss (last full
+500-step window) **0.6969**; held-out loss **0.7129** (820 windows), 0.7120 at step 17,000. Int8 file
+`build/int8/full_d352_g88.bin`, 11,629,696 B, same layout as the shipped one.
+
+Relation supplied, calculator's decoder (s8 definitions), 8,000-step -> 17,750-step:
+
+| item set | device check | strict |
+|---|---|---|
+| values given | 116 -> 115 | 107 -> **113** |
+| named by symbol | 117 -> 117 | 108 -> 115 |
+| named in words | 115 -> **119** | 101 -> 116 |
+| irrelevant value added | 78 -> **85** | 69 -> 83 |
+| decline: value withheld | 120 -> **118** | |
+| decline: no values | 102 -> **98** | |
+| decline: relation does not apply | 0 -> 4 | |
+| explain (format) | 81 -> 81 | |
+
+End to end, shipped selector (A157), correct / incorrect / declined: values given 93/4/23 -> 91/6/23;
+symbol 115/3/2 -> 115/3/2; words 89/4/27 -> 92/1/27; irrelevant value 9/4/107 -> 11/2/107; explain
+37/3/47 unchanged; declines withheld 119 -> 118, no values 102 -> 102, does not apply 119 -> 118, out of
+scope 1,982 -> 1,980. Fresh (A157): 248/5/47 -> 251/3/46, words 200/9/91 -> 204/5/91, symbol 285/10/5
+-> 286/9/5, irrelevant 23/18/259 -> 24/17/259. Incorrect answers end to end 15 -> 12 (development),
+42 -> 34 (fresh).
+
+Other read-outs, 8,000-step -> 17,750-step: paired distractor base 116 -> 115, last 113 -> 113, FIRST
+61 -> 60 (distractor value in the call in 43 of 59 -> 36 of 60 failures); reversing the values, of 91
+before -> after, 87 -> 87 (8,000 steps) and 86 -> 87 (17,750); `answer_x` by position first 24/47 -> 28/47, middle 13/32 -> 16/32, last 41/41 -> 41/41;
+declines naming only the missing variable 103/120 -> 107/118; group 16 against group 88 at most 1.7
+-> at most 0.8 points; fp32 greedy strict on values given 94.2%, the same as int8 (113/120).
+
+The six missing-value items it no longer declines: an `integ` of a made-up expression (`d_i = 2.3`
+used as the spring constant), an `integ` and a `solve` over Planck's constant, and three explanations
+in place of a refusal; the four from the no-values set each give only a physical constant (`h` three
+times, `R` once). Sources:
+`results/{correct,arms}_int8_g88p_full_d352.json`, `results/endtoend_g88p_full_d352_a15{5,6,7}.json`,
+`results/selection_holdout_full_d352.json`, `results/paired_{distractor,reorder}_g88p_full_d352.json`,
+`results/spare_position_g88p_full_d352.txt`, `results/refusal_names_g88p_full_d352.txt`,
+`results/{correct,arms}_int8_g16_full_d352.json`, `results/correct_fp32_greedy_device_full_d352.json`,
+`results/compare_full_training.txt`.
+
+**Decision:** five of seven decline measures are worse, so by the rule the 8,000-step model stays.
+Whether to ship the full-length model anyway is the author's decision (the paper says "fully
+trained"); until then every other section of this sheet describes the 8,000-step model.
 
 ## 9. Width ladder -- corrected 2026-09-25, on the calculator's decoder at group 16
 
