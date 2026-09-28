@@ -1,4 +1,4 @@
-/* bench_mem.c — fills HARDWARE.md rows B1-B7 and A7-A8.
+/* bench_mem.c: fills HARDWARE.md rows B1-B7 and A7-A8.
  *
  * These are the numbers the entire project rests on. B1 (largest malloc) sets the hard ceiling on
  * model size; B4 (streaming read bandwidth) sets the memory-bound throughput ceiling.
@@ -10,7 +10,7 @@
 /* ---- B1/B2/B3: how much memory can an Ndless application actually get? ---------------------- */
 
 /* B1: binary search for the largest single malloc that succeeds.
- * malloc succeeding is not the same as the memory being usable — the OS may overcommit — so we
+ * malloc succeeding is not the same as the memory being usable -- the OS may overcommit -- so we
  * touch one byte per 4 KB page before declaring victory. */
 static uint32_t probe_largest_malloc(void) {
     uint32_t lo = 0, hi = 64u * 1024u * 1024u;   /* upper bound: total physical RAM */

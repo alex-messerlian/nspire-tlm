@@ -68,7 +68,7 @@ def main():
 
     na = [(r["name"], v) for r, v in V if any(ord(c) > 127 for c in v)]
     ck(not na, f"every variant is pure ASCII ({len(na)} violations)", str(na[:2]))
-    em = [(r["name"], v) for r, v in V if "—" in v or "–" in v or " -- " in v]
+    em = [(r["name"], v) for r, v in V if "\u2014" in v or "\u2013" in v or " -- " in v]
     ck(not em, f"no em dash, en dash or ' -- ' ({len(em)})", str(em[:2]))
 
     # SYMBOLS: a subscripted symbol must be declared by the record it explains.

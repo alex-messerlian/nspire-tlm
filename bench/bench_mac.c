@@ -1,4 +1,4 @@
-/* bench_mac.c — fills HARDWARE.md rows B10-B12.
+/* bench_mac.c: fills HARDWARE.md rows B10-B12.
  *
  * This benchmark exists to settle the project's central disagreement. The brief asserts the device
  * is memory-bandwidth bound. ARM926EJ-S is a single-issue, no-SIMD core that retires at most one

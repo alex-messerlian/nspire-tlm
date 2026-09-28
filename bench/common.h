@@ -1,4 +1,4 @@
-/* common.h — shared measurement infrastructure for Phase 0 micro-benchmarks.
+/* common.h: shared measurement infrastructure for Phase 0 micro-benchmarks.
  *
  * NOT YET COMPILED. Written before the toolchain exists; expect breakage on first build.
  *
@@ -25,13 +25,13 @@
 
 /* ---- Memory map (Hackspire, CX II). See docs/HARDWARE.md section A. ------------------------- */
 #define ADDR_SDRAM_BASE     0x10000000u  /* 64 MB LPDDR                                          */
-#define ADDR_SRAM_BASE      0xA4000000u  /* 256 KB internal SRAM — usability UNMEASURED (B7)      */
+#define ADDR_SRAM_BASE      0xA4000000u  /* 256 KB internal SRAM -- usability UNMEASURED (B7)      */
 #define ADDR_SRAM_SIZE      (256u * 1024u)
 
 /* ---- SP804 timers -------------------------------------------------------------------------- */
 #define TIMER_FAST_BASE     0x90010000u  /* APB clock, ~99 MHz default                            */
 #define TIMER_12M_BASE      0x900C0000u  /* 12 MHz default                                        */
-#define TIMER_32K_BASE      0x900D0000u  /* 32.768 kHz default — our independent cross-check      */
+#define TIMER_32K_BASE      0x900D0000u  /* 32.768 kHz default -- our independent cross-check      */
 
 #define SP804_LOAD          0x00u
 #define SP804_VALUE         0x04u        /* counts DOWN                                           */
@@ -73,7 +73,7 @@ static inline uint32_t timer_raw(uint32_t base) {
 }
 
 /* Acquire a timer for free-running 32-bit use.
- * If it is ALREADY enabled in free-running 32-bit mode we leave it alone and just read it — that is
+ * If it is ALREADY enabled in free-running 32-bit mode we leave it alone and just read it -- that is
  * almost certainly the OS's own timebase and stopping it would be rude and probably fatal. */
 static inline void timer_acquire(bench_timer_t *t, uint32_t base) {
     t->base            = base;
@@ -132,7 +132,7 @@ static inline uint32_t ahb_clock_hz(void) {
     return hz;
 }
 
-/* Heuristic only — the log records the raw Hz too, so this never hides anything. */
+/* Heuristic only -- the log records the raw Hz too, so this never hides anything. */
 /* The number that matters for compute. */
 static inline uint32_t cpu_clock_hz(void) { return ahb_clock_hz() * 2u; }
 

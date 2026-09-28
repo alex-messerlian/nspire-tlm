@@ -9,7 +9,7 @@ cheap edit. That is deliberate.
 
 ### Changelog
 
-**v1.2.0** — **breaking for expression syntax, not for the wire format.** Amended before any data
+**v1.2.0** -- **breaking for expression syntax, not for the wire format.** Amended before any data
 generation, so no migration was required.
 
 - **§3.2 replaced: units resolve ONLY in `conv`. Everywhere else every identifier is a symbol.**
@@ -22,12 +22,12 @@ generation, so no migration was required.
   | `evalat(0.5*m*v^2, v, 20)` | `200 m` | `m`→metres |
   | `evalat(v*t, v, 10)` | `10000 kg` | `t`→tonnes |
 
-  Colliding: `m g h t s T A V C F N K J W L`. Confident, well-formatted, physically meaningless —
+  Colliding: `m g h t s T A V C F N K J W L`. Confident, well-formatted, physically meaningless --
   the exact failure this architecture exists to prevent, in the component it depends on.
 
   A generator lint was rejected: it constrains one producer, and there are several (the generator,
   retrieval records, hand-written tests, a student at the keypad). The interface constrains all of
-  them. It is also a rule a 10M model can actually learn — *"units live in `conv`"* — rather than a
+  them. It is also a rule a 10M model can actually learn -- *"units live in `conv`"* -- rather than a
   12-symbol collision list. And it makes the interface **more** uniform, not less: `solve`, `diff`
   and `integ` already treated identifiers as symbols, so `conv` becomes the single place units exist.
 
@@ -41,18 +41,18 @@ generation, so no migration was required.
 
 - **§4 amended: ambiguous division is refused.** A `/` followed by an implicit-multiplication group
   of two or more factors returns `!expr`. `100 m/10 s` means `(100 m)/(10 s)` while `1/2 m v^2`
-  means `(1/2)·m·v²` — opposite precedences, and either choice silently corrupts the other. Same
+  means `(1/2)·m·v²` -- opposite precedences, and either choice silently corrupts the other. Same
   principle as `solve` returning `!nosol` rather than an unreliable root. Single-factor denominators
   (`m/s`, `km/h`, `9.8 m/s^2`) are unambiguous and unaffected.
 
-**v1.1.1** — metrics only, no format change.
+**v1.1.1** -- metrics only, no format change.
 - §9: added false-positive tool call rate on conceptual questions.
 
-**v1.1.0** — amended before any data generation, so no migration was required.
+**v1.1.0** -- amended before any data generation, so no migration was required.
 - **§5.4 added: ambiguous dimension vectors are never collapsed to a derived unit name.** v1.0.0
   rendered every coherent SI dimension as its derived symbol, which made torque print as joules.
   A dimension vector cannot distinguish energy from torque, and emitting a guess would compile
-  "torque is measured in joules" into the weights — the first error a physics judge catches.
+  "torque is measured in joules" into the weights -- the first error a physics judge catches.
 - **§5.3 sum-term ordering is now implemented**, not just specified. v1.0.0 described
   descending-degree ordering that the evaluator did not perform. Spec and code now agree.
 - §8.5 added: the data generator must name target units explicitly via `conv` for blocked dimensions.
@@ -66,7 +66,7 @@ generation, so no migration was required.
 During training, result spans are present in the sequence but **masked out of the loss**. The model
 learns to *condition on* results, not to *produce* them.
 
-If results are left in the loss, the model learns to predict plausible-looking numbers — which is
+If results are left in the loss, the model learns to predict plausible-looking numbers -- which is
 exactly the failure this entire architecture exists to prevent. A 45M model that has learned to
 hallucinate `<res>` content is strictly worse than one with no tools at all, because it is wrong with
 formatting that looks authoritative.
@@ -93,7 +93,7 @@ The runtime detects `</tool>`, halts generation, executes, and appends:
 
 Generation then resumes with the result in context.
 
-Worked example — the full sequence as it appears in a training document:
+Worked example -- the full sequence as it appears in a training document:
 
 ```
 To find where the parabola crosses the x-axis, set y to zero and solve.
@@ -129,7 +129,7 @@ the model ways to emit something unparseable.
 ### 2.3 Hard limits
 
 Enforced by the runtime, not by the model's good behaviour. These exist because the device has no
-preemption and no way to escape a runaway loop — a hung generation means the calculator is dead until
+preemption and no way to escape a runaway loop -- a hung generation means the calculator is dead until
 a battery pull, in front of a judge.
 
 | Limit | Value | On violation |
@@ -142,7 +142,7 @@ a battery pull, in front of a judge.
 | Max integrand evaluations | 4096 | `!range` |
 | Max simplifier rewrite passes | 32 | return best-so-far |
 
-## 3. Function set — closed, fixed arity
+## 3. Function set: closed, fixed arity
 
 Seven functions. Closed set and fixed arity are what make validation trivial and let the model
 memorise the whole interface at 45M.
@@ -185,11 +185,11 @@ common silent wrongness in a stats tool.
 
   CHANGING THIS WAS FREE AND THAT WINDOW IS NOW CLOSED. `integ` had ZERO training documents when the
   second arity was added, so no existing document depended on the old contract.
-- **`solve` handles degree ≤ 2 only.** Higher degree returns `!nosol`. Not "attempts and fails" —
+- **`solve` handles degree ≤ 2 only.** Higher degree returns `!nosol`. Not "attempts and fails" --
   refuses cleanly, which is a behaviour the model can learn to route around.
 - **No limits, series, matrices, or ODEs.** Out of scope for v1.
 
-### 3.2 Identifier resolution — units vs. symbols
+### 3.2 Identifier resolution: units vs. symbols
 
 The one genuine ambiguity in the grammar. Is `m` a variable or metres?
 
@@ -197,7 +197,7 @@ The one genuine ambiguity in the grammar. Is `m` a variable or metres?
 `integ`, every bare identifier is a symbol.**
 
 So `conv(9.8 m/s^2 * 3 s, m/s)` gives `29.4 m/s`, while `evalat(0.5*m*v^2, v, 20)` returns `!expr`
-because `m` is an unbound symbol — not `200 m` with `m` silently read as metres.
+because `m` is an unbound symbol -- not `200 m` with `m` silently read as metres.
 
 Exempt: `pi`, `e`, and the dimensionless angle constants `deg`, `rad`, `rev`, which resolve
 everywhere. `sin(30 deg)` works.
@@ -218,7 +218,7 @@ postfix := primary ('!' )?                  // factorial, integers only
 primary := NUMBER | IDENT | IDENT '(' expr (',' expr)* ')' | '(' expr ')' | '|' expr '|'
 ```
 
-- **Implicit multiplication** is supported: `2x`, `3(x+1)`, `2 sin(x)`. Required — textbook notation
+- **Implicit multiplication** is supported: `2x`, `3(x+1)`, `2 sin(x)`. Required -- textbook notation
   uses it constantly and a model trained on textbooks will emit it.
 - `^` is right-associative: `2^3^2` = 2^9 = 512.
 - Unary minus binds looser than `^`: `-x^2` = `-(x^2)`.
@@ -228,7 +228,7 @@ primary := NUMBER | IDENT | IDENT '(' expr (',' expr)* ')' | '(' expr ')' | '|' 
   exponent marker; write exponents as `1.5e3` which the lexer takes as part of the numeric literal.
 - Equations, `solve` only: exactly one `=` at the top level.
 
-## 5. Result format — canonical, backend independent
+## 5. Result format: canonical, backend independent
 
 **Every backend must normalise into this grammar.** Backend 2 (TI math server) returns TI-formatted
 UCS-2 with Private Use Area code points; its adapter is responsible for converting to this form. The
@@ -240,7 +240,7 @@ Determinism is a hard requirement: the same call must produce byte-identical out
 device, forever. Training data is generated by executing these calls; if the device formats
 differently, every trained association is subtly wrong.
 
-`printf("%g")` is **not** acceptable — its behaviour varies across libc implementations, and we have
+`printf("%g")` is **not** acceptable -- its behaviour varies across libc implementations, and we have
 glibc/Apple libc on the host and newlib on the device.
 
 Algorithm, implemented once in `tools/eval/fmt.c` and shared:
@@ -268,7 +268,7 @@ Root ordering is specified because unordered output is nondeterministic output.
 ### 5.3 Canonical expression form
 
 `diff` output must be canonicalised or the same derivative prints differently run to run.
-**Implemented in `deriv.c:canon()`; verified by test.** Spec and code agree — do not let them drift.
+**Implemented in `deriv.c:canon()`; verified by test.** Spec and code agree -- do not let them drift.
 
 - Explicit `*` between all factors. No implicit multiplication on output.
 - No spaces.
@@ -285,7 +285,7 @@ Root ordering is specified because unordered output is nondeterministic output.
 
 ### 5.4 Ambiguous dimensions are never named
 
-Values carry SI dimension vectors, and output collapses a coherent dimension to its derived symbol —
+Values carry SI dimension vectors, and output collapses a coherent dimension to its derived symbol --
 `6 N`, `24 W`, `50 Pa`. **Two dimension vectors are excluded from that collapse and always render in
 base units:**
 
@@ -296,7 +296,7 @@ base units:**
 
 A dimension vector carries no information that separates these. Guessing writes a physics error
 directly into the corpus, and therefore into the weights. Base units are always *correct*, merely
-verbose — and §8.5 makes the verbosity the generator's problem, not the model's.
+verbose -- and §8.5 makes the verbosity the generator's problem, not the model's.
 
 Deliberately **not** blocked: `Pa` is shared by pressure, stress and Young's modulus, but all three
 are correctly written `Pa`, so the collapse is right in every case.
@@ -309,7 +309,7 @@ ambiguous one is a wrong physics fact in the training data. Bias toward blocking
 
 ### 6.1 Closed error set
 
-Errors are part of the model's vocabulary — it must learn to recover from them — so the set is closed
+Errors are part of the model's vocabulary -- it must learn to recover from them -- so the set is closed
 and the strings are short.
 
 | Code | Meaning |
@@ -338,12 +338,12 @@ Per call site:
 
 The response-level cap of 8 calls is independent and absolute.
 
-### 6.2b Format-failure retry — a different mechanism from §6.2
+### 6.2b Format-failure retry: a different mechanism from §6.2
 
 **§6.2 governs TOOL errors: the evaluator returned `!code` and the model gets one corrected call.
 This section governs the model's OWN OUTPUT being unparseable, which §6.2 does not describe and
 which the runtime must detect for itself.** Measured: failures are not deterministic under sampling
-— at T=0.8, 63% of failing items pass on some attempt — so retry is a real lever for the shipping
+-- at T=0.8, 63% of failing items pass on some attempt -- so retry is a real lever for the shipping
 path. It is **forbidden inside ladder measurements** (`LADDER_METRICS.md`).
 
 **Unparseable is defined structurally**, and this list is closed:
@@ -351,7 +351,7 @@ path. It is **forbidden inside ladder measurements** (`LADDER_METRICS.md`).
 1. no `<a>` span, or no `<end>`;
 2. `<tool>` and `</tool>` counts unequal;
 3. a `<tool>` with fewer `<arg>` than the function's arity;
-4. a model-authored `<res>` — should be unreachable given the §8.3 decode-time ban, and if seen
+4. a model-authored `<res>` -- should be unreachable given the §8.3 decode-time ban, and if seen
    means the ban is not wired;
 5. generation cap reached without `<end>`.
 
@@ -364,15 +364,15 @@ greedy decoding is bit-identical and buys nothing:
 **All attempts at T=0.8, new seed each time. Cap 8.**
 
 **Varied per-attempt temperature (0.8/1.0/1.2) is REMOVED.** It looked better on one seed and failed
-to replicate three times — at 140 heads (95.0% vs 95.0% at 8 attempts), across the three-seed sweep
+to replicate three times -- at 140 heads (95.0% vs 95.0% at 8 attempts), across the three-seed sweep
 (fixed won at 3 attempts, varied at 5, tie at 8, all inside their spreads), and at 230 heads
 (95.0% vs 97.2%, fixed winning). **The hypothesis is dead and the spec should not carry it.**
 
 Cap 8 rather than 5: the questions that wait longest are the same questions at every cap, so raising
 it does not expose more questions to long waits. 8 buys +6.7 pp of effective adherence for +0.1 s
-expected, and only 0.03% of questions — 1 in 3,554 — reach the final attempt.
+expected, and only 0.03% of questions -- 1 in 3,554 -- reach the final attempt.
 
-**Corrected — attempt 1 was specified as greedy and that was wrong.** The matched sweep shows T=0.8
+**Corrected -- attempt 1 was specified as greedy and that was wrong.** The matched sweep shows T=0.8
 dominating greedy on every axis that matters:
 
 | | greedy | T=0.8 |
@@ -386,7 +386,7 @@ Greedy costs 11 pp of effective adherence and doubles the variance, in exchange 
 single-shot. **Sampling also averages over the per-item determinism that makes greedy brittle**,
 which is why its variance is half.
 
-> **Every measurement in this repo taken before this correction was made under greedy decoding —
+> **Every measurement in this repo taken before this correction was made under greedy decoding --
 > a decoder we will not ship.** That includes the L2 arms, both capability curves, and every
 > adherence figure quoted for the 4,000- and 8,000-step runs. Those numbers are valid *as
 > greedy measurements* and are **not** the shipped configuration. Any figure carried forward must be
@@ -394,10 +394,10 @@ which is why its variance is half.
 
 **Degradation when all three fail:** emit the tool results already obtained, in the §5 canonical
 form, with a single sentence stating that the answer could not be composed. **Never emit a partial
-or repaired document** — a half-formed `<tool>` span reaching the user is worse than an honest
+or repaired document** -- a half-formed `<tool>` span reaching the user is worse than an honest
 failure, because the runtime cannot distinguish it from a real call.
 
-**Latency:** each retry is a full generation cycle. See `LATENCY_BUDGET.md` — at 23% raw failure a
+**Latency:** each retry is a full generation cycle. See `LATENCY_BUDGET.md` -- at 23% raw failure a
 3-attempt policy costs roughly 0.23 + 0.23·(1−p₂) extra cycles per question, which is real seconds
 and not free.
 
@@ -421,16 +421,16 @@ tb_status tool_dispatch(const char *name, const char *const *args, int nargs,
                         char *out, size_t out_sz);
 ```
 
-- **Backend 1** — `tools/eval/`, our own C. Mandatory. Runs on host **and** device. Host execution is
+- **Backend 1** -- `tools/eval/`, our own C. Mandatory. Runs on host **and** device. Host execution is
   a hard dependency of data generation, so this backend is on the critical path regardless of what
   Backend 2 turns out to be.
-- **Backend 2** — TI math server via syscalls 339/342. Device only, research, upgrade not requirement.
+- **Backend 2** -- TI math server via syscalls 339/342. Device only, research, upgrade not requirement.
   See `docs/BACKEND2_TI_MATH.md`. Its adapter owns UCS-2 ↔ ASCII transcoding, PUA substitution, and
   mapping TI's undocumented error numbers onto §6.1.
 
 **Differential testing is the acceptance gate for Backend 2**, if it ever lands: run the entire
 Backend 1 test corpus through Backend 2 and require byte-identical §5 output. Any divergence is a
-Backend 2 bug, because Backend 1 defines the contract — it is what the model was trained against.
+Backend 2 bug, because Backend 1 defines the contract -- it is what the model was trained against.
 
 ## 8. Data generation invariants
 
@@ -471,28 +471,28 @@ Enforced by the generator, not hoped for:
    right:  <tool>conv<arg>2*pi*5/(2 s)<arg>rad/s</tool> -> 15.70796327 rad/s
    ```
 
-   **Invariant 5 does not catch this** — the wrong form is already a `conv` with an explicit target,
+   **Invariant 5 does not catch this** -- the wrong form is already a `conv` with an explicit target,
    so the §5.4 lint passes while the value is off by 2π. The rule is separate: reject any `conv`
    whose source expression contains `deg`/`rad`/`rev` **and** whose target is a frequency or angular
-   rate. Angle constants belong in trigonometric arguments (`sin(30 deg)`), never in a rate — write
+   rate. Angle constants belong in trigonometric arguments (`sin(30 deg)`), never in a rate -- write
    the `2*pi` explicitly, as the invariant-5 examples above already do.
 
    Found by writing the eval set: six A3 items shipped a 2π error past a lint that was designed for
-   exactly this class of mistake. This is the third appearance of the same underlying hazard —
-   *dimensionless but numerically significant* — after the `sin(30 deg)` catch and the unit-name
+   exactly this class of mistake. This is the third appearance of the same underlying hazard --
+   *dimensionless but numerically significant* -- after the `sin(30 deg)` catch and the unit-name
    collision. Any new dimensionless constant must be checked against this pattern before it lands.
 
 ## 9. Metrics this spec makes measurable
 
-- **Tool call validity rate** — emitted calls that parse and execute, over all emitted calls. Split
+- **Tool call validity rate** -- emitted calls that parse and execute, over all emitted calls. Split
   by attempt 1 vs. attempt 2 so recovery is visible separately from first-shot accuracy.
-- **Answer correctness with tools vs. without** — same checkpoint, same questions, tool layer enabled
+- **Answer correctness with tools vs. without** -- same checkpoint, same questions, tool layer enabled
   and disabled. The difference is the architecture's entire justification, so it is the headline
   number.
-- **Result-span leak rate** — how often the model tries to emit a `<res>` token. Should be ~0 given
+- **Result-span leak rate** -- how often the model tries to emit a `<res>` token. Should be ~0 given
   §1's loss mask. **A nonzero value means the mask is broken**, and it is a cheap continuous check on
   the most dangerous possible bug in the pipeline.
-- **False-positive tool call rate** — share of *conceptual* eval questions ("what is a polynomial?",
+- **False-positive tool call rate** -- share of *conceptual* eval questions ("what is a polynomial?",
   "why does a quadratic have at most two real roots?") on which the model emits a call at all. Should
   be near zero. Validity rate alone cannot see this failure: a model that answers every conceptual
   question with a syntactically perfect, semantically pointless `solve` call scores 100% valid and is

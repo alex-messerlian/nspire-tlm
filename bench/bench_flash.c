@@ -1,4 +1,4 @@
-/* bench_flash.c — fills HARDWARE.md rows B8-B9 and A9.
+/* bench_flash.c: fills HARDWARE.md rows B8-B9 and A9.
  *
  * Why this matters: the brief states that any weight living in flash rather than RAM is a
  * catastrophe. That is true for a DENSE model, where every weight is read every token. It is NOT

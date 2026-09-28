@@ -1,4 +1,4 @@
-/* bench_platform.c — fills HARDWARE.md rows A1-A12, C1-C8.
+/* bench_platform.c: fills HARDWARE.md rows A1-A12, C1-C8.
  *
  * "What machine am I actually on?" Run this first; everything else depends on it.
  *

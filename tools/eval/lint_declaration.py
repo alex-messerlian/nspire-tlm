@@ -2,14 +2,14 @@
 
 The Leibniz find was surfaced by the DATA, not by the formula: a record declaring `d: 'm'` is
 declaring a unit for the differential operator, which is self-evidently wrong on its face. That
-shape — an internal contradiction visible without any physics, any evaluator, and any reference —
+shape -- an internal contradiction visible without any physics, any evaluator, and any reference --
 is the cheapest gate available. This collects every one of that shape.
 
 Each check needs only the record's own fields. None needs a source page, a dictionary, or a
 judgement about physics.
 
 Does NOT verify: that a consistently-declared record is physically correct. A record can be
-internally flawless and still state a false relation — `R_eqv=R_1-R_2` passes every check here.
+internally flawless and still state a false relation -- `R_eqv=R_1-R_2` passes every check here.
 """
 import json, re, sys
 

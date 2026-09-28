@@ -26,7 +26,7 @@ FALLBACK = "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"
 
 # what the UI and the notation renderer actually draw
 CHARS = [chr(c) for c in range(32, 127)]
-CHARS += list("°±×÷·−–—‘’“”…≤≥≈∞√∫Δ∂ΩμπλθαβγδεφσωρτηνξψχΣΠ₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹⁻")
+CHARS += list("°±×÷·−–\u2014‘’“”…≤≥≈∞√∫Δ∂ΩμπλθαβγδεφσωρτηνξψχΣΠ₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹⁻")
 
 def _bitmap(f, ch, w, height):
     img = Image.new("L", (max(w, 1), height), 0)

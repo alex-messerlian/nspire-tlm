@@ -1,19 +1,19 @@
 """PERMANENT LINT: Leibniz notation written as multiplication.
 
 `dV/dt` encoded as `(d*V)/(d*t)` parses as d×V ÷ d×t. The `d` CANCELS, so the value is right by
-accident — and the runtime, which builds its variable prompts from the formula, asks the student
+accident -- and the runtime, which builds its variable prompts from the formula, asks the student
 for a value of `d`. Under E that is a visible interface defect, not a silent one.
 
 Same class as `K*E` on the left-hand side: notation that reads as physics and evaluates as
 arithmetic. `K*E` was caught by the LHS gate; this is the right-hand-side form of it.
 
-Detection is the CANCELLING shape specifically — `d*` in both numerator and denominator — not any
+Detection is the CANCELLING shape specifically -- `d*` in both numerator and denominator -- not any
 `d*X`. A bare `d*X` is usually a genuine variable: `Delta_l = d*sin(theta)` has `d` as slit
 separation and is correct. Narrowing the claim to the shape is what gives the lint precision; the
 broad version flagged that record as a false positive.
 
 Does NOT verify: derivatives written any other way, integrals, or whether a finite-difference
-rewrite is physically appropriate — that is a judgement call for a human.
+rewrite is physically appropriate -- that is a judgement call for a human.
 """
 import json, re, sys
 

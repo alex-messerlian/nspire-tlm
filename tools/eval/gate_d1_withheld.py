@@ -23,7 +23,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 # user's request and a corpus generated before that change must still be checkable; the property
 # here is "the refusal names a variable", and which punctuation precedes it is incidental. An
 # answer that names NOTHING still counts as unparsed and still fails, which is the real guard.
-CLAIM = re.compile(r"[:—-]\s*([A-Za-z_][A-Za-z0-9_]*) is not given")
+CLAIM = re.compile(r"[:\u2014-]\s*([A-Za-z_][A-Za-z0-9_]*) is not given")
 GIVEN = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)\s*=")
 
 
