@@ -191,10 +191,10 @@ static char GDIR[32] = "/documents/tlm/";
      *
      * The A146 phase decoded five prompts with no tool execution, so it checked the engine and not
      * the loop the answers come from: tool calls executed, results injected, refusals and
-     * explanations written. Each turn below is assembled
-     * as app_request assembles it (ask_build, then ns_assemble on the chosen record) and run through
-     * tlm_generate -- src/store/gencore.c, the SAME function the app and the host harness call -- so
-     * tools/eval/parity_toolloop.py compares one implementation on two machines, id for id. The
+     * explanations written. Each turn below is assembled as app_request assembles it (ask_build,
+     * then ns_assemble on the chosen record) and run through tlm_generate -- src/store/gencore.c,
+     * the SAME function the app and the host harness call -- so tools/eval/parity_toolloop.py
+     * compares one implementation on two machines, id for id. The
      * turns cover each path: four answerable, one with an irrelevant value, a withheld value, no
      * values, and an explanation. Timed: time to the first generated token (prefill plus one step)
      * and to the end of the turn, the latency a student actually waits. */

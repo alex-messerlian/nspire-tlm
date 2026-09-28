@@ -2,7 +2,8 @@
  *
  * It lived inline in device_app.c's app_request, and tools/eval/int8gen.c carried a hand copy so
  * the host could score the calculator's decoder. A copy cannot give evidence that the DEVICE runs
- * the tool-execution loop the way the host harness does. Comparing two copies proves only that the copies agree. So the loop is here, and the app,
+ * the tool-execution loop the way the host harness does: comparing two copies proves only that
+ * the copies agree. So the loop is here, and the app,
  * the device benchmark (device_generate.c) and the host harness all call it; a device/host
  * comparison of full tool-using generations is then a comparison of one implementation on two
  * machines -- the same argument that makes the engine parity mean something.
