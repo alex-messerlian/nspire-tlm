@@ -44,6 +44,9 @@ paper/paper-arxiv.tex
 submission/arxiv-source.zip
 # original photographs and video of the calculator (large; see submission/PHOTOS.md)
 media/
+# the re-encoded videos and the TMLR supplementary ZIP, rebuilt by tools/paper/make_media.py --video
+submission/supplementary/*.mp4
+submission/supplementary.zip
 
 # int8 exports for host scoring on the device decoder (regenerable)
 build/int8/

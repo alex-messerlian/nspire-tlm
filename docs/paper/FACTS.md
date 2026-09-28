@@ -340,11 +340,23 @@ calls and injects the results itself, through the same `gencore` loop the host s
 Nothing is in /chattlm/startup (2026-09-27). The loader runs that folder during the install, with
 the Setup document still open, and the app started there could not get the model's memory.
 
+## 11b. Appendix B -- the video (media/video/IMG_7083.mov, not in git; see submission/PHOTOS.md)
+
+| | |
+|---|---|
+| recording | one take, 199.9 s, 4K HEVC 60 fps, no audio, unedited; battery symbol on screen at 15.5 s, no cable in frame |
+| question | the Figure 1 question, typed; the APP chose the relation ("Reading Motionally induced emf") |
+| answer | `0.01508 V. From epsilon=B*l*v.` -- identical to the host replay (`build/autoasm` then `build/int8gen`) |
+| entered | between 121.0 and 121.5 s (frames every 0.5 s) |
+| finished | between 180.0 and 180.5 s -- **about 59 s after entry** (58.5 to 59.5), including selection, prompt assembly and tokenization |
+| stages | Reading to Thinking 156-157 s; Thinking to Got 166-167 s; Got to Writing 170-171 s (frames every 1 s) |
+| paper frames | 15.5 s and 181.5 s, cut by `tools/paper/make_media.py`, hashes recorded there |
+
 ## 12. Open before submission
 
 0. ~~Fix the row-alignment defect?~~ DONE: A153 (commit `edcb002`), hidden padded to 1,056; test_ckpt
    rowalign + rq_probe's row check.
-1. Photographs (4 shots planned).
+1. ~~Photographs (4 shots planned).~~ DONE 2026-09-27: one video, three frames of it in Appendix B (section 11b).
 2. arXiv endorsement -- required since 21 Jan 2026 even with institutional email.
 3. Perplexity, host and device. Not measured; the paper must not imply it.
 4. Timing variance: decode n = 1 on the shipped engine (three runs, 1.920-1.923, on the defective

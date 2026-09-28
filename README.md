@@ -23,6 +23,9 @@ for a number; the model declines more reliably. Differences between our harness 
 accuracy by 9 to 21 points and exposed an engine defect that a host–calculator comparison could not detect. A per-
 token cost model fitted on battery predicts a decode run within 0.4%.
 
+## On the calculator
+
+
 ## Contents
 
 | Folder | What is in it |

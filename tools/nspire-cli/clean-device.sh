@@ -17,8 +17,9 @@
 # WHAT GOES: the top-level copy of the app, and the old one in /chattlm/startup; /tlm, after its
 # saved chats move to /chattlm/data; the benchmark programs and their /sweep shapes; the upstream
 # Ndless installer pair (ChatTLM Setup has installed from nothing since 2026-09-21, and the host
-# keeps a copy in ndless/); the OS's NspireLogs.zip. Every file removed is first pulled to attic/calculator-removed-<date>/ on the host,
-# and the benchmarks come back with tools/nspire-cli/push-bench.sh.
+# keeps a copy in ndless/); the OS's NspireLogs.zip. Every file removed is first pulled to
+# attic/calculator-removed-<date>/ on the host, and the benchmarks come back with
+# tools/nspire-cli/push-bench.sh.
 #
 # Run tools/nspire-cli/push-all.sh FIRST, so /chattlm/data is complete. This script refuses to empty
 # /tlm otherwise. DRY_RUN=1 lists what it would do and changes nothing.

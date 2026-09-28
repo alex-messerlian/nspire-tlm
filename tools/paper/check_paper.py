@@ -32,6 +32,7 @@ BIB = MS / "references.bib"
 LOG = ROOT / "docs" / "paper" / "CITATION_LOG.md"
 FIG = MS / "figures"
 MAKE_FIGURES = Path(__file__).resolve().parent / "make_figures.py"
+MAKE_MEDIA = Path(__file__).resolve().parent / "make_media.py"     # the photographs, cut from the video
 RES = ROOT / "results"
 ARXIV_ZIP = ROOT / "submission" / "arxiv-source.zip"
 # What arXiv needs besides the source: the style files and the bibliography. arXiv runs bibtex on the
@@ -127,7 +128,7 @@ def write_arxiv_zip(source: str, bbl: Path) -> list[str]:
         put("paper.bbl", bbl.read_bytes())
         for f in ARXIV_FILES:
             put(f, MS.joinpath(f).read_bytes())
-        for f in sorted(FIG.glob("*.pdf")):
+        for f in sorted([*FIG.glob("*.pdf"), *FIG.glob("*.jpg")]):    # drawn figures, then photographs
             put(f"figures/{f.name}", f.read_bytes())
     return names
 
@@ -194,6 +195,8 @@ def main() -> int:
     # to the same bytes. Comparing timestamps or commit times failed twice: a checkout reorders
     # mtimes, and a script change that leaves a figure unchanged made it read as stale forever.
     import contextlib, importlib.util, io, tempfile
+    # Photographs are not drawn: make_media.py cuts them from the author's recording (5b below).
+    photos = [f for f in figs if Path(f).suffix.lower() in (".jpg", ".jpeg", ".png")]
     spec = importlib.util.spec_from_file_location("make_figures", MAKE_FIGURES)
     mf = importlib.util.module_from_spec(spec)
     stale, absent = [], []
@@ -201,7 +204,7 @@ def main() -> int:
         spec.loader.exec_module(mf)
         with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
             mf.main(out=tmp)
-            for f in figs:
+            for f in (f for f in figs if f not in photos):
                 name = Path(f).stem + ".pdf"
                 drawn, used = Path(tmp) / name, FIG / name
                 if not drawn.exists():
@@ -213,6 +216,36 @@ def main() -> int:
     check("every included figure is exactly what make_figures.py draws from results/",
           not stale and not absent,
           f"regenerate: {', '.join(stale)}" if stale else f"cannot check: {'; '.join(absent)}")
+
+    # 5b. EACH PHOTOGRAPH IS A FRAME OF THE AUTHOR'S RECORDING, UNRETOUCHED: the JPEG in figures/ must
+    # be the one make_media.py records, and when the recording is here (it is not in git), cutting it
+    # again must give the same bytes. The AI-regenerated stills in media/ can never pass this.
+    spec = importlib.util.spec_from_file_location("make_media", MAKE_MEDIA)
+    mm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mm)
+    names = [Path(f).name for f in photos]
+    if names:
+        unknown = [n for n in names if n not in mm.PHOTOS]
+        wrong = [n for n in names if n in mm.PHOTOS and (FIG / n).exists()      # absence is reported above
+                 and mm.sha256(FIG / n) != mm.PHOTOS[n][3]]
+        check("every photograph is a frame make_media.py cuts from the recording, at its recorded hash",
+              not unknown and not wrong,
+              f"not made by make_media.py: {', '.join(unknown)}" if unknown
+              else f"differs from its recorded hash: {', '.join(wrong)}")
+        cut = "the photographs cut again from the recording give the same bytes"
+        if not mm.VIDEO.exists():
+            if final:
+                check(cut, False, f"cannot check: {mm.VIDEO} is missing (MEDIA=<dir> names another copy)")
+            else:
+                results.append(("photographs not cut again: the recording is not here (FAIL under --final)", True, ""))
+        else:
+            try:
+                with tempfile.TemporaryDirectory() as tmp:
+                    got = mm.draw_photos(Path(tmp), mm.source())
+                differ = [n for n in names if n in mm.PHOTOS and got.get(n) != mm.PHOTOS[n][3]]
+                check(cut, not differ, ", ".join(differ))
+            except SystemExit as e:                 # make_media refuses a recording with another hash
+                check(cut, False, str(e))
 
     # 6. Compile, then read the page the end-of-main-text marker landed on.
     # The PDF's build date is pinned to when the source last changed (SOURCE_DATE_EPOCH, which tectonic

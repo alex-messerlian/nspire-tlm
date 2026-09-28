@@ -270,8 +270,8 @@ product is summed in 32-bit integers. Normalization, rotary embeddings, attentio
 fp32 using the compiler's software floating-point routines, and the KV cache is fp32. The generation
 loop, tool execution and the 2\% answer check are one C module, shared by the application and by the
 evaluation harness of Section~\ref{sec:eval}. The calculator's operating system does not run native
-programs, so the application is started by a loader derived from Ndless \citep{ndless}, installed
-once from a setup document; the hardware is not modified.
+programs, so the application is started by a loader derived from Ndless \citep{ndless}, which a
+setup document installs after each restart; the hardware is not modified (Appendix~\ref{app:device}).
 
 % ==================================================================================================
 \section{Training Data}
@@ -842,7 +842,8 @@ funded the project personally.\fi
 competing interests.
 \item \textbf{Data availability.} The record store, the training corpus, the trained weights, and the
 device logs and results behind every table and figure will be released with the final version of
-this paper. The corpus, the store and the weights will be released under CC BY-NC-SA~4.0, following the licenses of the OpenStax source text.
+this paper. The corpus, the store and the weights will be released under CC BY-NC-SA~4.0, following the licenses of the OpenStax source text.\ifdeanonymized\else{} A video of the calculator in use
+(Appendix~\ref{app:device}) is in the supplementary material.\fi
 \item \textbf{Code availability.} The code, including the calculator application, the inference
 engine, the corpus generator and the evaluation harness, will be released with the final version of
 this paper, under the MIT License for the code written for this work and the Mozilla Public
@@ -928,5 +929,36 @@ variance estimate; equal optimizer steps do not hold convergence constant either
 and 0.952 at width 176, 0.799 and 0.787 at 352). Predictions we registered before training named an
 item set we later found measures declining, scored by a harness we later replaced
 (Section~\ref{sec:harness}), so this experiment is not a test of them.
+
+% ==================================================================================================
+\clearpage
+\section{The Calculator in Use}
+\label{app:device}
+
+Figure~\ref{fig:device} shows three frames from a video of the calculator answering the question of
+Figure~\ref{fig:exchange}, filmed in one take on battery with no cable attached. ChatTLM Setup, opened
+after a reset, installs the loader and closes, and the home screen reports it (a). The question was
+then typed on the keypad, whose letter keys are in alphabetical order, and entered. This time the
+application chose the relation itself, and it printed the same answer as in
+Figure~\ref{fig:exchange}, complete about 59\,s after the question was entered (b, c). That time is
+read from the video; unlike the 52.0\,s of Figure~\ref{fig:exchange}, it includes choosing the
+relation, building the prompt and tokenizing it. \ifdeanonymized The video will be released with the
+code.\else The video, unedited apart from re-encoding, is in the supplementary material.\fi
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{@{}c@{\hspace{1em}}c@{\hspace{1em}}c@{}}
+\includegraphics[height=6.4cm]{photo_ready.jpg} &
+\includegraphics[height=6.4cm]{photo_answer.jpg} &
+\includegraphics[height=6.4cm]{photo_screen.jpg} \\
+\small (a) & \small (b) & \small (c)
+\end{tabular}
+\caption{Frames from the video, cropped and scaled but not retouched. (a)~The home screen after ChatTLM
+Setup has run; the green line reads ``ChatTLM is ready'' and the battery symbol is at the top right.
+(b)~The finished answer. (c)~The screen of (b), enlarged: the question, the relation the application
+chose with the values it read and the result of the call (\tok{epsilon=B*l*v l=0.057 v=1.35
+B=0.196.\ -> 0.0150822}, with the stray period noted under Figure~\ref{fig:exchange}), and the answer.}
+\label{fig:device}
+\end{figure}
 
 \end{document}
