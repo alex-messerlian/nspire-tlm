@@ -130,9 +130,8 @@ CONTROLS = {
                         '"a_t=r*alpha_DISABLED":      (lambda v: v["alpha"] * v["r"]**2 <= 1.3e5,'),
     "prof_pairing":    ("src/runq_nspire.c",
                         "PF_END(PF_FFN);", "PF_END(PF_CLS);"),
-    "shipping_number": ("docs/RESULT_STEP0_FINAL.md",
-                        "and it is a lower bound,\nbecause false negatives are not controlled.",
-                        "and that is the figure."),
+    "shipping_number": ("docs/paper/FACTS.md",
+                        "**3.00% [1.72, 5.17], n = 400**", "**3.00%**"),
     "shape_spec":      ("tools/eval/shape_spec.py",
                         'if op not in ("Mult", "Add"):', 'if False:'),
     "shape_mutation":  ("src/store/shapecheck.c",
@@ -190,11 +189,6 @@ CONTROLS = {
     "dimensionless":   ("tools/eval/dispatch.c",   # revert F3: put the trailing "1" back
                         'if (!strcmp(args[1], "1")) {', 'if (0) {'),
     # Delete the control figure from the document that publishes the flattering one.
-    "selection_control":("docs/RESULT_RETRIEVAL_BASELINE.md",
-                        "| **RANDOM 20 containing the target** | **62.7%** | 84.5% |",
-                        "| **RANDOM 20 containing the target** | (removed) | 84.5% |"),
-    "stale_figures":   ("docs/LATENCY_BUDGET.md",   # put the stale figure back
-                        "`chars/token = 2.901`", "`chars/token = 3.5`"),
     # Revert A7: drop the constants back out of the question's givens.
     # Revert A8: give the mismatch branch its private RHS-only copy of the units rule back.
     # A gate that checks four fields needs a control per field, or it proves one. This reverts
@@ -265,8 +259,6 @@ CONTROLS = {
     "ask_quantity":    ("corpus/generate.py",
                         "        ask  = ask_for(r, quantity_surface(r, rng), rng)",
                         "        ask  = rng.choice(ASK_ALL).format(q=quantity_surface(r, rng))"),
-    "test_ui_errs":    ("tools/webui/index.html",   # a code the evaluator emits, dropped from the map
-                        '"!nosol":"no solution found",\n', ''),
     "test_loader":     ("src/store/loader.c",     # the truncation check: a short file must not pass
                         "if (!cnt || atoi(cnt) != declared || i != declared)", "if (0)"),
     # NOT ns_filter: the first control mutated its scope guard and SURVIVED, because this suite

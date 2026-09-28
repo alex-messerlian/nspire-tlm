@@ -1,0 +1,8 @@
+# Training, scoring and the gate suite, at the versions that produced the paper's results.
+#   python3 -m venv .venv-tok && .venv-tok/bin/pip install -r requirements.txt
+# The figures and the paper build use a second environment: tools/paper/requirements.txt.
+torch==2.13.0
+numpy==2.5.2
+tokenizers==0.23.1
+lupa==2.8
+pillow==12.3.0

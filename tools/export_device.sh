@@ -44,6 +44,7 @@ Q80_PAD_TO=$GS $PY tools/legacy_to_q80.py build/model_dev_legacy.bin build/model
 rm -f build/model_dev_legacy.bin
 
 echo "== staging the transfer set =="
+mkdir -p build/transfer
 cp build/model_dev_gs.bin build/transfer/model4096.bin.tns
 $PY tools/tok_pack.py >/dev/null && cp build/tok4096.tok build/transfer/tok4096.tok.tns
 GS_HAVE=$(od -An -tu4 -j37 -N4 build/transfer/model4096.bin.tns | tr -d ' ')

@@ -2,6 +2,8 @@ cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
 title: "Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator"
 type: software
+repository-code: "https://github.com/alex-messerlian/nspire-tlm"
+license: MIT
 authors:
   - family-names: Messerlian
     given-names: Alexander

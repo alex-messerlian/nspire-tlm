@@ -5,7 +5,7 @@
 #include "gfx.h"
 #include "loader.h"
 
-/* palette, kept in step with tools/webui/index.html */
+/* palette */
 /* ---- palette ------------------------------------------------------------------------------------
  * These were #defines, i.e. compile-time constants, which is fine for one theme and impossible for
  * two. They are now indices into a runtime table, so every existing call site is unchanged and the

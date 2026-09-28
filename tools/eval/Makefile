@@ -10,7 +10,7 @@ LDLIBS  := -lm
 
 CORE := fmt.c ast.c units.c parser.c numeric.c deriv.c solve.c literal.c integrate.c stat.c dispatch.c
 
-# Device build. Requires the Ndless SDK on PATH; see docs/PHASE0.md M1 and H8.
+# Device build. Requires the Ndless SDK on PATH; see README.md.
 
 all: evalcli test_eval fuzz
 

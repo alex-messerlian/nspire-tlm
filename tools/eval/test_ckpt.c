@@ -64,7 +64,7 @@ int main(void) {
          * this project's own rule violated inside the suite that enforces it: "cannot check" and
          * "checked and clean" must never share an exit status. Exit 2, which run_gates.sh already
          * renders as CANNOT CHECK and counts as a failure. */
-        printf("  CANNOT CHECK  %s not present -- run: cp build/model4096_gs96.bin %s\n", REAL, REAL);
+        printf("  CANNOT CHECK  %s not present -- download it from the release, or run tools/export_device.sh train/ship.pt 88\n", REAL);
         return 2;
     }
 

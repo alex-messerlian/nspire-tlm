@@ -154,7 +154,6 @@ newer_than bench/bench_mac.tns      bench/bench_mac.c bench/common.h
 newer_than bench/bench_flash.tns    bench/bench_flash.c bench/common.h
 newer_than bench/bench_rtc.tns      bench/bench_rtc.c bench/common.h
 newer_than tools/eval/eval_device.tns tools/eval/device_main.c tools/eval/eval.h
-newer_than src/llama2.tns             src/nspire_main.c src/runq_nspire.c src/nspire.c
 fi
 # A144. THE APP'S INPUTS COME FROM THE MAKEFILE, NOT FROM A GLOB.
 #
@@ -167,8 +166,8 @@ fi
 APP_INPUTS=$(printf 'show: ; @echo $(DEV_SRC) $(EVAL_CORE) $(APP_HDR)\n' | make -s --no-print-directory -f Makefile -f - show)
 [ -n "$APP_INPUTS" ] || { echo "  FATAL: could not read the app's inputs from the Makefile"; exit 1; }
 newer_than build/chattlm.tns        $APP_INPUTS
-# These two have their own Makefiles (tools/eval/, src/) and are NOT built by the repo-root `make`.
-# They were absent from a fresh worktree while push-all.sh sent them unconditionally under `set -e`,
+# eval_device.tns has its own Makefile (tools/eval/) and is NOT built by the repo-root `make`.
+# Programs like it were absent from a fresh worktree while push-all.sh sent them unconditionally under `set -e`,
 # so the transfer would have aborted mid-run after the device had already been half-written. Named
 # here so the failure arrives BEFORE anything is sent, with the command that fixes it.
 newer_than build/transfer/store.tns.tns     corpus/store_clean.json
@@ -202,7 +201,6 @@ ask_make resources  "$PWD/build/chattlm_support.tns" build/chattlm_support.tns
 ask_make installer  ../build/ChatTLM_Setup.tns       build/ChatTLM_Setup.tns
 if [ "${PUSH_BENCH:-0}" = "1" ]; then
 ask_make tools/eval eval_device.tns          tools/eval/eval_device.tns
-ask_make src        llama2.tns               src/llama2.tns
 for _b in forward cas platform mem mac flash rtc; do
     ask_make . "bench/bench_${_b}.tns" "bench/bench_${_b}.tns"
 done
@@ -213,7 +211,6 @@ if [ "$stale" -ne 0 ]; then
     echo "         previous session. Rebuild everything the transfer set needs:"
     echo "           make bench && make device"
     echo "           (cd tools/eval && make eval_device.tns)      # its own Makefile"
-    echo "           (cd src       && make llama2.tns)            # its own Makefile"
     echo "           python3 tools/store_pack.py corpus/store_clean.json build/store.tns"
     echo "           cp build/store.tns build/transfer/store.tns.tns"
     echo "           cp build/tok4096.tok build/transfer/tok4096.tok.tns"
@@ -235,7 +232,6 @@ echo "  staleness gate: every program is newer than its sources"
 if [ "${PUSH_BENCH:-0}" = "1" ]; then
 echo "--- programs (PUSH_BENCH=1) ---"
 send tools/eval/eval_device.tns  /eval_device.tns
-send src/llama2.tns              /llama2.tns
 send bench/bench_platform.tns    /bench_platform.tns
 send bench/bench_mem.tns         /bench_mem.tns
 send bench/bench_mac.tns         /bench_mac.tns

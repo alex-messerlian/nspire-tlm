@@ -28,10 +28,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 os.chdir(ROOT)
 
 # Binaries that are tracked ON PURPOSE and cannot be built here. Each needs a reason.
-EXEMPT = {
-    "tools/nspire-cli/nsp": "links libnspire from a sibling checkout; built by tools/nspire-cli/Makefile "
-                            "on a machine that has it, and committed so a device pass does not need one",
-}
+EXEMPT = {}
 
 try:
     tracked = subprocess.run(["git", "ls-files"], capture_output=True, text=True, check=True).stdout.split()

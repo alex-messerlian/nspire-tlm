@@ -4,10 +4,10 @@
 #
 #   tools/eval/score_on_device_decoder.sh <group> <checkpoint.pt>...
 #
-# The engine's own group (FIXED_GS, 32 since A151) is what ships; group 16 divides every row length
-# at widths 176 and 352 and scores the width ladder. Group 88, the defective layout, is no longer
-# buildable: rq_probe refuses it (docs/RESULT_CORRECTNESS.md s4). Exports go to build/int8/
-# (gitignored); results to results/{correct,arms}_int8_g<group>_<name>.json.
+# The engine's own group (FIXED_GS in src/runq_nspire.c: 88, with the hidden width padded to 1,056)
+# is what ships; group 16 divides every row length at widths 176 and 352 and scores the width
+# ladder. Any other group is refused. Exports go to build/int8/ (gitignored); results to
+# results/{correct,arms}_int8_<TAG>_<name>.json, where TAG defaults to g<group>.
 set -euo pipefail
 G="${1:?usage: score_on_device_decoder.sh <group> <checkpoint.pt>...}"; shift
 # Results are named results/{correct,arms}_int8_<TAG>_<name>.json. TAG defaults to g<group>, but

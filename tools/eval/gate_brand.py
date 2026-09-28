@@ -15,6 +15,7 @@ THE EXEMPTIONS ARE STRINGS THAT EXIST AND ARE NOT VISIBLE. Each is declared with
 binary it is allowed in; anything else fails. An undeclared occurrence is a failure even if it is
 lowercase, because "it is probably a path" is the reasoning that lets a real one through.
 """
+import os
 import sys
 from pathlib import Path
 
@@ -114,8 +115,10 @@ def main() -> int:
     finally:
         mutated.unlink(missing_ok=True)
 
-    # CONTROL 2: the unmodified Ndless release is precisely what this gate exists to stop shipping.
-    ref = Path("~/nspire-tlm/ndless/ndless_resources.tns")
+    # CONTROL 2: the unmodified Ndless loader is precisely what this gate exists to stop shipping.
+    # NDLESS_RELEASE names an official release's ndless_resources.tns; by default, the one a full
+    # build of vendor/Ndless produces from Ndless's own sources.
+    ref = Path(os.environ.get("NDLESS_RELEASE", ROOT / "vendor/Ndless/ndless/calcbin/ndless_resources.tns"))
     if ref.is_file():
         found, _ = scan(ref)
         if not found:

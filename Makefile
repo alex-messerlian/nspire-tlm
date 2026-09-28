@@ -66,7 +66,7 @@ TESTS      := $(TESTS_APP) $(TESTS_EVAL) $(TESTS_PLAIN) $(TESTS_STORE)
 .PHONY: all tests device check clean
 all: tests device
 
-tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/tlmui $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck $(BUILD)/devprompt $(BUILD)/devasm $(BUILD)/autoasm
+tests: $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app tools/eval/shapecli tools/eval/provcli tools/eval/evalcli $(BUILD)/asmcli $(BUILD)/askcli $(BUILD)/pickcli $(BUILD)/rankcli $(BUILD)/keycost $(BUILD)/promptcheck $(BUILD)/devprompt $(BUILD)/devasm $(BUILD)/autoasm
 
 $(BUILD):
 	@mkdir -p $(BUILD)
@@ -236,27 +236,6 @@ $(BUILD)/pickcli:        tools/eval/pickcli.c      src/store/picker.c src/store/
 	$(CC) $(HOSTFLAGS) -o $@ $< src/store/picker.c src/store/loader.c -lm
 
 
-# build/tlmui -- the host UI harness that tools/uiserver/server.py drives, and that every
-# localhost UI decision was validated against. It was a COMMITTED BINARY with no rule, and the
-# note in gate_binaries.py claimed NO SOURCE EXISTED for it. That was wrong, and wrong in the
-# repo's own recurring way: absence of a build rule was read as absence of source. The source is
-# right here -- tlm_demo.c has the main, ui_host.c implements ui.h against a terminal instead of
-# nspireio, host_stubs.c replays the 24 device tokens at the measured 373 ms each.
-#
-# The set was recovered by SYMBOL DIFF against the committed artefact, not by guessing: this list
-# is the unique one whose nm output the committed binary's is a subset of. It is a subset and not
-# an equality -- the committed binary is missing ns_tok_special_id, which tokenizer.c exports
-# today. So the artefact every UI claim rested on was already stale by at least one function.
-#
-# It links ui_host.c where the device links ui.c, and host_stubs.c where the device links
-# runq_nspire.c. tlm_demo.c ITSELF is compiled unchanged, which is the whole claim: layout, column
-# budget, truncation and scrolling are the shipped code. The MODEL is not -- see host_stubs.c.
-$(BUILD)/tlmui: src/store/tlm_demo.c src/store/ui_host.c src/store/host_stubs.c \
-                src/store/loader.c src/store/picker.c src/store/assemble.c \
-                src/store/tokenizer.c src/store/ui.h | $(BUILD)
-	$(CC) $(HOSTFLAGS) -o $@ $< src/store/ui_host.c src/store/host_stubs.c src/store/loader.c \
-	      src/store/picker.c src/store/assemble.c src/store/tokenizer.c -lm
-
 # Compiles runq_nspire.c on the HOST, which is the point: the loader that runs on the calculator is
 # the one under test, not a reimplementation of its rules.
 $(BUILD)/test_ckpt: tools/eval/test_ckpt.c src/runq_nspire.c | $(BUILD)
@@ -413,9 +392,29 @@ bench/%.tns: bench/%.elf
 	 make-prg $@.zehn $@ && rm -f $@.zehn && \
 	 echo "  $@  $$(wc -c < $@ | tr -d ' ') bytes"
 
+# ---- data ------------------------------------------------------------------------------------
+# The generated training corpus is stored compressed, because GitHub refuses a file over 100 MB.
+# `make corpus` unpacks it byte for byte. After regenerating the corpus, `make pack-corpus` writes
+# the archive back (gzip -n, so an unchanged corpus gives an unchanged archive).
+corpus/synth_sample.jsonl: corpus/synth_sample.jsonl.gz
+	gunzip -c $< > $@.tmp && mv $@.tmp $@
+
+# The store and the tokenizer in the flat formats the calculator reads, packed from their sources.
+$(BUILD)/store.tns: corpus/store_clean.json corpus/knowledge/definitions_train.json tools/store_pack.py | $(BUILD)
+	python3 tools/store_pack.py
+
+$(BUILD)/tok4096.tok: train/tok4096.json tools/tok_pack.py | $(BUILD)
+	python3 tools/tok_pack.py
+
+.PHONY: corpus pack-corpus data
+corpus: corpus/synth_sample.jsonl
+pack-corpus:
+	gzip -9 -n -c corpus/synth_sample.jsonl > corpus/synth_sample.jsonl.gz
+data: corpus $(BUILD)/store.tns $(BUILD)/tok4096.tok
+
 # ---- gates -----------------------------------------------------------------------------------
 # Builds first, so "not built" can never be mistaken for a passing suite.
-check: tests
+check: tests data
 	@bash tools/eval/run_gates.sh
 
 clean:

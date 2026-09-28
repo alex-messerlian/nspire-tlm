@@ -1,7 +1,6 @@
 /* The prompt app_request sends, for a question and the record the student picked.
  * Reads "rid<TAB>question" lines on stdin; prints one prompt per line, or "ERR <reason>" (not a
- * bang-prefixed code: those are the evaluator's refusal codes, which test_ui_errs holds the UI to
- * cover).
+ * bang-prefixed code: those are the evaluator's refusal codes, and this is not the evaluator).
  *
  * Same calls in the same order as device_app.c's app_request: ask_build (parse the givens, strip
  * them from the question) then ns_assemble on the record named by rid. The only thing app_request

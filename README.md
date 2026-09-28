@@ -6,6 +6,12 @@ ORCID [0009-0003-4933-6832](https://orcid.org/0009-0003-4933-6832)
 **Paper:** [`paper/paper.pdf`](paper/paper.pdf), the anonymous copy under review at TMLR, and
 [`paper/paper-arxiv.pdf`](paper/paper-arxiv.pdf), the named copy for arXiv.
 
+ChatTLM is a physics assistant that runs entirely on a TI-Nspire CX II CAS: a 10.9M-parameter language
+model, an int8 inference engine written in C, and a runtime that does the arithmetic the model asks for.
+This repository holds the calculator application, the training and evaluation code, the data, every
+measurement behind the paper, and the paper itself. The trained models and ready-to-copy calculator
+files are in the [release](https://github.com/alex-messerlian/nspire-tlm/releases).
+
 ## Abstract
 
 We decided to test the limits by building a physics assistant that runs natively on a TI-Nspire CX II CAS graphing
@@ -33,25 +39,131 @@ on battery predicts a decode run within 0.4%.
 
 *Left: a frame from the author's unedited video of the calculator answering the question of the paper's Figure 1, on
 battery with no cable attached. Right: the same screen drawn by the application's own code, from the calculator
-decoder's output replayed on a computer. The paper's Appendix B has more of both, and the video will be released with
-the code.*
+decoder's output replayed on a computer. The paper's Appendix B has more of both, and the video is attached to the
+release.*
 
-## Contents
+## Try it on a calculator
+
+It was built and tested on a TI-Nspire CX II CAS with OS 6.4.0.74. The setup document supports OS 6.2.0 to 6.4.0.
+
+1. From the [release](https://github.com/alex-messerlian/nspire-tlm/releases), download the six calculator files.
+2. Copy them to the calculator in this layout (the folder names matter, and all three data files must be together):
+
+   ```text
+   My Documents/chattlm/ChatTLM Setup        ChatTLM_Setup.tns
+   My Documents/chattlm/chattlm_support      chattlm_support.tns
+   My Documents/chattlm/ChatTLM              ChatTLM.tns
+   My Documents/chattlm/data/                store.tns.tns, tok4096.tok.tns, model4096.bin.tns
+   ```
+
+   Any program that copies documents to the calculator will do. If you build from source,
+   `tools/nspire-cli/push-all.sh` sends everything from `build/` in this layout and checks every file by hash after
+   sending it (see below).
+3. Unplug the USB cable. With it attached the calculator runs at 288 MHz instead of 396 MHz.
+4. Open **ChatTLM Setup** in the chattlm folder. It installs the support files and closes, and the home screen says
+   "ChatTLM is ready". Then open **ChatTLM** in the same folder, type a physics question with its values, and press
+   enter.
+
+ChatTLM Setup installs [Ndless](https://github.com/ndless-nspire/Ndless), the loader that lets the calculator run
+native programs, using Ndless's own installer (see [`installer/README.md`](installer/README.md)). A reset (the button
+on the back) removes it, so open ChatTLM Setup again after every reset. If ChatTLM cannot find its files, it lists on
+screen each folder it tried and which file was missing.
+
+## Build from source
+
+Tested on macOS on Apple silicon, with Python 3 and Homebrew. The host tests need only a C compiler and Python; the
+calculator programs need the Ndless toolchain, which is built from source inside `vendor/`.
+
+```bash
+git clone https://github.com/alex-messerlian/nspire-tlm.git && cd nspire-tlm
+python3 -m venv .venv-tok && .venv-tok/bin/pip install -r requirements.txt
+tools/fetch_vendor.sh      # Ndless, llama2.c and libnspire, at the commits this was built against
+make tests data            # host test programs; the corpus unpacked; the store and tokenizer packed
+```
+
+The calculator programs. `tools/build_toolchain_macos.sh` builds the ARM cross compiler (it downloads the GCC,
+binutils and newlib sources with `wget`, needs Homebrew's `gmp`, `mpfr`, `libmpc`, `zlib` and `texinfo`, and takes a
+while); the
+SDK's libraries and tools are then built with the new compiler on `PATH`:
+
+```bash
+tools/build_toolchain_macos.sh
+PATH="$PWD/vendor/Ndless/ndless-sdk/toolchain/install/bin:$PWD/vendor/Ndless/ndless-sdk/bin:$PATH" \
+    make -C vendor/Ndless/ndless-sdk
+make device setup          # build/chattlm.tns and build/ChatTLM_Setup.tns
+make -C resources          # build/chattlm_support.tns, the loader
+```
+
+The model. Download `model4096.bin.tns` from the release into `build/transfer/`, or download `ship.pt` into `train/`
+and export it at int8, group 88 (this also stages the store, the tokenizer and the app in `build/transfer/`):
+
+```bash
+tools/export_device.sh train/ship.pt 88
+```
+
+The transfer tool, which needs Homebrew's `libusb` and `pkg-config`:
+
+```bash
+(cd vendor/libnspire && ./configure --prefix="$PWD/_install" && make install)
+make -C tools/nspire-cli
+tools/nspire-cli/push-all.sh
+```
+
+## Checks
+
+```bash
+make check
+```
+
+builds the host programs and runs the test and check suite: 92 checks on the evaluator, the corpus generator, the
+store, the prompt assembly, the tokenizer, the loader and the application's logic. For 44 of them,
+`tools/eval/gate_controls.py` feeds in a deliberately broken input and confirms that the check then fails. Some
+checks read the calculator programs and the model file; if any of those is missing, the suite names it and runs
+nothing, rather than passing without it.
+
+## Reproducing the paper
+
+Every number in the paper is listed in [`docs/paper/FACTS.md`](docs/paper/FACTS.md) with the conditions it was
+measured under and the file in `results/` it comes from. From there:
+
+- **The data.** `corpus/generate.py` writes the synthetic corpus from the record store and the tables beside it
+  (`corpus/synth_stamp.json` records the inputs of the committed copy). `tools/fetch_oer.sh` fetches the OpenStax
+  books, and `train/prepare.py` mixes the two into the training stream.
+  [`docs/paper/DATA_PROVENANCE.md`](docs/paper/DATA_PROVENANCE.md) describes both and their licenses.
+- **Training.** The shipped model is the 8,000-step run
+  `RUN=math1 SEED=1 DIM=352 LAYERS=6 HEADS=8 SEQ=512 BS=24 STEPS=8000 .venv-tok/bin/python train/select_run.py`
+  ([`train/README.md`](train/README.md) lists every model file). It was trained on an earlier version of the corpus from the same generator, attached to the release as
+  `synth_sample_shipped_model.jsonl.gz`; the corpus in `corpus/` is the one the width-ladder and fully trained models
+  used. The pre-registrations of those runs are in `docs/`.
+- **Scoring.** The scripts are in `tools/eval/`. `TAG=g88p tools/eval/score_on_device_decoder.sh 88 train/ship.pt`
+  scores the shipped model with the calculator's own int8 decoder and writes `results/correct_int8_g88p_ship.json`
+  and `results/arms_int8_g88p_ship.json`; `tools/eval/score_endtoend.py` runs the whole system with the
+  application's own relation selection; FACTS.md names the script behind each figure.
+- **Timings** need the calculator, on battery. [`bench/README.md`](bench/README.md) lists the benchmark programs,
+  [`docs/HARDWARE.md`](docs/HARDWARE.md) the hardware measurements, and `results/device_g88p/` the logs of the shipped
+  engine.
+
+## Repository map
 
 | Folder | What is in it |
 |---|---|
-| `paper/` | `paper.pdf` and `paper-arxiv.pdf`, their LaTeX source `paper.tex`, `references.bib`, `figures/`, TMLR's style files, and the paper's license |
-| `submission/` | [`SUBMISSION.md`](submission/SUBMISSION.md): what to upload to TMLR and arXiv, what the forms ask for, and what is left to do |
-| `src/` | The calculator application and the inference engine, in C |
-| `corpus/` | The record store and the program that generates the training documents |
-| `train/` | Training code; [`train/README.md`](train/README.md) lists the model files, which are not in git |
-| `tools/` | The evaluation harness and its checks (`tools/eval/`), and the paper's checks and figure scripts (`tools/paper/`) |
-| `results/`, `device_pull/` | Every measurement behind the paper's tables and figures, and raw logs pulled from the calculator |
-| `docs/` | A write-up per result; [`docs/paper/`](docs/paper/) holds the paper's records: every number and its source, and the citation log |
-| `bench/` | The calculator's micro-benchmarks |
-| `resources/`, `installer/` | The loader derived from Ndless, and the setup document that installs it |
+| `paper/` | `paper.pdf` and `paper-arxiv.pdf`, their LaTeX source, `references.bib`, `figures/`, TMLR's style files and the paper's license |
+| `src/` | The inference engine (`runq_nspire.c`) and, in `src/store/`, the calculator application: interface, store loader, relation selection, prompt assembly, tokenizer and tool execution |
+| `tools/eval/` | The evaluator the model's tool calls run on, the scoring harnesses, and the checks behind `make check` |
+| `corpus/` | The record store, the corpus generator and its inputs, and the evaluation splits |
+| `train/` | Data preparation and training; [`train/README.md`](train/README.md) lists the model files in the release |
+| `results/` | Every measurement behind the paper's tables and figures, including the logs pulled from the calculator |
+| `docs/` | The hardware measurements, the tool-call specification, the pre-registrations, and in [`docs/paper/`](docs/paper/) the paper's records: every number with its source, the citation log and the data provenance |
+| `bench/` | The calculator benchmarks |
+| `installer/`, `resources/` | The setup document and the loader, both derived from Ndless |
+| `tools/paper/` | The paper's checks, figures, calculator screens and cost model |
+| `tools/nspire-cli/` | USB transfer to the calculator |
+| `submission/` | Notes on the photographs, the video and the supplementary material |
 
-## Editing and rebuilding the paper
+The documents in `docs/` are the records the paper relies on. They were written during the project, so some of them
+refer to working notes that are not published; FACTS.md and the paper are current.
+
+## Rebuilding the paper
 
 Edit `paper/paper.tex`. Keep the `\label{...}` names, the `\ifdeanonymized ... \fi` blocks (they hide the author's name
 in the review copy) and `\label{endofmain}` just before the statements (the length check uses it). Every number in the
@@ -73,16 +185,9 @@ fonts, figures, length), from the repository root:
 ```
 
 The environment is `python3 -m venv .venv-fig && .venv-fig/bin/pip install -r tools/paper/requirements.txt`. The
-figures are drawn from `results/` by `tools/paper/make_figures.py`.
-
-## Reproducing the results
-
-`make check` builds the host tools and runs the test and check suite. The evaluation scripts are in `tools/eval/`, and
-each `docs/RESULT_*.md` describes one result and how it was produced. Timings need the calculator, running on battery,
-and the Ndless toolchain; [`build/transfer/README.txt`](build/transfer/README.txt) describes the transfer to the
-calculator. The project's working log, from the original brief to the pushback on its hypotheses, is in
-[`docs/PROJECT_NOTES.md`](docs/PROJECT_NOTES.md); some of its numbers are superseded, and the paper and FACTS.md are
-current.
+figures are drawn from `results/` by `tools/paper/make_figures.py`. `--final` also cuts the photographs again from
+the original recording, which is not published because it records where it was filmed; without it, leave out
+`--final` and every other check still runs.
 
 ## Citation
 
@@ -101,11 +206,10 @@ If you use this work, please cite:
 
 ## License
 
-- **Paper** (everything in `paper/`, including the figures): [CC BY 4.0](paper/LICENSE.md). TMLR's style files keep
-  their own licenses.
-- **Code, data and weights**: to be released with the final version of the paper, under the MIT License for the code
-  written for this work, the Mozilla Public License 1.1 for the loader derived from Ndless, and CC BY-NC-SA 4.0 for the
-  corpus, the record store and the weights, following the licenses of the OpenStax source text.
+The code is under the [MIT License](LICENSE). The loader and setup document derived from Ndless keep the Mozilla
+Public License 1.1; the record store, the corpus and the model weights are under CC BY-NC-SA 4.0, following the
+licenses of the OpenStax books they come from; and the paper is under [CC BY 4.0](paper/LICENSE.md).
+[`NOTICE.md`](NOTICE.md) says which files each license covers.
 
 ## Contact
 

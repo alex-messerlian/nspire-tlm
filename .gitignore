@@ -1,69 +1,54 @@
+# ---- build products -----------------------------------------------------------------------------
+# build/ holds what `make` produces. One test fixture there is tracked.
+build/*
+!build/tok_reference.json
 *.elf
 *.tns
 *.zehn
 *.dis
-vendor/Ndless/
-vendor/llama2.c/
-models/*.bin
-models/*.gguf
-models/*.pt
-.DS_Store
-vendor/libnspire/
-corpus/raw/
-.venv-tok/
-
-__pycache__/
-*.pyc
-.venv-tok
-vendor
-build/test_*_mut
+*.o
 *.bak
-.gate_controls.lock
-
-# The 5.1 GB OpenStax source. NEVER commit this path: it is untracked bulk data, and a
-# symlink committed here was checked out over the real directory in the main worktree and
-# destroyed it. Keep it ignored so `git add -A` cannot pick it up.
-corpus/raw
-build/model_*.bin
-overnight.log
-probe_*.txt
-d2_*.txt
-
-# figure-generation environment (tools/paper/requirements.txt)
-.venv-fig/
-
-# paper build outputs (regenerable; tools/paper/check_paper.py removes LaTeX's working files after
-# each build). paper/paper.pdf and paper/paper-arxiv.pdf ARE tracked: the folder is the deliverable.
+build/test_*_mut
+# host tools compiled next to their sources (tools/eval/Makefile)
+tools/eval/evalcli
+tools/eval/provcli
+tools/eval/shapecli
+tools/eval/test_eval
+tools/eval/fuzz
+tools/eval/golden.txt
+tools/nspire-cli/nsp
+# paper build outputs; paper/paper.pdf and paper/paper-arxiv.pdf are tracked
 paper/*.aux
 paper/*.bbl
 paper/*.blg
 paper/*.log
 paper/*.out
 paper/paper-arxiv.tex
-# the arXiv upload, rebuilt from paper/ by check_paper.py --preprint
+# the arXiv upload and the TMLR supplementary files, rebuilt by tools/paper/
 submission/arxiv-source.zip
-# original photographs and video of the calculator (large; see submission/PHOTOS.md)
-media/
-# the re-encoded videos and the TMLR supplementary ZIP, rebuilt by tools/paper/make_media.py --video
-submission/supplementary/*.mp4
 submission/supplementary.zip
+submission/supplementary/*.mp4
 
-# int8 exports for host scoring on the device decoder (regenerable)
-build/int8/
-
-# ---- 2026-09-26 tidy-up ------------------------------------------------------------------------
-# build/ holds what `make` produces. The few DATA files there stay tracked (model4096*.bin,
-# tok4096.tok, tok_reference.json, transfer/README.txt): an ignore rule never untracks a tracked
-# file, and a new data file needs `git add -f`.
-build/*
-# host tools compiled by `make` next to their sources
-tools/eval/evalcli
-tools/eval/provcli
-tools/eval/shapecli
-tools/eval/test_eval
-# local leftovers, kept rather than deleted (attic/README.txt)
-attic/
-# model checkpoints are too large for git; train/README.md lists the ones that matter and must be
-# backed up. Checkpoints tracked before this rule stay tracked.
+# ---- data that lives outside git ----------------------------------------------------------------
+# the Ndless SDK, llama2.c and libnspire (tools/fetch_vendor.sh); no trailing slash, so a symlink matches too
+/vendor
+# the OpenStax sources, 5.1 GB (tools/fetch_oer.sh). Never commit this path.
+/corpus/raw
+# unpacked from corpus/synth_sample.jsonl.gz by `make corpus`
+corpus/synth_sample.jsonl
+# training streams (train/prepare.py) and checkpoints (release assets, see train/README.md)
+train/*.bin
 train/*.pt
 train/archive_*/
+/models
+# the original photographs and video of the calculator (see submission/PHOTOS.md)
+/media
+
+# ---- environments and local files ---------------------------------------------------------------
+/.venv-tok
+/.venv-fig
+__pycache__/
+*.pyc
+.DS_Store
+.gate_controls.lock
+/attic

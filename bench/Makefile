@@ -1,6 +1,6 @@
 # Phase 0 micro-benchmarks for TI-Nspire CX II.
 #
-# Requires the Ndless SDK on PATH (nspire-gcc, genzehn, make-prg). See docs/PHASE0.md.
+# Requires the Ndless SDK on PATH (nspire-gcc, genzehn, make-prg). See README.md.
 #
 # -O2 not -O3: -O3 on this toolchain has a habit of vectorising nothing and inlining everything,
 # which makes the disassembly unreadable. We need to READ the disassembly to confirm the hot loops

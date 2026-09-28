@@ -12,7 +12,7 @@ overwrites the record span with the no-match literal, so a legitimate D3 is unre
 path. The class was not mis-tuned; it could not be produced correctly.
 
 POSITIVE CONTROL, which is what makes the 100% trustworthy rather than a broken predicate: the six
-hand-written out-of-scope questions in docs/EVAL_ITEMS.md (ladder statics, two-block friction,
+hand-written out-of-scope questions in GOOD_D3 below (ladder statics, two-block friction,
 headwind projectile, three-cable statics) all score LEGITIMATE. The criterion discriminates.
 
 This gate therefore has two jobs, and the second is why it is not just an assertion that the count
@@ -22,6 +22,16 @@ and each one must pass the criterion.
 import importlib.util, json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+
+
+GOOD_D3 = [  # questions no stored relation answers, written by hand for the evaluation design
+    "A ladder leans against a frictionless wall at 60 degrees. Find the friction force at the base.",
+    "A block slides down a rough incline, compresses a spring, and rebounds. Find the final height.",
+    "Two blocks connected over a pulley with friction on both surfaces. Find the acceleration.",
+    "A projectile is launched at 40 degrees into a headwind. Find the range.",
+    "A rod pivots about one end while a mass slides along it. Find the angular acceleration.",
+    "Find the tension in each of three cables supporting a sign at different angles.",
+]
 
 
 def main():
@@ -37,8 +47,7 @@ def main():
 
     # POSITIVE CONTROL FIRST: if the criterion cannot clear the known-good questions it discriminates
     # nothing, and a zero count below would mean nothing either.
-    md = (ROOT / "docs/EVAL_ITEMS.md").read_text().splitlines()
-    good = [l.split("|")[2].strip() for l in md if l.startswith("| D3-")]
+    good = GOOD_D3
     cleared = sum(1 for q in good
                   if not d3.answerable_by(recs, set(d3.GIVEN.findall(q)), q.lower()))
     print(f"  positive control: {cleared}/{len(good)} hand-written out-of-scope questions LEGITIMATE")

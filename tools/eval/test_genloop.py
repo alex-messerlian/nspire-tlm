@@ -113,13 +113,10 @@ print("\n  -- no second implementation --")
 # without editing a number that says what it is. Adding a file therefore costs a visible increment
 # rather than one quiet line.
 #
-# DEADLINE: every remaining name migrates or is deleted. The ones producing figures we quote go
-# first; see docs/RESULT_STRATUM_DRIFT.md for the ranking.
-ALLOW_MAX = 19
+# DEADLINE: every remaining name migrates or is deleted. The legacy training scripts were deleted
+# for the public release, which took the list from 19 to 3.
+ALLOW_MAX = 3
 ALLOW = {  # legacy training scripts, grandfathered. Adding to this list is a deliberate act.
- "attempt_policy.py","capability.py","e2e.py","fit_catch.py","eval_noise.py","name_cue.py",
- "inline_test.py","l2.py","retry_test.py","no_record.py","rescore.py","reprobe.py",
- "seed_population.py","shippability.py","refusal_run.py","verbatim_retest.py",
  "prepare.py","genloop.py","test_genloop.py",
 }
 offenders = []

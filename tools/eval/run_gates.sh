@@ -64,8 +64,7 @@ need_file() {   # need_file <path> <how to make it>
 # Correcting a wrong first law in store_clean.json left build/store.tns holding the old formula --
 # need_file saw the path and passed, so every store-derived gate was checking a store nobody had
 # rebuilt. Only gate_record_bytes caught it, and only because the diff happened to touch a record.
-# Same class as gate_stale_figures over a corpus nobody regenerated, one level more dangerous:
-# this build product is what ships.
+# One level more dangerous than a stale corpus: this build product is what ships.
 need_fresh() {  # need_fresh <product> <source> <how to make it>
     if [ -e "$1" ] && [ -e "$2" ] && [ "$2" -nt "$1" ]; then
         printf "  %-20s STALE: older than %s -- run: %s\n" "$(basename "$1")" "$2" "$3"
@@ -74,8 +73,8 @@ need_fresh() {  # need_fresh <product> <source> <how to make it>
 }
 need_file "$PY"              "python3 -m venv .venv-tok && .venv-tok/bin/pip install -r requirements.txt"
 need_file "$STORE"           "the record store; pass a path as \$1 if it lives elsewhere"
-need_file build/store.tns    "python3 tools/store_pack.py $STORE build/store.tns"
-need_fresh build/store.tns "$STORE" "python3 tools/store_pack.py"
+need_file build/store.tns    "make data"
+need_fresh build/store.tns "$STORE" "make data"
 # THE EVAL SPLITS BAKE THE RECORD SPAN, so a store edit silently makes every arm serve a document
 # the model was never trained on. Measured when the condition pass was scoped: 1,115 of 1,128 items
 # across these ten files embed the literal "standard conditions", so editing a single `req` moves
@@ -92,14 +91,18 @@ for _sp in corpus/split_fit.json corpus/split_fit_ho.json corpus/split_fit_m.jso
            corpus/split_select.json corpus/split_report.json; do
     need_fresh "$_sp" "$STORE" "rebuild the arm splits (fit_judgement.py / answer_control.py / d1_arm.py / build_splits.py)"
 done
-need_file build/tok4096.tok  "python3 tools/tok_pack.py"
+need_file build/tok4096.tok  "make data"
+need_file build/tok_reference.json "git checkout -- build/tok_reference.json   # a tracked test fixture"
+need_file corpus/synth_sample.jsonl "make data   # unpacks corpus/synth_sample.jsonl.gz"
+need_file build/transfer/model4096.bin.tns "put the release's model4096.bin.tns in build/transfer/, or run tools/export_device.sh train/ship.pt 88"
+need_file build/chattlm.tns  "make device"
+need_file build/ChatTLM_Setup.tns "make -C installer"
 
 # A134. gate_brand reads the BUILT loader, so a stale one would be checked and pass while the
-# shipped file still said Ndless. Same shape as gate_stale_figures over a corpus nobody
-# regenerated, except this build product is the deliverable.
+# shipped file still said Ndless. This build product is the deliverable.
 need_file  build/chattlm_support.tns "make -C resources"
 need_fresh build/chattlm_support.tns resources/brand.py "make -C resources"
-need_file tools/eval/shapecli "make tests   # the structural call check, ARCHITECTURE.md s6"
+need_file tools/eval/shapecli "make tests   # the structural call check"
 if [ "$prereq_missing" -ne 0 ]; then
     echo "GATE SUITE DID NOT RUN -- prerequisites above are missing."
     echo "This is NOT a gate failure. Nothing was checked. Create them and re-run."
@@ -153,10 +156,6 @@ if ! _skip items_refs; then $PY tools/eval/gate_items_refs.py >/dev/null 2>&1 &&
 # DIMENSIONLESS_AUDIT.md calls this "gating (exit 1 on any)". It was in no gate, and it ran
 # `./evalcli` relative, so it only worked from tools/eval. Both fixed 2026-08-27.
 if ! _skip dimensionless; then $PY tools/eval/audit_dimensionless.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "dimensionless" || { printf "  %-20s FAIL\n" "dimensionless"; fail=1; }; fi
-# topic-scoping-artifact, promoted from UNENFORCED 2026-08-27: a published selection improvement
-# must publish its same-size random control. Topic-scoping read 61.2% against a random-20 at 62.7%.
-if ! _skip selection_control; then $PY tools/eval/gate_selection_control.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "selection_control" || { printf "  %-20s FAIL\n" "selection_control"; fail=1; }; fi
-if ! _skip stale_figures; then $PY tools/eval/gate_stale_figures.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "stale_figures" || { printf "  %-20s FAIL\n" "stale_figures"; fail=1; }; fi
 if ! _skip corpus_fresh; then $PY tools/eval/gate_corpus_fresh.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "corpus_fresh" || { printf "  %-20s FAIL\n" "corpus_fresh"; fail=1; }; fi
 if ! _skip record_derivatives; then $PY tools/eval/audit_record_derivatives.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "record_derivatives" || { printf "  %-20s FAIL\n" "record_derivatives"; fail=1; }; fi
 if ! _skip split_heldout; then $PY tools/eval/gate_split_heldout.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "split_heldout" || { printf "  %-20s FAIL\n" "split_heldout"; fail=1; }; fi
@@ -270,7 +269,6 @@ if ! _skip test_tokenizer; then ./build/test_tokenizer build/tok4096.tok build/t
 # UI and interaction suites. These were written and NOT LISTED HERE, which is the same defect the
 # gates exist to catch, pointed at the gates themselves: a suite nothing runs is a suite that does
 # not exist. Every one of these is built from source that ships.
-if ! _skip test_ui_errs; then $PY tools/eval/test_ui_errs.py >/dev/null 2>&1 && printf "  %-20s PASS\n" "test_ui_errs" || { printf "  %-20s FAIL\n" "test_ui_errs"; fail=1; }; fi
 # test_ckpt guards the LOADER. It is listed here and not only in the Makefile because this file,
 # not TESTS, is what decides whether the suite passed -- a roster kept in two places drifts, and
 # the half nobody reads is the half that silently stops running.
