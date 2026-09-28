@@ -19,7 +19,7 @@ What it shows, with times read from its frames:
 |---|---|
 | 0:00 | the home screen |
 | 0:05 | the chattlm folder in My Documents |
-| 0:10 | ChatTLM Setup; it installs the loader and closes |
+| 0:10 | ChatTLM Setup; it installs the loader and closes (its heading then read "One-time setup"; it now reads "Run after every reset") |
 | 0:15 | the home screen with "ChatTLM is ready" |
 | 0:20 to 0:26 | ChatTLM opened from the chattlm folder |
 | 0:27 to 2:01 | the question of the paper's Figure 1 typed on the keypad |

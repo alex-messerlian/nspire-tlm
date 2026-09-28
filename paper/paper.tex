@@ -271,7 +271,7 @@ fp32 using the compiler's software floating-point routines, and the KV cache is 
 loop, tool execution and the 2\% answer check are one C module, shared by the application and by the
 evaluation harness of Section~\ref{sec:eval}. The calculator's operating system does not run native
 programs, so the application is started by a loader derived from Ndless \citep{ndless}, which a
-setup document installs after each restart; the hardware is not modified (Appendix~\ref{app:device}).
+setup document installs again after every reset; the hardware is not modified (Appendix~\ref{app:device}).
 
 % ==================================================================================================
 \section{Training Data}
@@ -717,7 +717,7 @@ instruction level. The empty-cache model under-predicts the decode run above by 
 \section{Memory and Speed Limits}
 \label{sec:frontier}
 
-\textbf{Memory.} After a fresh boot, the largest single block an application can allocate is
+\textbf{Memory.} Right after a reset, the largest single block an application can allocate is
 21.53\,MiB. The checkpoint is one block, but it is not the only constraint: the engine also holds an
 fp32 KV cache of $2 \cdot L \cdot \mathrm{context} \cdot \mathrm{width} \cdot 4$ bytes. At the
 shipped shape the cache is 8.25\,MiB, 43\% of the 19.34\,MiB that checkpoint and cache take together
@@ -730,7 +730,7 @@ length, context and parameters trade off
 directly.
 
 The largest block also depends on what the device did recently: after a program failed inside the
-loader it was 5.02\,MiB until a reboot, while four load-and-free cycles of the shipped model left it
+loader it was 5.02\,MiB until the calculator was reset, while four load-and-free cycles of the shipped model left it
 unchanged to the byte, so the loss comes from the crash, not from fragmentation.
 
 \begin{figure}[t]
@@ -739,7 +739,7 @@ unchanged to the byte, so the loss comes from the crash, not from fragmentation.
 \includegraphics[width=\linewidth]{fig_memory.pdf}
 \caption{Checkpoint and fp32 KV cache per width (six layers, context 512), and whether the model
 loaded. The shaded band is where the limit on the two-block total must lie; width 384 is a group-32
-layout. The largest single block on a fresh boot was 21.53\,MiB.}
+layout. The largest single block right after a reset was 21.53\,MiB.}
 \label{fig:memory}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.49\linewidth}\centering
@@ -938,7 +938,7 @@ item set we later found measures declining, scored by a harness we later replace
 
 Figure~\ref{fig:device} shows three frames from a video of the calculator answering the question of
 Figure~\ref{fig:exchange}, filmed in one take on battery with no cable attached. ChatTLM Setup, opened
-after a reset, installs the loader and closes, and the home screen reports it (a). The question was
+after the reset button on the back of the calculator was pressed, installs the loader and closes, and the home screen reports it (a). The question was
 then typed on the keypad, whose letter keys are in alphabetical order, and entered. This time the
 application chose the relation itself, and it printed the same answer as in
 Figure~\ref{fig:exchange}, complete about 59\,s after the question was entered (b, c). That time is

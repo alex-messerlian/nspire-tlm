@@ -37,7 +37,7 @@ EDITS: list[tuple[str, str, str, int]] = [
     # second or opening the file by accident would uninstall on a cancel.
     ("install.c",
      'if (show_msgbox_2b("Ndless", "Do you really want to uninstall Ndless r" STRINGIFY(NDLESS_REVISION) "?\\nThe device will reboot.", "Yes", "No") == 2)',
-     'if (show_msgbox_2b("ChatTLM", "Remove ChatTLM support files?\\n\\nChatTLM will stop opening until you run ChatTLM Setup again.\\nThe calculator will restart.", "Remove", "Keep") == 2)', 1),
+     'if (show_msgbox_2b("ChatTLM", "Remove ChatTLM support files?\\n\\nChatTLM will stop opening until you run ChatTLM Setup again.\\nThe calculator will reset.", "Remove", "Keep") == 2)', 1),
 
     # ---------- the screen-compatibility dialog ----------
     ("lcd_compat.c",
@@ -48,7 +48,7 @@ EDITS: list[tuple[str, str, str, int]] = [
      '''show_dialog_box2_(0, (const char*) u"ChatTLM", (const char*) u"Adjusting the display for this\\n"
                                      "calculator model.\\n"
                                      "Some of the screen may look wrong\\n"
-                                     "until you restart.", dlg);''', 1),
+                                     "until you reset the calculator.", dlg);''', 1),
 
     # ---------- the dialogs shown when a program will not load ----------
     ("zehn_loader.cpp", 'msgbox("Information about the executable", ',

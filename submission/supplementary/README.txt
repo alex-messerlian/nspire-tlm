@@ -3,12 +3,14 @@ Supplementary material: a video of the assistant running on the calculator
 calculator_full.mp4    3 min 20 s, H.264, 1080 x 1920, 30 frames per second, no sound
 
 One continuous take, filmed with a phone, of a TI-Nspire CX II CAS on battery with no cable attached,
-from just after a reset to power-off. The question is the one in Figure 1 of the paper; the calculator
-chooses the relation itself and prints the same answer.
+from just after the reset button on its back was pressed, to power-off. The question is the one in
+Figure 1 of the paper; the calculator chooses the relation itself and prints the same answer.
 
   0:00  the home screen
   0:05  the chattlm folder in My Documents
-  0:10  ChatTLM Setup installs the loader and closes; the home screen then says "ChatTLM is ready"
+  0:10  ChatTLM Setup installs the loader and closes; the home screen then says "ChatTLM is ready".
+        (Its heading then read "One-time setup"; it now reads "Run after every reset", because the
+        loader has to be installed again after every reset.)
   0:20  ChatTLM is opened from the same folder
   0:27  the question is typed on the keypad, whose letter keys are in alphabetical order
   2:01  the question is entered

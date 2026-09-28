@@ -100,8 +100,8 @@ Throughput by position, filled-cache model: 2.417 tok/s at 0 (extrapolated), 1.6
 
 | | |
 |---|---|
-| heap ceiling, fresh boot | **22,576,128 B = 21.53 MiB** (also measured 21.64 on another boot) |
-| heap ceiling after a crashed load | **5.02 MiB** -- does not recover until reboot |
+| heap ceiling, right after a reset | **22,576,128 B = 21.53 MiB** (also measured 21.64 after another reset) |
+| heap ceiling after a crashed load | **5.02 MiB** -- does not recover until the calculator is reset |
 | d352 footprint, shipped padded file | **19.34 MiB** = 11.09 (checkpoint) + 8.25 (fp32 KV cache) |
 | two-block limit | **at least 22.10 MiB**: d384 at group 32 (13.10 + 9.00 MiB) LOADED (results/device_g32/); d440 (26.87 MiB, and 27.19 padded) does not fit |
 | fragmentation across 4 load/free cycles | **none**, 22,576,128 B unchanged to the byte |
@@ -114,7 +114,7 @@ layers, context 512 and an fp32 cache, the limit lies between 12.2M and 16.6M pa
 two-block total between 22.10 and 26.87 MiB. Because the KV term is linear in `seq_len`, context length and parameter count trade
 directly against each other.
 
-**Demo consequence: reboot before demonstrating.** ChatTLM needs 19.34 MiB; a device that has run
+**Demo consequence: reset before demonstrating.** ChatTLM needs 19.34 MiB; a device that has run
 something that crashed, or a program that exits without freeing (golden_dev before A154), has less.
 
 ## 7. Frontier -- shipped padded group-88 engine, FILLED KV cache (results/device_g88p/)
@@ -332,7 +332,7 @@ calls and injects the results itself, through the same `gencore` loop the host s
 
 ## 11. Device inventory
 
-    /chattlm/ChatTLM_Setup.tns       setup, once after each restart (installs the loader, then closes)
+    /chattlm/ChatTLM_Setup.tns       setup, once after every reset (installs the loader, then closes)
     /chattlm/chattlm_support.tns     the loader, read by hardcoded path
     /chattlm/ChatTLM.tns             the app; the student opens it from My Documents
     /chattlm/data/{store,tok4096,model4096}   data -- all three must share one directory

@@ -96,12 +96,12 @@ local BODY = {
         "This installs the support files",
         "ChatTLM needs in order to run.",
         "",
-        "A restart is normal. Open this",
-        "again if it happens.",
+        "The calculator may reset itself.",
+        "If it does, open this again.",
     },
     installing = {
         "Installing. This takes a moment",
-        "and the calculator may restart.",
+        "and the calculator may reset.",
     },
     -- SETUP NO LONGER STARTS THE APP (2026-09-27). Started from inside this document, ChatTLM could
     -- not get the model's memory while the document was still open, and quitting it came back
@@ -126,9 +126,9 @@ local FAIL_BODY = {
         "the whole folder across again.",
     },
     setup = {
-        "Setup could not start. Restart",
-        "the calculator and open this",
-        "document again.",
+        "Setup could not start. Press",
+        "reset on the back, then open",
+        "this document again.",
     },
 }
 
@@ -143,7 +143,8 @@ function on.paint(gc)
 
     local heading, hcol
     if status == "ready" then
-        heading, hcol = "One-time setup", INK2
+        -- NOT "One-time setup": the loader is gone after every reset, so Setup is run again each time.
+        heading, hcol = "Run after every reset", INK2
     elseif status == "install_done" then
         heading, hcol = "Ready", OKFG
     elseif status == "install_failed" then

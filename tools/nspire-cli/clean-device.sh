@@ -2,7 +2,7 @@
 # clean-device.sh -- leave ONLY the folder a student gets: /chattlm.
 #
 # WHAT SURVIVES (2026-09-27: one folder, the layout the public release ships):
-#   /chattlm/ChatTLM_Setup.tns     the document a student opens once after each restart. It installs
+#   /chattlm/ChatTLM_Setup.tns     the document a student opens once after every reset. It installs
 #                                  the loader and closes; the home screen says "ChatTLM is ready".
 #   /chattlm/chattlm_support.tns   the loader. The exploit reads this exact path (installer/stage0.S,
 #                                  respath), so it cannot move.
