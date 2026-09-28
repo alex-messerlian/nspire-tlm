@@ -932,6 +932,7 @@ item set we later found measures declining, scored by a harness we later replace
 
 % ==================================================================================================
 \clearpage
+\makeatletter\setlength{\@fptop}{0pt}\makeatother   % a page holding only figures starts at the top
 \section{The Calculator in Use}
 \label{app:device}
 
@@ -959,6 +960,30 @@ Setup has run; the green line reads ``ChatTLM is ready'' and the battery symbol 
 chose with the values it read and the result of the call (\tok{epsilon=B*l*v l=0.057 v=1.35
 B=0.196.\ -> 0.0150822}, with the stray period noted under Figure~\ref{fig:exchange}), and the answer.}
 \label{fig:device}
+\end{figure}
+
+Figure~\ref{fig:screens} shows four screens drawn by the application's own drawing code, compiled for
+a computer, at the calculator's 320$\times$240 pixels. The application chooses the relation and
+builds the line above each answer exactly as it does on the calculator, and each answer is the output
+of the calculator's decoder run on the host, which matches the calculator token for token
+(Section~\ref{sec:parity}). Screen (b) is the one filmed in Figure~\ref{fig:device}c.
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{@{}c@{\hspace{1.2em}}c@{}}
+\includegraphics[width=0.44\linewidth]{screen_start.png} &
+\includegraphics[width=0.44\linewidth]{screen_emf.png} \\
+\small (a) & \small (b) \\[4pt]
+\includegraphics[width=0.44\linewidth]{screen_symbol.png} &
+\includegraphics[width=0.44\linewidth]{screen_decline.png} \\
+\small (c) & \small (d)
+\end{tabular}
+\caption{Screens drawn by the application's own code, in the dark theme the calculator was using when
+it was filmed (the theme follows the clock). (a)~The start screen. (b)~The question of
+Figure~\ref{fig:device}, as it was typed. (c)~A question that names its values by symbol. (d)~A
+question no record answers, which the application declines. Above each answer is the relation the
+application chose (``none'' in (d)), with the values it read and the result of the call.}
+\label{fig:screens}
 \end{figure}
 
 \end{document}

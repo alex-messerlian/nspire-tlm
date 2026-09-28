@@ -120,6 +120,11 @@ $(BUILD)/autoasm: tools/eval/autoasm.c $(APP_SRC) src/store/app.h src/store/font
 $(BUILD)/render_app: tools/eval/render_app.c $(APP_SRC) $(APP_HDR) $(BUILD)/hoststub.o | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< $(HOST_LINK) src/store/toolrun.c $(EVAL_CORE) -lm
 
+# The paper's app screens (tools/paper/make_screens.py): one finished exchange drawn by the shipped
+# app.c, selection and summary line included, from the calculator decoder's recorded output.
+$(BUILD)/render_screen: tools/paper/render_screen.c $(APP_SRC) $(APP_HDR) $(BUILD)/hoststub.o | $(BUILD)
+	$(CC) $(HOSTFLAGS) -o $@ $< $(HOST_LINK) src/store/toolrun.c $(EVAL_CORE) -lm
+
 $(BUILD)/test_prov: tools/eval/test_prov.c tools/eval/provenance.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -o $@ $< tools/eval/provenance.c -lm
 
@@ -415,5 +420,5 @@ check: tests
 
 clean:
 	rm -f tools/eval/shapecli tools/eval/provcli
-	rm -f $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app $(BUILD)/hoststub.[co] \
+	rm -f $(addprefix $(BUILD)/,$(TESTS)) $(BUILD)/render_app $(BUILD)/render_screen $(BUILD)/hoststub.[co] \
 	      $(BUILD)/chattlm.elf $(BUILD)/chattlm.zehn

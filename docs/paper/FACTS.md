@@ -351,6 +351,9 @@ the Setup document still open, and the app started there could not get the model
 | finished | between 180.0 and 180.5 s -- **about 59 s after entry** (58.5 to 59.5), including selection, prompt assembly and tokenization |
 | stages | Reading to Thinking 156-157 s; Thinking to Got 166-167 s; Got to Writing 170-171 s (frames every 1 s) |
 | paper frames | 15.5 s and 181.5 s, cut by `tools/paper/make_media.py`, hashes recorded there |
+| app screens (Figure 7) | drawn by `build/render_screen` (the shipped app.c) from the host decoder's output, recorded in `tools/paper/make_screens.py`; the filmed question's screen matches the 181.5 s frame line for line |
+
+The app's theme follows the clock (dark 18:00-06:00), which is why the video, filmed at 19:19, is dark.
 
 ## 12. Open before submission
 

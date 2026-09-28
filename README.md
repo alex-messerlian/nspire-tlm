@@ -25,6 +25,15 @@ token cost model fitted on battery predicts a decode run within 0.4%.
 
 ## On the calculator
 
+<p>
+<img src="paper/figures/photo_answer.jpg" height="330" alt="A TI-Nspire CX II CAS on a wooden table, showing the answer 0.01508 V to a question about motional emf">
+<img src="paper/figures/screen_emf.png" width="440" alt="The same screen drawn by the application's own code: the question, the relation it chose, and the answer 0.01508 V">
+</p>
+
+*Left: a frame from the author's unedited video of the calculator answering the question of the paper's Figure 1, on
+battery with no cable attached. Right: the same screen drawn by the application's own code, from the calculator
+decoder's output replayed on a computer. The paper's Appendix B has more of both, and the video will be released with
+the code.*
 
 ## Contents
 

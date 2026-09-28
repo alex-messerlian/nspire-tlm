@@ -47,6 +47,19 @@ host replay of the calculator's code gives for the same question (`build/autoasm
 - `submission/supplementary.zip` (62.8 MB): the full video and `submission/supplementary/README.txt`, the upload for
   TMLR's supplementary material.
 
+## The app screens: drawn by the application's own code
+
+`paper/figures/screen_*.png` (`tools/paper/make_screens.py`), the paper's Figure 7 and the README's picture: the start
+screen, the filmed question (typed as in the video, without a question mark), "Given V = 12, I = 2, find R" and "Who
+wrote Hamlet?". `build/render_screen` runs the shipped `app.c`: the app chooses the relation, parses the values and
+builds the line above the answer as the calculator does, and the answer is the calculator decoder's output replayed on
+the host (recorded in `make_screens.py`). The filmed question's screen matches the video's frame line for line; the
+pointer is left off. `check_paper.py` redraws every screen and compares bytes, and runs the decoder again when the
+model is present.
+
+**Why dark.** The app's theme is on Auto, which follows the clock: dark from 18:00 to 06:00. The video was filmed
+at 19:19, so it is dark, and the screens are drawn dark so they match it; `LIGHT=1 make_screens.py` draws the light theme into `build/screens-light/`.
+
 ## If you film again
 
 - **Battery, cable out.** With the cable in, the calculator runs at 288 MHz instead of 396, and every time shown would

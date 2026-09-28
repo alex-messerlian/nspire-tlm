@@ -33,6 +33,7 @@ LOG = ROOT / "docs" / "paper" / "CITATION_LOG.md"
 FIG = MS / "figures"
 MAKE_FIGURES = Path(__file__).resolve().parent / "make_figures.py"
 MAKE_MEDIA = Path(__file__).resolve().parent / "make_media.py"     # the photographs, cut from the video
+MAKE_SCREENS = Path(__file__).resolve().parent / "make_screens.py"  # the screens, drawn by app.c
 RES = ROOT / "results"
 ARXIV_ZIP = ROOT / "submission" / "arxiv-source.zip"
 # What arXiv needs besides the source: the style files and the bibliography. arXiv runs bibtex on the
@@ -128,7 +129,7 @@ def write_arxiv_zip(source: str, bbl: Path) -> list[str]:
         put("paper.bbl", bbl.read_bytes())
         for f in ARXIV_FILES:
             put(f, MS.joinpath(f).read_bytes())
-        for f in sorted([*FIG.glob("*.pdf"), *FIG.glob("*.jpg")]):    # drawn figures, then photographs
+        for f in sorted([*FIG.glob("*.pdf"), *FIG.glob("*.jpg"), *FIG.glob("*.png")]):   # drawn, filmed, screens
             put(f"figures/{f.name}", f.read_bytes())
     return names
 
@@ -195,8 +196,9 @@ def main() -> int:
     # to the same bytes. Comparing timestamps or commit times failed twice: a checkout reorders
     # mtimes, and a script change that leaves a figure unchanged made it read as stale forever.
     import contextlib, importlib.util, io, tempfile
-    # Photographs are not drawn: make_media.py cuts them from the author's recording (5b below).
-    photos = [f for f in figs if Path(f).suffix.lower() in (".jpg", ".jpeg", ".png")]
+    # Not every figure is drawn from results/: make_media.py cuts the photographs from the author's
+    # recording (5b below) and make_screens.py draws the calculator screens with the app's code (5c).
+    photos = [f for f in figs if Path(f).suffix.lower() != ".pdf"]
     spec = importlib.util.spec_from_file_location("make_figures", MAKE_FIGURES)
     mf = importlib.util.module_from_spec(spec)
     stale, absent = [], []
@@ -223,15 +225,17 @@ def main() -> int:
     spec = importlib.util.spec_from_file_location("make_media", MAKE_MEDIA)
     mm = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mm)
-    names = [Path(f).name for f in photos]
+    spec = importlib.util.spec_from_file_location("make_screens", MAKE_SCREENS)
+    ms = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ms)
+    unknown = [Path(f).name for f in photos if Path(f).name not in mm.PHOTOS and Path(f).name not in ms.SCREENS]
+    check("every image that is not a drawn figure is a video frame or an app screen, and nothing else",
+          not unknown, f"made by neither make_media.py nor make_screens.py: {', '.join(unknown)}")
+    names = [Path(f).name for f in photos if Path(f).name in mm.PHOTOS]
     if names:
-        unknown = [n for n in names if n not in mm.PHOTOS]
-        wrong = [n for n in names if n in mm.PHOTOS and (FIG / n).exists()      # absence is reported above
-                 and mm.sha256(FIG / n) != mm.PHOTOS[n][3]]
+        wrong = [n for n in names if (FIG / n).exists() and mm.sha256(FIG / n) != mm.PHOTOS[n][3]]
         check("every photograph is a frame make_media.py cuts from the recording, at its recorded hash",
-              not unknown and not wrong,
-              f"not made by make_media.py: {', '.join(unknown)}" if unknown
-              else f"differs from its recorded hash: {', '.join(wrong)}")
+              not wrong, f"differs from its recorded hash: {', '.join(wrong)}")
         cut = "the photographs cut again from the recording give the same bytes"
         if not mm.VIDEO.exists():
             if final:
@@ -246,6 +250,38 @@ def main() -> int:
                 check(cut, not differ, ", ".join(differ))
             except SystemExit as e:                 # make_media refuses a recording with another hash
                 check(cut, False, str(e))
+
+    # 5c. EACH CALCULATOR SCREEN IS WHAT THE APP'S OWN CODE DRAWS FROM THE RECORDED OUTPUT: redraw it
+    # with build/render_screen (the shipped app.c) and compare bytes; and when the model is here, the
+    # calculator's decoder must still give the output the screen was drawn from.
+    screens = [Path(f).name for f in photos if Path(f).name in ms.SCREENS]
+    if screens:
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                ms.build()
+            with tempfile.TemporaryDirectory() as tmp:
+                got = ms.draw(Path(tmp))
+            wrong = [n for n in screens if not (FIG / n).exists() or ms.sha256(FIG / n) != ms.SCREENS[n][2]]
+            differ = [n for n in screens if got.get(n) != ms.SCREENS[n][2]]
+            check("every calculator screen is what the app's code draws from the recorded output",
+                  not wrong and not differ,
+                  f"differs from its recorded hash: {', '.join(wrong)}" if wrong else f"redraws differently: {', '.join(differ)}")
+        except (SystemExit, subprocess.CalledProcessError) as e:
+            check("every calculator screen is what the app's code draws from the recorded output", False, f"cannot check: {e}")
+        said = "the calculator's decoder still gives the output each screen shows"
+        asked = [(n, ms.SCREENS[n][0], ms.SCREENS[n][1]) for n in screens if ms.SCREENS[n][0]]
+        if not ms.MODEL.exists():
+            if final:
+                check(said, False, f"cannot check: {ms.MODEL} is missing")
+            else:
+                results.append(("screens not re-decoded: the model is not here (FAIL under --final)", True, ""))
+        elif asked:
+            try:
+                now = ms.decode([q for _, q, _ in asked])
+                off = [n for (n, _, rec), fresh in zip(asked, now) if fresh != rec]
+                check(said, len(now) == len(asked) and not off, ", ".join(off))
+            except subprocess.CalledProcessError as e:
+                check(said, False, f"cannot check: {e}")
 
     # 6. Compile, then read the page the end-of-main-text marker landed on.
     # The PDF's build date is pinned to when the source last changed (SOURCE_DATE_EPOCH, which tectonic
