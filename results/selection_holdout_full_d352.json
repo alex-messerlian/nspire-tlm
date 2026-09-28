@@ -1,0 +1,194 @@
+{
+ "seeds": {
+  "values given, symbol asked": [
+   "answer",
+   1011
+  ],
+  "named in words": [
+   "worded",
+   1017
+  ],
+  "symbol only": [
+   "symbol",
+   2017
+  ],
+  "one irrelevant value": [
+   "spare",
+   1013
+  ]
+ },
+ "revisions": {
+  "A155": "793a551",
+  "A156": "60b3607",
+  "A157": null
+ },
+ "selection": {
+  "values given, symbol asked": {
+   "n": 300,
+   "A155": {
+    "right": 49,
+    "wrong": 14,
+    "none": 237
+   },
+   "A156": {
+    "right": 157,
+    "wrong": 14,
+    "none": 129
+   },
+   "A157": {
+    "right": 253,
+    "wrong": 5,
+    "none": 42
+   }
+  },
+  "named in words": {
+   "n": 300,
+   "A155": {
+    "right": 66,
+    "wrong": 10,
+    "none": 224
+   },
+   "A156": {
+    "right": 208,
+    "wrong": 10,
+    "none": 82
+   },
+   "A157": {
+    "right": 208,
+    "wrong": 10,
+    "none": 82
+   }
+  },
+  "symbol only": {
+   "n": 300,
+   "A155": {
+    "right": 2,
+    "wrong": 26,
+    "none": 272
+   },
+   "A156": {
+    "right": 82,
+    "wrong": 26,
+    "none": 192
+   },
+   "A157": {
+    "right": 295,
+    "wrong": 0,
+    "none": 5
+   }
+  },
+  "one irrelevant value": {
+   "n": 300,
+   "A155": {
+    "right": 41,
+    "wrong": 15,
+    "none": 244
+   },
+   "A156": {
+    "right": 41,
+    "wrong": 15,
+    "none": 244
+   },
+   "A157": {
+    "right": 41,
+    "wrong": 15,
+    "none": 244
+   }
+  }
+ },
+ "end_to_end": {
+  "values given, symbol asked": {
+   "n": 300,
+   "A155": {
+    "correct": 48,
+    "wrong": 2,
+    "declined": 250
+   },
+   "A156": {
+    "correct": 155,
+    "wrong": 3,
+    "declined": 142
+   },
+   "A157": {
+    "correct": 251,
+    "wrong": 3,
+    "declined": 46
+   }
+  },
+  "named in words": {
+   "n": 300,
+   "A155": {
+    "correct": 64,
+    "wrong": 3,
+    "declined": 233
+   },
+   "A156": {
+    "correct": 204,
+    "wrong": 5,
+    "declined": 91
+   },
+   "A157": {
+    "correct": 204,
+    "wrong": 5,
+    "declined": 91
+   }
+  },
+  "symbol only": {
+   "n": 300,
+   "A155": {
+    "correct": 2,
+    "wrong": 5,
+    "declined": 293
+   },
+   "A156": {
+    "correct": 81,
+    "wrong": 6,
+    "declined": 213
+   },
+   "A157": {
+    "correct": 286,
+    "wrong": 9,
+    "declined": 5
+   }
+  },
+  "one irrelevant value": {
+   "n": 300,
+   "A155": {
+    "correct": 24,
+    "wrong": 17,
+    "declined": 259
+   },
+   "A156": {
+    "correct": 24,
+    "wrong": 17,
+    "declined": 259
+   },
+   "A157": {
+    "correct": 24,
+    "wrong": 17,
+    "declined": 259
+   }
+  },
+  "fit (negative, development set)": {
+   "n": 120,
+   "A155": {
+    "correct": 119,
+    "wrong": 1,
+    "declined": 0,
+    "chose_inapplicable": 0
+   },
+   "A156": {
+    "correct": 119,
+    "wrong": 1,
+    "declined": 0,
+    "chose_inapplicable": 0
+   },
+   "A157": {
+    "correct": 118,
+    "wrong": 2,
+    "declined": 0,
+    "chose_inapplicable": 0
+   }
+  }
+ }
+}
