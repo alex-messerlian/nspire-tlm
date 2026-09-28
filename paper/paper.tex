@@ -139,7 +139,7 @@ work states the power state.}
 CalcGPT 3 & TI-Nspire & built-in Python & not stated & 8-bit GRU, 640-word vocabulary, dialogue & none \\
 Transformer On Calc & TI-Nspire CX II CAS & native, Ndless & not stated & 260K llama2.c, TinyStories & ${\sim}9$ (fp32) / ${\sim}16$ (int8) tok/s, 64 tokens \\
 CasioLLM & Casio fx-CG50 & native add-in & streamed from flash & third-party, up to 25M, 4-bit & 10-token reply in 27.1\,s \\
-Our work & TI-Nspire CX II CAS & native, Ndless-derived & in RAM & 10.9M, int8, fully trained; tools & 1.88 tok/s decode at positions 53--87; 26--75\,s per turn from the start of generation; battery \\
+Our work & TI-Nspire CX II CAS & native, Ndless-derived & in RAM & 10.9M, int8; tools & 1.88 tok/s decode at positions 53--87; 26--75\,s per turn from the start of generation; battery \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -279,7 +279,7 @@ setup document installs again after every reset; the hardware is not modified (A
 \section{Training Data}
 \label{sec:data}
 
-The model is fully trained from scratch on a mixture that is, by tokens, 85\% synthetic
+The model is trained from scratch on a mixture that is, by tokens, 85\% synthetic
 documents and 15\% raw textbook text. The textbook text is a random sample of the modules of 24 OpenStax
 textbooks \citep{openstax}, markup removed; 22 of the books are licensed CC BY-NC-SA 4.0 and 2 CC BY 4.0. No
 other dataset is used.
@@ -535,6 +535,13 @@ just as often when the prompt names a missing value (99.6\% at both widths), is 
 often when every value is given, mostly because of incorrect values in the call, and passes the explanation
 format check 34.5 points less often. Two seeds per width are not a variance estimate, and equal
 steps do not hold convergence constant.
+
+\textbf{Training longer.} Trained on the current corpus for 17,750 steps instead of 8,000, 20 tokens per
+parameter \citep{hoffmann2022training}, the shipped configuration is correct on 436 rather than 426 of the
+480 answerable items (427 rather than 385 strictly), but declines on only 216 of the 222 that lack a value,
+three of them answered with a tool call that should not exist, so a rule we fixed before training kept the
+shipped model. The seed-1 model of Appendix~\ref{app:ladder}, which stops at 8,000 steps on that corpus,
+shows the same trade.
 
 % ==================================================================================================
 \section{End to End: Choosing the Relation}
