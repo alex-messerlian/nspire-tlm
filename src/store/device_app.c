@@ -362,8 +362,8 @@ static int answer_states_result(const char *ans, const char *res) {
  * the tokenizer AND the model all open (resolve_data_dir), so a half-populated directory does not win.
  *
  * A STUDENT'S CALCULATOR HOLDS ONE FOLDER, /documents/chattlm/, and the data sit in its data/
- * subfolder (2026-09-27): the setup document, the support file, startup/ and data/ are all a reader
- * sees. The older locations stay as fallbacks, so a calculator from an earlier install keeps working
+ * subfolder (2026-09-27): the setup document, the support file, ChatTLM itself and data/ are all a
+ * reader sees. The older locations stay as fallbacks, so a calculator from an earlier install keeps working
  * and the benchmark push (tools/nspire-cli/push-bench.sh) can keep its own copy in /tlm. */
 static const char *DATA_DIRS[] = { "/documents/chattlm/data/", "/documents/chattlm/", "/documents/tlm/",
                                    "/documents/slm/", "/documents/ndless/", "/documents/bench/",
@@ -386,7 +386,8 @@ static int model_room(char *why, int cap) {
     long need = 0;
     if (rq_fits(dpath("model4096.bin.tns"), &need)) return 1;
     snprintf(why, cap, "Not enough free memory: the model needs %ld.%ld MB. Press the reset button "
-             "on the back of the calculator, then open ChatTLM Setup.", need / 1000000, (need / 100000) % 10);
+             "on the back of the calculator, open ChatTLM Setup, then open ChatTLM.",
+             need / 1000000, (need / 100000) % 10);
     return 0;
 }
 /* Returns 1 when a directory holding ALL THREE data files was found.

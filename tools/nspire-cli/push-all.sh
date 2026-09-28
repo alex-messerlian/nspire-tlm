@@ -61,6 +61,20 @@ send() {     # send <local> <remote>
     verify "$1" "$2"
 }
 
+# Remove a file the current layout no longer uses, after pulling it to attic/ on the host. A file
+# that is absent is fine; one that cannot be backed up or removed is left in place and reported.
+left=0
+retire() {   # retire <remote>
+    $NSP ls "$(dirname "$1")" 2>/dev/null | awk '{print $3}' | grep -Fqx "$(basename "$1")" || return 0
+    keep="attic/calculator-removed-$(date +%Y-%m-%d)$1"
+    mkdir -p "$(dirname "$keep")"
+    if $NSP pull "$1" "$keep" >/dev/null 2>&1 && $NSP rm "$1" >/dev/null 2>&1; then
+        echo "  removed $1 (backed up to $keep)"
+    else
+        echo "  *** COULD NOT REMOVE $1"; left=1
+    fi
+}
+
 echo "--- device ---"
 $NSP info
 
@@ -73,8 +87,9 @@ echo "--- directories ---"
 # /chattlm/startup were never created, so the first push after the rename failed partway through
 # with "Path does not exist" -- AFTER writing /chattlm.tns; and /bench and /models were recreated
 # on every run even with PUSH_BENCH unset, which is the root clutter clean-device.sh exists to
-# remove. A directory is made here only if a file is going into it.
-DIRS="/chattlm/startup /chattlm/data"
+# remove. A directory is made here only if a file is going into it. /chattlm/startup is no longer
+# one of them: nothing goes there since 2026-09-27 (see the ChatTLM block below).
+DIRS="/chattlm/data"
 [ "${PUSH_BENCH:-0}" = "1" ]  && DIRS="$DIRS /bench"
 [ "${PUSH_LEGACY:-0}" = "1" ] && DIRS="$DIRS /models"
 for d in $DIRS; do
@@ -236,25 +251,26 @@ fi
 # accepts a prefix only when store, tokenizer AND model all open under it.
 #
 # ONE FOLDER (2026-09-27). A student's calculator holds /chattlm only: ChatTLM_Setup.tns,
-# chattlm_support.tns, startup/chattlm.tns and data/. That folder is what the public release
-# ships. The top-level /chattlm.tns and /tlm are no longer written; tools/nspire-cli/clean-device.sh
-# removes them from a calculator that has them, after moving the student's saved chats.
+# chattlm_support.tns, ChatTLM.tns and data/. That folder is what the public release ships. The
+# top-level /chattlm.tns and /tlm are no longer written; tools/nspire-cli/clean-device.sh removes
+# them from a calculator that has them, after moving the student's saved chats.
 echo "--- ChatTLM (8.2 MB: ~40 s to push, ~40 s to verify) ---"
-# A130. THE STARTUP COPY IS PUSHED TOO, AND IT IS THE ONE THE CALCULATOR ACTUALLY RUNS.
+# THE STUDENT OPENS THE APP; THE LOADER DOES NOT START IT (2026-09-27, the author's call).
 #
-# The loader runs every document in /chattlm/startup at boot (ploaderhook.c:484, file_each on
-# "./chattlm/startup"), so a copy of the app lives there and that copy is what a student sees when
-# they turn the calculator on. This script pushed ONLY /chattlm.tns.
+# It used to live in /chattlm/startup. The loader runs every document in that folder
+# (ploaderhook.c:484, file_each on "./chattlm/startup") during the install, while ChatTLM Setup is
+# still open, so ChatTLM started with the Setup document still in memory. It could not get the
+# model's memory and said "Not enough free memory" on every launch, and quitting it led back into
+# Setup rather than to the documents. Ndless itself starts nothing unless something is put in its
+# startup folder, and the author never had the problem with it.
 #
-# The two happened to be identical when this was noticed -- verified by pulling both and comparing
-# sha256 -- so nothing was wrong yet. That is luck, not a mechanism: the next push would have
-# updated the root copy and left the boot copy behind, and the device would have kept running the
-# old app while every hash check on the new one passed. A stale binary that reports itself as
-# freshly transferred is the exact failure this script's verify step exists to prevent, one path
-# over.
-#
-# Pushed from the same local file, so they cannot diverge.
-send build/chattlm.tns             /chattlm/startup/chattlm.tns
+# Now Setup installs the loader and closes, the home screen says "ChatTLM is ready", the student
+# opens /chattlm/ChatTLM.tns from My Documents, and quitting returns there. A130's rule stands in a
+# simpler form: ONE copy of the app on the calculator, pushed from build/chattlm.tns, so there is
+# no second copy to go stale. The old startup copy is removed, or Setup would keep starting it.
+send build/chattlm.tns             /chattlm/ChatTLM.tns
+retire /chattlm/startup/chattlm.tns
+$NSP rmdir /chattlm/startup >/dev/null 2>&1 || true    # an empty startup folder is harmless
 # A131/A134. THE SETUP DOCUMENT AND THE SUPPORT FILE IT LOADS.
 #
 # ChatTLM_Setup.tns is the one file a student opens on a calculator that has never run ChatTLM.
@@ -280,6 +296,11 @@ fi
 echo
 if [ "$fail" -ne 0 ]; then
     echo "FAILED -- at least one file is corrupt on the device. Do not run anything."
+    exit 1
+fi
+if [ "$left" -ne 0 ]; then
+    echo "NOT DONE -- /chattlm/startup still holds an old ChatTLM, and ChatTLM Setup would start it"
+    echo "inside Setup, short of memory. Delete it on the calculator, or re-run this script."
     exit 1
 fi
 echo "All files verified byte-identical on device."

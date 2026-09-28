@@ -332,11 +332,13 @@ calls and injects the results itself, through the same `gencore` loop the host s
 
 ## 11. Device inventory
 
-    /chattlm.tns                     the app
-    /chattlm/ChatTLM_Setup.tns       one-time setup (installs the loader)
+    /chattlm/ChatTLM_Setup.tns       setup, once after each restart (installs the loader, then closes)
     /chattlm/chattlm_support.tns     the loader, read by hardcoded path
-    /chattlm/startup/chattlm.tns     boot copy, what a student actually runs
-    /tlm/{store,tok4096,model4096}   data -- all three must share one directory
+    /chattlm/ChatTLM.tns             the app; the student opens it from My Documents
+    /chattlm/data/{store,tok4096,model4096}   data -- all three must share one directory
+
+Nothing is in /chattlm/startup (2026-09-27). The loader runs that folder during the install, with
+the Setup document still open, and the app started there could not get the model's memory.
 
 ## 12. Open before submission
 

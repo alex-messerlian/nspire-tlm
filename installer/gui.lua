@@ -103,9 +103,14 @@ local BODY = {
         "Installing. This takes a moment",
         "and the calculator may restart.",
     },
+    -- SETUP NO LONGER STARTS THE APP (2026-09-27). Started from inside this document, ChatTLM could
+    -- not get the model's memory while the document was still open, and quitting it came back
+    -- here. Setup now installs and closes, the home screen says "ChatTLM is ready", and the student
+    -- opens ChatTLM from My Documents, as with Ndless itself.
     install_done = {
-        "ChatTLM is installed and should",
-        "open by itself.",
+        "Installed. Open ChatTLM from",
+        "the chattlm folder in",
+        "My Documents.",
     },
 }
 local FAIL_BODY = {
@@ -208,7 +213,7 @@ function on.paint(gc)
         col(gc, INK2)
         gc:fillRect(28 + p * (w - 60), cy + 13, 60, 4)
     elseif status == "install_done" then
-        centre(gc, "Opening ChatTLM", cy + 9, OKFG, 11, "b")
+        centre(gc, "Now open ChatTLM", cy + 9, OKFG, 11, "b")
     else
         centre(gc, "Open this document again", cy + 9, ERFG, 11, "b")
     end

@@ -2,21 +2,22 @@
 # clean-device.sh -- leave ONLY the folder a student gets: /chattlm.
 #
 # WHAT SURVIVES (2026-09-27: one folder, the layout the public release ships):
-#   /chattlm/ChatTLM_Setup.tns     the document a student opens. It installs the loader, which then
-#                                  starts ChatTLM by itself.
+#   /chattlm/ChatTLM_Setup.tns     the document a student opens once after each restart. It installs
+#                                  the loader and closes; the home screen says "ChatTLM is ready".
 #   /chattlm/chattlm_support.tns   the loader. The exploit reads this exact path (installer/stage0.S,
 #                                  respath), so it cannot move.
-#   /chattlm/startup/chattlm.tns   ChatTLM. The loader runs every document in this folder
-#                                  (ploaderhook.c:484, file_each on "./chattlm/startup").
+#   /chattlm/ChatTLM.tns           ChatTLM, which the student opens from My Documents. NOT in
+#                                  /chattlm/startup: the loader runs that folder inside Setup, where
+#                                  the model cannot get its memory (2026-09-27; see push-all.sh).
 #   /chattlm/data/                 the model, tokenizer and record store, and the student's saved
 #                                  chats and feedback (device_app.c looks here first).
 #   /themes.csv                    the calculator's own file, not ours. Ndless only reads it in an SDK
 #                                  sample (samples/newlib-c++/test_newlib.cpp); the loader never does.
 #
-# WHAT GOES: the top-level copy of the app; /tlm, after its saved chats move to /chattlm/data; the
-# benchmark programs and their /sweep shapes; the upstream Ndless installer pair (ChatTLM Setup has
-# installed from nothing since 2026-09-21, and the host keeps a copy in ndless/); the OS's
-# NspireLogs.zip. Every file removed is first pulled to attic/calculator-removed-<date>/ on the host,
+# WHAT GOES: the top-level copy of the app, and the old one in /chattlm/startup; /tlm, after its
+# saved chats move to /chattlm/data; the benchmark programs and their /sweep shapes; the upstream
+# Ndless installer pair (ChatTLM Setup has installed from nothing since 2026-09-21, and the host
+# keeps a copy in ndless/); the OS's NspireLogs.zip. Every file removed is first pulled to attic/calculator-removed-<date>/ on the host,
 # and the benchmarks come back with tools/nspire-cli/push-bench.sh.
 #
 # Run tools/nspire-cli/push-all.sh FIRST, so /chattlm/data is complete. This script refuses to empty
@@ -96,6 +97,10 @@ for s in m176 m192 m256 m264 m264h6 m320 m352 m352b m384 m440 m440h10; do
 done
 dropdir /sweep
 
+echo "--- the app's old place, which the loader started inside Setup ---"
+drop /chattlm/startup/chattlm.tns
+dropdir /chattlm/startup
+
 echo "--- the upstream Ndless installer pair, and the OS's log bundle ---"
 drop /ndless/ndless_installer_4.5.5-6.2.0-6.4.0.tns
 drop /ndless/ndless_resources.tns
@@ -104,7 +109,7 @@ drop /NspireLogs.zip
 
 echo
 echo "--- what is left ---"
-for d in / /chattlm /chattlm/startup /chattlm/data; do
+for d in / /chattlm /chattlm/data; do
     echo "  $d"
     $NSP ls "$d" 2>/dev/null | sed 's/^/      /'
 done
