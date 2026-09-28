@@ -350,4 +350,5 @@ json.dump({"seed":SEED,"discrimination":disc,
            "refuse_correct":ref_ok/len(REFI),"answer_correct":ans_ok/len(ANS),
            "shape_ok":SHAPES["ok"],"shape_mismatch":SHAPES["mismatch"],
            "shape_unchecked":SHAPES["unchecked"]},
-          open(f"train/sel_s{SEED}.json","w"), indent=1)
+          open(f"train/{RUN}.json","w"), indent=1)   # named by RUN like the checkpoint: a RUN=... smoke
+                                                     # test with SEED=1 overwrote the tracked sel_s1.json
