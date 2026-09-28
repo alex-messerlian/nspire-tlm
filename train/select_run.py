@@ -27,6 +27,12 @@ HEADS = int(os.environ.get("HEADS",  "6"))
 SEQ   = int(os.environ.get("SEQ",    "256"))
 BS    = int(os.environ.get("BS",     "24"))
 LR    = float(os.environ.get("LR",   "3e-4"))
+# A LONG RUN NEEDS TO SEE ITS OWN PROGRESS. The 8,000-step runs printed training loss only and saved
+# once, at the end; a full-length run (docs/PREREG_FULL_TRAINING.md) needs held-out loss, to tell
+# whether more steps still help, and checkpoints along the way, because a Metal wedge on this machine
+# once cost 7h29m with nothing saved. Both default to 0, off, so every earlier config is unchanged.
+VAL_EVERY  = int(os.environ.get("VAL_EVERY",  "0"))
+CKPT_EVERY = int(os.environ.get("CKPT_EVERY", "0"))
 assert DIM % HEADS == 0, f"dim {DIM} not divisible by heads {HEADS}"
 dev = "mps" if torch.backends.mps.is_available() else "cpu"
 torch.manual_seed(SEED); np.random.seed(SEED)
@@ -95,6 +101,10 @@ assert r.returncode==0, f"prepare.py failed: {r.stderr[-300:]}"
 tr=np.fromfile("train/mix4096_train.bin",dtype=np.uint16)
 tk=Tokenizer.from_file("train/tok4096.json")
 RES_O,RES_C,ENDT,TOOLC=(tk.token_to_id(t) for t in ("<res>","</res>","<end>","</tool>"))
+if CKPT_EVERY:
+    _stale = sorted(pathlib.Path("train").glob(f"{RUN}_step*.pt"))
+    assert not _stale, f"A49: {_stale[0]} exists and this run would overwrite it"
+    _tok_sha0 = _hl.sha256(open("train/tok4096.json","rb").read()).hexdigest()[:16]
 
 # ---- train -----------------------------------------------------------------------------
 import math
@@ -109,6 +119,21 @@ WARM=max(1,int(STEPS*0.03))
 def lr_at(s):
     if s<WARM: return LR*s/WARM
     p=(s-WARM)/max(1,STEPS-WARM); return 0.1*LR+0.9*LR*0.5*(1+math.cos(math.pi*p))
+# Held-out loss on EVERY whole window of the validation split, the same windows each time, with the
+# same result-span mask as training, so two readings differ only because the model did.
+if VAL_EVERY:
+    va=np.fromfile("train/mix4096_val.bin",dtype=np.uint16)
+    _vw=np.arange(0,len(va)-SEQ-1,SEQ)
+def val_loss():
+    m.eval(); tot=0.0; n=0
+    with torch.no_grad():
+        for k in range(0,len(_vw),BS):
+            j=_vw[k:k+BS]
+            x=np.stack([va[a:a+SEQ] for a in j]).astype(np.int64)
+            y=np.stack([va[a+1:a+1+SEQ] for a in j]).astype(np.int64)
+            _=m(torch.from_numpy(x).to(dev),torch.from_numpy(masked_targets(y,RES_O,RES_C)).to(dev))
+            tot+=m.last_loss.item()*len(j); n+=len(j)
+    m.train(); return tot/n
 curve=[]; win=[]; t0=time.time()
 import time
 _T0 = time.time()
@@ -130,6 +155,13 @@ for s in range(STEPS):
     # with a command-buffer fault, so this is a known failure mode of this machine and not a
     # surprise. "Silence is indistinguishable from a hang" is a standing rule here and the trainer
     # was the one place still violating it.
+    if VAL_EVERY and s and s % VAL_EVERY == 0:
+        print(f"    step {s}/{STEPS}  VAL loss {val_loss():.4f}  ({len(_vw)} windows)", flush=True)
+    if CKPT_EVERY and s and s % CKPT_EVERY == 0:
+        torch.save({"model":m.state_dict(),"args":args.__dict__,"seed":SEED,"steps":s,
+                    "corpus_sha":_corpus_sha,"corpus_heads":sorted(_heads),"tok_sha":_tok_sha0},
+                   f"train/{RUN}_step{s}.pt")
+        print(f"    step {s}/{STEPS}  saved train/{RUN}_step{s}.pt", flush=True)
     if s % 200 == 0:
         print(f"    step {s}/{STEPS}  loss {l.item():.4f}  {(time.time()-_T0)/60:.1f} min",
               flush=True)
@@ -164,6 +196,8 @@ torch.save({"model":m.state_dict(),"args":args.__dict__,"seed":SEED,"steps":STEP
 
 # ---- divergence gate, BEFORE metrics ----------------------------------------------------
 print("  loss: "+" ".join(f"{v:.4f}" for v in curve), flush=True)
+if VAL_EVERY:
+    print(f"  final VAL loss {val_loss():.4f}  ({len(_vw)} windows)", flush=True)
 if len(curve)>=4:
     q=len(curve)//4
     best=min(st.mean(curve[i:i+q]) for i in range(0,len(curve)-q+1))
