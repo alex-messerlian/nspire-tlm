@@ -36,3 +36,15 @@ reported in the paper as a result.
 calculator parity check and Figure 1's logged turn on the device, the app screens (`make_screens.py`),
 and Appendix B, whose video shows the current model. Speed, memory, the cost model and the frontier
 depend on the size and the engine, which do not change; one decode run on the device confirms it.
+
+**How the rule is read (added 2026-09-28, 02:10 PDT, while the run was at step 14,400 and before
+any score of the new model existed).** `tools/eval/compare_full_training.py` applies it, and its
+controls were run first: the shipped model against itself does not ship, one more correct answer in
+both totals ships, and one fewer decline blocks it.
+
+- *Every set that should be declined*, counted in items declined, new at least equal: with the
+  relation supplied, value withheld, no values and relation does not apply; end to end with the
+  shipped selector, the same three and the 2,000 out-of-scope questions.
+- *Better on answer accuracy*: correct answers summed over the four answerable sets, strictly more
+  in both totals, with the relation supplied (480 items) and end to end with the shipped selector
+  (480 development plus 1,200 fresh items).
