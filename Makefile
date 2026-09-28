@@ -271,6 +271,11 @@ $(BUILD)/int8gen_g16: tools/eval/int8gen.c src/runq_nspire.c src/store/tokenizer
 $(BUILD)/golden_forward: tools/eval/golden_forward.c src/runq_nspire.c | $(BUILD)
 	$(CC) $(HOSTFLAGS) -DFIXED_GS=$(GS_SRC) -o $@ $< -lm
 
+# One prompt decoded greedily by the int8 engine on the host; tools/eval/int8_calls.py compares its
+# first tool call with the fp32 model's. It had no rule and was built by hand.
+$(BUILD)/golden_decode: tools/eval/golden_decode.c src/runq_nspire.c src/store/tokenizer.c | $(BUILD)
+	$(CC) $(HOSTFLAGS) -DFIXED_GS=$(GS_SRC) -o $@ $< src/store/tokenizer.c -lm
+
 # THE DEVICE HALF OF THE GOLDEN, WHICH HAD NO BUILD RULE AT ALL.
 #
 # build/golden_dev.tns was cross-compiled once by a hand-typed line and nothing in the repo
