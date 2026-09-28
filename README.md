@@ -3,8 +3,8 @@
 **Alexander Messerlian** · Independent Researcher, Palo Alto, CA, USA ·
 ORCID [0009-0003-4933-6832](https://orcid.org/0009-0003-4933-6832)
 
-**Paper:** [`paper/paper.pdf`](paper/paper.pdf), the anonymous copy under review at TMLR, and
-[`paper/paper-arxiv.pdf`](paper/paper-arxiv.pdf), the named copy for arXiv.
+**Paper:** [`paper/paper.pdf`](paper/paper.pdf), the anonymous copy for TMLR's double-blind review, and
+[`paper/paper-arxiv.pdf`](paper/paper-arxiv.pdf), the named preprint.
 
 ChatTLM is a physics assistant that runs entirely on a TI-Nspire CX II CAS: a 10.9M-parameter language
 model, an int8 inference engine written in C, and a runtime that does the arithmetic the model asks for.
@@ -179,7 +179,7 @@ To rebuild the review copy:
 cd paper && tectonic paper.tex
 ```
 
-To rebuild both PDFs, write the arXiv upload `submission/arxiv-source.zip`, and run every check (anonymity, citations,
+To rebuild both PDFs, write the preprint's LaTeX source `submission/arxiv-source.zip`, and run every check (anonymity, citations,
 fonts, figures, length), from the repository root:
 
 ```bash
@@ -200,7 +200,7 @@ If you use this work, please cite:
   author = {Alexander Messerlian},
   title  = {Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator},
   year   = {2026},
-  note   = {Manuscript under review}
+  note   = {Manuscript}
 }
 ```
 
