@@ -4,7 +4,7 @@
 ORCID [0009-0003-4933-6832](https://orcid.org/0009-0003-4933-6832)
 
 **Paper:** [`paper/paper.pdf`](paper/paper.pdf), the anonymous copy for TMLR's double-blind review, and
-[`paper/paper-arxiv.pdf`](paper/paper-arxiv.pdf), the named preprint.
+[`paper/paper-preprint.pdf`](paper/paper-preprint.pdf), the named preprint.
 
 ChatTLM is a physics assistant that runs entirely on a TI-Nspire CX II CAS: a 10.9M-parameter language
 model, an int8 inference engine written in C, and a runtime that does the arithmetic the model asks for.
@@ -149,7 +149,7 @@ measured under and the file in `results/` it comes from. From there:
 
 | Folder | What is in it |
 |---|---|
-| `paper/` | `paper.pdf` and `paper-arxiv.pdf`, their LaTeX source, `references.bib`, `figures/`, TMLR's style files and the paper's license |
+| `paper/` | `paper.pdf` and `paper-preprint.pdf`, their LaTeX source, `references.bib`, `figures/`, TMLR's style files and the paper's license |
 | `src/` | The inference engine (`runq_nspire.c`) and, in `src/store/`, the calculator application: interface, store loader, relation selection, prompt assembly, tokenizer and tool execution |
 | `tools/eval/` | The evaluator the model's tool calls run on, the scoring harnesses, and the checks behind `make check` |
 | `corpus/` | The record store, the corpus generator and its inputs, and the evaluation splits |
@@ -179,7 +179,7 @@ To rebuild the review copy:
 cd paper && tectonic paper.tex
 ```
 
-To rebuild both PDFs, write the preprint's LaTeX source `submission/arxiv-source.zip`, and run every check (anonymity, citations,
+To rebuild both PDFs, write the preprint's LaTeX source `submission/preprint-source.zip`, and run every check (anonymity, citations,
 fonts, figures, length), from the repository root:
 
 ```bash

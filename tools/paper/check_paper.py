@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-"""Pre-submission checks: the desk-rejection and arXiv-ban risks, as code rather than a list.
+"""Pre-submission checks: the desk-rejection and preprint-screening risks, as code rather than a list.
 
     .venv-fig/bin/python tools/paper/check_paper.py              # while drafting
-    .venv-fig/bin/python tools/paper/check_paper.py --final      # before TMLR or arXiv upload
-    .venv-fig/bin/python tools/paper/check_paper.py --preprint   # also build + check the arXiv variant
+    .venv-fig/bin/python tools/paper/check_paper.py --final      # before the TMLR or preprint upload
+    .venv-fig/bin/python tools/paper/check_paper.py --preprint   # also build + check the named preprint
 
-It rebuilds paper/paper.pdf (the anonymous copy); --preprint also rebuilds paper/paper-arxiv.pdf
-and writes submission/arxiv-source.zip, the file arXiv takes. LaTeX's working files are removed
-afterwards, so paper/ holds only the manuscript.
+It rebuilds paper/paper.pdf (the anonymous copy); --preprint also rebuilds paper/paper-preprint.pdf
+and writes submission/preprint-source.zip, the LaTeX upload for preprints.org. LaTeX's working files
+are removed afterwards, so paper/ holds only the manuscript.
 
 Each check names the rule it enforces. "Cannot check" is reported as a FAIL, never as a pass: a
 check that silently skips on missing input reads exactly like a check that found nothing.
 
-Drafting mode tolerates the skeleton's guidance comments. --final does not, because arXiv serves
-the LaTeX SOURCE, comments included, and its May 2026 policy bans for "leftover chatbot
-meta-commentary" and "unedited placeholder instructions".
+Drafting mode tolerates the skeleton's guidance comments. --final does not: the preprint server
+receives the LaTeX SOURCE, comments included, and drafting notes or placeholder instructions must
+not reach it.
 """
 from __future__ import annotations
 
@@ -35,11 +35,11 @@ MAKE_FIGURES = Path(__file__).resolve().parent / "make_figures.py"
 MAKE_MEDIA = Path(__file__).resolve().parent / "make_media.py"     # the photographs, cut from the video
 MAKE_SCREENS = Path(__file__).resolve().parent / "make_screens.py"  # the screens, drawn by app.c
 RES = ROOT / "results"
-ARXIV_ZIP = ROOT / "submission" / "arxiv-source.zip"
-# What arXiv needs besides the source: the style files and the bibliography. arXiv runs bibtex on the
-# .bib, and uses a .bbl named like the main .tex in preference when one is present
-# (info.arxiv.org/help/submit_tex.html, read 2026-09-27), so both go in.
-ARXIV_FILES = ("references.bib", "tmlr.sty", "tmlr.bst", "fancyhdr.sty", "TMLR_STYLE_LICENSE")
+PREPRINT_ZIP = ROOT / "submission" / "preprint-source.zip"
+# What the LaTeX upload needs besides the source: the style files and the bibliography. preprints.org
+# asks for every file needed to recreate the PDF, the .bib included; the .bbl goes in too, so the source
+# builds without running bibtex.
+PREPRINT_FILES = ("references.bib", "tmlr.sty", "tmlr.bst", "fancyhdr.sty", "TMLR_STYLE_LICENSE")
 # LaTeX's working files, removed after each build so the folder shows only the manuscript.
 WORK = (".aux", ".bbl", ".blg", ".log", ".out")
 # TMLR has NO page limit. Its author guide: "a paper's length should be justified by its content and
@@ -109,25 +109,25 @@ def changed_at(p: Path) -> float:
 
 
 def clean_work(stem: str) -> None:
-    """Remove LaTeX's working files for one build (paper or paper-arxiv); they are regenerated."""
+    """Remove LaTeX's working files for one build (paper or paper-preprint); they are regenerated."""
     for ext in WORK:
         MS.joinpath(stem + ext).unlink(missing_ok=True)
 
 
-def write_arxiv_zip(source: str, bbl: Path) -> list[str]:
-    """submission/arxiv-source.zip: the [preprint] source as paper.tex, its .bbl as paper.bbl (the
-    name arXiv requires), the style files, the .bib and the figures. Fixed timestamps, so the same
+def write_preprint_zip(source: str, bbl: Path) -> list[str]:
+    """submission/preprint-source.zip: the [preprint] source as paper.tex, its .bbl as paper.bbl (the
+    name that matches it), the style files, the .bib and the figures. Fixed timestamps, so the same
     source always gives the same bytes. Returns the names written."""
     import zipfile
     names = []
-    ARXIV_ZIP.parent.mkdir(exist_ok=True)
-    with zipfile.ZipFile(ARXIV_ZIP, "w", zipfile.ZIP_DEFLATED) as z:
+    PREPRINT_ZIP.parent.mkdir(exist_ok=True)
+    with zipfile.ZipFile(PREPRINT_ZIP, "w", zipfile.ZIP_DEFLATED) as z:
         def put(name: str, data: bytes) -> None:
             z.writestr(zipfile.ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0)), data)
             names.append(name)
         put("paper.tex", source.encode())
         put("paper.bbl", bbl.read_bytes())
-        for f in ARXIV_FILES:
+        for f in PREPRINT_FILES:
             put(f, MS.joinpath(f).read_bytes())
         for f in sorted([*FIG.glob("*.pdf"), *FIG.glob("*.jpg"), *FIG.glob("*.png")]):   # drawn, filmed, screens
             put(f"figures/{f.name}", f.read_bytes())
@@ -150,11 +150,11 @@ def main() -> int:
     hits = [f"L{i}: {t.strip()[:60]}" for i, t in body_lines(tex) if PLACEHOLDER.search(t)]
     check("no placeholders in the rendered text", not hits, "; ".join(hits[:3]))
 
-    # 2. Guidance comments -- tolerated while drafting, fatal for upload (arXiv serves the source).
+    # 2. Guidance comments -- tolerated while drafting, fatal for upload (the source is uploaded).
     comments = [f"L{i}" for i, line in enumerate(tex.splitlines(), 1)
                 if re.search(r"(?<!\\)%.*", line) and GUIDANCE.search(line)]
     if final:
-        check("no drafting guidance left in the SOURCE (arXiv publishes it)", not comments,
+        check("no drafting guidance left in the SOURCE (it is uploaded)", not comments,
               f"{len(comments)} guidance comment lines, e.g. {', '.join(comments[:5])}. "
               "Strip comments before upload (e.g. arxiv_latex_cleaner).")
     else:
@@ -165,7 +165,7 @@ def main() -> int:
     body = "\n".join(t for _, t in body_lines(tex))
     named = re.search(r"\\usepackage\[[^\]]*(accepted|preprint)[^\]]*\]\{tmlr\}", body)
     check("submission mode (plain \\usepackage{tmlr}) -- authors print as Anonymous", not named,
-          f"[{named.group(1)}] prints the author; the arXiv variant is built by --preprint" if named else "")
+          f"[{named.group(1)}] prints the author; the preprint is built by --preprint" if named else "")
     rest = strip_author(tex)
     check("\\author{...} block found (so the leak check below is not vacuous)", rest != tex)
     leaks = [s_ for s_ in IDENTIFYING if s_.lower() in "\n".join(t for _, t in body_lines(rest)).lower()]
@@ -324,10 +324,14 @@ def main() -> int:
         check("compiled PDF text and metadata are anonymous", not leak, ", ".join(leak))
         check("PDF prints 'Anonymous authors' and the TMLR review header",
               "Anonymous authors" in text and "Under review as submission to TMLR" in text)
+        # TMLR's FAQ: authors "mention explicitly in their submission that they have used this tool, as a
+        # footnote on the first page". Checked on the text of page 1 of the copy TMLR reviews.
+        first = " ".join((rd.pages[0].extract_text() or "").split())
+        check("page 1 carries the AI-use footnote TMLR's FAQ requires", "AI tools were used in this work" in first)
 
-    # 8. The arXiv variant, built from THIS source with [preprint]: named, and no TMLR review header.
+    # 8. The named preprint, built from THIS source with [preprint]: named, and no TMLR review header.
     if "--preprint" in sys.argv:
-        pre = TEX.with_name("paper-arxiv.tex")
+        pre = TEX.with_name("paper-preprint.tex")
         # ^ and re.M: the first textual "\\usepackage{tmlr}" is in a COMMENT above the real line, and
         # count=1 without the anchor rewrote the comment and built a second anonymous copy.
         new, n = re.subn(r"^\\usepackage\{tmlr\}", r"\\usepackage[preprint]{tmlr}", tex, count=1, flags=re.M)
@@ -340,23 +344,29 @@ def main() -> int:
         pdf_p = pre.with_suffix(".pdf")
         if r.returncode == 0 and pdf_p.exists():
             from pypdf import PdfReader
-            t = " ".join((pg.extract_text() or "") for pg in PdfReader(str(pdf_p)).pages)
+            pages = PdfReader(str(pdf_p)).pages
+            t = " ".join((pg.extract_text() or "") for pg in pages)
             check("preprint names the author", "Messerlian" in t)
             check("preprint carries no TMLR review header or anonymity line",
                   "Under review" not in t and "Anonymous authors" not in t)
+            # preprints.org: the first page must give title, authors, abstract, KEYWORDS, contact and
+            # affiliations. The TMLR template has no keywords, so the preprint adds them.
+            first = " ".join((pages[0].extract_text() or "").split())
+            check("preprint page 1 has keywords and the contact address (preprints.org)",
+                  "Keywords:" in first and "alex.messerlian@icloud.com" in first)
             bbl = pre.with_suffix(".bbl")
             if bbl.exists():
-                names = write_arxiv_zip(new, bbl)
-                check(f"arXiv upload written: {ARXIV_ZIP.relative_to(ROOT)} ({len(names)} files)", True)
-                # The upload must build with nothing but its own contents, as it will on arXiv.
+                names = write_preprint_zip(new, bbl)
+                check(f"preprint upload written: {PREPRINT_ZIP.relative_to(ROOT)} ({len(names)} files)", True)
+                # The upload must build with nothing but its own contents, as it will for the server.
                 import tempfile, zipfile
                 with tempfile.TemporaryDirectory() as tmp:
-                    zipfile.ZipFile(ARXIV_ZIP).extractall(tmp)
+                    zipfile.ZipFile(PREPRINT_ZIP).extractall(tmp)
                     rz = subprocess.run(["tectonic", "paper.tex"], cwd=tmp, capture_output=True, text=True)
-                    check("the arXiv upload compiles on its own, from an empty folder", rz.returncode == 0,
+                    check("the preprint upload compiles on its own, from an empty folder", rz.returncode == 0,
                           rz.stderr.strip().splitlines()[-1] if rz.returncode else "")
             else:
-                check("arXiv upload written", False, "no .bbl from the preprint build -- a FAIL")
+                check("preprint upload written", False, "no .bbl from the preprint build -- a FAIL")
         clean_work(pre.stem)
         pre.unlink(missing_ok=True)
 

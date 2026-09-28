@@ -4,7 +4,7 @@
 \documentclass[10pt]{article}
 
 % SUBMISSION: plain \usepackage{tmlr} -> "Anonymous authors", "Under review as submission to TMLR".
-% arXiv: [preprint] (names shown, no TMLR header) -- tools/paper/check_paper.py --preprint builds
+% Preprint (preprints.org): [preprint] (names shown, no TMLR header) -- check_paper.py --preprint builds
 % that variant from this file, so there is one source. Camera-ready: [accepted], which also needs
 % \month, \year and \openreview defined (see the TMLR template).
 \usepackage{tmlr}
@@ -19,6 +19,14 @@
 \graphicspath{{figures/}}
 % The preprint prints no running head; drop the rule that would sit empty above it.
 \makeatletter\if@preprint\renewcommand{\headrulewidth}{0pt}\fi\makeatother
+% The first-page AI footnote TMLR's FAQ requires costs three lines; three paragraphs whose last line held
+% a word or two carry \looseness=-1, so the main text still ends on page 12. No word was changed.
+% preprints.org asks for keywords on the first page; the TMLR copy prints none.
+\makeatletter
+\newcommand{\preprintkeywords}{\if@preprint\par\medskip\noindent\textbf{Keywords:} on-device language
+  models; tool-augmented language models; evaluation methodology; quantization; embedded inference;
+  small language models\fi}
+\makeatother
 
 % Links as blue text without boxes, as in the author's other paper.
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
@@ -28,7 +36,7 @@
 
 \newcommand{\tok}[1]{\texttt{\small #1}}
 
-% DEANONYMIZED is true in the [preprint] (arXiv) and [accepted] builds -- tmlr.sty sets @accepted in
+% DEANONYMIZED is true in the [preprint] and [accepted] builds -- tmlr.sty sets @accepted in
 % both -- and false in the submission. The TMLR template: author contributions and acknowledgments
 % go in "only once your submission is accepted and deanonymized".
 \makeatletter
@@ -53,7 +61,8 @@
 \begin{abstract}
 We decided to test the limits by building a physics assistant that runs natively on a TI-Nspire CX
 II CAS graphing calculator: one ARM926EJ-S core at 396\,MHz, with no floating-point unit, a maximum
-single memory allocation of about 21.5\,MiB and no network. We use it as a case study in how the
+single memory allocation of about 21.5\,MiB and no network.\footnote{AI tools were used in this work;
+see \emph{Use of AI tools} in the Statements and Declarations for details.} We use it as a case study in how the
 conclusions of a tiny-model evaluation depend on what the evaluation runs. The 10.9M-parameter
 model never does the arithmetic itself: the runtime picks a relation from a store, puts it in the
 prompt with the question's values, and runs the tool call the model writes. Given the correct relation,
@@ -68,6 +77,7 @@ correct more often and incorrect less often on every set that asks for a number;
 reliably. Differences between our harness and the calculator moved strict accuracy by 9 to 21
 points and exposed an engine defect that a host--calculator comparison could not detect. A
 per-token cost model fitted on battery predicts a decode run within 0.4\%.
+\preprintkeywords
 \end{abstract}
 
 % ==================================================================================================
@@ -529,7 +539,7 @@ number or a refusal. The model writes the tool arguments and the text, and its m
 copying errors in the arguments and imprecise restatements of results. Section~\ref{sec:e2e} repeats
 this comparison behind the selector.
 
-\textbf{A smaller model.} Appendix~\ref{app:ladder} trains 3.1M- and 10.9M-parameter models the same way
+\looseness=-1 \textbf{A smaller model.} Appendix~\ref{app:ladder} trains 3.1M- and 10.9M-parameter models the same way
 on the current corpus (new models, not the shipped one), with two seeds each. The smaller model declines
 just as often when the prompt names a missing value (99.6\% at both widths), is correct 19.6 points less
 often when every value is given, mostly because of incorrect values in the call, and passes the explanation
@@ -664,7 +674,7 @@ not measure.
 \section{What a Token Costs}
 \label{sec:cost}
 
-We measure the cost of one decoded token by depth, width and position. Depth, position and the breakdown by
+\looseness=-1 We measure the cost of one decoded token by depth, width and position. Depth, position and the breakdown by
 stage come from one battery run of one benchmark. It times windows of 12 consecutive positions and reports
 their mean, which we place at the window's mean position. Width comes from a sweep in that session.
 
@@ -797,7 +807,7 @@ run at about a forty-eighth of the DRAM read speed, so we keep the model in memo
 \section{Limitations}
 \label{sec:limits}
 
-\textbf{The evaluation is synthetic.} Every item, including the fresh ones of Section~\ref{sec:e2e} but not the 2,000
+\looseness=-1 \textbf{The evaluation is synthetic.} Every item, including the fresh ones of Section~\ref{sec:e2e} but not the 2,000
 out-of-scope questions, comes from the generators that produced the training documents and uses the store's own
 symbols, with values the model has not seen. How often students' own wording and notation lead to a confident
 choice is not measured. Almost every call in the evaluation is to \tok{eval}, one of the seven tools, and we do

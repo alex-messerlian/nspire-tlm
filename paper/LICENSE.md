@@ -2,7 +2,7 @@
 
 Copyright (c) 2026 Alexander Messerlian
 
-The paper in this folder (`paper.tex`, `paper.pdf`, `paper-arxiv.pdf`, `references.bib` and the four figures in
+The paper in this folder (`paper.tex`, `paper.pdf`, `paper-preprint.pdf`, `references.bib` and the four figures in
 `figures/`) is licensed under the
 [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
 TMLR licenses every submission under CC BY 4.0 from the time of submission, and copyright stays with the author.

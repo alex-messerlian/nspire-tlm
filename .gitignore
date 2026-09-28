@@ -17,15 +17,15 @@ tools/eval/test_eval
 tools/eval/fuzz
 tools/eval/golden.txt
 tools/nspire-cli/nsp
-# paper build outputs; paper/paper.pdf and paper/paper-arxiv.pdf are tracked
+# paper build outputs; paper/paper.pdf and paper/paper-preprint.pdf are tracked
 paper/*.aux
 paper/*.bbl
 paper/*.blg
 paper/*.log
 paper/*.out
-paper/paper-arxiv.tex
-# the arXiv upload and the TMLR supplementary files, rebuilt by tools/paper/
-submission/arxiv-source.zip
+paper/paper-preprint.tex
+# the preprint's LaTeX upload and the TMLR supplementary files, rebuilt by tools/paper/
+submission/preprint-source.zip
 submission/supplementary.zip
 submission/supplementary/*.mp4
 

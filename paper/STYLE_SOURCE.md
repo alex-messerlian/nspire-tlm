@@ -20,5 +20,5 @@ paper does not use) and the two example PDFs.
 Build modes, one source (`paper.tex`):
 
 - submission: `\usepackage{tmlr}` (anonymous, "Under review as submission to TMLR")
-- arXiv: `\usepackage[preprint]{tmlr}`, built by `tools/paper/check_paper.py --preprint` as `paper-arxiv.pdf`
+- Preprint (preprints.org): `\usepackage[preprint]{tmlr}`, built by `tools/paper/check_paper.py --preprint` as `paper-preprint.pdf`
 - camera-ready: `\usepackage[accepted]{tmlr}` plus `\month`, `\year`, `\openreview`
