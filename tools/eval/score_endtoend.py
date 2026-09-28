@@ -48,8 +48,9 @@ import score_correct as S                                     # noqa: E402  (ref
 ANSWER = ("answer_0", "answer_s", "answer_w", "answer_x")
 DECLINE = ("d1", "d1_zero")
 # MODEL_BIN scores another int8 file with everything else unchanged (docs/PREREG_FULL_TRAINING.md scores
-# the full-length model BEFORE it replaces the shipped one); the default is the shipped file.
-MODEL = pathlib.Path(os.environ.get("MODEL_BIN", ROOT / "build/transfer/model4096.bin.tns"))
+# the full-length model BEFORE it replaces the shipped one); the default is the shipped file. A
+# relative MODEL_BIN is taken from the repository root, where every generation runs.
+MODEL = ROOT / os.environ.get("MODEL_BIN", "build/transfer/model4096.bin.tns")
 OOS_N = 2000
 
 
@@ -148,7 +149,8 @@ def main(dest=None):
     # AUTOASM_BIN: an earlier revision's selector, built by selection_holdout.autoasm_for, so the
     # A155 and A156 columns can be re-scored on another model; the default is the working tree's.
     binary = os.environ.get("AUTOASM_BIN")
-    out = {"model": str(MODEL.relative_to(ROOT)), "decoding": "greedy-int8",
+    shown = MODEL.relative_to(ROOT) if MODEL.is_relative_to(ROOT) else MODEL
+    out = {"model": str(shown), "decoding": "greedy-int8",
            "selection": f"app.c open_picker ({binary or 'build/autoasm'})", "arms": {}}
     print(f"\n  {'arm':12s} {'n':>5s}  {'choice right':>12s} {'wrong':>6s} {'none':>6s}   "
           f"{'result correct':>14s} {'declined':>9s} {'wrong':>6s}")
