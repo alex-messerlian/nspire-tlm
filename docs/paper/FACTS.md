@@ -334,9 +334,11 @@ times, `R` once). Sources:
 `results/{correct,arms}_int8_g16_full_d352.json`, `results/correct_fp32_greedy_device_full_d352.json`,
 `results/compare_full_training.txt`.
 
-**Decision:** five of seven decline measures are worse, so by the rule the 8,000-step model stays.
-Whether to ship the full-length model anyway is the author's decision (the paper says "fully
-trained"); until then every other section of this sheet describes the 8,000-step model.
+**Decision (the author, 2026-09-28):** keep the 8,000-step model, as the rule decided. The paper reports
+this run in Section 6 ("A fully trained version": 216 vs 222 declines, 115 vs 116 values given, 436 vs 426
+of 480 answerable) and no longer says "fully trained" of the shipped model (Table 1, Section 4). Every other
+section of this sheet describes the 8,000-step model, which is what ships. A version of the paper that
+shipped this model instead was drafted and not used.
 
 ## 9. Width ladder -- corrected 2026-09-25, on the calculator's decoder at group 16
 

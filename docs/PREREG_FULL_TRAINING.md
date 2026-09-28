@@ -94,3 +94,7 @@ refusals.
 trained" into the paper before this result existed. Keeping the rule's outcome means that wording
 changes; shipping the 17,750-step model means overriding the rule stated here, which must then be
 reported with this table.
+
+**The author's decision (2026-09-28): keep the 8,000-step model**, as the rule decided. The paper
+reports the run in Section 6, and "fully trained" is corrected to "trained from scratch" in Table 1
+and Section 4.
