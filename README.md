@@ -46,7 +46,9 @@ release.*
 
 It was built and tested on a TI-Nspire CX II CAS with OS 6.4.0.74. The setup document supports OS 6.2.0 to 6.4.0.
 
-1. From the [release](https://github.com/alex-messerlian/nspire-tlm/releases), download the six calculator files.
+1. From the [release](https://github.com/alex-messerlian/nspire-tlm/releases), download
+   `chattlm-calculator-files.zip`, which holds the `chattlm` folder laid out as below, or the six calculator files
+   one by one.
 2. Copy them to the calculator in this layout (the folder names matter, and all three data files must be together):
 
    ```text
