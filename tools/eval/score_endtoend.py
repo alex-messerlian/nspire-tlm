@@ -47,7 +47,9 @@ import score_correct as S                                     # noqa: E402  (ref
 
 ANSWER = ("answer_0", "answer_s", "answer_w", "answer_x")
 DECLINE = ("d1", "d1_zero")
-MODEL = ROOT / "build/transfer/model4096.bin.tns"
+# MODEL_BIN scores another int8 file with everything else unchanged (docs/PREREG_FULL_TRAINING.md scores
+# the full-length model BEFORE it replaces the shipped one); the default is the shipped file.
+MODEL = pathlib.Path(os.environ.get("MODEL_BIN", ROOT / "build/transfer/model4096.bin.tns"))
 OOS_N = 2000
 
 
@@ -143,8 +145,11 @@ def main(dest=None):
     S.controls(tables)                       # answer grader: positive and negative controls
     selection_control([it for arm in ANSWER for it, _ in tables[arm][0]])
 
+    # AUTOASM_BIN: an earlier revision's selector, built by selection_holdout.autoasm_for, so the
+    # A155 and A156 columns can be re-scored on another model; the default is the working tree's.
+    binary = os.environ.get("AUTOASM_BIN")
     out = {"model": str(MODEL.relative_to(ROOT)), "decoding": "greedy-int8",
-           "selection": "app.c open_picker (build/autoasm)", "arms": {}}
+           "selection": f"app.c open_picker ({binary or 'build/autoasm'})", "arms": {}}
     print(f"\n  {'arm':12s} {'n':>5s}  {'choice right':>12s} {'wrong':>6s} {'none':>6s}   "
           f"{'result correct':>14s} {'declined':>9s} {'wrong':>6s}")
     arms = [(a, [it for it, _ in tables[a][0]], [r for _, r in tables[a][0]]) for a in ANSWER]
@@ -154,7 +159,7 @@ def main(dest=None):
     arms.append(("out_of_scope", [{"q": q, "record": None} for q in stems], None))
     for arm, items, refs in arms:
         skipped = len(tables[arm][1]) if arm in tables else 0
-        rows = run_arm(arm, items, refs)
+        rows = run_arm(arm, items, refs, binary=binary)
         s, r, n = tally(rows, "selection"), tally(rows, "result"), len(rows)
         if arm == "fit":          # "right" here is the bound but INAPPLICABLE relation
             s = {"chose_inapplicable": s.get("right", 0), "wrong": s.get("wrong", 0),
