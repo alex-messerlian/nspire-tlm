@@ -539,8 +539,8 @@ steps do not hold convergence constant.
 \textbf{Training longer.} Trained on the current corpus for 17,750 steps instead of 8,000, 20 tokens per
 parameter \citep{hoffmann2022training}, the shipped configuration is correct on 436 rather than 426 of the
 480 answerable items (427 rather than 385 strictly), but declines on only 216 of the 222 that lack a value,
-three of them answered with a tool call that should not exist, so a rule we fixed before training kept the
-shipped model. The seed-1 model of Appendix~\ref{app:ladder}, which stops at 8,000 steps on that corpus,
+and three of the six it answers get a tool call that should not exist, so a rule we fixed before training
+kept the shipped model. The seed-1 model of Appendix~\ref{app:ladder}, which stops at 8,000 steps on that corpus,
 shows the same trade.
 
 % ==================================================================================================
