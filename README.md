@@ -4,7 +4,8 @@
 ORCID [0009-0003-4933-6832](https://orcid.org/0009-0003-4933-6832)
 
 **Paper:** [`paper/paper.pdf`](paper/paper.pdf), the anonymous copy for TMLR's double-blind review, and
-[`paper/paper-preprint.pdf`](paper/paper-preprint.pdf), the named preprint.
+[`paper/paper-preprint.pdf`](paper/paper-preprint.pdf), the named preprint, which is public on
+[Preprints.org](https://www.preprints.org/manuscript/202609.2599).
 
 ChatTLM is a physics assistant that runs entirely on a TI-Nspire CX II CAS: a 10.9M-parameter language
 model, an int8 inference engine written in C, and a runtime that does the arithmetic the model asks for.
@@ -197,10 +198,11 @@ If you use this work, please cite:
 
 ```bibtex
 @misc{messerlian2026calculator,
-  author = {Alexander Messerlian},
-  title  = {Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator},
-  year   = {2026},
-  note   = {Manuscript}
+  author       = {Alexander Messerlian},
+  title        = {Letting the Tools Do the Math: A 10.9M-Parameter Language Model on a Graphing Calculator},
+  howpublished = {Preprints.org, preprint 202609.2599},
+  year         = {2026},
+  url          = {https://www.preprints.org/manuscript/202609.2599}
 }
 ```
 
