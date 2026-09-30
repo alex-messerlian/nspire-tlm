@@ -51,6 +51,24 @@ MARKERS = ("o", "s", "^")
 COL_W = 3.15         # half the TMLR text width: figures are set in pairs at 0.49\linewidth
 PT = 1 / 72
 
+# PLOS MODE (make_plos.py): PLOS takes TIFF only, text in "Arial, Times, or Symbol font in 8-12 point",
+# and figures no wider than the 5.2-inch text column (journals.plos.org/plosone/s/figures, read
+# 2026-09-30). The default mode is untouched: fs() and size() are identities there, so the PDFs the
+# paper uses keep their bytes, which check_paper.py compares.
+PLOS = False
+PLOS_W = 5.2         # inches: the PLOS text column
+PLOS_DPI = 600
+H_SCALE = 1.0        # PLOS mode scales each height with the width, keeping the figure's shape
+MIN_FS = 0.0         # PLOS mode: no text below 8 pt
+
+
+def fs(size: float) -> float:
+    return max(size, MIN_FS)
+
+
+def size(h: float) -> tuple[float, float]:
+    return (COL_W, h * H_SCALE)
+
 
 def style() -> None:
     plt.rcParams.update({
@@ -63,6 +81,11 @@ def style() -> None:
         "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
         "legend.frameon": False, "pdf.fonttype": 42,   # embed TrueType, as venues require
     })
+    if PLOS:
+        plt.rcParams.update({
+            "font.family": "Arial", "font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9,
+            "xtick.labelsize": 8, "ytick.labelsize": 8, "legend.fontsize": 8,
+        })
 
 
 LADDER_RUNS = ("w176", "w176s2", "w352", "w352s2")
@@ -165,7 +188,7 @@ def _ols(pts):
 def fig_position(fw: dict) -> str:
     """Per-token cost vs position, with the KV cache empty (the old sweep) and FILLED (real decode).
     The gap between the two lines is the finding: attention over zero rows is cheaper on soft-float."""
-    fig, ax = plt.subplots(figsize=(COL_W, 2.0))
+    fig, ax = plt.subplots(figsize=size(2.0))
     series = [("filled cache (real decode)", fw["filled"], S1, "o"),
               ("empty cache", fw["pos"], S2, "s")]
     for label, pts, col, mk in series:
@@ -191,12 +214,12 @@ def fig_stages(fw: dict) -> str:
     major = sorted([(n, us) for n, us, _ in fw["stages"] if us / total >= 0.02], key=lambda s: s[1])
     other = total - sum(us for _, us in major)      # 7 small stages + 0.3% unattributed
     rows = [("everything else", other)] + major
-    fig, ax = plt.subplots(figsize=(COL_W, 1.7))
+    fig, ax = plt.subplots(figsize=size(1.7))
     y = range(len(rows))
     ax.barh(list(y), [us / total * 100 for _, us in rows], height=0.55, color=S1, edgecolor=SURFACE, linewidth=0)
     ax.set_yticks(list(y), [STAGE_NAME.get(n, n) for n, _ in rows], color=INK2)
     for i, (_, us) in enumerate(rows):
-        ax.text(us / total * 100 + 1, i, f"{us / total * 100:.1f}%", va="center", color=INK, fontsize=7)
+        ax.text(us / total * 100 + 1, i, f"{us / total * 100:.1f}%", va="center", color=INK, fontsize=fs(7))
     ax.set_xlabel("% of per-token time"); ax.set_xlim(0, 68)
     ax.grid(axis="y", visible=False)
     return save(fig, "fig_stages")
@@ -214,7 +237,7 @@ def fig_frontier(sw: dict) -> str:
         a = t["us8"] - 14.5 * t["per_pos"]
         pts.append((params_for(dim) / 1e6, dim, a, t["per_pos"]))
     pts.sort()
-    fig, ax = plt.subplots(figsize=(COL_W, 2.1))
+    fig, ax = plt.subplots(figsize=size(2.1))
     # Positions 8 and 256 are the two MEASURED points per shape (Table 2 quotes the same two);
     # 128 is linear between them and is labelled as interpolated rather than passed off as measured.
     for (pos, col, mk, lab) in zip((14.5, 128, 262.5), (S1, S2, S3), MARKERS,
@@ -223,11 +246,11 @@ def fig_frontier(sw: dict) -> str:
         ax.plot(xs, ys, color=col, lw=1.5, marker=mk, ms=4.5, mec=SURFACE, mew=1.0, label=lab,
                 linestyle="--" if pos == 128 else "-")
     ax.axhline(2.0, color=MUTED, lw=0.8, zorder=1)
-    ax.text(0.3, 2.08, "2 tok/s", color=MUTED, fontsize=6.5, va="bottom")
+    ax.text(0.3, 2.08, "2 tok/s", color=MUTED, fontsize=fs(6.5), va="bottom")
     nf = sorted({(params_for(v["dim"]) / 1e6, v["dim"]) for v in sw["need"].values() if not v["fits"]})
     for x, d in nf:     # a TESTED failure: the engine tried to load it on hardware and could not
         ax.scatter([x], [0.35], marker="x", s=28, color=INK2, linewidth=1.2, zorder=3)
-        ax.text(x, 0.75, f"width {d}\ndid not load", ha="center", va="bottom", color=INK2, fontsize=6.5)
+        ax.text(x, 0.75, f"width {d}\ndid not load", ha="center", va="bottom", color=INK2, fontsize=fs(6.5))
     nf = [x for x, _ in nf]
     ax.set_xlabel("parameters (millions)"); ax.set_ylabel("tokens per second")
     ax.set_xlim(0, max(nf + [pts[-1][0]]) + 1.5); ax.set_ylim(0, None)
@@ -262,7 +285,7 @@ def fig_memory(sw: dict) -> str:
     uniq.append(g32_d384())
     uniq.sort(key=lambda r: r["dim"])
     MiB = 2 ** 20
-    fig, ax = plt.subplots(figsize=(COL_W, 1.95))
+    fig, ax = plt.subplots(figsize=size(1.95))
     x = range(len(uniq))
     ck = [r["file"] / MiB for r in uniq]; kv = [r["kv"] / MiB for r in uniq]
     hatch = ["//" if r["layout"] == "group 32" else "" for r in uniq]
@@ -275,9 +298,9 @@ def fig_memory(sw: dict) -> str:
     hi = min(t_ for t_, r in zip(tot, uniq) if not r["fits"])
     ax.axhspan(lo, hi, color=GRID, alpha=0.9, zorder=0, linewidth=0)
     ax.text(-0.35, hi + 0.5, f"limit on the total: {lo:.1f} to {hi:.1f} MiB", ha="left",
-            color=INK2, fontsize=6.5)
+            color=INK2, fontsize=fs(6.5))
     for i, r in enumerate(uniq):
-        ax.text(i, tot[i] + 0.4, f"{tot[i]:.1f}", ha="center", color=INK, fontsize=6.5)
+        ax.text(i, tot[i] + 0.4, f"{tot[i]:.1f}", ha="center", color=INK, fontsize=fs(6.5))
     ax.set_xticks(list(x), [f"{r['dim']}\n{'loads' if r['fits'] else 'did not load'}" for r in uniq])
     ax.set_xlabel("width (384: group-32 layout, hatched)")
     ax.set_ylabel("MiB held at once")
@@ -290,7 +313,7 @@ def fig_ladder(ld: dict) -> str:
     arms = [("d1", "decline:\nvalue missing"), ("compute", "numeric\nanswer correct"),
             ("explain", "explanation\nformat"), ("fit", "judge\nfit")]
     widths = sorted(ld)
-    fig, ax = plt.subplots(figsize=(COL_W, 2.0))
+    fig, ax = plt.subplots(figsize=size(2.0))
     bw = 0.34
     for j, (w, col) in enumerate(zip(widths, (S1, S2))):
         means = [sum(ld[w][a]) / len(ld[w][a]) for a, _ in arms]
@@ -302,7 +325,7 @@ def fig_ladder(ld: dict) -> str:
             if len(ld[w][a]) > 1:                     # individual training seeds as dots
                 ax.scatter([xs[i]] * len(ld[w][a]), ld[w][a], s=9, color=INK, zorder=3, linewidth=0)
             top = max([means[i]] + ld[w][a])       # clear the highest seed dot, not just the bar
-            ax.text(xs[i], top + 4.0, f"{means[i]:.0f}", ha="center", color=INK, fontsize=6.5)
+            ax.text(xs[i], top + 4.0, f"{means[i]:.0f}", ha="center", color=INK, fontsize=fs(6.5))
     ax.set_xticks(range(len(arms)), [lbl for _, lbl in arms], color=INK2)
     ax.set_ylabel("items passed (%)"); ax.set_ylim(0, 116); ax.grid(axis="x", visible=False)
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncols=2)
@@ -311,6 +334,8 @@ def fig_ladder(ld: dict) -> str:
 
 def save(fig, name: str) -> str:
     fig.tight_layout(pad=0.3)
+    if PLOS:
+        return save_tiff(fig, name)
     p = OUT / f"{name}.pdf"
     # No CreationDate: the same data then gives the same bytes, so a rebuild shows no false change.
     fig.savefig(p, metadata={"CreationDate": None})
@@ -321,11 +346,29 @@ def save(fig, name: str) -> str:
     return p.name
 
 
-def main(out: str | None = None) -> None:
-    """Draw every figure into paper/figures/, or into `out` (then without PNG previews)."""
-    global OUT, PREVIEW_ON
+def save_tiff(fig, name: str) -> str:
+    """PLOS: an RGB 8-bit TIFF with LZW compression (its guidelines require both), at 600 dpi. The
+    canvas renders RGBA, so the alpha channel is dropped here rather than left for PLOS's checker."""
+    import io
+
+    from PIL import Image
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=PLOS_DPI)
+    plt.close(fig)
+    p = OUT / f"{name}.tif"
+    Image.open(buf).convert("RGB").save(p, compression="tiff_lzw", dpi=(PLOS_DPI, PLOS_DPI))
+    return p.name
+
+
+def main(out: str | None = None, plos: bool = False) -> None:
+    """Draw every figure into paper/figures/, or into `out` (then without PNG previews). plos=True
+    draws the same figures as PLOS TIFFs instead: Arial, 8 pt at least, the 5.2-inch column."""
+    global OUT, PREVIEW_ON, PLOS, COL_W, H_SCALE, MIN_FS
     if out:
         OUT, PREVIEW_ON = Path(out), False
+    if plos:
+        PLOS, H_SCALE, MIN_FS = True, PLOS_W / COL_W, 8.0
+        COL_W = PLOS_W
     style()
     fw, sw, ld = parse_forward(), parse_sweep(), parse_ladder()
     # fig_ladder is no longer in the paper (Table 7 carries the ladder); it is not written, so the
@@ -339,4 +382,4 @@ def main(out: str | None = None) -> None:
 
 if __name__ == "__main__":
     import sys
-    main(sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else None)
+    main(sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else None, plos="--plos" in sys.argv)
