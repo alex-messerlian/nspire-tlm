@@ -92,7 +92,7 @@ TEXT_CHANGES = [
 # used word for word; this adds the parts PLOS asks for that it does not state. FOR THE AUTHOR TO CONFIRM.
 AI_STATEMENT = (
     "Claude Opus~5 and Claude Opus~5.5 (Anthropic) were used to help develop the software, run host-side "
-    "tests, train the model. The author conceived and directed the project "
+    "tests, and train the model. The author conceived and directed the project "
     "and all of its agentic workflows, made every measurement on the calculator, checked every reported "
     "result against the logged data, and revised and edited the manuscript.")
 
