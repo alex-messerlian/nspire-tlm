@@ -30,6 +30,8 @@ submission/supplementary.zip
 submission/supplementary/*.mp4
 # the PLOS ONE submission, rebuilt by tools/paper/make_plos.py, and its drafts (kept local)
 submission/plos/
+# the Zenodo upload: the v1.0 release files and a source archive (kept local)
+submission/zenodo/
 
 # ---- data that lives outside git ----------------------------------------------------------------
 # the Ndless SDK, llama2.c and libnspire (tools/fetch_vendor.sh); no trailing slash, so a symlink matches too

@@ -90,12 +90,11 @@ TEXT_CHANGES = [
 # affected, and say "how the user evaluated the validity of the tool's outputs"; for authors it goes "in
 # the body of the article ... in the Acknowledgement section". paper.tex's own "Use of AI tools" item is
 # used word for word; this adds the parts PLOS asks for that it does not state. FOR THE AUTHOR TO CONFIRM.
-AI_ADDITION = (
-    "The same models drafted the explanation documents in the training corpus and ran the reading passes "
-    "that checked a sample of it (see ``\\nameref{sec:data}''). Their output was checked in three ways: "
-    "every figure is redrawn by a script from the logged results and compared byte for byte with the "
-    "figure in the article, every photograph is checked against the frame of the recording it was cut "
-    "from, and the accuracy results are computed with the calculator's own decoder code.")
+AI_STATEMENT = (
+    "Claude Opus~5 and Claude Opus~5.5 (Anthropic) were used to help develop the software, run host-side "
+    "tests, train the model. The author conceived and directed the project "
+    "and all of its agentic workflows, made every measurement on the calculator, checked every reported "
+    "result against the logged data, and revised and edited the manuscript.")
 
 results: list[tuple[str, bool, str]] = []
 
@@ -387,8 +386,7 @@ def build_main(tex: str) -> tuple[str, dict]:
     si = "\\section*{Supporting information}\n\n" + "\n\n".join(
         f"\\paragraph*{{{name}.}}\n\\label{{{lbl}}}\n\\textbf{{{title}.}} {legend}"
         for lbl, name, title, legend in SI.values())
-    ai = " ".join(items["Use of AI tools"].split())
-    ack = f"\\section*{{Acknowledgments}}\n\n{ai} {AI_ADDITION}\n\n{' '.join(items['Trademarks'].split())}"
+    ack = f"\\section*{{Acknowledgments}}\n\n{AI_STATEMENT}\n\n{' '.join(items['Trademarks'].split())}"
     doc = (front(abstract) + text.strip() + "\n\n" + si + "\n\n" + ack +
            "\n\n\\nolinenumbers\n\n\\bibliography{references}\n\n\\end{document}\n")
     return doc, {"items": items, "order": order, "appendix": appendix, "abstract": abstract}
@@ -579,7 +577,7 @@ def verify(doc: str, info: dict, labels: dict, figs: list[Path]) -> None:
     check("both appendices built", set(info.get("si_docs", {})) == {v[0] for v in SI.values()})
     ack = body.split("\\section*{Acknowledgments}", 1)[1]
     check("the AI disclosure is in the Acknowledgments, naming the tools",
-          "Claude Opus" in ack and "Claude Code" in ack)
+          "Claude Opus" in ack and "Anthropic" in ack)
     for f in figs:
         im = Image.open(f)
         dpi = float(im.info["dpi"][0])
